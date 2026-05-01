@@ -1,0 +1,9 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lime rounded square background -->
+  <rect width="200" height="200" rx="44" ry="44" fill="#C5E86C"/>
+  <!-- Midi M mark extracted from official logo, recentered and scaled -->
+  <g transform="translate(22, 35) scale(0.78)">
+    <path d="M143.512 117.913H107.027V318.914H145.927C145.927 232.586 145.927 198.296 143.782 181.595L204.411 270.472L264.506 181.595C262.361 198.296 262.361 192.104 262.361 277.868H301.26V117.913H264.506L204.141 205.661L143.512 117.913Z" fill="#26213F" transform="translate(-107, -117)"/>
+    <circle cx="205" cy="208" r="18" fill="#26213F"/>
+  </g>
+</svg>

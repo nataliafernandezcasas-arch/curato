@@ -1,0 +1,12 @@
+{
+  "name": "midi-pass-playwright",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "upload": "node upload.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}
