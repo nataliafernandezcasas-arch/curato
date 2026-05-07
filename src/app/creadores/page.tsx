@@ -215,7 +215,7 @@ export default function CreadoresPage() {
             </motion.p>
             <motion.div {...fade(0.25)}>
               <Link
-                href="/auth/sign-in"
+                href="/candidature"
                 className="inline-block font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne px-10 py-4 hover:bg-copper transition-all duration-300"
               >
                 Demander une invitation
