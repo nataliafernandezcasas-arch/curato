@@ -36,6 +36,13 @@ export default function CandidaturePage() {
         message: form.message || null,
       });
       if (dbError) throw dbError;
+
+      await fetch("/api/candidature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, name: form.name, email: form.email.toLowerCase().trim() }),
+      });
+
       setSubmitted(true);
     } catch {
       setError("Une erreur s'est produite. Veuillez réessayer.");
