@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import MidiLogo from "@/components/midi-logo";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -21,53 +20,61 @@ function VerifyForm() {
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
-      const { data, error: verifyError } = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
+      const { error: verifyError } = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
       if (verifyError) {
-        // Try magiclink type as fallback
-        const { data: data2, error: verifyError2 } = await supabase.auth.verifyOtp({ email, token: code, type: "magiclink" });
-        if (verifyError2) { setError("Código inválido o expirado."); return; }
+        const { error: verifyError2 } = await supabase.auth.verifyOtp({ email, token: code, type: "magiclink" });
+        if (verifyError2) { setError("Code invalide ou expiré."); return; }
       }
-      // Force redirect
       window.location.href = "/dashboard";
     } catch {
-      setError("Error de conexión.");
+      setError("Erreur de connexion.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border border-border rounded-xl p-7 space-y-5">
-      <div className="text-center pb-2">
-        <p className="text-sm text-text-muted">Enviamos un código a</p>
-        <p className="text-sm font-semibold text-text-primary">{email}</p>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="text-center mb-8">
+        <p className="font-serif text-[13px] font-light text-text-muted tracking-wide">
+          Code envoyé à
+        </p>
+        <p className="font-serif text-[15px] font-light text-text-primary mt-1">{email}</p>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-text-secondary mb-2 uppercase tracking-wide">Código</label>
+        <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+          Code de vérification
+        </label>
         <input
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
           required
           maxLength={6}
-          className="w-full px-4 py-4 rounded-lg border border-border bg-surface text-text-primary text-center text-2xl tracking-[0.5em] font-bold focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all"
+          className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-2xl text-center tracking-[0.5em] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/30"
           placeholder="000000"
         />
       </div>
 
       {error && (
-        <div className="bg-midi-orange/8 border border-midi-orange/15 text-midi-orange text-sm p-3 rounded-lg">
+        <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">
           {error}
-        </div>
+        </p>
       )}
 
-      <button type="submit" disabled={loading || code.length !== 6} className="w-full bg-text-primary text-white text-[13px] font-semibold py-3 rounded-lg hover:bg-accent transition-all duration-400 disabled:opacity-50 active:scale-[0.97]">
-        {loading ? "Verificando..." : "Verificar"}
+      <button
+        type="submit"
+        disabled={loading || code.length !== 6}
+        className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
+      >
+        {loading ? "Vérification…" : "Accéder"}
       </button>
 
-      <p className="text-center text-[11px] text-text-muted">
-        <Link href="/auth/sign-in" className="text-accent hover:text-text-primary transition-colors">Cambiar email</Link>
+      <p className="text-center font-serif text-[12px] font-light text-text-muted/60 tracking-wide">
+        <Link href="/auth/sign-in" className="text-champagne/60 hover:text-champagne transition-colors">
+          Changer d'adresse e-mail
+        </Link>
       </p>
     </form>
   );
@@ -75,16 +82,32 @@ function VerifyForm() {
 
 export default function VerifyPage() {
   return (
-    <div className="min-h-[100dvh] bg-surface flex items-center justify-center px-5">
-      <div className="max-w-[380px] w-full">
-        <div className="text-center mb-10">
-          <Link href="/" aria-label="Midi Pass" className="inline-flex items-center gap-2 text-text-primary">
-            <MidiLogo className="h-7 w-auto" />
-            <span className="text-xl font-semibold tracking-tight leading-none">Pass</span>
+    <div className="min-h-[100dvh] relative flex items-center justify-center px-5">
+      {/* Background */}
+      <div className="absolute inset-0">
+        <img
+          src="/hero-floral.jpeg"
+          alt=""
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-charcoal-deep/80 backdrop-blur-sm" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-[400px]">
+        {/* Logo */}
+        <div className="text-center mb-12">
+          <Link href="/" className="inline-block mb-8">
+            <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
           </Link>
-          <h1 className="text-2xl font-extralight tracking-tighter text-text-primary mt-6">Verifica tu email</h1>
+          <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
+            Vérification
+          </h1>
+          <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">
+            Saisissez le code reçu par e-mail
+          </p>
         </div>
-        <Suspense fallback={<div className="text-center text-text-muted text-sm">Cargando...</div>}>
+
+        <Suspense fallback={<div className="text-center font-serif text-[13px] text-text-muted">Chargement…</div>}>
           <VerifyForm />
         </Suspense>
       </div>

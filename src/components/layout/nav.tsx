@@ -4,24 +4,41 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { List, X } from "@phosphor-icons/react";
-import MidiLogo from "../midi-logo";
 
 export default function Nav() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: "/", label: "Home" },
-    { href: "/creadores", label: "Creadores" },
-    { href: "/comercios", label: "Comercios" },
+    { href: "/creadores", label: "Créateurs" },
+    { href: "/comercios", label: "Maisons" },
   ];
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-border">
-      <div className="max-w-[1200px] mx-auto px-5 h-14 flex items-center justify-between">
-        <Link href="/" aria-label="Midi Pass" className="inline-flex items-baseline gap-1.5 text-text-primary">
-          <MidiLogo className="h-[14px] w-auto self-center" />
-          <span className="text-lg font-semibold tracking-tight leading-none">Pass</span>
+    <nav className="fixed top-0 w-full z-50 border-b border-white/10 overflow-hidden">
+      {/* Floral background from logo */}
+      <div className="absolute inset-0">
+        <img
+          src="/Logo Curato.png"
+          alt=""
+          className="w-full h-full object-cover object-center scale-110"
+          style={{ filter: "brightness(0.35)" }}
+        />
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      </div>
+
+      {/* Nav content */}
+      <div className="relative z-10 max-w-[1200px] mx-auto px-5 h-16 flex items-center justify-between">
+        <Link href="/" aria-label="Curato" className="block">
+          <img
+            src="/logo-curato-simple.png"
+            alt="curato"
+            style={{
+              height: "14px",
+              width: "auto",
+              display: "block",
+            }}
+          />
         </Link>
 
         {/* Desktop */}
@@ -30,49 +47,56 @@ export default function Nav() {
             <Link
               key={l.href}
               href={l.href}
-              className={`text-[13px] font-medium px-3.5 py-1.5 rounded-lg transition-all duration-300 ${
+              className={`font-serif text-[14px] font-light px-4 py-1.5 tracking-wider transition-all duration-300 ${
                 path === l.href
-                  ? "text-text-primary bg-surface-hover"
-                  : "text-text-secondary hover:text-text-primary hover:bg-surface-hover/50"
+                  ? "text-champagne"
+                  : "text-white/60 hover:text-champagne"
               }`}
             >
               {l.label}
             </Link>
           ))}
-          <div className="w-px h-5 bg-border mx-2" />
-          <Link href="/auth/sign-in" className="text-[13px] font-semibold text-white bg-text-primary px-4 py-1.5 rounded-lg hover:bg-accent transition-all duration-300 active:scale-[0.97]">
-            Sign In
+          <div className="w-px h-4 bg-white/15 mx-3" />
+          <Link
+            href="/auth/sign-in"
+            className="font-serif text-[13px] font-light tracking-widest text-charcoal-deep bg-champagne px-5 py-1.5 hover:bg-copper transition-all duration-300"
+          >
+            Accéder
           </Link>
         </div>
 
         {/* Mobile toggle */}
         <div className="flex md:hidden items-center gap-3">
-          <Link href="/auth/sign-in" className="text-[12px] font-semibold text-white bg-text-primary px-3.5 py-1.5 rounded-lg active:scale-[0.97]">
-            Sign In
-          </Link>
-          <button onClick={() => setOpen(!open)} className="text-text-primary p-1">
-            {open ? <X size={22} /> : <List size={22} />}
+          <button onClick={() => setOpen(!open)} className="text-champagne p-1">
+            {open ? <X size={20} /> : <List size={20} />}
           </button>
         </div>
       </div>
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-surface border-t border-border px-5 py-4 space-y-1">
+        <div className="relative z-10 md:hidden border-t border-white/10 px-5 py-6 space-y-2 bg-black/60 backdrop-blur-md">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className={`block text-[15px] font-medium py-2.5 px-3 rounded-lg transition-all ${
-                path === l.href
-                  ? "text-text-primary bg-surface-hover"
-                  : "text-text-secondary"
+              className={`block font-serif text-[18px] font-light py-2 tracking-wider transition-all ${
+                path === l.href ? "text-champagne" : "text-white/60"
               }`}
             >
               {l.label}
             </Link>
           ))}
+          <div className="pt-4">
+            <Link
+              href="/auth/sign-in"
+              onClick={() => setOpen(false)}
+              className="inline-block font-serif text-[13px] tracking-widest text-charcoal-deep bg-champagne px-6 py-2 hover:bg-copper transition-all duration-300"
+            >
+              Accéder
+            </Link>
+          </div>
         </div>
       )}
     </nav>
