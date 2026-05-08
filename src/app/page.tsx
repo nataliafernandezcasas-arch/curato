@@ -102,15 +102,15 @@ export default function Home() {
         {/* ── LE MODÈLE ── */}
         <section className="py-28 md:py-36 border-t border-border">
           <div className="max-w-[1200px] mx-auto px-5">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-              <div className="lg:col-span-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-start">
+              <div className="md:col-span-4">
                 <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">Le modèle</motion.p>
                 <motion.h2 {...fade(0.1)} className="font-serif text-4xl md:text-5xl font-light tracking-[0.35em] uppercase leading-[1.05] text-text-primary">
                   Un écosystème où{" "}
                   <span className="text-champagne">tout le monde gagne.</span>
                 </motion.h2>
               </div>
-              <div className="lg:col-span-8 lg:pt-10 space-y-10">
+              <div className="md:col-span-8 md:pt-10 space-y-10">
                 <motion.div {...fade(0.2)} className="border-l border-champagne/25 pl-8">
                   <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-3">Pour les créateurs</p>
                   <p className="font-serif text-[18px] font-light text-text-secondary leading-relaxed">
