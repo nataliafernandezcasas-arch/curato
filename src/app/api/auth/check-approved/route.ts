@@ -1,17 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();
-    if (!email) return NextResponse.json({ error: "Email requerido" }, { status: 400 });
-
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    if (!email) return NextResponse.json({ approved: false, message: "Email requis." });
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("Missing Supabase env vars");
+      return NextResponse.json({ approved: false, message: "Votre candidature est en cours d'examen. Nous vous contacterons prochainement." });
+    }
+
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data, error } = await supabase
       .from("applications")
@@ -21,13 +26,13 @@ export async function POST(request: NextRequest) {
       .limit(1)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase error:", error);
+      return NextResponse.json({ approved: false, message: "Votre candidature est en cours d'examen. Nous vous contacterons prochainement." });
+    }
 
     if (!data) {
-      return NextResponse.json({
-        approved: false,
-        message: "No encontramos una candidature avec cet e-mail. Candidatez d'abord.",
-      });
+      return NextResponse.json({ approved: false, message: "Aucune candidature trouvée avec cet e-mail. Candidatez d'abord." });
     }
 
     if (data.status === "approved") {
@@ -35,12 +40,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ approved: true, type });
     }
 
-    return NextResponse.json({
-      approved: false,
-      message: "Votre candidature est en cours d'examen. Nous vous contacterons prochainement.",
-    });
+    return NextResponse.json({ approved: false, message: "Votre candidature est en cours d'examen. Nous vous contacterons prochainement." });
   } catch (err) {
     console.error("Check approved error:", err);
-    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+    return NextResponse.json({ approved: false, message: "Votre candidature est en cours d'examen. Nous vous contacterons prochainement." });
   }
 }
