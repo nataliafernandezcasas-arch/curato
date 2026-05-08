@@ -43,17 +43,18 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
     try {
       const res = await fetch("/api/admin/applications", {
         method: "PATCH",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: app.id, status }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         onUpdate(app.id, status);
       } else {
-        const data = await res.json().catch(() => ({}));
-        setErr(data.error || "Error al actualizar");
+        setErr(`Error ${res.status}: ${data.error || "desconocido"}`);
       }
-    } catch {
-      setErr("Error de conexión");
+    } catch (e) {
+      setErr(`Error: ${e instanceof Error ? e.message : "conexión"}`);
     } finally {
       setLoading(null);
     }
