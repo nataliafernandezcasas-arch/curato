@@ -81,7 +81,7 @@ export const translations = {
       benefits: [
         { num: "I", title: "Crédit mensuel", desc: "Un budget mensuel en EUR, renouvelé chaque mois, à utiliser librement dans les adresses sélectionnées du carnet Curato." },
         { num: "II", title: "Adresses exclusives", desc: "Restaurants gastronomiques, spas, hôtels boutique, ateliers wellness,sélectionnés pour leur qualité et leur singularité." },
-        { num: "III", title: "Zéro contrainte", desc: "Aucun brief imposé. Aucune date de publication. Vous vivez l'expérience d'abord." },
+        { num: "III", title: "Contenu authentique", desc: "Aucun brief imposé, aucun récit dicté. Vous découvrez d'abord, puis vous partagez ce qui vous a touché." },
         { num: "IV", title: "Un carnet qui grandit", desc: "Le réseau de maisons partenaires s'étend continuellement. Nouvelles adresses, nouvelles expériences chaque saison." },
       ],
       quoteText: "Une adresse sélectionnée qu'ils auraient visitée de toute façon.",
@@ -233,7 +233,7 @@ export const translations = {
       benefits: [
         { num: "I", title: "Monthly credit", desc: "A monthly budget in EUR, renewed each month, to use freely at Curato's selected addresses." },
         { num: "II", title: "Exclusive addresses", desc: "Gastronomic restaurants, spas, boutique hotels, wellness studios,selected for their quality and singularity." },
-        { num: "III", title: "Zero constraints", desc: "No imposed brief. No publication date. You live the experience first." },
+        { num: "III", title: "Authentic content", desc: "No imposed brief, no scripted narrative. You discover first, then share what moved you." },
         { num: "IV", title: "A growing book", desc: "The network of partner houses expands continuously. New addresses, new experiences each season." },
       ],
       quoteText: "A selected address they would have visited anyway.",
@@ -385,7 +385,7 @@ export const translations = {
       benefits: [
         { num: "I", title: "Crédito mensual", desc: "Un presupuesto mensual en EUR, renovado cada mes, para usar libremente en las direcciones seleccionadas del carnet Curato." },
         { num: "II", title: "Direcciones exclusivas", desc: "Restaurantes gastronómicos, spas, hoteles boutique, estudios wellness,seleccionados por su calidad y singularidad." },
-        { num: "III", title: "Cero restricciones", desc: "Sin brief impuesto. Sin fecha de publicación. Primero vives la experiencia." },
+        { num: "III", title: "Contenido auténtico", desc: "Sin brief impuesto, sin narrativa dictada. Descubres primero, luego compartes lo que te emocionó." },
         { num: "IV", title: "Un carnet que crece", desc: "La red de maisons asociadas se expande continuamente. Nuevas direcciones, nuevas experiencias cada temporada." },
       ],
       quoteText: "Una dirección seleccionada que habrían visitado de todas formas.",
