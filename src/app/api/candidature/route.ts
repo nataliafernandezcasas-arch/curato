@@ -45,12 +45,12 @@ function confirmationEmail(name: string, typeLabel: string) {
         <!-- Body -->
         <tr>
           <td style="background-color:#1A1A1A;padding:0 48px 16px;">
-            <p style="margin:0;font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#9a8a6a;">Candidature reçue</p>
+            <p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#9a8a6a;">Candidature reçue</p>
           </td>
         </tr>
         <tr>
           <td style="background-color:#1A1A1A;padding:16px 48px 40px;">
-            <h1 style="margin:0;font-size:34px;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;color:#F0EBE0;line-height:1.1;">
+            <h1 style="margin:0;font-size:34px;font-weight:300;letter-spacing:0.28em;text-transform:uppercase;color:#F0EBE0;line-height:1.1;">
               Merci,<br />${name}.
             </h1>
           </td>
@@ -66,15 +66,15 @@ function confirmationEmail(name: string, typeLabel: string) {
         <!-- Text -->
         <tr>
           <td style="background-color:#1A1A1A;padding:36px 48px 20px;">
-            <p style="margin:0;font-size:16px;font-weight:300;line-height:1.8;color:#7a7060;">
+            <p style="margin:0;font-size:16px;font-weight:300;line-height:1.625;color:#7a7060;">
               Nous avons bien reçu votre candidature en tant que<br />
               <span style="color:#CBB78F;">${typeLabel}</span>.
             </p>
           </td>
         </tr>
         <tr>
-          <td style="background-color:#1A1A1A;padding:0 48px 48px;">
-            <p style="margin:0;font-size:16px;font-weight:300;line-height:1.8;color:#7a7060;">
+          <td style="background-color:#1A1A1A;padding:36px 48px 20px;">
+            <p style="margin:0;font-size:16px;font-weight:300;line-height:1.625;color:#7a7060;">
               Chaque candidature est étudiée manuellement avec soin.<br />
               Nous vous contacterons prochainement.
             </p>
@@ -100,7 +100,7 @@ function confirmationEmail(name: string, typeLabel: string) {
         <!-- Footer -->
         <tr>
           <td style="background-color:#141414;padding:32px 48px;">
-            <p style="margin:0;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#3a3028;">Paris · Sur invitation</p>
+            <p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#3a3028;">Paris · Sur invitation</p>
           </td>
         </tr>
 
@@ -123,8 +123,8 @@ function notificationEmail(name: string, typeLabel: string, email: string, insta
 
   const rowsHtml = rows.map(r => `
     <tr>
-      <td style="padding:12px 0;border-top:1px solid #2e2e2e;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#5a5040;width:110px;vertical-align:top;padding-right:20px;">${r.label}</td>
-      <td style="padding:12px 0;border-top:1px solid #2e2e2e;font-size:15px;font-weight:300;color:#9a9080;line-height:1.6;">${r.value}</td>
+      <td style="padding:12px 0;border-top:1px solid #2e2e2e;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:#5a5040;width:110px;vertical-align:top;padding-right:20px;">${r.label}</td>
+      <td style="padding:12px 0;border-top:1px solid #2e2e2e;font-size:15px;font-weight:300;color:#9a9080;line-height:1.625;">${r.value}</td>
     </tr>
   `).join("");
 
@@ -153,8 +153,8 @@ function notificationEmail(name: string, typeLabel: string, email: string, insta
         <tr>
           <td style="background-color:#1A1A1A;padding:40px 48px 16px;">
             <img src="${BASE}/logo-curato-simple.png" alt="curato" height="12" style="display:block;height:12px;width:auto;margin-bottom:36px;" />
-            <p style="margin:0 0 16px;font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#9a8a6a;">Nouvelle candidature</p>
-            <h1 style="margin:0 0 32px;font-size:26px;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;color:#F0EBE0;">${name}</h1>
+            <p style="margin:0 0 16px;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#9a8a6a;">Nouvelle candidature</p>
+            <h1 style="margin:0 0 32px;font-size:26px;font-weight:300;letter-spacing:0.28em;text-transform:uppercase;color:#F0EBE0;">${name}</h1>
             <table width="100%" cellpadding="0" cellspacing="0">
               ${rowsHtml}
             </table>
@@ -164,7 +164,7 @@ function notificationEmail(name: string, typeLabel: string, email: string, insta
         <!-- Footer -->
         <tr>
           <td style="background-color:#141414;padding:28px 48px;margin-top:32px;">
-            <p style="margin:0;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#3a3028;">Paris · Sur invitation</p>
+            <p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#3a3028;">Paris · Sur invitation</p>
           </td>
         </tr>
 
