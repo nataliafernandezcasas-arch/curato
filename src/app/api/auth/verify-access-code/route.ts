@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       type: "magiclink",
       email: email.toLowerCase().trim(),
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://curatocollective.com"}/auth/callback?next=/dashboard`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://curatocollective.com"}/auth/callback`,
       },
     });
 
