@@ -15,7 +15,7 @@ export default function Nav() {
 
   const links = [
     { href: "/creadores", label: t.creators },
-    { href: "/comercios", label: t.maisons },
+    { href: "/casas", label: t.maisons },
   ];
 
   return (

@@ -60,7 +60,7 @@ export default function BusinessesPage() {
       <main className="pt-14">
         <section className="py-16 md:py-24">
           <div className="max-w-[520px] mx-auto px-5">
-            <Link href="/comercios" className="inline-flex items-center gap-1.5 text-[12px] text-text-muted hover:text-text-primary transition-colors mb-8">
+            <Link href="/casas" className="inline-flex items-center gap-1.5 text-[12px] text-text-muted hover:text-text-primary transition-colors mb-8">
               <ArrowLeft size={14} /> Volver a Comercios
             </Link>
 

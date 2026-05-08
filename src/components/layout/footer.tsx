@@ -24,7 +24,7 @@ export default function Footer() {
           </div>
           <div className="flex gap-8 text-[12px] text-text-muted font-serif font-light tracking-widest">
             <Link href="/creadores" className="hover:text-champagne transition-colors">{t.nav.creators}</Link>
-            <Link href="/comercios" className="hover:text-champagne transition-colors">{t.nav.maisons}</Link>
+            <Link href="/casas" className="hover:text-champagne transition-colors">{t.nav.maisons}</Link>
             <Link href="/auth/sign-in" className="hover:text-champagne transition-colors">{t.nav.access}</Link>
           </div>
         </div>
