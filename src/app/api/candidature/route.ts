@@ -98,7 +98,7 @@ function confirmationEmail(name: string, typeLabel: string) {
         <!-- Footer -->
         <tr>
           <td style="background-color:#141414;padding:32px 48px;">
-            <p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#3a3028;">Paris · Sur invitation</p>
+            <p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#CBB78F;">Paris · Sur invitation</p>
           </td>
         </tr>
 
@@ -162,7 +162,7 @@ function notificationEmail(name: string, typeLabel: string, email: string, insta
         <!-- Footer -->
         <tr>
           <td style="background-color:#141414;padding:28px 48px;margin-top:32px;">
-            <p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#3a3028;">Paris · Sur invitation</p>
+            <p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#CBB78F;">Paris · Sur invitation</p>
           </td>
         </tr>
 
