@@ -25,15 +25,13 @@ function confirmationEmail(name: string, typeLabel: string) {
           <td style="padding:0;position:relative;height:320px;overflow:hidden;background-color:#111;background-image:url('${BASE}/hero-floral.jpeg');background-size:cover;background-position:center;">
             <img src="${BASE}/hero-floral.jpeg" alt="" width="600" style="display:block;width:100%;height:320px;object-fit:cover;object-position:center;opacity:0.55;" />
             <!-- Logo centered over image -->
-            <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;">
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center" style="padding:0;">
-                    <img src="${BASE}/logo-curato-simple.png" alt="curato" height="14" style="display:block;height:14px;width:auto;" />
-                  </td>
-                </tr>
-              </table>
-            </div>
+            <table width="100%" cellpadding="0" cellspacing="0" style="position:absolute;top:0;left:0;right:0;bottom:0;height:320px;">
+              <tr>
+                <td align="center" valign="middle" style="padding:0;height:320px;">
+                  <img src="${BASE}/logo-curato-simple.png" alt="curato" height="22" style="display:block;height:22px;width:auto;" />
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
 
