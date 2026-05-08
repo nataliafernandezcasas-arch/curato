@@ -35,7 +35,7 @@ export default function CreadoresPage() {
             </motion.p>
             <motion.h1 {...fade(0.2)} className="font-serif text-5xl md:text-[6.5rem] font-light tracking-[0.28em] uppercase leading-[1] text-text-primary max-w-4xl">
               {t.heroTitle1}<br />
-              <span className="text-champagne">{t.heroTitle2}</span>
+              <span className="text-champagne italic">{t.heroTitle2}</span>
             </motion.h1>
             <motion.p {...fade(0.35)} className="font-serif text-[18px] font-light text-text-secondary mt-8 max-w-xl leading-relaxed">
               {t.heroSubtitle}

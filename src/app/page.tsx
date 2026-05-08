@@ -65,10 +65,9 @@ export default function Home() {
               transition={{ delay: 0.7, duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="font-serif text-[clamp(2.1rem,10vw,7rem)] font-light tracking-[0.35em] uppercase leading-[1] text-text-primary mb-8 max-w-[800px]"
             >
-              <span className="text-champagne">{lang === "fr" ? "Jamais" : "Never"}</span>{" "}
-              {lang === "fr" ? "une campagne." : "a campaign."}
+              {t.heroTitle1}
               <br />
-              {t.heroTitle2}
+              <span className="text-champagne">{t.heroTitle2}</span>
             </motion.h1>
 
             <motion.p
@@ -112,8 +111,7 @@ export default function Home() {
               <div className="md:col-span-4">
                 <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">{t.modelLabel}</motion.p>
                 <motion.h2 {...fade(0.1)} className="font-serif text-4xl md:text-5xl font-light tracking-[0.35em] uppercase leading-[1.05] text-text-primary">
-                  {lang === "fr" ? "Un écosystème où " : "An ecosystem where "}
-                  <span className="text-champagne">{lang === "fr" ? "tout le monde gagne." : "everyone wins."}</span>
+                  {t.modelTitle}
                 </motion.h2>
               </div>
               <div className="md:col-span-8 md:pt-10 space-y-10">
@@ -146,6 +144,22 @@ export default function Home() {
           </motion.div>
         </section>
 
+        {/* ── MANIFESTE ── */}
+        <section className="py-32 md:py-44 px-5 bg-cream">
+          <div className="max-w-[860px] mx-auto">
+            <motion.p {...fade()} className="font-serif text-[11px] tracking-[0.35em] uppercase text-cream-muted mb-14">
+              {t.manifestLabel}
+            </motion.p>
+            <motion.p {...fade(0.1)} className="font-serif text-[clamp(1.2rem,2.8vw,1.9rem)] font-light leading-[1.7] text-cream-text">
+              {t.manifestCreatorText}
+            </motion.p>
+            <motion.div {...fadeIn(0.25)} className="my-12 w-10 h-px bg-cream-border" />
+            <motion.p {...fade(0.3)} className="font-serif text-[clamp(1.2rem,2.8vw,1.9rem)] font-light leading-[1.7] text-cream-text">
+              {t.manifestMaisonText}
+            </motion.p>
+          </div>
+        </section>
+
         {/* ── CRÉATEURS / MAISONS ── */}
         <section className="border-t border-border">
           <div className="max-w-[1200px] mx-auto px-5 py-10">
@@ -153,7 +167,7 @@ export default function Home() {
               <motion.div {...fade(0.1)} className="bg-charcoal-deep p-10 md:p-14 hover:bg-charcoal-mid transition-colors duration-500">
                 <span className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50">{t.creatorsLabel}</span>
                 <h3 className="font-serif text-3xl md:text-4xl font-light tracking-[0.35em] uppercase mt-5 mb-5 leading-[1.05] text-text-primary">
-                  {t.creatorsTitle} <span className="text-champagne">{lang === "fr" ? "valeur." : ""}</span>
+                  {t.creatorsTitle}
                 </h3>
                 <ul className="space-y-3 mb-8">
                   {t.creatorsBullets.map((item) => (
@@ -209,7 +223,7 @@ export default function Home() {
           <div className="max-w-[1200px] mx-auto px-5">
             <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-4">{t.categoriesLabel}</motion.p>
             <motion.h2 {...fade(0.1)} className="font-serif text-[clamp(1.6rem,7vw,2.5rem)] font-light tracking-[0.35em] uppercase text-text-primary mb-14">
-              {lang === "fr" ? "Expériences " : "Curated "}<span className="text-champagne">{lang === "fr" ? "sélectionnées." : "experiences."}</span>
+              {t.categoriesTitle}
             </motion.h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border">
               {t.categories.map((cat, i) => (
@@ -252,7 +266,7 @@ export default function Home() {
               <div className="max-w-[520px]">
                 <p className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">{t.ctaLabel}</p>
                 <h2 className="font-serif text-4xl md:text-6xl font-light tracking-[0.35em] uppercase leading-[1.05] text-text-primary">
-                  {lang === "fr" ? "Rejoindre " : "Join "}<span className="text-champagne">Curato.</span>
+                  {t.ctaTitle}
                 </h2>
                 <p className="font-serif text-[17px] font-light text-text-muted mt-6">
                   {t.ctaSubtitle}

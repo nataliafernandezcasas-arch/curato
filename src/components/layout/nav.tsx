@@ -55,10 +55,10 @@ export default function Nav() {
           <div className="w-px h-4 bg-white/15 mx-3" />
           {/* Language toggle */}
           <button
-            onClick={() => setLang(lang === "fr" ? "en" : "fr")}
+            onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
             className="font-serif text-[12px] font-light tracking-widest text-white/40 hover:text-champagne transition-colors mr-3"
           >
-            {lang === "fr" ? "EN" : "FR"}
+            {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
           </button>
           <Link
             href="/auth/sign-in"
@@ -71,10 +71,10 @@ export default function Nav() {
         {/* Mobile toggle */}
         <div className="flex md:hidden items-center gap-3">
           <button
-            onClick={() => setLang(lang === "fr" ? "en" : "fr")}
+            onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
             className="font-serif text-[12px] font-light tracking-widest text-white/40 hover:text-champagne transition-colors"
           >
-            {lang === "fr" ? "EN" : "FR"}
+            {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
           </button>
           <button onClick={() => setOpen(!open)} className="text-champagne p-1">
             {open ? <X size={20} /> : <List size={20} />}

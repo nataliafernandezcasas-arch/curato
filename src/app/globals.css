@@ -19,6 +19,11 @@
   --color-text-muted: rgba(245,239,228,0.38);
   --color-accent: #CBB78F;
 
+  --color-cream: #F2EDE4;
+  --color-cream-text: #2A201C;
+  --color-cream-muted: rgba(42, 32, 28, 0.42);
+  --color-cream-border: rgba(42, 32, 28, 0.12);
+
   --font-serif: 'Cormorant Garant', Georgia, serif;
 }
 

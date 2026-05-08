@@ -13,7 +13,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("curato-lang") as Lang | null;
-    if (saved === "fr" || saved === "en") setLangState(saved);
+    if (saved === "fr" || saved === "en" || saved === "es") setLangState(saved);
   }, []);
 
   function setLang(l: Lang) {
