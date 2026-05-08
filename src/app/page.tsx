@@ -71,7 +71,7 @@ export default function Home() {
               className="font-serif text-[19px] font-light text-text-secondary leading-relaxed max-w-[44ch] mb-14"
             >
               Un écosystème vivant qui unit créateurs et maisons d'exception,
-              pour qu'ils construisent quelque chose ensemble.
+              pour qu'ils construisent ensemble.
             </motion.p>
 
             <motion.div
