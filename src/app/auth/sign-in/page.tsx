@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
@@ -9,6 +9,22 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  // Handle implicit flow tokens from magic link (access_token in URL hash)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash.includes("access_token=")) return;
+    const params = new URLSearchParams(hash.slice(1));
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+    if (!access_token || !refresh_token) return;
+    (async () => {
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+      if (!error) window.location.href = "/dashboard";
+    })();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
