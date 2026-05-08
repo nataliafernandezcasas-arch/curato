@@ -196,10 +196,14 @@ export async function PATCH(request: NextRequest) {
   if (status === "approved") {
     accessCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    await supabase
+    const { error: updateError } = await supabase
       .from("applications")
       .update({ access_code: accessCode, access_code_expires_at: expiresAt, status })
       .eq("id", id);
+    if (updateError) {
+      console.error("Failed to save access code:", updateError);
+      return NextResponse.json({ error: `Error guardando código: ${updateError.message}` }, { status: 500 });
+    }
   } else {
     // Update status only
     const { error } = await supabase
