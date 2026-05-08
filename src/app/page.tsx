@@ -145,16 +145,16 @@ export default function Home() {
         </section>
 
         {/* ── MANIFESTE ── */}
-        <section className="py-32 md:py-44 px-5 bg-cream">
+        <section className="py-32 md:py-44 px-5 bg-charcoal-deep border-t border-border">
           <div className="max-w-[860px] mx-auto">
-            <motion.p {...fade()} className="font-serif text-[11px] tracking-[0.35em] uppercase text-cream-muted mb-14">
+            <motion.p {...fade()} className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-14">
               {t.manifestLabel}
             </motion.p>
-            <motion.p {...fade(0.1)} className="font-serif text-[clamp(1.2rem,2.8vw,1.9rem)] font-light leading-[1.7] text-cream-text">
+            <motion.p {...fade(0.1)} className="font-serif text-[clamp(1.2rem,2.8vw,1.9rem)] font-light leading-[1.7] text-text-secondary">
               {t.manifestCreatorText}
             </motion.p>
-            <motion.div {...fadeIn(0.25)} className="my-12 w-10 h-px bg-cream-border" />
-            <motion.p {...fade(0.3)} className="font-serif text-[clamp(1.2rem,2.8vw,1.9rem)] font-light leading-[1.7] text-cream-text">
+            <motion.div {...fadeIn(0.25)} className="my-12 w-10 h-px bg-border" />
+            <motion.p {...fade(0.3)} className="font-serif text-[clamp(1.2rem,2.8vw,1.9rem)] font-light leading-[1.7] text-text-secondary">
               {t.manifestMaisonText}
             </motion.p>
           </div>
