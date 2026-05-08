@@ -153,7 +153,7 @@ export default function Home() {
                   {[
                     "Crédit mensuel en EUR, adapté à votre profil",
                     "Restaurants, beauté, bien-être, hôtels boutique",
-                    "Intégré à votre vie, jamais une campagne",
+                    "Authentique, pas sponsorisé",
                     "Adresses sélectionnées à Paris",
                   ].map((item) => (
                     <li key={item} className="flex gap-3 items-start">
