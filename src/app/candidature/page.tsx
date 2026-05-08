@@ -42,9 +42,8 @@ export default function CandidaturePage() {
       if (!res.ok) throw new Error(data.error || "Erreur inconnue");
 
       setSubmitted(true);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : JSON.stringify(err);
-      setError("Erreur: " + msg);
+    } catch {
+      setError("Une erreur s'est produite. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
