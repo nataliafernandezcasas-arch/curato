@@ -25,8 +25,11 @@ export default function CandidaturePage() {
     setError("");
 
     try {
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
       const { error: dbError } = await supabase.from("applications").insert({
         type,
         name: form.name,
