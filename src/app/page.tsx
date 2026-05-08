@@ -110,7 +110,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-start">
               <div className="md:col-span-4">
                 <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">{t.modelLabel}</motion.p>
-                <motion.h2 {...fade(0.1)} className="font-serif text-4xl md:text-5xl font-light tracking-[0.35em] uppercase leading-[1.05] text-text-primary">
+                <motion.h2 {...fade(0.1)} className="font-serif text-2xl md:text-[1.85rem] font-light tracking-[0.28em] uppercase leading-[1.2] text-text-primary">
                   {t.modelTitle}
                 </motion.h2>
               </div>
