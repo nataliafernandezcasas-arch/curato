@@ -37,7 +37,7 @@ export default function AdminLoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+        <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-charcoal-deep/50 mb-3">
           Clave
         </label>
         <div className="relative">
@@ -47,13 +47,13 @@ export default function AdminLoginForm() {
             required
             value={pass}
             onChange={(e) => setPass(e.target.value)}
-            className="w-full px-5 py-4 pr-12 border border-white/10 bg-white/5 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors"
+            className="w-full px-5 py-4 pr-12 border border-black/15 bg-white/70 text-charcoal-deep font-serif text-[15px] font-light focus:outline-none focus:border-black/30 transition-colors placeholder:text-charcoal-deep/30"
             placeholder="••••••••••"
           />
           <button
             type="button"
             onClick={() => setShow(!show)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-champagne/40 hover:text-champagne/70 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-charcoal-deep/30 hover:text-charcoal-deep/60 transition-colors"
           >
             {show ? <EyeSlash size={18} /> : <Eye size={18} />}
           </button>
@@ -61,7 +61,7 @@ export default function AdminLoginForm() {
       </div>
 
       {error && (
-        <p className="font-serif text-[13px] font-light text-copper/80 border-l border-copper/40 pl-4">
+        <p className="font-serif text-[13px] font-light text-copper border-l border-copper/40 pl-4">
           {error}
         </p>
       )}
@@ -69,7 +69,7 @@ export default function AdminLoginForm() {
       <button
         type="submit"
         disabled={loading || !pass}
-        className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
+        className="w-full font-serif text-[13px] tracking-widest uppercase text-white bg-charcoal-deep py-4 hover:bg-copper transition-all duration-300 disabled:opacity-40"
       >
         {loading ? "Verificando…" : "Entrar"}
       </button>
