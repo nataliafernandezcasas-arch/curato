@@ -174,7 +174,7 @@ export default function Home() {
                 </h3>
                 <ul className="space-y-3 mb-8">
                   {[
-                    "Visites de créateurs sincèrement intéressés par votre maison",
+                    "Visites de créateurs intéressés par votre maison",
                     "Contenu éditorial publié sur leurs réseaux",
                     "90 jours de droits d'utilisation exclusifs",
                     "Sans frais d'intermédiation par visite",
