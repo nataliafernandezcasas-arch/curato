@@ -1,5 +1,4 @@
 import Link from "next/link";
-import MidiLogo from "@/components/midi-logo";
 import { isAdmin, getAdminPass } from "@/lib/admin/auth";
 import AdminLoginForm from "./login-form";
 
@@ -11,10 +10,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!configured) {
     return (
-      <div className="min-h-[100dvh] bg-surface flex items-center justify-center px-5">
+      <div className="min-h-[100dvh] bg-charcoal-deep flex items-center justify-center px-5">
         <div className="max-w-[380px] text-center">
-          <h1 className="text-2xl font-extralight tracking-tighter text-text-primary mb-3">Admin no configurado</h1>
-          <p className="text-sm text-text-muted">Falta setear <code>ADMIN_PASS</code> en las env vars de Vercel.</p>
+          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-copper mb-6">Error de configuración</p>
+          <p className="font-serif text-[15px] font-light text-text-muted">
+            Falta la variable <code className="text-champagne">ADMIN_PASS</code> en Vercel.
+          </p>
         </div>
       </div>
     );
@@ -22,14 +23,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!ok) {
     return (
-      <div className="min-h-[100dvh] bg-surface flex items-center justify-center px-5">
-        <div className="w-full max-w-[380px]">
-          <Link href="/" aria-label="Midi Pass" className="inline-flex items-center gap-2 text-text-primary mb-10">
-            <MidiLogo className="h-5 w-auto" />
-            <span className="text-base font-semibold tracking-tight leading-none">Pass</span>
-          </Link>
-          <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-accent mb-3">Acceso interno</p>
-          <h1 className="text-2xl font-extralight tracking-tighter text-text-primary mb-8">Ingresá la clave</h1>
+      <div className="min-h-[100dvh] bg-charcoal-deep flex items-center justify-center px-5">
+        <div className="w-full max-w-[360px]">
+          <div className="text-center mb-10">
+            <Link href="/">
+              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto", display: "inline-block" }} />
+            </Link>
+            <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mt-6 mb-3">Acceso interno</p>
+            <h1 className="font-serif text-2xl font-light tracking-[0.28em] uppercase text-text-primary">Admin</h1>
+          </div>
           <AdminLoginForm />
         </div>
       </div>
@@ -37,20 +39,24 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="min-h-[100dvh] bg-surface">
-      <nav className="border-b border-border bg-surface/80 backdrop-blur-xl px-5 h-14 flex items-center">
+    <div className="min-h-[100dvh] bg-charcoal-deep">
+      <nav className="border-b border-white/10 px-5 h-14 flex items-center bg-black/40 backdrop-blur-sm">
         <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between">
-          <Link href="/" aria-label="Midi Pass" className="flex items-center gap-2 text-text-primary">
-            <MidiLogo className="h-6 w-auto" />
-            <span className="text-lg font-semibold tracking-tight leading-none">Pass</span>
-            <span className="ml-3 text-[10px] font-semibold tracking-[0.18em] uppercase text-accent">Admin</span>
-          </Link>
-          <div className="flex items-center gap-5 text-[13px] font-medium">
-            <Link href="/admin/lanzamiento" className="text-text-primary">Lanzamiento</Link>
-            <form action="/api/admin/logout" method="post">
-              <button type="submit" className="text-text-muted hover:text-text-primary transition-colors">Salir</button>
-            </form>
+          <div className="flex items-center gap-6">
+            <Link href="/">
+              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
+            </Link>
+            <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/40">Admin</span>
+            <div className="w-px h-3 bg-white/10" />
+            <Link href="/admin" className="font-serif text-[12px] tracking-wider text-text-secondary hover:text-champagne transition-colors">
+              Candidaturas
+            </Link>
           </div>
+          <form action="/api/admin/logout" method="post">
+            <button type="submit" className="font-serif text-[12px] tracking-wider text-text-muted hover:text-text-secondary transition-colors">
+              Salir
+            </button>
+          </form>
         </div>
       </nav>
       {children}
