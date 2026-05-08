@@ -395,8 +395,8 @@ export const translations = {
     },
     maisons: {
       badge: "Para las casas",
-      heroTitle1: "Te han",
-      heroTitle2: "elegido.",
+      heroTitle1: "Ellos te",
+      heroTitle2: "eligen.",
       heroSubtitle: "Creadores que visitan tu casa porque la han elegido, no porque los contrataron. Contenido auténtico, artesanal, publicado.",
       principleLabel: "El principio",
       principleTitle: "Siempre una historia.",
