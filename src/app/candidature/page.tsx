@@ -25,26 +25,21 @@ export default function CandidaturePage() {
     setError("");
 
     try {
-      const { createClient } = await import("@supabase/supabase-js");
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { error: dbError } = await supabase.from("applications").insert({
-        type,
-        name: form.name,
-        email: form.email.toLowerCase().trim(),
-        instagram: form.instagram || null,
-        website: form.website || null,
-        message: form.message || null,
-      });
-      if (dbError) throw dbError;
-
-      await fetch("/api/candidature", {
+      const res = await fetch("/api/candidature", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, name: form.name, email: form.email.toLowerCase().trim() }),
+        body: JSON.stringify({
+          type,
+          name: form.name,
+          email: form.email.toLowerCase().trim(),
+          instagram: form.instagram || null,
+          website: form.website || null,
+          message: form.message || null,
+        }),
       });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur inconnue");
 
       setSubmitted(true);
     } catch (err: unknown) {

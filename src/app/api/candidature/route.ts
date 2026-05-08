@@ -1,19 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createClient } from "@supabase/supabase-js";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
-  const { type, name, email } = await req.json();
+  const { type, name, email, instagram, website, message } = await req.json();
 
   const typeLabel = type === "creator" ? "Créateur · Créatrice" : "Maison · Commerce";
+  const normalizedEmail = email.toLowerCase().trim();
 
+  // Insert into Supabase
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { error: dbError } = await supabase.from("applications").insert({
+    type,
+    name,
+    email: normalizedEmail,
+    instagram: instagram || null,
+    website: website || null,
+    message: message || null,
+  });
+
+  if (dbError) {
+    console.error("Supabase insert error:", dbError);
+    return NextResponse.json({ error: dbError.message }, { status: 500 });
+  }
+
+  // Send emails (non-blocking — don't fail the request if email fails)
   try {
     await Promise.all([
-      // Confirmation to applicant
       resend.emails.send({
         from: "Curato <hello@curatocollective.com>",
-        to: email,
+        to: normalizedEmail,
         subject: "Votre candidature a bien été reçue",
         html: `
           <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #1E1E1E; padding: 48px 32px;">
@@ -31,8 +53,6 @@ export async function POST(req: NextRequest) {
           </div>
         `,
       }),
-
-      // Notification to team
       resend.emails.send({
         from: "Curato <hello@curatocollective.com>",
         to: "hello@curatocollective.com",
@@ -43,16 +63,16 @@ export async function POST(req: NextRequest) {
             <h1 style="font-size: 24px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 32px;">${name}</h1>
             <table style="width: 100%; border-collapse: collapse;">
               <tr><td style="padding: 10px 0; border-top: 1px solid #e8e0d0; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #9a8a6a; width: 120px;">Type</td><td style="padding: 10px 0; border-top: 1px solid #e8e0d0; font-size: 15px; font-weight: 300;">${typeLabel}</td></tr>
-              <tr><td style="padding: 10px 0; border-top: 1px solid #e8e0d0; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #9a8a6a;">Email</td><td style="padding: 10px 0; border-top: 1px solid #e8e0d0; font-size: 15px; font-weight: 300;"><a href="mailto:${email}" style="color: #CBB78F;">${email}</a></td></tr>
+              <tr><td style="padding: 10px 0; border-top: 1px solid #e8e0d0; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #9a8a6a;">Email</td><td style="padding: 10px 0; border-top: 1px solid #e8e0d0; font-size: 15px; font-weight: 300;"><a href="mailto:${normalizedEmail}" style="color: #CBB78F;">${normalizedEmail}</a></td></tr>
             </table>
           </div>
         `,
       }),
     ]);
-
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Email failed" }, { status: 500 });
+  } catch (emailErr) {
+    console.error("Email send error:", emailErr);
+    // Don't fail — the application was saved
   }
+
+  return NextResponse.json({ ok: true });
 }
