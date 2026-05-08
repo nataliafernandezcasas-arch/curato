@@ -44,8 +44,9 @@ export default function CandidaturePage() {
       });
 
       setSubmitted(true);
-    } catch {
-      setError("Une erreur s'est produite. Veuillez réessayer.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : JSON.stringify(err);
+      setError("Erreur: " + msg);
     } finally {
       setLoading(false);
     }
