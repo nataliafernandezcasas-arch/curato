@@ -35,16 +35,25 @@ function StatusBadge({ status }: { status: string }) {
 
 function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: string, status: string) => void }) {
   const [loading, setLoading] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   async function update(status: string) {
     setLoading(status);
+    setErr(null);
     try {
       const res = await fetch("/api/admin/applications", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: app.id, status }),
       });
-      if (res.ok) onUpdate(app.id, status);
+      if (res.ok) {
+        onUpdate(app.id, status);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setErr(data.error || "Error al actualizar");
+      }
+    } catch {
+      setErr("Error de conexión");
     } finally {
       setLoading(null);
     }
@@ -52,35 +61,44 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
 
   if (app.status === "approved") {
     return (
-      <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-500 hover:text-red-700 transition-colors disabled:opacity-40">
-        {loading === "rejected" ? "…" : "Rechazar"}
-      </button>
+      <div className="space-y-1">
+        <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-500 hover:text-red-700 transition-colors disabled:opacity-40">
+          {loading === "rejected" ? "…" : "Rechazar"}
+        </button>
+        {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
+      </div>
     );
   }
   if (app.status === "rejected") {
     return (
-      <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors disabled:opacity-40">
-        {loading === "approved" ? "…" : "Aceptar"}
-      </button>
+      <div className="space-y-1">
+        <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors disabled:opacity-40">
+          {loading === "approved" ? "…" : "Aceptar"}
+        </button>
+        {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
+      </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <button
-        onClick={() => update("approved")}
-        disabled={!!loading}
-        className="font-serif text-[11px] tracking-widest uppercase text-white bg-charcoal-deep px-4 py-2 hover:bg-emerald-700 transition-all duration-200 disabled:opacity-40"
-      >
-        {loading === "approved" ? "…" : "Aceptar"}
-      </button>
-      <button
-        onClick={() => update("rejected")}
-        disabled={!!loading}
-        className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep/60 border border-black/20 px-4 py-2 hover:border-red-400 hover:text-red-600 transition-all duration-200 disabled:opacity-40"
-      >
-        {loading === "rejected" ? "…" : "Rechazar"}
-      </button>
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => update("approved")}
+          disabled={!!loading}
+          className="font-serif text-[11px] tracking-widest uppercase text-white bg-charcoal-deep px-4 py-2 hover:bg-emerald-700 transition-all duration-200 disabled:opacity-40"
+        >
+          {loading === "approved" ? "…" : "Aceptar"}
+        </button>
+        <button
+          onClick={() => update("rejected")}
+          disabled={!!loading}
+          className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep/60 border border-black/20 px-4 py-2 hover:border-red-400 hover:text-red-600 transition-all duration-200 disabled:opacity-40"
+        >
+          {loading === "rejected" ? "…" : "Rechazar"}
+        </button>
+      </div>
+      {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
     </div>
   );
 }
