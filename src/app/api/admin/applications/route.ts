@@ -6,7 +6,7 @@ import { isAdmin } from "@/lib/admin/auth";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE = "https://curatocollective.com";
 
-function acceptedEmail(name: string, type: string) {
+function acceptedEmail(name: string, type: string, code: string) {
   const isCreator = type === "creator";
   const firstName = name.split(" ")[0];
   return `<!DOCTYPE html>
@@ -65,9 +65,16 @@ function acceptedEmail(name: string, type: string) {
         </p>
       </td></tr>
 
+      <!-- Access code -->
+      <tr><td style="background-color:#1A1A1A;padding:0 48px 36px;">
+        <p style="margin:0 0 12px;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#7a7060;">Votre code d'accès</p>
+        <p style="margin:0;font-size:36px;font-weight:300;letter-spacing:0.4em;color:#CBB78F;font-family:Georgia,'Times New Roman',Times,serif;">${code}</p>
+        <p style="margin:8px 0 0;font-size:12px;color:#5a5040;">Valable 7 jours · Ne pas partager</p>
+      </td></tr>
+
       <!-- CTA -->
-      <tr><td style="background-color:#1A1A1A;padding:32px 48px 48px;">
-        <a href="${BASE}/auth/sign-in" style="display:inline-block;font-family:Georgia,'Times New Roman',Times,serif;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:#1A1A1A;background-color:#CBB78F;padding:16px 32px;text-decoration:none;">
+      <tr><td style="background-color:#1A1A1A;padding:0 48px 48px;">
+        <a href="${BASE}/auth/access" style="display:inline-block;font-family:Georgia,'Times New Roman',Times,serif;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:#1A1A1A;background-color:#CBB78F;padding:16px 32px;text-decoration:none;">
           Accéder à Curato
         </a>
       </td></tr>
@@ -180,17 +187,27 @@ export async function PATCH(request: NextRequest) {
   // Get application data to send email
   const { data: app } = await supabase
     .from("applications")
-    .select("name, email, type")
+    .select("name, email, type, instagram, website")
     .eq("id", id)
     .single();
 
-  // Update status
-  const { error } = await supabase
-    .from("applications")
-    .update({ status })
-    .eq("id", id);
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  // Generate access code on approval
+  let accessCode: string | null = null;
+  if (status === "approved") {
+    accessCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    await supabase
+      .from("applications")
+      .update({ access_code: accessCode, access_code_expires_at: expiresAt, status })
+      .eq("id", id);
+  } else {
+    // Update status only
+    const { error } = await supabase
+      .from("applications")
+      .update({ status })
+      .eq("id", id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   // On approval: create creator or comercio record so dashboard routing works
   if (status === "approved" && app) {
@@ -198,7 +215,7 @@ export async function PATCH(request: NextRequest) {
       await supabase.from("creators").upsert({
         full_name: app.name,
         email: app.email,
-        handle: app.instagram?.replace("@", "") || "",
+        handle: (app as any).instagram?.replace("@", "") || "",
         platform: "instagram",
         category: "",
         followers: 0,
@@ -224,7 +241,7 @@ export async function PATCH(request: NextRequest) {
         plan: "1_month",
         monthly_price: 0,
         rating: 0,
-        website_url: app.website || null,
+        website_url: (app as any).website || null,
       }, { onConflict: "email" });
     }
   }
@@ -233,7 +250,7 @@ export async function PATCH(request: NextRequest) {
   if (app?.email && app?.name) {
     try {
       const html = status === "approved"
-        ? acceptedEmail(app.name, app.type)
+        ? acceptedEmail(app.name, app.type, accessCode!)
         : rejectedEmail(app.name, app.type);
 
       const subject = status === "approved"
