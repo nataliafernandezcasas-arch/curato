@@ -114,7 +114,7 @@ export default function Home() {
                 <motion.div {...fade(0.2)} className="border-l border-champagne/25 pl-8">
                   <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-3">Pour les créateurs</p>
                   <p className="font-serif text-[18px] font-light text-text-secondary leading-relaxed">
-                    Un <span className="text-text-primary">crédit mensuel en EUR</span> pour découvrir les meilleurs restaurants, sanctuaires de beauté, retraites de bien-être et hôtels boutique, intégré à leur vie quotidienne, jamais comme une campagne.
+                    Un <span className="text-text-primary">crédit mensuel en EUR</span> pour découvrir les meilleurs restaurants, sanctuaires de beauté, retraites de bien-être et hôtels boutique. Né d'un choix sincère.
                   </p>
                 </motion.div>
                 <motion.div {...fade(0.3)} className="border-l border-copper/25 pl-8">
