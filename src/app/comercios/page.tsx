@@ -86,7 +86,7 @@ export default function ComerciosPage() {
         </section>
 
         {/* PHOTO PAIR */}
-        <section className="grid grid-cols-2 h-[55vh]">
+        <section className="grid grid-cols-2 h-[75vh]">
           <div className="relative overflow-hidden">
             <img src="/Hotelerie.jpeg" alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/20" />
