@@ -192,6 +192,43 @@ export async function PATCH(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  // On approval: create creator or comercio record so dashboard routing works
+  if (status === "approved" && app) {
+    if (app.type === "creator") {
+      await supabase.from("creators").upsert({
+        full_name: app.name,
+        email: app.email,
+        handle: app.instagram?.replace("@", "") || "",
+        platform: "instagram",
+        category: "",
+        followers: 0,
+        country: "FR",
+        city: "Paris",
+        stage: "active",
+        monthly_credit_cop: 300,
+        credit_used_cop: 0,
+        visits_count: 0,
+        content_rate: 0,
+        rating: 0,
+        usage_percent: 0,
+      }, { onConflict: "email" });
+    } else if (app.type === "business") {
+      await supabase.from("comercios").upsert({
+        name: app.name,
+        email: app.email,
+        contact_name: app.name,
+        category: "gastronomy",
+        country: "FR",
+        city: "Paris",
+        stage: "activo",
+        plan: "1_month",
+        monthly_price: 0,
+        rating: 0,
+        website_url: app.website || null,
+      }, { onConflict: "email" });
+    }
+  }
+
   // Send email
   if (app?.email && app?.name) {
     try {
