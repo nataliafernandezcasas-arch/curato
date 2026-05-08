@@ -5,6 +5,8 @@ import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { motion } from "framer-motion";
 import { ArrowRight } from "@phosphor-icons/react";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations } from "@/lib/i18n/translations";
 
 const fade = (d: number = 0) => ({
   initial: { opacity: 0, y: 20 },
@@ -20,7 +22,12 @@ const fadeIn = (d: number = 0) => ({
   transition: { delay: d, duration: 1.1 },
 });
 
+const catImgs = ["/Gastronomie.jpeg", "/Bien etre.jpeg", "/Conscience.jpeg", "/Hotelerie.jpeg"];
+
 export default function Home() {
+  const { lang } = useLang();
+  const t = translations[lang].home;
+
   return (
     <>
       <Nav />
@@ -39,7 +46,6 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-charcoal-deep/70 to-transparent" />
           </motion.div>
 
-          {/* spacer: empuja el contenido hacia abajo, mínimo 80px para dejar espacio al nav */}
           <div className="flex-1 min-h-[80px]" />
 
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 w-full pb-16 md:pb-28">
@@ -50,7 +56,7 @@ export default function Home() {
               className="inline-flex items-center gap-2.5 font-serif text-[11px] font-light tracking-[0.35em] uppercase text-champagne/60 mb-7 md:mb-10"
             >
               <span className="w-6 h-px bg-champagne/40" />
-              Paris · Sur invitation
+              {t.badge}
             </motion.span>
 
             <motion.h1
@@ -59,9 +65,10 @@ export default function Home() {
               transition={{ delay: 0.7, duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="font-serif text-[clamp(2.1rem,10vw,7rem)] font-light tracking-[0.35em] uppercase leading-[1] text-text-primary mb-8 max-w-[800px]"
             >
-              <span className="text-champagne">Jamais</span> une campagne.
+              <span className="text-champagne">{lang === "fr" ? "Jamais" : "Never"}</span>{" "}
+              {lang === "fr" ? "une campagne." : "a campaign."}
               <br />
-              Toujours une histoire.
+              {t.heroTitle2}
             </motion.h1>
 
             <motion.p
@@ -70,8 +77,7 @@ export default function Home() {
               transition={{ delay: 1, duration: 0.9 }}
               className="font-serif text-[19px] font-light text-text-secondary leading-relaxed max-w-[44ch] mb-14"
             >
-              Un écosystème vivant qui unit créateurs et maisons d'exception,
-              pour qu'ils construisent ensemble.
+              {t.heroSubtitle}
             </motion.p>
 
             <motion.div
@@ -81,21 +87,21 @@ export default function Home() {
               className="flex flex-wrap gap-4"
             >
               <Link href="/creadores" className="group inline-flex items-center gap-3 bg-champagne text-charcoal-deep font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:bg-copper hover:text-white transition-all duration-400">
-                Je suis créateur <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                {t.ctaCreator} <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link href="/comercios" className="inline-flex items-center gap-3 border border-champagne/30 text-champagne font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:border-champagne/60 hover:bg-champagne/5 transition-all duration-400">
-                Je suis une maison
+                {t.ctaMaison}
               </Link>
             </motion.div>
           </div>
         </section>
 
-        {/* ── PHOTO INTERLUDE 1 ── */}
+        {/* ── PHOTO INTERLUDE ── */}
         <motion.section {...fadeIn()} className="w-full h-[70vh] md:h-[90vh] overflow-hidden relative">
           <img src="/Background Image 4.jpeg" alt="" className="w-full h-full object-cover object-center" />
           <div className="absolute inset-0 bg-charcoal-deep/30" />
           <div className="absolute bottom-10 left-0 right-0 text-center">
-            <span className="font-serif text-[11px] font-light tracking-[0.4em] uppercase text-champagne/50">Curato · Paris</span>
+            <span className="font-serif text-[11px] font-light tracking-[0.4em] uppercase text-champagne/50">{t.photoCaption}</span>
           </div>
         </motion.section>
 
@@ -104,23 +110,23 @@ export default function Home() {
           <div className="max-w-[1200px] mx-auto px-5">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-start">
               <div className="md:col-span-4">
-                <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">Le modèle</motion.p>
+                <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">{t.modelLabel}</motion.p>
                 <motion.h2 {...fade(0.1)} className="font-serif text-4xl md:text-5xl font-light tracking-[0.35em] uppercase leading-[1.05] text-text-primary">
-                  Un écosystème où{" "}
-                  <span className="text-champagne">tout le monde gagne.</span>
+                  {lang === "fr" ? "Un écosystème où " : "An ecosystem where "}
+                  <span className="text-champagne">{lang === "fr" ? "tout le monde gagne." : "everyone wins."}</span>
                 </motion.h2>
               </div>
               <div className="md:col-span-8 md:pt-10 space-y-10">
                 <motion.div {...fade(0.2)} className="border-l border-champagne/25 pl-8">
-                  <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-3">Pour les créateurs</p>
+                  <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-3">{t.modelCreatorLabel}</p>
                   <p className="font-serif text-[18px] font-light text-text-secondary leading-relaxed">
-                    Un <span className="text-text-primary">crédit mensuel en EUR</span> pour découvrir les meilleurs restaurants, sanctuaires de beauté, retraites de bien-être et hôtels boutique. Une adresse qu'ils auraient visitée de toute façon.
+                    {t.modelCreatorText}
                   </p>
                 </motion.div>
                 <motion.div {...fade(0.3)} className="border-l border-copper/25 pl-8">
-                  <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-copper/60 mb-3">Pour les maisons</p>
+                  <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-copper/60 mb-3">{t.modelMaisonLabel}</p>
                   <p className="font-serif text-[18px] font-light text-text-secondary leading-relaxed">
-                    Des visites de créateurs qui les ont <span className="text-text-primary">sincèrement choisis</span>, du contenu éditorial publié sur leurs réseaux, et 90 jours de droits d'utilisation exclusifs.
+                    {t.modelMaisonText}
                   </p>
                 </motion.div>
               </div>
@@ -145,17 +151,12 @@ export default function Home() {
           <div className="max-w-[1200px] mx-auto px-5 py-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
               <motion.div {...fade(0.1)} className="bg-charcoal-deep p-10 md:p-14 hover:bg-charcoal-mid transition-colors duration-500">
-                <span className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50">Pour les créateurs</span>
+                <span className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50">{t.creatorsLabel}</span>
                 <h3 className="font-serif text-3xl md:text-4xl font-light tracking-[0.35em] uppercase mt-5 mb-5 leading-[1.05] text-text-primary">
-                  Votre présence<br />a de la <span className="text-champagne">valeur.</span>
+                  {t.creatorsTitle} <span className="text-champagne">{lang === "fr" ? "valeur." : ""}</span>
                 </h3>
                 <ul className="space-y-3 mb-8">
-                  {[
-                    "Crédit mensuel en EUR, adapté à votre profil",
-                    "Restaurants, beauté, bien-être, hôtels boutique",
-                    "Authentique, pas sponsorisé",
-                    "Adresses sélectionnées à Paris",
-                  ].map((item) => (
+                  {t.creatorsBullets.map((item) => (
                     <li key={item} className="flex gap-3 items-start">
                       <span className="w-4 h-px bg-champagne/40 mt-[11px] shrink-0" />
                       <span className="font-serif text-[15px] font-light text-text-secondary leading-relaxed">{item}</span>
@@ -163,22 +164,17 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link href="/creadores" className="group/link inline-flex items-center gap-2 font-serif text-[12px] font-light tracking-widest uppercase text-champagne hover:text-copper transition-colors">
-                  En savoir plus <ArrowRight size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
+                  {t.learnMore} <ArrowRight size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
                 </Link>
               </motion.div>
 
               <motion.div {...fade(0.18)} className="bg-charcoal-deep p-10 md:p-14 hover:bg-charcoal-mid transition-colors duration-500">
-                <span className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-copper/60">Pour les maisons</span>
+                <span className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-copper/60">{t.maisonsLabel}</span>
                 <h3 className="font-serif text-3xl md:text-4xl font-light tracking-[0.35em] uppercase mt-5 mb-5 leading-[1.05] text-text-primary">
-                  Des créateurs qui vous ont choisi. <span className="text-copper">Parce qu'ils vous préfèrent.</span>
+                  {t.maisonsTitle} <span className="text-copper">{t.maisonsSubtitle}</span>
                 </h3>
                 <ul className="space-y-3 mb-8">
-                  {[
-                    "Visites de créateurs intéressés par votre maison",
-                    "Contenu éditorial publié sur leurs réseaux",
-                    "90 jours de droits d'utilisation exclusifs",
-                    "Sans frais d'intermédiation par visite",
-                  ].map((item) => (
+                  {t.maisonsBullets.map((item) => (
                     <li key={item} className="flex gap-3 items-start">
                       <span className="w-4 h-px bg-copper/40 mt-[11px] shrink-0" />
                       <span className="font-serif text-[15px] font-light text-text-secondary leading-relaxed">{item}</span>
@@ -186,24 +182,24 @@ export default function Home() {
                   ))}
                 </ul>
                 <Link href="/comercios" className="group/link inline-flex items-center gap-2 font-serif text-[12px] font-light tracking-widest uppercase text-copper hover:text-champagne transition-colors">
-                  En savoir plus <ArrowRight size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
+                  {t.learnMore} <ArrowRight size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
                 </Link>
               </motion.div>
             </div>
           </div>
         </section>
 
-        {/* ── QUOTE PLEINE PAGE ── */}
+        {/* ── QUOTE ── */}
         <motion.section {...fadeIn()} className="relative h-[75vh] md:h-[95vh] overflow-hidden flex items-center justify-center">
           <img src="/Background Image 6.jpeg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
           <div className="absolute inset-0 bg-charcoal-deep/55" />
           <div className="relative z-10 text-center px-5 max-w-[700px] mx-auto">
             <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.4em] uppercase text-champagne/50 mb-8">
-             Notre vision
+              {t.visionLabel}
             </motion.p>
             <motion.h2 {...fade(0.15)} className="font-serif text-3xl md:text-5xl font-light tracking-[0.35em] uppercase leading-[1.1] text-text-primary">
-              Un écosystème vivant.<br />
-              <span className="text-champagne">Pas une plateforme.</span>
+              {t.visionTitle1}<br />
+              <span className="text-champagne">{t.visionTitle2}</span>
             </motion.h2>
           </div>
         </motion.section>
@@ -211,20 +207,15 @@ export default function Home() {
         {/* ── CATÉGORIES ── */}
         <section className="py-28 border-t border-border">
           <div className="max-w-[1200px] mx-auto px-5">
-            <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-4">Les catégories</motion.p>
+            <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-4">{t.categoriesLabel}</motion.p>
             <motion.h2 {...fade(0.1)} className="font-serif text-[clamp(1.6rem,7vw,2.5rem)] font-light tracking-[0.35em] uppercase text-text-primary mb-14">
-              Expériences <span className="text-champagne">sélectionnées.</span>
+              {lang === "fr" ? "Expériences " : "Curated "}<span className="text-champagne">{lang === "fr" ? "sélectionnées." : "experiences."}</span>
             </motion.h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border">
-              {[
-                { name: "Gastronomie", desc: "Restaurants, cafés, bistrots, expériences culinaires", img: "/Gastronomie.jpeg" },
-                { name: "Bien-être", desc: "Spas, massages, yoga, studios boutique", img: "/Bien etre.jpeg" },
-                { name: "Conscience", desc: "Soins du visage, instituts beauté, ateliers, nail bars", img: "/Conscience.jpeg" },
-                { name: "Hôtellerie", desc: "Hôtels boutique, retraites, séjours singuliers", img: "/Hotelerie.jpeg" },
-              ].map((cat, i) => (
+              {t.categories.map((cat, i) => (
                 <motion.div key={cat.name} {...fade(i * 0.07)} className="group bg-charcoal-deep overflow-hidden hover:bg-charcoal-mid transition-colors duration-500">
                   <div className="aspect-[3/4] overflow-hidden relative">
-                    <img src={cat.img} alt={cat.name} className="w-full h-full object-cover opacity-85 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700 ease-out" />
+                    <img src={catImgs[i]} alt={cat.name} className="w-full h-full object-cover opacity-85 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700 ease-out" />
                     <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep/80 via-transparent to-transparent" />
                   </div>
                   <div className="p-6">
@@ -259,21 +250,20 @@ export default function Home() {
           <div className="relative z-10 max-w-[1200px] mx-auto px-5">
             <motion.div {...fade()} className="flex flex-col md:flex-row items-start md:items-end justify-between gap-12">
               <div className="max-w-[520px]">
-                <p className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">Rejoindre Curato</p>
+                <p className="font-serif text-[11px] font-light tracking-[0.3em] uppercase text-champagne/50 mb-6">{t.ctaLabel}</p>
                 <h2 className="font-serif text-4xl md:text-6xl font-light tracking-[0.35em] uppercase leading-[1.05] text-text-primary">
-                  Rejoindre{" "}
-                  <span className="text-champagne">Curato.</span>
+                  {lang === "fr" ? "Rejoindre " : "Join "}<span className="text-champagne">Curato.</span>
                 </h2>
                 <p className="font-serif text-[17px] font-light text-text-muted mt-6">
-                  Places limitées. Sur invitation uniquement.
+                  {t.ctaSubtitle}
                 </p>
               </div>
               <div className="flex flex-col gap-3 shrink-0">
                 <Link href="/creadores" className="group inline-flex items-center gap-3 bg-champagne text-charcoal-deep font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:bg-copper hover:text-white transition-all duration-400">
-                  Postuler comme créateur <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                  {t.ctaCreatorBtn} <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                 </Link>
                 <Link href="/comercios" className="inline-flex items-center gap-3 border border-champagne/25 text-champagne/70 font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:border-champagne/50 hover:text-champagne transition-all duration-400">
-                  Inscrire ma maison
+                  {t.ctaMaisonBtn}
                 </Link>
               </div>
             </motion.div>

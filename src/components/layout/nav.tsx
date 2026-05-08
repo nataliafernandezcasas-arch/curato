@@ -4,19 +4,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { List, X } from "@phosphor-icons/react";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations } from "@/lib/i18n/translations";
 
 export default function Nav() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const { lang, setLang } = useLang();
+  const t = translations[lang].nav;
 
   const links = [
-    { href: "/creadores", label: "Créateurs" },
-    { href: "/comercios", label: "Maisons" },
+    { href: "/creadores", label: t.creators },
+    { href: "/comercios", label: t.maisons },
   ];
 
   return (
     <nav className="fixed top-0 w-full z-50 border-b border-white/10 overflow-hidden">
-      {/* Floral background from logo */}
       <div className="absolute inset-0">
         <img
           src="/Logo Curato.png"
@@ -27,17 +30,12 @@ export default function Nav() {
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       </div>
 
-      {/* Nav content */}
       <div className="relative z-10 max-w-[1200px] mx-auto px-5 h-16 flex items-center justify-between">
         <Link href="/" aria-label="Curato" className="block">
           <img
             src="/logo-curato-simple.png"
             alt="curato"
-            style={{
-              height: "14px",
-              width: "auto",
-              display: "block",
-            }}
+            style={{ height: "14px", width: "auto", display: "block" }}
           />
         </Link>
 
@@ -48,25 +46,36 @@ export default function Nav() {
               key={l.href}
               href={l.href}
               className={`font-serif text-[14px] font-light px-4 py-1.5 tracking-wider transition-all duration-300 ${
-                path === l.href
-                  ? "text-champagne"
-                  : "text-white/60 hover:text-champagne"
+                path === l.href ? "text-champagne" : "text-white/60 hover:text-champagne"
               }`}
             >
               {l.label}
             </Link>
           ))}
           <div className="w-px h-4 bg-white/15 mx-3" />
+          {/* Language toggle */}
+          <button
+            onClick={() => setLang(lang === "fr" ? "en" : "fr")}
+            className="font-serif text-[12px] font-light tracking-widest text-white/40 hover:text-champagne transition-colors mr-3"
+          >
+            {lang === "fr" ? "EN" : "FR"}
+          </button>
           <Link
             href="/auth/sign-in"
             className="font-serif text-[13px] font-light tracking-widest text-charcoal-deep bg-champagne px-5 py-1.5 hover:bg-copper transition-all duration-300"
           >
-            Accéder
+            {t.access}
           </Link>
         </div>
 
         {/* Mobile toggle */}
         <div className="flex md:hidden items-center gap-3">
+          <button
+            onClick={() => setLang(lang === "fr" ? "en" : "fr")}
+            className="font-serif text-[12px] font-light tracking-widest text-white/40 hover:text-champagne transition-colors"
+          >
+            {lang === "fr" ? "EN" : "FR"}
+          </button>
           <button onClick={() => setOpen(!open)} className="text-champagne p-1">
             {open ? <X size={20} /> : <List size={20} />}
           </button>
@@ -94,7 +103,7 @@ export default function Nav() {
               onClick={() => setOpen(false)}
               className="inline-block font-serif text-[13px] tracking-widest text-charcoal-deep bg-champagne px-6 py-2 hover:bg-copper transition-all duration-300"
             >
-              Accéder
+              {t.access}
             </Link>
           </div>
         </div>

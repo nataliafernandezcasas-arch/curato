@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations } from "@/lib/i18n/translations";
 
 const fade = (d = 0) => ({
   initial: { opacity: 0, y: 16 },
@@ -18,6 +20,8 @@ export default function CandidaturePage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const { lang } = useLang();
+  const t = translations[lang].candidature;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,7 +47,7 @@ export default function CandidaturePage() {
 
       setSubmitted(true);
     } catch {
-      setError("Une erreur s'est produite. Veuillez réessayer.");
+      setError(t.error);
     } finally {
       setLoading(false);
     }
@@ -60,15 +64,11 @@ export default function CandidaturePage() {
           <Link href="/" className="inline-block mb-12">
             <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
           </Link>
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">Candidature reçue</p>
-          <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-text-primary mb-6">
-            Merci.
-          </h1>
-          <p className="font-serif text-[16px] font-light text-text-secondary leading-relaxed mb-10">
-            Nous étudions chaque candidature avec soin. Vous recevrez une réponse prochainement.
-          </p>
+          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">{t.successBadge}</p>
+          <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-text-primary mb-6">{t.successTitle}</h1>
+          <p className="font-serif text-[16px] font-light text-text-secondary leading-relaxed mb-10">{t.successText}</p>
           <Link href="/" className="font-serif text-[12px] tracking-widest uppercase text-champagne/60 hover:text-champagne transition-colors">
-            Retour à l'accueil
+            {t.successBack}
           </Link>
         </motion.div>
       </div>
@@ -87,62 +87,44 @@ export default function CandidaturePage() {
           <Link href="/" className="inline-block mb-8">
             <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
           </Link>
-          <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
-            Candidature
-          </h1>
-          <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">
-            Sur invitation · Places limitées
-          </p>
+          <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">{t.title}</h1>
+          <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">{t.badge}</p>
         </div>
 
         {!type ? (
           <motion.div {...fade(0.1)} className="space-y-4">
-            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 text-center mb-8">
-              Je suis
-            </p>
+            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 text-center mb-8">{t.chooseLabel}</p>
             <button
               onClick={() => setType("creator")}
               className="w-full group border border-border bg-charcoal-mid/40 p-8 text-left hover:border-champagne/40 hover:bg-charcoal-mid transition-all duration-300"
             >
-              <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-3">Créateur · Créatrice</p>
-              <p className="font-serif text-xl font-light tracking-wider uppercase text-text-primary">
-                Je veux découvrir Paris.
-              </p>
-              <p className="font-serif text-[14px] font-light text-text-muted mt-3 leading-relaxed">
-                Crédit mensuel pour explorer les meilleures adresses de la ville.
-              </p>
+              <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-3">{t.creatorLabel}</p>
+              <p className="font-serif text-xl font-light tracking-wider uppercase text-text-primary">{t.creatorTitle}</p>
+              <p className="font-serif text-[14px] font-light text-text-muted mt-3 leading-relaxed">{t.creatorDesc}</p>
             </button>
             <button
               onClick={() => setType("maison")}
               className="w-full group border border-border bg-charcoal-mid/40 p-8 text-left hover:border-copper/40 hover:bg-charcoal-mid transition-all duration-300"
             >
-              <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-copper/50 mb-3">Maison · Commerce</p>
-              <p className="font-serif text-xl font-light tracking-wider uppercase text-text-primary">
-                Je veux rejoindre le carnet.
-              </p>
-              <p className="font-serif text-[14px] font-light text-text-muted mt-3 leading-relaxed">
-                Accueillir des créateurs qui vous ont sincèrement choisi.
-              </p>
+              <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-copper/50 mb-3">{t.maisonLabel}</p>
+              <p className="font-serif text-xl font-light tracking-wider uppercase text-text-primary">{t.maisonTitle}</p>
+              <p className="font-serif text-[14px] font-light text-text-muted mt-3 leading-relaxed">{t.maisonDesc}</p>
             </button>
           </motion.div>
         ) : (
           <motion.form {...fade(0.1)} onSubmit={handleSubmit} className="space-y-5">
             <div className="flex items-center gap-4 mb-8">
-              <button
-                type="button"
-                onClick={() => setType(null)}
-                className="font-serif text-[11px] tracking-[0.2em] uppercase text-text-muted/50 hover:text-text-muted transition-colors"
-              >
-                ← Retour
+              <button type="button" onClick={() => setType(null)} className="font-serif text-[11px] tracking-[0.2em] uppercase text-text-muted/50 hover:text-text-muted transition-colors">
+                {t.back}
               </button>
               <span className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50">
-                {type === "creator" ? "Créateur · Créatrice" : "Maison · Commerce"}
+                {type === "creator" ? t.creatorLabel : t.maisonLabel}
               </span>
             </div>
 
             <div>
               <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-                {type === "creator" ? "Nom complet" : "Nom de la maison"}
+                {type === "creator" ? t.nameLabel : t.nameLabelMaison}
               </label>
               <input
                 type="text"
@@ -150,72 +132,64 @@ export default function CandidaturePage() {
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
                 className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
-                placeholder={type === "creator" ? "Votre nom" : "Le Cinq, Café de Flore…"}
+                placeholder={type === "creator" ? t.namePlaceholder : t.namePlaceholderMaison}
               />
             </div>
 
             <div>
-              <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-                Adresse e-mail
-              </label>
+              <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.emailLabel}</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
                 className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
-                placeholder="votre@email.com"
+                placeholder={t.emailPlaceholder}
               />
             </div>
 
             {type === "creator" && (
               <div>
-                <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-                  Instagram
-                </label>
+                <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.instagramLabel}</label>
                 <input
                   type="text"
                   value={form.instagram}
                   onChange={(e) => setForm({ ...form, instagram: e.target.value })}
                   className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
-                  placeholder="@votrehandle"
+                  placeholder={t.instagramPlaceholder}
                 />
               </div>
             )}
 
             {type === "maison" && (
               <div>
-                <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-                  Site web
-                </label>
+                <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.websiteLabel}</label>
                 <input
                   type="url"
                   value={form.website}
                   onChange={(e) => setForm({ ...form, website: e.target.value })}
                   className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
-                  placeholder="https://votresite.com"
+                  placeholder={t.websitePlaceholder}
                 />
               </div>
             )}
 
             <div>
               <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-                {type === "creator" ? "Pourquoi Curato ?" : "Décrivez votre maison"}
-                <span className="normal-case tracking-normal ml-2 text-text-muted/40">— facultatif</span>
+                {type === "creator" ? t.whyLabel : t.describeLabel}
+                <span className="normal-case tracking-normal ml-2 text-text-muted/40">{t.optional}</span>
               </label>
               <textarea
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 rows={4}
                 className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40 resize-none"
-                placeholder={type === "creator" ? "Quelques mots sur vous et votre univers…" : "Votre histoire, votre adresse, ce qui vous rend unique…"}
+                placeholder={type === "creator" ? t.whyPlaceholder : t.describePlaceholder}
               />
             </div>
 
             {error && (
-              <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">
-                {error}
-              </p>
+              <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">{error}</p>
             )}
 
             <button
@@ -223,12 +197,10 @@ export default function CandidaturePage() {
               disabled={loading}
               className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? "Envoi en cours…" : "Envoyer ma candidature"}
+              {loading ? t.submitting : t.submitBtn}
             </button>
 
-            <p className="text-center font-serif text-[12px] font-light text-text-muted/50 tracking-wide">
-              Chaque candidature est étudiée manuellement.
-            </p>
+            <p className="text-center font-serif text-[12px] font-light text-text-muted/50 tracking-wide">{t.note}</p>
           </motion.form>
         )}
       </div>
