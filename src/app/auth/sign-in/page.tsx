@@ -15,24 +15,23 @@ export default function SignInPage() {
     setError("");
 
     try {
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-
-      // Look up email by handle
-      const cleanHandle = handle.replace("@", "").trim().toLowerCase();
-      const { data: creator } = await supabase
-        .from("creators")
-        .select("email")
-        .ilike("handle", cleanHandle)
-        .maybeSingle();
-
-      if (!creator?.email) {
+      // Look up email by handle via server API (bypasses RLS)
+      const lookupRes = await fetch("/api/auth/lookup-handle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ handle }),
+      });
+      const lookupData = await lookupRes.json();
+      if (!lookupRes.ok || !lookupData.email) {
         setError("Identifiant introuvable. Vérifiez votre e-mail de bienvenue.");
         return;
       }
 
+      const { createClient } = await import("@/lib/supabase/client");
+      const supabase = createClient();
+
       const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: creator.email,
+        email: lookupData.email,
         password,
       });
 
