@@ -184,7 +184,7 @@ export async function PATCH(request: NextRequest) {
   const ok = await isAdmin();
   if (!ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { id, status } = await request.json();
+  const { id, status, followers } = await request.json();
   if (!id || !["approved", "rejected"].includes(status)) {
     return NextResponse.json({ error: "Parámetros inválidos" }, { status: 400 });
   }
@@ -240,6 +240,7 @@ export async function PATCH(request: NextRequest) {
         stage: "active",
         monthly_credit_cop: 300,
         credit_used_cop: 0,
+        ...(followers != null ? { followers } : {}),
       }, { onConflict: "email" });
       if (creatorErr) console.error("Creator upsert error:", creatorErr);
     } else if (app.type === "business") {

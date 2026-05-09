@@ -36,6 +36,7 @@ function StatusBadge({ status }: { status: string }) {
 function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: string, status: string) => void }) {
   const [loading, setLoading] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [followers, setFollowers] = useState("");
 
   async function update(status: string) {
     setLoading(status);
@@ -45,7 +46,11 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: app.id, status }),
+        body: JSON.stringify({
+          id: app.id,
+          status,
+          followers: status === "approved" && app.type === "creator" ? parseInt(followers) || 0 : undefined,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -72,7 +77,16 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
   }
   if (app.status === "rejected") {
     return (
-      <div className="space-y-1">
+      <div className="space-y-2">
+        {app.type === "creator" && (
+          <input
+            type="number"
+            value={followers}
+            onChange={(e) => setFollowers(e.target.value)}
+            placeholder="Seguidores"
+            className="w-full font-serif text-[11px] border border-black/20 px-3 py-1.5 text-charcoal-deep placeholder:text-charcoal-deep/30 focus:outline-none focus:border-black/40"
+          />
+        )}
         <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors disabled:opacity-40">
           {loading === "approved" ? "…" : "Aceptar"}
         </button>
@@ -83,6 +97,15 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
 
   return (
     <div className="space-y-2">
+      {app.type === "creator" && (
+        <input
+          type="number"
+          value={followers}
+          onChange={(e) => setFollowers(e.target.value)}
+          placeholder="Nº de seguidores"
+          className="w-full font-serif text-[11px] border border-black/20 px-3 py-1.5 text-charcoal-deep placeholder:text-charcoal-deep/30 focus:outline-none focus:border-black/40"
+        />
+      )}
       <div className="flex items-center gap-3">
         <button
           onClick={() => update("approved")}
