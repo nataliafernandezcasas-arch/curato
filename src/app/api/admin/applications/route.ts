@@ -217,9 +217,18 @@ export async function PATCH(request: NextRequest) {
       user_metadata: { force_password_change: true, handle },
     });
 
-    // If user already exists, update their password
-    if (authErr && authData === null) {
-      console.error("createUser error:", authErr.message);
+    // If user already exists, find them and update their password
+    if (authErr) {
+      const { data: listData } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      const existing = listData?.users?.find((u) => u.email === app.email);
+      if (existing) {
+        await supabase.auth.admin.updateUserById(existing.id, {
+          password: tempPassword,
+          user_metadata: { force_password_change: true, handle },
+        });
+      } else {
+        console.error("createUser error:", authErr.message);
+      }
     }
 
     // Create creator or comercio record
