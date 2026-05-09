@@ -6,7 +6,7 @@ import { isAdmin } from "@/lib/admin/auth";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE = "https://curatocollective.com";
 
-function acceptedEmail(name: string, type: string, code: string) {
+function acceptedEmail(name: string, type: string, handle: string, tempPassword: string) {
   const isCreator = type === "creator";
   const firstName = name.split(" ")[0];
   return `<!DOCTYPE html>
@@ -65,16 +65,23 @@ function acceptedEmail(name: string, type: string, code: string) {
         </p>
       </td></tr>
 
-      <!-- Access code -->
+      <!-- Credentials -->
       <tr><td style="background-color:#1A1A1A;padding:0 48px 36px;">
-        <p style="margin:0 0 12px;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#7a7060;">Votre code d'accès</p>
-        <p style="margin:0;font-size:36px;font-weight:300;letter-spacing:0.4em;color:#CBB78F;font-family:Georgia,'Times New Roman',Times,serif;">${code}</p>
-        <p style="margin:8px 0 0;font-size:12px;color:#5a5040;">Valable 7 jours · Ne pas partager</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #2a2a2a;">
+          <tr><td style="padding:24px 28px;">
+            <p style="margin:0 0 16px;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#7a7060;">Vos identifiants</p>
+            <p style="margin:0 0 8px;font-size:13px;color:#5a5040;">Identifiant</p>
+            <p style="margin:0 0 20px;font-size:18px;font-weight:300;color:#CBB78F;letter-spacing:0.05em;">@${handle || name.toLowerCase().replace(/\s+/g, "")}</p>
+            <p style="margin:0 0 8px;font-size:13px;color:#5a5040;">Mot de passe temporaire</p>
+            <p style="margin:0;font-size:18px;font-weight:300;color:#CBB78F;letter-spacing:0.1em;">${tempPassword}</p>
+            <p style="margin:12px 0 0;font-size:11px;color:#5a5040;">Vous serez invité·e à changer votre mot de passe à la première connexion.</p>
+          </td></tr>
+        </table>
       </td></tr>
 
       <!-- CTA -->
       <tr><td style="background-color:#1A1A1A;padding:0 48px 48px;">
-        <a href="${BASE}/auth/access" style="display:inline-block;font-family:Georgia,'Times New Roman',Times,serif;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:#1A1A1A;background-color:#CBB78F;padding:16px 32px;text-decoration:none;">
+        <a href="${BASE}/auth/sign-in" style="display:inline-block;font-family:Georgia,'Times New Roman',Times,serif;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;color:#1A1A1A;background-color:#CBB78F;padding:16px 32px;text-decoration:none;">
           Accéder à Curato
         </a>
       </td></tr>
@@ -184,42 +191,43 @@ export async function PATCH(request: NextRequest) {
 
   const supabase = createAdminClient();
 
-  // Get application data to send email
   const { data: app } = await supabase
     .from("applications")
     .select("name, email, type, instagram, website")
     .eq("id", id)
     .single();
 
-  // Generate access code on approval
-  let accessCode: string | null = null;
-  if (status === "approved") {
-    accessCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { error: updateError } = await supabase
-      .from("applications")
-      .update({ access_code: accessCode, access_code_expires_at: expiresAt, status })
-      .eq("id", id);
-    if (updateError) {
-      console.error("Failed to save access code:", updateError);
-      return NextResponse.json({ error: `Error guardando código: ${updateError.message}` }, { status: 500 });
-    }
-  } else {
-    // Update status only
-    const { error } = await supabase
-      .from("applications")
-      .update({ status })
-      .eq("id", id);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  // Update application status
+  const { error: statusErr } = await supabase
+    .from("applications")
+    .update({ status })
+    .eq("id", id);
+  if (statusErr) return NextResponse.json({ error: statusErr.message }, { status: 500 });
 
-  // On approval: create creator or comercio record so dashboard routing works
   if (status === "approved" && app) {
+    const handle = ((app as any).instagram || "").replace("@", "").trim() ||
+      app.name.toLowerCase().replace(/\s+/g, "");
+    const tempPassword = `Curato${Math.floor(100000 + Math.random() * 900000)}!`;
+
+    // Create Supabase auth user with temp password
+    const { data: authData, error: authErr } = await supabase.auth.admin.createUser({
+      email: app.email,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: { force_password_change: true, handle },
+    });
+
+    // If user already exists, update their password
+    if (authErr && authData === null) {
+      console.error("createUser error:", authErr.message);
+    }
+
+    // Create creator or comercio record
     if (app.type === "creator") {
       const { error: creatorErr } = await supabase.from("creators").upsert({
         full_name: app.name,
         email: app.email,
-        handle: (app as any).instagram?.replace("@", "") || "",
+        handle,
         stage: "active",
         monthly_credit_cop: 300,
         credit_used_cop: 0,
@@ -235,24 +243,25 @@ export async function PATCH(request: NextRequest) {
       }, { onConflict: "email" });
       if (comercioErr) console.error("Comercio upsert error:", comercioErr);
     }
-  }
 
-  // Send email
-  if (app?.email && app?.name) {
+    // Send acceptance email with credentials
     try {
-      const html = status === "approved"
-        ? acceptedEmail(app.name, app.type, accessCode!)
-        : rejectedEmail(app.name, app.type);
-
-      const subject = status === "approved"
-        ? `Bienvenue dans Curato, ${app.name.split(" ")[0]}.`
-        : `Votre candidature Curato — ${app.name.split(" ")[0]}`;
-
       await resend.emails.send({
         from: "Curato <hello@curatocollective.com>",
         to: app.email,
-        subject,
-        html,
+        subject: `Bienvenue dans Curato, ${app.name.split(" ")[0]}.`,
+        html: acceptedEmail(app.name, app.type, handle, tempPassword),
+      });
+    } catch (emailErr) {
+      console.error("Email send error:", emailErr);
+    }
+  } else if (status === "rejected" && app?.email && app?.name) {
+    try {
+      await resend.emails.send({
+        from: "Curato <hello@curatocollective.com>",
+        to: app.email,
+        subject: `Votre candidature Curato — ${app.name.split(" ")[0]}`,
+        html: rejectedEmail(app.name, app.type),
       });
     } catch (emailErr) {
       console.error("Email send error:", emailErr);
