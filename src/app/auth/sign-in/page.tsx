@@ -23,7 +23,7 @@ export default function SignInPage() {
       const { data: creator } = await supabase
         .from("creators")
         .select("email")
-        .eq("handle", cleanHandle)
+        .ilike("handle", cleanHandle)
         .maybeSingle();
 
       if (!creator?.email) {

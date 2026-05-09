@@ -205,7 +205,7 @@ export async function PATCH(request: NextRequest) {
   if (statusErr) return NextResponse.json({ error: statusErr.message }, { status: 500 });
 
   if (status === "approved" && app) {
-    const handle = ((app as any).instagram || "").replace("@", "").trim() ||
+    const handle = ((app as any).instagram || "").replace("@", "").trim().toLowerCase() ||
       app.name.toLowerCase().replace(/\s+/g, "");
     const tempPassword = `Curato${Math.floor(100000 + Math.random() * 900000)}!`;
 
