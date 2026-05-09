@@ -216,37 +216,24 @@ export async function PATCH(request: NextRequest) {
   // On approval: create creator or comercio record so dashboard routing works
   if (status === "approved" && app) {
     if (app.type === "creator") {
-      await supabase.from("creators").upsert({
+      const { error: creatorErr } = await supabase.from("creators").upsert({
         full_name: app.name,
         email: app.email,
         handle: (app as any).instagram?.replace("@", "") || "",
-        platform: "instagram",
-        category: "",
-        followers: 0,
-        country: "FR",
-        city: "Paris",
         stage: "active",
         monthly_credit_cop: 300,
         credit_used_cop: 0,
-        visits_count: 0,
-        content_rate: 0,
-        rating: 0,
-        usage_percent: 0,
       }, { onConflict: "email" });
+      if (creatorErr) console.error("Creator upsert error:", creatorErr);
     } else if (app.type === "business") {
-      await supabase.from("comercios").upsert({
+      const { error: comercioErr } = await supabase.from("comercios").upsert({
         name: app.name,
         email: app.email,
         contact_name: app.name,
-        category: "gastronomy",
-        country: "FR",
-        city: "Paris",
         stage: "activo",
-        plan: "1_month",
-        monthly_price: 0,
-        rating: 0,
         website_url: (app as any).website || null,
       }, { onConflict: "email" });
+      if (comercioErr) console.error("Comercio upsert error:", comercioErr);
     }
   }
 
