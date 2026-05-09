@@ -22,6 +22,7 @@ type Profile = {
   handle: string | null;
   monthly_credit_cop: number | null;
   credit_used_cop: number | null;
+  followers: number | null;
 };
 
 const CAT_LABELS: Record<string, string> = {
@@ -48,7 +49,7 @@ export default function InfluencerDashboard() {
 
       const { data: creator } = await supabase
         .from("creators")
-        .select("full_name, handle, monthly_credit_cop, credit_used_cop")
+        .select("full_name, handle, monthly_credit_cop, credit_used_cop, followers")
         .eq("email", (user.email || "").toLowerCase())
         .maybeSingle();
 
@@ -109,9 +110,31 @@ export default function InfluencerDashboard() {
                 <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-2">
                   Bonjour
                 </p>
-                <h1 className="font-serif text-2xl font-light tracking-wider text-text-primary">
+                <h1 className="font-serif text-2xl font-light tracking-wider text-text-primary mb-2">
                   {profile.full_name || profile.handle || "Créateur"}
                 </h1>
+                {profile.handle && (
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={`https://instagram.com/${profile.handle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-serif text-[12px] text-champagne/50 hover:text-champagne transition-colors tracking-wide"
+                    >
+                      @{profile.handle}
+                    </a>
+                    {profile.followers != null && profile.followers > 0 && (
+                      <>
+                        <span className="text-white/10">·</span>
+                        <span className="font-serif text-[12px] text-text-muted/60">
+                          {profile.followers >= 1000
+                            ? `${(profile.followers / 1000).toFixed(profile.followers >= 10000 ? 0 : 1)}K`
+                            : profile.followers} seguidores
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
               <div className="text-right">
                 <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-text-muted mb-1">Crédit disponible</p>
