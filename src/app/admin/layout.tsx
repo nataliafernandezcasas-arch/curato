@@ -66,6 +66,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/admin" className="font-serif text-[12px] tracking-wider text-charcoal-deep/70 hover:text-charcoal-deep transition-colors">
               Candidaturas
             </Link>
+            <Link href="/admin/qr" className="font-serif text-[12px] tracking-wider text-charcoal-deep/70 hover:text-charcoal-deep transition-colors">
+              QR Invitación
+            </Link>
           </div>
           <form action="/api/admin/logout" method="post">
             <button type="submit" className="font-serif text-[12px] tracking-wider text-charcoal-deep/40 hover:text-charcoal-deep transition-colors">
