@@ -49,7 +49,7 @@ export default function InfluencerDashboard() {
       const { data: creator } = await supabase
         .from("creators")
         .select("full_name, handle, monthly_credit_cop, credit_used_cop")
-        .eq("owner_id", user.id)
+        .eq("email", (user.email || "").toLowerCase())
         .maybeSingle();
 
       if (creator) setProfile(creator);
