@@ -99,7 +99,7 @@ export default function InvitacionPage() {
 
         <div className="w-16 h-px bg-champagne/30 mb-10" />
 
-        <p className="font-serif text-[16px] font-light leading-[1.85] text-text-muted max-w-[480px]">
+        <p className="font-serif text-[16px] font-light leading-[1.85] text-text-muted max-w-[480px] whitespace-pre-line">
           {t.body1}
         </p>
 
