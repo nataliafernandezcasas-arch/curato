@@ -505,7 +505,7 @@ export const translations = {
       badge: "París · Por invitación",
       title1: "Has sido",
       title2: "seleccionado·a.",
-      body1: "Curato te abre las puertas de un carnet de direcciones parisinas cuidadosamente seleccionadas: Gastronomie, Bien-être, Conscience et Hôtellerie.",
+      body1: "Curato te abre las puertas de un carnet de direcciones parisinas cuidadosamente seleccionadas:\nGastronomía, Bienestar, Belleza y Hotelería.",
       body2: "Cada dirección fue elegida por lo que ofrece de raro.",
       body2accent: "Cada creador·a, por lo que encarna.",
       cta: "Unirse a Curato",
