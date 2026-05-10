@@ -185,7 +185,7 @@ export async function PATCH(request: NextRequest) {
   if (!ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { id, status, followers } = await request.json();
-  if (!id || !["approved", "rejected"].includes(status)) {
+  if (!id || !["approved", "rejected", "deleted"].includes(status)) {
     return NextResponse.json({ error: "Parámetros inválidos" }, { status: 400 });
   }
 
@@ -203,6 +203,10 @@ export async function PATCH(request: NextRequest) {
     .update({ status })
     .eq("id", id);
   if (statusErr) return NextResponse.json({ error: statusErr.message }, { status: 500 });
+
+  if (status === "deleted") {
+    return NextResponse.json({ ok: true });
+  }
 
   if (status === "approved" && app) {
     const handle = ((app as any).instagram || "").replace("@", "").trim().toLowerCase() ||

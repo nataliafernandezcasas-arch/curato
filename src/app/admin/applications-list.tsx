@@ -20,11 +20,13 @@ function StatusBadge({ status }: { status: string }) {
     pending: "text-amber-700 border-amber-300 bg-amber-50",
     approved: "text-emerald-700 border-emerald-300 bg-emerald-50",
     rejected: "text-red-600 border-red-300 bg-red-50",
+    deleted: "text-charcoal-deep/30 border-black/10 bg-black/5",
   };
   const labels: Record<string, string> = {
     pending: "Pendiente",
     approved: "Aceptada",
     rejected: "Rechazada",
+    deleted: "Borrada",
   };
   return (
     <span className={`inline-block font-serif text-[10px] tracking-[0.25em] uppercase border px-2.5 py-1 ${styles[status] ?? styles.pending}`}>
@@ -65,11 +67,24 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
     }
   }
 
+  if (app.status === "deleted") {
+    return (
+      <div className="space-y-1">
+        <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-charcoal-deep/40 hover:text-charcoal-deep transition-colors disabled:opacity-40">
+          {loading === "pending" ? "…" : "Restaurar"}
+        </button>
+        {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
+      </div>
+    );
+  }
   if (app.status === "approved") {
     return (
       <div className="space-y-1">
         <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-500 hover:text-red-700 transition-colors disabled:opacity-40">
           {loading === "rejected" ? "…" : "Rechazar"}
+        </button>
+        <button onClick={() => update("deleted")} disabled={!!loading} className="block font-serif text-[11px] tracking-wider text-charcoal-deep/30 hover:text-charcoal-deep/60 transition-colors disabled:opacity-40">
+          {loading === "deleted" ? "…" : "Borrar"}
         </button>
         {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
       </div>
@@ -89,6 +104,9 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
         )}
         <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors disabled:opacity-40">
           {loading === "approved" ? "…" : "Aceptar"}
+        </button>
+        <button onClick={() => update("deleted")} disabled={!!loading} className="block font-serif text-[11px] tracking-wider text-charcoal-deep/30 hover:text-charcoal-deep/60 transition-colors disabled:opacity-40">
+          {loading === "deleted" ? "…" : "Borrar"}
         </button>
         {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
       </div>
@@ -121,6 +139,13 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
         >
           {loading === "rejected" ? "…" : "Rechazar"}
         </button>
+        <button
+          onClick={() => update("deleted")}
+          disabled={!!loading}
+          className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep/25 hover:text-charcoal-deep/50 transition-colors disabled:opacity-40"
+        >
+          {loading === "deleted" ? "…" : "Borrar"}
+        </button>
       </div>
       {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
     </div>
@@ -129,7 +154,7 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
 
 export default function ApplicationsList({ initial }: { initial: Application[] }) {
   const [apps, setApps] = useState(initial);
-  const [tab, setTab] = useState<"all" | "creator" | "business">("all");
+  const [tab, setTab] = useState<"all" | "creator" | "business" | "deleted">("all");
   const router = useRouter();
 
   function handleUpdate(id: string, status: string) {
@@ -137,19 +162,28 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
     router.refresh();
   }
 
-  const filtered = tab === "all" ? apps : apps.filter((a) => a.type === tab);
+  const active = apps.filter((a) => a.status !== "deleted");
+  const deleted = apps.filter((a) => a.status === "deleted");
+
+  const filtered =
+    tab === "deleted" ? deleted :
+    tab === "all" ? active :
+    active.filter((a) => a.type === tab);
+
   const counts = {
-    all: apps.length,
-    creator: apps.filter((a) => a.type === "creator").length,
-    business: apps.filter((a) => a.type === "business").length,
-    pending: apps.filter((a) => a.status === "pending").length,
-    approved: apps.filter((a) => a.status === "approved").length,
+    all: active.length,
+    creator: active.filter((a) => a.type === "creator").length,
+    business: active.filter((a) => a.type === "business").length,
+    pending: active.filter((a) => a.status === "pending").length,
+    approved: active.filter((a) => a.status === "approved").length,
+    deleted: deleted.length,
   };
 
   const tabs = [
     { key: "all", label: "Todas", count: counts.all },
     { key: "creator", label: "Creadores", count: counts.creator },
     { key: "business", label: "Casas", count: counts.business },
+    { key: "deleted", label: "Borradas", count: counts.deleted },
   ] as const;
 
   return (
