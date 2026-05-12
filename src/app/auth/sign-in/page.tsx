@@ -2,8 +2,19 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations, Lang } from "@/lib/i18n/translations";
+
+const LANGS: { key: Lang; label: string }[] = [
+  { key: "fr", label: "FR" },
+  { key: "en", label: "EN" },
+  { key: "es", label: "ES" },
+];
 
 export default function SignInPage() {
+  const { lang, setLang } = useLang();
+  const t = translations[lang].signIn;
+
   const [handle, setHandle] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,7 +26,6 @@ export default function SignInPage() {
     setError("");
 
     try {
-      // Look up email by handle via server API (bypasses RLS)
       const lookupRes = await fetch("/api/auth/lookup-handle", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -23,7 +33,7 @@ export default function SignInPage() {
       });
       const lookupData = await lookupRes.json();
       if (!lookupRes.ok || !lookupData.email) {
-        setError("Identifiant introuvable. Vérifiez votre e-mail de bienvenue.");
+        setError(t.errorHandle);
         return;
       }
 
@@ -36,7 +46,7 @@ export default function SignInPage() {
       });
 
       if (signInErr) {
-        setError("Mot de passe incorrect. Vérifiez votre e-mail de bienvenue.");
+        setError(t.errorPassword);
         return;
       }
 
@@ -46,7 +56,7 @@ export default function SignInPage() {
         window.location.href = "/dashboard";
       }
     } catch {
-      setError("Erreur de connexion. Veuillez réessayer.");
+      setError(t.errorConnection);
     } finally {
       setLoading(false);
     }
@@ -59,23 +69,38 @@ export default function SignInPage() {
         <div className="absolute inset-0 bg-charcoal-deep/80 backdrop-blur-sm" />
       </div>
 
+      {/* Language switcher */}
+      <div className="absolute top-5 right-5 flex items-center gap-3 z-20">
+        {LANGS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setLang(key)}
+            className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
+              lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="relative z-10 w-full max-w-[400px]">
         <div className="text-center mb-12">
           <Link href="/" className="inline-block mb-8">
             <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
           </Link>
           <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
-            Accéder
+            {t.title}
           </h1>
           <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">
-            Réservé aux membres de Curato
+            {t.subtitle}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-              Identifiant
+              {t.handleLabel}
             </label>
             <input
               type="text"
@@ -83,13 +108,13 @@ export default function SignInPage() {
               onChange={(e) => setHandle(e.target.value)}
               required
               className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
-              placeholder="@votrehandle"
+              placeholder={t.handlePlaceholder}
             />
           </div>
 
           <div>
             <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-              Mot de passe
+              {t.passwordLabel}
             </label>
             <input
               type="password"
@@ -112,14 +137,14 @@ export default function SignInPage() {
             disabled={loading}
             className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
           >
-            {loading ? "Connexion…" : "Se connecter"}
+            {loading ? t.submitting : t.submitBtn}
           </button>
         </form>
 
         <p className="text-center mt-10 font-serif text-[12px] font-light text-text-muted tracking-wide">
-          Pas encore membre ?{" "}
+          {t.notMember}{" "}
           <Link href="/creadores" className="text-champagne hover:text-copper transition-colors">
-            Demander une invitation
+            {t.requestInvite}
           </Link>
         </p>
       </div>
