@@ -66,7 +66,7 @@ export default function CreadoresPage() {
 
         {/* PHOTO BREAK */}
         <section className="relative h-[60vh] overflow-hidden">
-          <img src="/Background Image 7.jpeg" alt="" className="w-full h-full object-cover object-center" />
+          <img src="/Background Image 7.jpeg" alt="" className="w-full h-full object-cover object-bottom" />
           <div className="absolute inset-0 bg-black/30" />
         </section>
 
