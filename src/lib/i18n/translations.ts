@@ -71,7 +71,7 @@ export const translations = {
       howLabel: "Comment ça fonctionne",
       howTitle: "Simple. Élégant. Authentique.",
       steps: [
-        { num: "01", title: "Sélection", desc: "Curato sélectionne les créateurs parisiens dont l'univers correspond à l'esthétique de la plateforme. Chaque profil est étudié manuellement." },
+        { num: "01", title: "Sélection", desc: "Curato sélectionne les créateurs parisiens dont l'univers correspond à l'esthétique de la plateforme. Chaque profil est étudié avec soin." },
         { num: "02", title: "Crédit mensuel", desc: "Une fois accepté, vous recevez un crédit mensuel en EUR utilisable dans les adresses sélectionnées du carnet Curato à Paris." },
         { num: "03", title: "Visite libre", desc: "Vous choisissez où aller, quand y aller. Aucun brief, aucune obligation de publier,la visite doit d'abord vous appartenir." },
         { num: "04", title: "Contenu naturel", desc: "Si l'expérience vous inspire, vous publiez. Stories, reels, posts. Le contenu naît de l'expérience, pas d'une commande." },
@@ -246,7 +246,7 @@ export const translations = {
       howLabel: "How it works",
       howTitle: "Simple. Elegant. Authentic.",
       steps: [
-        { num: "01", title: "Selection", desc: "Curato selects Parisian creators whose universe aligns with the platform's aesthetic. Every profile is reviewed manually." },
+        { num: "01", title: "Selection", desc: "Curato selects Parisian creators whose universe aligns with the platform's aesthetic. Every profile is reviewed with care." },
         { num: "02", title: "Monthly credit", desc: "Once accepted, you receive a monthly credit in EUR to use at Curato's selected addresses across Paris." },
         { num: "03", title: "Free visit", desc: "You choose where to go, when to go. No brief, no obligation to post,the visit belongs to you first." },
         { num: "04", title: "Natural content", desc: "If the experience inspires you, you publish. Stories, reels, posts. Content born from experience, not from a brief." },
@@ -421,7 +421,7 @@ export const translations = {
       howLabel: "Cómo funciona",
       howTitle: "Simple. Elegante. Auténtico.",
       steps: [
-        { num: "01", title: "Selección", desc: "Curato selecciona creadores parisinos cuyo universo coincide con la estética de la plataforma. Cada perfil se estudia manualmente." },
+        { num: "01", title: "Selección", desc: "Curato selecciona creadores parisinos cuyo universo coincide con la estética de la plataforma. Cada perfil se estudia con cuidado." },
         { num: "02", title: "Crédito mensual", desc: "Una vez aceptado, recibes un crédito mensual en EUR para usar en las direcciones seleccionadas del carnet Curato en París." },
         { num: "03", title: "Visita libre", desc: "Tú eliges adónde ir, cuándo ir. Sin brief, sin obligación de publicar,la visita te pertenece primero." },
         { num: "04", title: "Contenido natural", desc: "Si la experiencia te inspira, publicas. Stories, reels, posts. El contenido nace de la experiencia, no de un encargo." },
