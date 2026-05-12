@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash } from "@phosphor-icons/react";
 
 type Application = {
   id: string;
@@ -69,7 +70,7 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
 
   if (app.status === "deleted") {
     return (
-      <div className="space-y-1">
+      <div className="flex items-center gap-3">
         <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-charcoal-deep/40 hover:text-charcoal-deep transition-colors disabled:opacity-40">
           {loading === "pending" ? "…" : "Restaurar"}
         </button>
@@ -79,12 +80,12 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
   }
   if (app.status === "approved") {
     return (
-      <div className="space-y-1">
+      <div className="flex items-center gap-3">
         <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-500 hover:text-red-700 transition-colors disabled:opacity-40">
           {loading === "rejected" ? "…" : "Rechazar"}
         </button>
-        <button onClick={() => update("deleted")} disabled={!!loading} className="block font-serif text-[11px] tracking-wider text-charcoal-deep/30 hover:text-charcoal-deep/60 transition-colors disabled:opacity-40">
-          {loading === "deleted" ? "…" : "Borrar"}
+        <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-charcoal-deep/25 hover:text-red-400 transition-colors disabled:opacity-40">
+          {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
         </button>
         {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
       </div>
@@ -102,12 +103,14 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
             className="w-full font-serif text-[11px] border border-black/20 px-3 py-1.5 text-charcoal-deep placeholder:text-charcoal-deep/30 focus:outline-none focus:border-black/40"
           />
         )}
-        <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors disabled:opacity-40">
-          {loading === "approved" ? "…" : "Aceptar"}
-        </button>
-        <button onClick={() => update("deleted")} disabled={!!loading} className="block font-serif text-[11px] tracking-wider text-charcoal-deep/30 hover:text-charcoal-deep/60 transition-colors disabled:opacity-40">
-          {loading === "deleted" ? "…" : "Borrar"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors disabled:opacity-40">
+            {loading === "approved" ? "…" : "Aceptar"}
+          </button>
+          <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-charcoal-deep/25 hover:text-red-400 transition-colors disabled:opacity-40">
+            {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
+          </button>
+        </div>
         {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
       </div>
     );
@@ -142,9 +145,10 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
         <button
           onClick={() => update("deleted")}
           disabled={!!loading}
-          className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep/25 hover:text-charcoal-deep/50 transition-colors disabled:opacity-40"
+          title="Borrar"
+          className="text-charcoal-deep/25 hover:text-red-400 transition-colors disabled:opacity-40"
         >
-          {loading === "deleted" ? "…" : "Borrar"}
+          {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
         </button>
       </div>
       {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
