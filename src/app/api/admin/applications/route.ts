@@ -185,7 +185,7 @@ export async function PATCH(request: NextRequest) {
   if (!ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { id, status, followers } = await request.json();
-  if (!id || !["approved", "rejected", "deleted"].includes(status)) {
+  if (!id || !["approved", "rejected", "deleted", "pending"].includes(status)) {
     return NextResponse.json({ error: "Parámetros inválidos" }, { status: 400 });
   }
 
@@ -204,7 +204,7 @@ export async function PATCH(request: NextRequest) {
     .eq("id", id);
   if (statusErr) return NextResponse.json({ error: statusErr.message }, { status: 500 });
 
-  if (status === "deleted") {
+  if (status === "deleted" || status === "pending") {
     return NextResponse.json({ ok: true });
   }
 
