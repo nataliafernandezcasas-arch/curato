@@ -169,10 +169,17 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
   const active = apps.filter((a) => a.status !== "deleted");
   const deleted = apps.filter((a) => a.status === "deleted");
 
-  const filtered =
+  const filtered = (
     tab === "deleted" ? deleted :
     tab === "all" ? active :
-    active.filter((a) => a.type === tab);
+    active.filter((a) => a.type === tab)
+  ).sort((a, b) => {
+    // Pending first
+    if (a.status === "pending" && b.status !== "pending") return -1;
+    if (b.status === "pending" && a.status !== "pending") return 1;
+    // Then most recent first
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 
   const counts = {
     all: active.length,
