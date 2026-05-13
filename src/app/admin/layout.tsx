@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { isAdmin, getAdminPass } from "@/lib/admin/auth";
 import AdminLoginForm from "./login-form";
+import AdminNavClient from "./nav-client";
 
 export const dynamic = "force-dynamic";
 
@@ -56,26 +57,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       {/* Nav */}
       <nav className="relative z-10 border-b border-white/10 px-5 h-14 flex items-center">
-        <div className="max-w-[1100px] mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/">
-              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
-            </Link>
-            <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30">Admin</span>
-            <div className="w-px h-3 bg-white/15" />
-            <Link href="/admin" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
-              Candidaturas
-            </Link>
-            <Link href="/admin/qr" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
-              QR Invitación
-            </Link>
-          </div>
-          <form action="/api/admin/logout" method="post">
-            <button type="submit" className="font-serif text-[12px] tracking-wider text-white/30 hover:text-white transition-colors">
-              Salir
-            </button>
-          </form>
-        </div>
+        <AdminNavClient />
       </nav>
 
       <div className="relative z-10">

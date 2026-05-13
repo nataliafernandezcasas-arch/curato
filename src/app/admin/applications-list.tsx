@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash } from "@phosphor-icons/react";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations } from "@/lib/i18n/translations";
 
 type Application = {
   id: string;
@@ -16,7 +18,7 @@ type Application = {
   created_at: string;
 };
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, t }: { status: string; t: { [K in keyof typeof translations.fr.admin]: string } }) {
   const styles: Record<string, string> = {
     pending: "text-amber-300 border-amber-400/40 bg-amber-400/10",
     approved: "text-emerald-300 border-emerald-400/40 bg-emerald-400/10",
@@ -24,10 +26,10 @@ function StatusBadge({ status }: { status: string }) {
     deleted: "text-white/25 border-white/10 bg-white/5",
   };
   const labels: Record<string, string> = {
-    pending: "Pendiente",
-    approved: "Aceptada",
-    rejected: "Rechazada",
-    deleted: "Borrada",
+    pending: t.statusPending,
+    approved: t.statusApproved,
+    rejected: t.statusRejected,
+    deleted: t.statusDeleted,
   };
   return (
     <span className={`inline-block font-serif text-[10px] tracking-[0.25em] uppercase border px-2.5 py-1 ${styles[status] ?? styles.pending}`}>
@@ -36,7 +38,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: string, status: string) => void }) {
+function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: string, status: string) => void; t: { [K in keyof typeof translations.fr.admin]: string } }) {
   const [loading, setLoading] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [followers, setFollowers] = useState("");
@@ -72,7 +74,7 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
     return (
       <div className="flex items-center gap-3">
         <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-white/40 hover:text-white transition-colors disabled:opacity-40">
-          {loading === "pending" ? "…" : "Restaurar"}
+          {loading === "pending" ? "…" : t.actionRestore}
         </button>
         {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
       </div>
@@ -82,7 +84,7 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
     return (
       <div className="flex items-center gap-3">
         <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-400 hover:text-red-300 transition-colors disabled:opacity-40">
-          {loading === "rejected" ? "…" : "Rechazar"}
+          {loading === "rejected" ? "…" : t.actionReject}
         </button>
         <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
           {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
@@ -99,13 +101,13 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
             type="number"
             value={followers}
             onChange={(e) => setFollowers(e.target.value)}
-            placeholder="Seguidores"
+            placeholder={t.followersPlaceholderShort}
             className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
           />
         )}
         <div className="flex items-center gap-3">
           <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-40">
-            {loading === "approved" ? "…" : "Aceptar"}
+            {loading === "approved" ? "…" : t.actionAccept}
           </button>
           <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
             {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
@@ -123,7 +125,7 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
           type="number"
           value={followers}
           onChange={(e) => setFollowers(e.target.value)}
-          placeholder="Nº de seguidores"
+          placeholder={t.followersPlaceholder}
           className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
         />
       )}
@@ -133,14 +135,14 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
           disabled={!!loading}
           className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-4 py-2 hover:bg-emerald-400 transition-all duration-200 disabled:opacity-40"
         >
-          {loading === "approved" ? "…" : "Aceptar"}
+          {loading === "approved" ? "…" : t.actionAccept}
         </button>
         <button
           onClick={() => update("rejected")}
           disabled={!!loading}
           className="font-serif text-[11px] tracking-widest uppercase text-white/50 border border-white/20 px-4 py-2 hover:border-red-400 hover:text-red-400 transition-all duration-200 disabled:opacity-40"
         >
-          {loading === "rejected" ? "…" : "Rechazar"}
+          {loading === "rejected" ? "…" : t.actionReject}
         </button>
         <button
           onClick={() => update("deleted")}
@@ -160,6 +162,8 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
   const [apps, setApps] = useState(initial);
   const [tab, setTab] = useState<"all" | "creator" | "business" | "deleted">("all");
   const router = useRouter();
+  const { lang } = useLang();
+  const t = translations[lang].admin;
 
   function handleUpdate(id: string, status: string) {
     setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
@@ -191,22 +195,32 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
   };
 
   const tabs = [
-    { key: "all", label: "Todas", count: counts.all },
-    { key: "creator", label: "Creadores", count: counts.creator },
-    { key: "business", label: "Casas", count: counts.business },
-    { key: "deleted", label: "Borradas", count: counts.deleted },
+    { key: "all", label: t.tabAll, count: counts.all },
+    { key: "creator", label: t.tabCreators, count: counts.creator },
+    { key: "business", label: t.tabHouses, count: counts.business },
+    { key: "deleted", label: t.tabDeleted, count: counts.deleted },
   ] as const;
 
   return (
     <div>
+      {/* Header */}
+      <div className="mb-12">
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-4">
+          {t.pageLabel}
+        </p>
+        <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-white">
+          {t.pageTitle}
+        </h1>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-10">
         {[
-          { label: "Total", value: counts.all },
-          { label: "Pendientes", value: counts.pending },
-          { label: "Aceptadas", value: counts.approved },
+          { key: "total", label: t.statTotal, value: counts.all },
+          { key: "pending", label: t.statPending, value: counts.pending },
+          { key: "approved", label: t.statApproved, value: counts.approved },
         ].map((s) => (
-          <div key={s.label} className="bg-white/8 backdrop-blur-sm border border-white/10 px-8 py-6">
+          <div key={s.key} className="bg-white/8 backdrop-blur-sm border border-white/10 px-8 py-6">
             <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-champagne/50 mb-2">{s.label}</p>
             <p className="font-serif text-3xl font-light text-white">{s.value}</p>
           </div>
@@ -234,7 +248,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
       {/* List */}
       {filtered.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="font-serif text-[15px] font-light text-white/40">No hay candidaturas aún.</p>
+          <p className="font-serif text-[15px] font-light text-white/40">{t.empty}</p>
         </div>
       ) : (
         <div className="divide-y divide-white/10">
@@ -244,9 +258,9 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
                 <div className="flex items-center gap-4 flex-wrap">
                   <h3 className="font-serif text-[17px] font-light text-white">{app.name}</h3>
                   <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/40 border border-white/15 px-2 py-0.5">
-                    {app.type === "creator" ? "Creador" : "Casa"}
+                    {app.type === "creator" ? t.typeCreator : t.typeHouse}
                   </span>
-                  <StatusBadge status={app.status} />
+                  <StatusBadge status={app.status} t={t} />
                 </div>
 
                 <div className="flex items-center gap-5 flex-wrap">
@@ -293,7 +307,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
               </div>
 
               <div className="flex md:justify-end">
-                <ActionButtons app={app} onUpdate={handleUpdate} />
+                <ActionButtons app={app} onUpdate={handleUpdate} t={t} />
               </div>
             </div>
           ))}
