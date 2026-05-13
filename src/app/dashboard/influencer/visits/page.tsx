@@ -22,12 +22,12 @@ type Visit = {
 
 const STATUS: Record<string, { label: string; color: string }> = {
   reserved:          { label: "Réservée",           color: "text-champagne/70 border-champagne/20 bg-champagne/5" },
-  checked_in:        { label: "Arrivée",             color: "text-copper/70 border-copper/20 bg-copper/5" },
-  content_pending:   { label: "Contenu en attente",  color: "text-amber-400 border-amber-400/20 bg-amber-400/5" },
-  content_submitted: { label: "Contenu envoyé",      color: "text-emerald-400 border-emerald-400/20 bg-emerald-400/5" },
-  completed:         { label: "Complétée",           color: "text-emerald-400 border-emerald-400/20 bg-emerald-400/5" },
-  cancelled:         { label: "Annulée",             color: "text-red-400/70 border-red-400/20 bg-red-400/5" },
-  expired:           { label: "Expirée",             color: "text-text-muted border-white/10 bg-white/3" },
+  checked_in:        { label: "En visite",           color: "text-copper/70 border-copper/20 bg-copper/5" },
+  content_pending:   { label: "Contenu en attente",  color: "text-amber-300 border-amber-400/30 bg-amber-400/5" },
+  content_submitted: { label: "Contenu envoyé",      color: "text-emerald-300 border-emerald-400/30 bg-emerald-400/5" },
+  completed:         { label: "Complétée",           color: "text-emerald-300 border-emerald-400/30 bg-emerald-400/5" },
+  cancelled:         { label: "Annulée",             color: "text-red-400/60 border-red-400/20 bg-red-400/5" },
+  expired:           { label: "Expirée",             color: "text-white/25 border-white/10 bg-white/3" },
 };
 
 const CAT_LABELS: Record<string, string> = {
@@ -49,6 +49,12 @@ function UploadModal({ visit, userEmail, onClose, onUploaded }: {
     if (e.target.files) setFiles(prev => [...prev, ...Array.from(e.target.files!)]);
   };
 
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const dropped = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/") || f.type.startsWith("video/"));
+    setFiles(prev => [...prev, ...dropped]);
+  };
+
   const handleUpload = async () => {
     if (files.length === 0) { setError("Sélectionne au moins un fichier"); return; }
     setUploading(true);
@@ -64,55 +70,76 @@ function UploadModal({ visit, userEmail, onClose, onUploaded }: {
       onUploaded();
       onClose();
     } catch {
-      setError("Erreur de connexion");
+      setError("Erreur de connexion. Réessaie.");
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4" onClick={onClose}>
-      <div className="bg-charcoal-mid border border-white/10 max-w-md w-full p-8" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-serif text-lg font-light tracking-wider text-text-primary">Partager le contenu</h3>
-          <button onClick={onClose} className="text-text-muted hover:text-champagne transition-colors"><X size={18} /></button>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm px-4 pb-4 md:pb-0" onClick={onClose}>
+      <div className="bg-charcoal-mid border border-white/10 w-full max-w-lg p-8" onClick={e => e.stopPropagation()}>
+
+        <div className="flex items-start justify-between mb-6">
+          <div>
+            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-2">Partager le contenu</p>
+            <h3 className="font-serif text-xl font-light text-white">{visit.offers?.title}</h3>
+            <p className="font-serif text-[13px] text-white/40 mt-0.5">{visit.offers?.comercios?.name}</p>
+          </div>
+          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors mt-1">
+            <X size={18} />
+          </button>
         </div>
 
-        <p className="font-serif text-[14px] font-light text-text-secondary mb-1">{visit.offers?.title}</p>
-        <p className="font-serif text-[12px] text-text-muted mb-6">{visit.offers?.comercios?.name}</p>
+        {/* Drop zone */}
+        <div
+          onDrop={handleDrop}
+          onDragOver={e => e.preventDefault()}
+          onClick={() => inputRef.current?.click()}
+          className="border border-dashed border-white/15 p-10 text-center hover:border-champagne/30 transition-all duration-300 mb-5 cursor-pointer group"
+        >
+          <UploadSimple size={28} className="text-white/20 group-hover:text-champagne/50 mx-auto mb-3 transition-colors" />
+          <p className="font-serif text-[14px] font-light text-white/50 group-hover:text-white/70 transition-colors">Photos ou vidéos</p>
+          <p className="font-serif text-[11px] text-white/25 mt-1">Stories, reels, posts · Glisse ou clique</p>
+        </div>
+        <input ref={inputRef} type="file" multiple accept="image/*,video/*" onChange={handleFiles} className="hidden" />
 
+        {/* File list */}
         {files.length > 0 && (
-          <div className="space-y-2 mb-4">
+          <div className="space-y-2 mb-5">
             {files.map((f, i) => (
-              <div key={i} className="flex items-center justify-between border border-white/8 px-4 py-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  {f.type.startsWith("video") ? <VideoCamera size={14} className="text-champagne/60 shrink-0" /> : <Camera size={14} className="text-champagne/60 shrink-0" />}
-                  <span className="font-serif text-[12px] text-text-secondary truncate">{f.name}</span>
+              <div key={i} className="flex items-center justify-between border border-white/8 bg-white/3 px-4 py-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {f.type.startsWith("video") ? (
+                    <VideoCamera size={14} className="text-champagne/50 shrink-0" />
+                  ) : (
+                    <Camera size={14} className="text-champagne/50 shrink-0" />
+                  )}
+                  <span className="font-serif text-[12px] text-white/60 truncate">{f.name}</span>
+                  <span className="font-serif text-[10px] text-white/25 shrink-0">
+                    {(f.size / 1024 / 1024).toFixed(1)} MB
+                  </span>
                 </div>
-                <button onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))} className="text-text-muted hover:text-copper ml-2"><X size={12} /></button>
+                <button onClick={() => setFiles(prev => prev.filter((_, idx) => idx !== i))} className="text-white/25 hover:text-red-400 transition-colors ml-2 shrink-0">
+                  <X size={12} />
+                </button>
               </div>
             ))}
           </div>
         )}
 
-        <button
-          onClick={() => inputRef.current?.click()}
-          className="w-full border border-dashed border-white/15 p-8 text-center hover:border-champagne/30 transition-all duration-300 mb-4"
-        >
-          <UploadSimple size={24} className="text-text-muted mx-auto mb-3" />
-          <p className="font-serif text-[13px] font-light text-text-secondary">Photos ou vidéos</p>
-          <p className="font-serif text-[11px] text-text-muted mt-1">Stories, reels ou posts de votre visite</p>
-        </button>
-        <input ref={inputRef} type="file" multiple accept="image/*,video/*" onChange={handleFiles} className="hidden" />
-
-        {error && <p className="font-serif text-[13px] text-copper/80 mb-4">{error}</p>}
+        {error && <p className="font-serif text-[13px] text-red-400 mb-4">{error}</p>}
 
         <button
           onClick={handleUpload}
           disabled={uploading || files.length === 0}
           className="w-full font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40"
         >
-          {uploading ? "Envoi en cours…" : `Envoyer ${files.length} fichier${files.length !== 1 ? "s" : ""}`}
+          {uploading
+            ? "Envoi en cours…"
+            : files.length === 0
+            ? "Sélectionne des fichiers"
+            : `Envoyer ${files.length} fichier${files.length !== 1 ? "s" : ""}`}
         </button>
       </div>
     </div>
@@ -129,7 +156,7 @@ export default function InfluencerVisitsPage() {
     const { createClient } = await import("@/lib/supabase/client");
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) { window.location.href = "/auth/sign-in"; return; }
     setUserEmail(user.email || "");
     const { data: creator } = await supabase.from("creators").select("id").eq("owner_id", user.id).maybeSingle();
     if (!creator) { setVisits([]); setLoading(false); return; }
@@ -144,8 +171,7 @@ export default function InfluencerVisitsPage() {
 
   async function signOut() {
     const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await (await import("@/lib/supabase/client")).createClient().auth.signOut();
     window.location.href = "/";
   }
 
@@ -153,6 +179,7 @@ export default function InfluencerVisitsPage() {
 
   return (
     <div className="min-h-[100dvh] bg-charcoal-deep">
+
       {/* Nav */}
       <nav className="border-b border-white/10 px-5 h-14 flex items-center bg-black/30 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between">
@@ -161,14 +188,14 @@ export default function InfluencerVisitsPage() {
               <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
             </Link>
             <div className="w-px h-3 bg-white/10" />
-            <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-text-muted hover:text-champagne transition-colors">
+            <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-white/50 hover:text-champagne transition-colors">
               Adresses
             </Link>
             <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-champagne transition-colors">
               Mes visites
             </Link>
           </div>
-          <button onClick={signOut} className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-text-muted hover:text-champagne transition-colors">
+          <button onClick={signOut} className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/30 hover:text-white transition-colors">
             <SignOut size={14} />
             Sortir
           </button>
@@ -177,76 +204,92 @@ export default function InfluencerVisitsPage() {
 
       <div className="max-w-[1200px] mx-auto px-5 py-12">
         <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-4">Historique</p>
-        <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-text-primary mb-12">Mes visites</h1>
+        <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-white mb-12">Mes visites</h1>
 
         {loading ? (
-          <p className="font-serif text-[14px] font-light text-text-muted py-20 text-center">Chargement…</p>
+          <p className="font-serif text-[14px] font-light text-white/30 py-20 text-center">Chargement…</p>
         ) : visits.length === 0 ? (
           <div className="text-center py-24 border border-white/5">
-            <Clock size={32} className="text-text-muted mx-auto mb-4" />
-            <p className="font-serif text-[16px] font-light text-text-muted mb-2">Aucune visite pour le moment.</p>
-            <p className="font-serif text-[13px] font-light text-text-muted/50 mb-8">
-              Explorez les adresses sélectionnées et réservez votre première expérience.
+            <Clock size={32} className="text-white/20 mx-auto mb-4" />
+            <p className="font-serif text-[16px] font-light text-white/40 mb-2">Aucune visite pour le moment.</p>
+            <p className="font-serif text-[13px] font-light text-white/25 mb-8">
+              Explorez les adresses et réservez votre première expérience.
             </p>
             <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne px-8 py-3 hover:bg-copper hover:text-white transition-all duration-300">
               Voir les adresses
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-white/8">
             {visits.map((visit) => {
-              const status = STATUS[visit.status] || { label: visit.status, color: "text-text-muted border-white/10 bg-white/3" };
+              const status = STATUS[visit.status] || { label: visit.status, color: "text-white/30 border-white/10 bg-white/3" };
+              const proofs = visit.content_proof_urls ?? [];
+              const canUpload = ["content_pending", "checked_in", "reserved"].includes(visit.status);
+
               return (
-                <div key={visit.id} className="py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1 min-w-0 space-y-2">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className={`font-serif text-[10px] tracking-[0.2em] uppercase border px-2.5 py-1 ${status.color}`}>
-                        {status.label}
-                      </span>
-                      <span className="font-serif text-[10px] tracking-[0.2em] uppercase text-text-muted/50">
-                        {CAT_LABELS[visit.offers?.category] || visit.offers?.category}
-                      </span>
+                <div key={visit.id} className="py-8">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className={`font-serif text-[10px] tracking-[0.2em] uppercase border px-2.5 py-1 ${status.color}`}>
+                          {status.label}
+                        </span>
+                        <span className="font-serif text-[10px] tracking-[0.2em] uppercase text-white/25">
+                          {CAT_LABELS[visit.offers?.category] || visit.offers?.category}
+                        </span>
+                      </div>
+                      <h3 className="font-serif text-[18px] font-light text-white">{visit.offers?.title}</h3>
+                      <p className="font-serif text-[13px] text-white/40">{visit.offers?.comercios?.name}</p>
+                      <div className="flex items-center gap-4 text-white/25 flex-wrap">
+                        <span className="flex items-center gap-1.5 font-serif text-[12px]">
+                          <MapPin size={12} /> {visit.offers?.address}
+                        </span>
+                        <span className="flex items-center gap-1.5 font-serif text-[12px]">
+                          <Clock size={12} /> {new Date(visit.reserved_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                        </span>
+                      </div>
                     </div>
-                    <h3 className="font-serif text-[17px] font-light text-text-primary">{visit.offers?.title}</h3>
-                    <p className="font-serif text-[12px] text-text-muted">{visit.offers?.comercios?.name}</p>
-                    <div className="flex items-center gap-4 text-text-muted/50">
-                      <span className="flex items-center gap-1.5 font-serif text-[12px]">
-                        <MapPin size={12} /> {visit.offers?.address}
-                      </span>
-                      <span className="flex items-center gap-1.5 font-serif text-[12px]">
-                        <Clock size={12} /> {new Date(visit.reserved_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
-                      </span>
+
+                    <div className="flex items-center gap-4 shrink-0">
+                      {visit.visit_value_cop > 0 && (
+                        <p className="font-serif text-xl font-light text-champagne">€{visit.visit_value_cop}</p>
+                      )}
+                      {canUpload && (
+                        <button
+                          onClick={() => setUploadVisit(visit)}
+                          className="flex items-center gap-1.5 font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-5 py-2.5 hover:bg-copper hover:text-white transition-all duration-300"
+                        >
+                          <UploadSimple size={12} />
+                          Partager
+                        </button>
+                      )}
+                      {visit.status === "content_submitted" && (
+                        <div className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-emerald-400">
+                          <CheckCircle size={14} weight="fill" /> Envoyé
+                        </div>
+                      )}
+                      {visit.status === "completed" && (
+                        <div className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-emerald-400">
+                          <CheckCircle size={14} weight="fill" /> Complétée
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 shrink-0">
-                    {visit.visit_value_cop > 0 && (
-                      <div className="text-right">
-                        <p className="font-serif text-lg font-light text-champagne">€{visit.visit_value_cop}</p>
-                      </div>
-                    )}
-
-                    {["content_pending", "checked_in", "reserved"].includes(visit.status) && (
-                      <button
-                        onClick={() => setUploadVisit(visit)}
-                        className="flex items-center gap-1.5 font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-4 py-2 hover:bg-copper hover:text-white transition-all duration-300"
-                      >
-                        <UploadSimple size={12} /> Partager
-                      </button>
-                    )}
-
-                    {visit.status === "content_submitted" && (
-                      <div className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-emerald-400">
-                        <CheckCircle size={14} weight="fill" /> Envoyé
-                      </div>
-                    )}
-
-                    {visit.status === "completed" && (
-                      <div className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-emerald-400">
-                        <CheckCircle size={14} weight="fill" /> Complétée
-                      </div>
-                    )}
-                  </div>
+                  {/* Content thumbnails */}
+                  {proofs.length > 0 && (
+                    <div className="flex gap-2 flex-wrap mt-3">
+                      {proofs.map((url, i) => (
+                        <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-white/5 overflow-hidden block group shrink-0">
+                          {url.match(/\.(mp4|mov|webm)$/i) ? (
+                            <video src={url} className="w-full h-full object-cover group-hover:opacity-70 transition-opacity" muted playsInline />
+                          ) : (
+                            <img src={url} alt="" className="w-full h-full object-cover group-hover:opacity-70 transition-opacity" />
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
