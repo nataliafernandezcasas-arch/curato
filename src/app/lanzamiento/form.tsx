@@ -5,9 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle } from "@phosphor-icons/react";
 
 const PROFILES = [
-  { value: "creator", label: "Creador" },
-  { value: "merchant", label: "Comercio" },
-  { value: "curious", label: "Curioso" },
+  { value: "creator", label: "Créateur · Creator" },
+  { value: "merchant", label: "Maison · House" },
+  { value: "curious", label: "Invité · Guest" },
 ] as const;
 
 type Profile = (typeof PROFILES)[number]["value"];
@@ -25,15 +25,14 @@ export default function LaunchForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // Persist any UTM source server-side later if needed; here we just send it.
   useEffect(() => {
-    // No-op; placeholder if we ever add prefill from query.
+    // placeholder for future prefill logic
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!profile) {
-      setError("Cuéntanos qué eres.");
+      setError("Veuillez sélectionner votre profil.");
       return;
     }
     setLoading(true);
@@ -45,7 +44,7 @@ export default function LaunchForm() {
         body: JSON.stringify({
           full_name: fullName,
           email,
-          whatsapp,
+          whatsapp: whatsapp || undefined,
           profile,
           instagram_handle: instagram || undefined,
           source,
@@ -53,12 +52,12 @@ export default function LaunchForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "No pudimos guardar tu registro.");
+        setError(data.error || "Nous n'avons pas pu enregistrer votre inscription.");
         return;
       }
       setSuccess(true);
     } catch {
-      setError("Error de conexión. Intenta de nuevo.");
+      setError("Erreur de connexion. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -66,47 +65,55 @@ export default function LaunchForm() {
 
   if (success) {
     return (
-      <div className="border border-border rounded-2xl bg-surface-raised p-8 text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-midi-lime mb-5">
-          <CheckCircle size={24} weight="fill" className="text-text-primary" />
+      <div className="border border-white/15 bg-white/5 backdrop-blur-sm p-8 text-center">
+        <div className="inline-flex items-center justify-center w-12 h-12 border border-champagne/40 mb-5">
+          <CheckCircle size={22} weight="fill" className="text-champagne" />
         </div>
-        <h2 className="text-2xl font-extralight tracking-tighter text-text-primary mb-2">
-          Estás dentro.
+        <h2 className="font-serif text-[26px] font-light tracking-wide text-white mb-3">
+          Vous êtes confirmé.
         </h2>
-        <p className="text-sm text-text-secondary leading-relaxed mb-6">
-          Te llega un email con la confirmación.<br />
-          Nos vemos el <span className="text-text-primary font-medium">13 de mayo en Bogotá</span>.
+        <p className="font-serif text-[14px] font-light text-white/50 leading-relaxed mb-6">
+          Un email de confirmation vous sera envoyé.<br />
+          À bientôt le{" "}
+          <span className="text-champagne">22 juillet à Paris</span>.
         </p>
         <a
           href={googleCalendarUrl()}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block text-[12px] font-semibold text-accent hover:text-text-primary transition-colors underline underline-offset-4"
+          className="font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 hover:text-champagne transition-colors"
         >
-          Agregar al calendario
+          Ajouter au calendrier →
         </a>
       </div>
     );
   }
 
   const inputClass =
-    "w-full px-4 py-3 rounded-lg border border-border bg-surface-raised text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/50 transition-all";
-  const labelClass = "block text-[11px] font-medium text-text-secondary mb-2 uppercase tracking-[0.12em]";
+    "w-full px-4 py-3 border border-white/15 bg-white/5 text-white font-serif text-[14px] placeholder:text-white/25 focus:outline-none focus:border-champagne/50 transition-all backdrop-blur-sm";
+
+  const labelClass =
+    "block font-serif text-[10px] tracking-[0.3em] uppercase text-white/35 mb-2";
 
   return (
-    <form onSubmit={handleSubmit} className="border border-border rounded-2xl bg-surface-raised p-6 md:p-7 space-y-5">
+    <form
+      onSubmit={handleSubmit}
+      className="border border-white/15 bg-white/5 backdrop-blur-sm p-6 md:p-7 space-y-5"
+    >
+      {/* Name */}
       <div>
-        <label className={labelClass}>Nombre completo</label>
+        <label className={labelClass}>Nom complet · Full name</label>
         <input
           type="text"
           required
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           className={inputClass}
-          placeholder="Tu nombre"
+          placeholder="Votre nom · Your name"
         />
       </div>
 
+      {/* Email */}
       <div>
         <label className={labelClass}>Email</label>
         <input
@@ -115,24 +122,30 @@ export default function LaunchForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className={inputClass}
-          placeholder="tu@email.com"
+          placeholder="votre@email.com"
         />
       </div>
 
+      {/* WhatsApp – optional */}
       <div>
-        <label className={labelClass}>WhatsApp</label>
+        <label className={labelClass}>
+          WhatsApp{" "}
+          <span className="text-white/20 normal-case tracking-normal font-serif text-[10px]">
+            (optionnel · optional)
+          </span>
+        </label>
         <input
           type="tel"
-          required
           value={whatsapp}
           onChange={(e) => setWhatsapp(e.target.value)}
           className={inputClass}
-          placeholder="+57 300 000 0000"
+          placeholder="+33 6 00 00 00 00"
         />
       </div>
 
+      {/* Profile */}
       <div>
-        <label className={labelClass}>Soy</label>
+        <label className={labelClass}>Je suis · I am</label>
         <div className="grid grid-cols-3 gap-2">
           {PROFILES.map((p) => {
             const selected = profile === p.value;
@@ -141,10 +154,10 @@ export default function LaunchForm() {
                 key={p.value}
                 type="button"
                 onClick={() => setProfile(p.value)}
-                className={`py-2.5 rounded-lg text-[13px] font-medium transition-all duration-200 active:scale-[0.97] ${
+                className={`py-3 font-serif text-[11px] tracking-wide transition-all duration-200 border ${
                   selected
-                    ? "bg-text-primary text-white"
-                    : "bg-surface text-text-secondary border border-border hover:border-border-hover"
+                    ? "border-champagne bg-champagne/15 text-champagne"
+                    : "border-white/15 bg-transparent text-white/40 hover:border-white/30 hover:text-white/70"
                 }`}
               >
                 {p.label}
@@ -154,49 +167,56 @@ export default function LaunchForm() {
         </div>
       </div>
 
+      {/* Instagram */}
       <div>
         <label className={labelClass}>
-          Instagram <span className="text-text-muted normal-case tracking-normal">(opcional)</span>
+          Instagram{" "}
+          <span className="text-white/20 normal-case tracking-normal font-serif text-[10px]">
+            (optionnel)
+          </span>
         </label>
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-text-muted">@</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-serif text-[14px] text-white/25">
+            @
+          </span>
           <input
             type="text"
             value={instagram}
             onChange={(e) => setInstagram(e.target.value.replace(/^@/, ""))}
             className={`${inputClass} pl-8`}
-            placeholder="tuusuario"
+            placeholder="votrepseudo"
           />
         </div>
       </div>
 
+      {/* Error */}
       {error && (
-        <div className="bg-midi-orange/8 border border-midi-orange/20 text-midi-orange text-sm px-3 py-2.5 rounded-lg">
-          {error}
-        </div>
+        <p className="font-serif text-[12px] text-red-400/80">{error}</p>
       )}
 
+      {/* Submit */}
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-text-primary text-white text-[13px] font-semibold py-3.5 rounded-lg hover:bg-accent transition-all duration-300 disabled:opacity-50 active:scale-[0.97]"
+        className="w-full font-serif text-[12px] tracking-[0.3em] uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40"
       >
-        {loading ? "Enviando..." : "Asegurar mi lugar"}
+        {loading ? "…" : "Confirmer ma présence"}
       </button>
     </form>
   );
 }
 
 function googleCalendarUrl() {
-  // 13 May 2026 17:30 Bogotá (UTC-5) → 22:30 UTC; estimated 4h duration.
-  const start = "20260513T223000Z";
-  const end = "20260514T023000Z";
-  const params = new URLSearchParams({
+  // 22 July 2026 19:00 Paris (CEST = UTC+2) → 17:00 UTC; 3h duration
+  const start = "20260722T170000Z";
+  const end = "20260722T200000Z";
+  const urlParams = new URLSearchParams({
     action: "TEMPLATE",
-    text: "Lanzamiento Midi Pass",
+    text: "Lancement Curato · Paris",
     dates: `${start}/${end}`,
-    details: "Has sido seleccionado para vivir en exclusiva el lanzamiento de Midi Pass.",
-    location: "Amora Vida — Cr 12 # 98-87, Bogotá",
+    details:
+      "Vous avez été sélectionné pour vivre en exclusivité le lancement de Curato — l'écosystème où les créateurs et les maisons qu'ils aiment se rencontrent.",
+    location: "Paris, France",
   });
-  return `https://www.google.com/calendar/render?${params.toString()}`;
+  return `https://www.google.com/calendar/render?${urlParams.toString()}`;
 }

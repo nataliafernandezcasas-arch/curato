@@ -28,6 +28,9 @@ export default function AdminNavClient() {
         <Link href="/admin/qr" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
           {t.navQR}
         </Link>
+        <Link href="/admin/nuevo" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
+          + Nouveau
+        </Link>
       </div>
       <div className="flex items-center gap-5">
         {LANGS.map(({ key, label }) => (

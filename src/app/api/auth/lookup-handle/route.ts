@@ -3,20 +3,37 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: NextRequest) {
   const { handle } = await request.json();
-  if (!handle) return NextResponse.json({ error: "Handle requis" }, { status: 400 });
+  if (!handle) return NextResponse.json({ error: "Identifiant requis" }, { status: 400 });
 
   const supabase = createAdminClient();
   const clean = handle.replace("@", "").trim().toLowerCase();
 
-  const { data, error } = await supabase
+  // 1. Try creators by handle
+  const { data: creator } = await supabase
     .from("creators")
     .select("email")
     .ilike("handle", clean)
     .maybeSingle();
 
-  if (error || !data?.email) {
-    return NextResponse.json({ error: "Identifiant introuvable" }, { status: 404 });
+  if (creator?.email) {
+    return NextResponse.json({ email: creator.email });
   }
 
-  return NextResponse.json({ email: data.email });
+  // 2. If input looks like an email, try comercios by email
+  if (clean.includes("@")) {
+    const { data: comercio } = await supabase
+      .from("comercios")
+      .select("email")
+      .ilike("email", clean)
+      .maybeSingle();
+
+    if (comercio?.email) {
+      return NextResponse.json({ email: comercio.email });
+    }
+
+    // 3. Also allow direct email sign-in for any Supabase auth user
+    return NextResponse.json({ email: clean });
+  }
+
+  return NextResponse.json({ error: "Identifiant introuvable" }, { status: 404 });
 }

@@ -154,8 +154,8 @@ export const translations = {
     signIn: {
       title: "Accéder",
       subtitle: "Réservé aux membres de Curato",
-      handleLabel: "Identifiant",
-      handlePlaceholder: "@votrehandle",
+      handleLabel: "Handle · Email",
+      handlePlaceholder: "@handle ou email@maison.com",
       passwordLabel: "Mot de passe",
       submitBtn: "Se connecter",
       submitting: "Connexion…",
@@ -369,8 +369,8 @@ export const translations = {
     signIn: {
       title: "Sign in",
       subtitle: "Reserved for Curato members",
-      handleLabel: "Username",
-      handlePlaceholder: "@yourhandle",
+      handleLabel: "Handle · Email",
+      handlePlaceholder: "@handle or email@maison.com",
       passwordLabel: "Password",
       submitBtn: "Sign in",
       submitting: "Signing in…",
@@ -610,8 +610,8 @@ export const translations = {
     signIn: {
       title: "Acceder",
       subtitle: "Reservado para miembros de Curato",
-      handleLabel: "Usuario",
-      handlePlaceholder: "@tuhandle",
+      handleLabel: "Handle · Email",
+      handlePlaceholder: "@handle o email@maison.com",
       passwordLabel: "Contraseña",
       submitBtn: "Iniciar sesión",
       submitting: "Entrando…",

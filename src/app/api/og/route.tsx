@@ -11,36 +11,88 @@ export async function GET() {
           height: "630px",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#f8f7f4",
-          fontFamily: "system-ui, sans-serif",
+          alignItems: "flex-start",
+          justifyContent: "flex-end",
+          backgroundColor: "#1C1A18",
+          padding: "80px",
+          fontFamily: "Georgia, serif",
         }}
       >
-        {/* Purple M + dot from the real Midi logo */}
-        <svg width="220" height="130" viewBox="100 100 260 240" fill="none">
-          <path d="M143.512 117.913H107.027V318.914H145.927C145.927 232.586 145.927 198.296 143.782 181.595L204.411 270.472L264.506 181.595C262.361 198.296 262.361 192.104 262.361 277.868H301.26V117.913H264.506L204.141 205.661L143.512 117.913Z" fill="#825DC7"/>
-          <path d="M340.078 277.874H301.178V318.915H340.078V277.874Z" fill="#825DC7"/>
-        </svg>
+        {/* Decorative line */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "1px",
+            backgroundColor: "#CBB78F",
+            opacity: 0.3,
+          }}
+        />
 
-        {/* Midi Pass text */}
+        {/* Wordmark */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            marginTop: "20px",
+            flexDirection: "column",
+            gap: "16px",
           }}
         >
-          <span style={{ fontSize: "14px", fontWeight: 500, color: "#a09a92", letterSpacing: "3px", textTransform: "uppercase" as const }}>
-            PASS
+          <span
+            style={{
+              fontSize: "72px",
+              fontWeight: 400,
+              color: "#CBB78F",
+              letterSpacing: "0.35em",
+              textTransform: "lowercase" as const,
+              lineHeight: 1,
+            }}
+          >
+            curato
           </span>
-        </div>
 
-        {/* Tagline */}
-        <p style={{ fontSize: "22px", color: "#6b6660", marginTop: "20px", fontWeight: 300 }}>
-          Experiencias reales. Contenido auténtico.
-        </p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+            }}
+          >
+            <div
+              style={{
+                width: "40px",
+                height: "1px",
+                backgroundColor: "#CBB78F",
+                opacity: 0.4,
+              }}
+            />
+            <span
+              style={{
+                fontSize: "13px",
+                color: "#7A7168",
+                letterSpacing: "0.4em",
+                textTransform: "uppercase" as const,
+              }}
+            >
+              Paris · Invitation only
+            </span>
+          </div>
+
+          <p
+            style={{
+              margin: 0,
+              fontSize: "22px",
+              fontWeight: 400,
+              color: "#F5F0E8",
+              opacity: 0.5,
+              fontStyle: "italic",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Jamais une campagne. Toujours une histoire.
+          </p>
+        </div>
       </div>
     ),
     {

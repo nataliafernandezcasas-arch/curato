@@ -210,7 +210,7 @@ export default function BusinessDashboard() {
                                 )}
                                 {creator?.followers != null && creator.followers > 0 && (
                                   <span className="font-serif text-[12px] text-white/30">
-                                    {formatFollowers(creator.followers)} seguidores
+                                    {formatFollowers(creator.followers)} abonnés
                                   </span>
                                 )}
                               </div>

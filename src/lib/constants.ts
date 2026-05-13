@@ -1,81 +1,71 @@
-export const MIDI_PASS = {
-  MONTHLY_CREDIT_COP: 1_500_000,
-  MIN_FOLLOWERS: 5_000,
-  CONTENT_DEADLINE_HOURS: 48,
-  QR_TOKEN_VALIDITY_HOURS: 24,
-  MIN_CREDIT_USAGE_PERCENT: 60,
+export const CURATO = {
+  CONTENT_DEADLINE_HOURS: 72,
   CONTENT_USAGE_DAYS: 90,
+  MIN_FOLLOWERS: 5_000,
 } as const;
 
-export const BUSINESS_CATEGORIES = [
-  { value: "gastronomy", label: "Gastronomia" },
-  { value: "beauty", label: "Beauty & Cuidado Personal" },
-  { value: "wellness", label: "Wellness & Salud" },
-  { value: "hospitality", label: "Hoteles & Hospedaje" },
+export const OFFER_CATEGORIES = [
+  { value: "gastronomy", label: "Gastronomie" },
+  { value: "beauty", label: "Beauté & Soins" },
+  { value: "wellness", label: "Wellness & Bien-être" },
+  { value: "hospitality", label: "Hôtellerie" },
+  { value: "fashion", label: "Mode & Joaillerie" },
+  { value: "art", label: "Art & Culture" },
 ] as const;
 
+// Kept for any legacy forms that reference these
+export const BUSINESS_CATEGORIES = OFFER_CATEGORIES;
+
 export const CONTENT_NICHES = [
-  "Gastronomia",
-  "Beauty",
+  "Gastronomie",
+  "Beauté",
   "Wellness",
   "Lifestyle",
-  "Travel",
-  "Fitness",
-  "Moda",
-  "Tech",
-  "Entretenimiento",
+  "Voyage",
+  "Mode",
+  "Art",
+  "Hôtellerie",
 ] as const;
 
 export const FOLLOWER_RANGES = [
-  { value: "5k-10k", label: "5,000 - 10,000" },
-  { value: "10k-50k", label: "10,000 - 50,000" },
-  { value: "50k-100k", label: "50,000 - 100,000" },
-  { value: "100k-500k", label: "100,000 - 500,000" },
-  { value: "500k+", label: "500,000+" },
+  { value: "5k-10k", label: "5 000 – 10 000" },
+  { value: "10k-50k", label: "10 000 – 50 000" },
+  { value: "50k-100k", label: "50 000 – 100 000" },
+  { value: "100k-500k", label: "100 000 – 500 000" },
+  { value: "500k+", label: "500 000+" },
 ] as const;
 
-/**
- * Countries supported by Midi: all LATAM (minus excluded), Central America, USA & Canada.
- * dialCode is the E.164 country calling code (without +).
- * flag is a plain emoji — renders on any platform that supports Unicode flags (all modern browsers).
- */
 export const COUNTRIES = [
-  // North America
-  { code: "US", name: "Estados Unidos", dialCode: "1",   flag: "🇺🇸" },
-  { code: "CA", name: "Canadá",         dialCode: "1",   flag: "🇨🇦" },
-
-  // Mexico
-  { code: "MX", name: "México",         dialCode: "52",  flag: "🇲🇽" },
-
-  // Central America
-  { code: "GT", name: "Guatemala",      dialCode: "502", flag: "🇬🇹" },
-  { code: "BZ", name: "Belice",         dialCode: "501", flag: "🇧🇿" },
-  { code: "SV", name: "El Salvador",    dialCode: "503", flag: "🇸🇻" },
-  { code: "HN", name: "Honduras",       dialCode: "504", flag: "🇭🇳" },
-  { code: "CR", name: "Costa Rica",     dialCode: "506", flag: "🇨🇷" },
-  { code: "PA", name: "Panamá",         dialCode: "507", flag: "🇵🇦" },
-
-  // Caribbean (LATAM-relevant, excluding restricted)
-  { code: "DO", name: "República Dominicana", dialCode: "1809", flag: "🇩🇴" },
-  { code: "PR", name: "Puerto Rico",    dialCode: "1787", flag: "🇵🇷" },
-
-  // South America
-  { code: "CO", name: "Colombia",       dialCode: "57",  flag: "🇨🇴" },
-  { code: "EC", name: "Ecuador",        dialCode: "593", flag: "🇪🇨" },
-  { code: "PE", name: "Perú",           dialCode: "51",  flag: "🇵🇪" },
-  { code: "BR", name: "Brasil",         dialCode: "55",  flag: "🇧🇷" },
-  { code: "AR", name: "Argentina",      dialCode: "54",  flag: "🇦🇷" },
-  { code: "CL", name: "Chile",          dialCode: "56",  flag: "🇨🇱" },
-  { code: "UY", name: "Uruguay",        dialCode: "598", flag: "🇺🇾" },
-  { code: "PY", name: "Paraguay",       dialCode: "595", flag: "🇵🇾" },
-  { code: "BO", name: "Bolivia",        dialCode: "591", flag: "🇧🇴" },
+  // Europe
+  { code: "FR", name: "France",           dialCode: "33",  flag: "🇫🇷" },
+  { code: "BE", name: "Belgique",         dialCode: "32",  flag: "🇧🇪" },
+  { code: "CH", name: "Suisse",           dialCode: "41",  flag: "🇨🇭" },
+  { code: "LU", name: "Luxembourg",       dialCode: "352", flag: "🇱🇺" },
+  { code: "MC", name: "Monaco",           dialCode: "377", flag: "🇲🇨" },
+  { code: "GB", name: "United Kingdom",   dialCode: "44",  flag: "🇬🇧" },
+  { code: "DE", name: "Deutschland",      dialCode: "49",  flag: "🇩🇪" },
+  { code: "IT", name: "Italia",           dialCode: "39",  flag: "🇮🇹" },
+  { code: "ES", name: "España",           dialCode: "34",  flag: "🇪🇸" },
+  { code: "PT", name: "Portugal",         dialCode: "351", flag: "🇵🇹" },
+  { code: "NL", name: "Nederland",        dialCode: "31",  flag: "🇳🇱" },
+  { code: "SE", name: "Sverige",          dialCode: "46",  flag: "🇸🇪" },
+  { code: "DK", name: "Danmark",          dialCode: "45",  flag: "🇩🇰" },
+  { code: "NO", name: "Norge",            dialCode: "47",  flag: "🇳🇴" },
+  { code: "US", name: "United States",    dialCode: "1",   flag: "🇺🇸" },
+  // LATAM
+  { code: "MX", name: "México",           dialCode: "52",  flag: "🇲🇽" },
+  { code: "CO", name: "Colombia",         dialCode: "57",  flag: "🇨🇴" },
+  { code: "AR", name: "Argentina",        dialCode: "54",  flag: "🇦🇷" },
+  { code: "BR", name: "Brasil",           dialCode: "55",  flag: "🇧🇷" },
+  { code: "CL", name: "Chile",            dialCode: "56",  flag: "🇨🇱" },
+  { code: "PE", name: "Perú",             dialCode: "51",  flag: "🇵🇪" },
 ] as const;
 
 export type CountryCode = (typeof COUNTRIES)[number]["code"];
 
 export const APPLICATION_STATUS = {
   PENDING: "pending",
-  ACCEPTED: "accepted",
+  ACCEPTED: "approved",
   REJECTED: "rejected",
 } as const;
 

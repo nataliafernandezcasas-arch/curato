@@ -41,7 +41,7 @@ export default async function DashboardPage() {
     const updates: Record<string, string> = {};
     if (!comercio.owner_id) updates.owner_id = user.id;
     if (!comercio.qr_code) {
-      updates.qr_code = `MIDI-${(comercio.name || "BIZ").toUpperCase().replace(/\s+/g, "").slice(0, 6)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      updates.qr_code = `CURATO-${(comercio.name || "MAISON").toUpperCase().replace(/\s+/g, "").slice(0, 6)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
     }
     if (Object.keys(updates).length > 0) {
       await admin.from("comercios").update(updates).eq("id", comercio.id);
