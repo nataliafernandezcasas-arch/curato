@@ -50,28 +50,28 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="min-h-[100dvh] relative">
       {/* Background */}
       <div className="fixed inset-0 z-0">
-        <img src="/Background Image 7.jpeg" alt="" className="w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px]" />
+        <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
+        <div className="absolute inset-0 bg-black/60" />
       </div>
 
       {/* Nav */}
-      <nav className="relative z-10 border-b border-black/10 px-5 h-14 flex items-center bg-white/50 backdrop-blur-sm">
+      <nav className="relative z-10 border-b border-white/10 px-5 h-14 flex items-center">
         <div className="max-w-[1100px] mx-auto w-full flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/">
-              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block", filter: "invert(1)" }} />
+              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
             </Link>
-            <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-charcoal-deep/40">Admin</span>
-            <div className="w-px h-3 bg-black/10" />
-            <Link href="/admin" className="font-serif text-[12px] tracking-wider text-charcoal-deep/70 hover:text-charcoal-deep transition-colors">
+            <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30">Admin</span>
+            <div className="w-px h-3 bg-white/15" />
+            <Link href="/admin" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
               Candidaturas
             </Link>
-            <Link href="/admin/qr" className="font-serif text-[12px] tracking-wider text-charcoal-deep/70 hover:text-charcoal-deep transition-colors">
+            <Link href="/admin/qr" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
               QR Invitación
             </Link>
           </div>
           <form action="/api/admin/logout" method="post">
-            <button type="submit" className="font-serif text-[12px] tracking-wider text-charcoal-deep/40 hover:text-charcoal-deep transition-colors">
+            <button type="submit" className="font-serif text-[12px] tracking-wider text-white/30 hover:text-white transition-colors">
               Salir
             </button>
           </form>

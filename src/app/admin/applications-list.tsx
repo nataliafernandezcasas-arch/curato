@@ -18,10 +18,10 @@ type Application = {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    pending: "text-amber-700 border-amber-300 bg-amber-50",
-    approved: "text-emerald-700 border-emerald-300 bg-emerald-50",
-    rejected: "text-red-600 border-red-300 bg-red-50",
-    deleted: "text-charcoal-deep/30 border-black/10 bg-black/5",
+    pending: "text-amber-300 border-amber-400/40 bg-amber-400/10",
+    approved: "text-emerald-300 border-emerald-400/40 bg-emerald-400/10",
+    rejected: "text-red-400 border-red-400/40 bg-red-400/10",
+    deleted: "text-white/25 border-white/10 bg-white/5",
   };
   const labels: Record<string, string> = {
     pending: "Pendiente",
@@ -71,23 +71,23 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
   if (app.status === "deleted") {
     return (
       <div className="flex items-center gap-3">
-        <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-charcoal-deep/40 hover:text-charcoal-deep transition-colors disabled:opacity-40">
+        <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-white/40 hover:text-white transition-colors disabled:opacity-40">
           {loading === "pending" ? "…" : "Restaurar"}
         </button>
-        {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
+        {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
       </div>
     );
   }
   if (app.status === "approved") {
     return (
       <div className="flex items-center gap-3">
-        <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-500 hover:text-red-700 transition-colors disabled:opacity-40">
+        <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-400 hover:text-red-300 transition-colors disabled:opacity-40">
           {loading === "rejected" ? "…" : "Rechazar"}
         </button>
-        <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-charcoal-deep/25 hover:text-red-400 transition-colors disabled:opacity-40">
+        <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
           {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
         </button>
-        {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
+        {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
       </div>
     );
   }
@@ -100,18 +100,18 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
             value={followers}
             onChange={(e) => setFollowers(e.target.value)}
             placeholder="Seguidores"
-            className="w-full font-serif text-[11px] border border-black/20 px-3 py-1.5 text-charcoal-deep placeholder:text-charcoal-deep/30 focus:outline-none focus:border-black/40"
+            className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
           />
         )}
         <div className="flex items-center gap-3">
-          <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-600 hover:text-emerald-800 transition-colors disabled:opacity-40">
+          <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-40">
             {loading === "approved" ? "…" : "Aceptar"}
           </button>
-          <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-charcoal-deep/25 hover:text-red-400 transition-colors disabled:opacity-40">
+          <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
             {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
           </button>
         </div>
-        {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
+        {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
       </div>
     );
   }
@@ -124,21 +124,21 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
           value={followers}
           onChange={(e) => setFollowers(e.target.value)}
           placeholder="Nº de seguidores"
-          className="w-full font-serif text-[11px] border border-black/20 px-3 py-1.5 text-charcoal-deep placeholder:text-charcoal-deep/30 focus:outline-none focus:border-black/40"
+          className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
         />
       )}
       <div className="flex items-center gap-3">
         <button
           onClick={() => update("approved")}
           disabled={!!loading}
-          className="font-serif text-[11px] tracking-widest uppercase text-white bg-charcoal-deep px-4 py-2 hover:bg-emerald-700 transition-all duration-200 disabled:opacity-40"
+          className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-4 py-2 hover:bg-emerald-400 transition-all duration-200 disabled:opacity-40"
         >
           {loading === "approved" ? "…" : "Aceptar"}
         </button>
         <button
           onClick={() => update("rejected")}
           disabled={!!loading}
-          className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep/60 border border-black/20 px-4 py-2 hover:border-red-400 hover:text-red-600 transition-all duration-200 disabled:opacity-40"
+          className="font-serif text-[11px] tracking-widest uppercase text-white/50 border border-white/20 px-4 py-2 hover:border-red-400 hover:text-red-400 transition-all duration-200 disabled:opacity-40"
         >
           {loading === "rejected" ? "…" : "Rechazar"}
         </button>
@@ -146,12 +146,12 @@ function ActionButtons({ app, onUpdate }: { app: Application; onUpdate: (id: str
           onClick={() => update("deleted")}
           disabled={!!loading}
           title="Borrar"
-          className="text-charcoal-deep/25 hover:text-red-400 transition-colors disabled:opacity-40"
+          className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40"
         >
           {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
         </button>
       </div>
-      {err && <p className="font-serif text-[10px] text-red-500">{err}</p>}
+      {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
     </div>
   );
 }
@@ -199,23 +199,23 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
           { label: "Pendientes", value: counts.pending },
           { label: "Aceptadas", value: counts.approved },
         ].map((s) => (
-          <div key={s.label} className="bg-white/70 backdrop-blur-sm border border-black/8 px-8 py-6">
-            <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-charcoal-deep/40 mb-2">{s.label}</p>
-            <p className="font-serif text-3xl font-light text-charcoal-deep">{s.value}</p>
+          <div key={s.label} className="bg-white/8 backdrop-blur-sm border border-white/10 px-8 py-6">
+            <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-champagne/50 mb-2">{s.label}</p>
+            <p className="font-serif text-3xl font-light text-white">{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 mb-8 border-b border-black/10">
+      <div className="flex gap-6 mb-8 border-b border-white/10">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`font-serif text-[12px] tracking-wider pb-3 transition-colors border-b-2 -mb-px ${
               tab === t.key
-                ? "text-charcoal-deep border-charcoal-deep"
-                : "text-charcoal-deep/40 border-transparent hover:text-charcoal-deep/70"
+                ? "text-white border-champagne"
+                : "text-white/35 border-transparent hover:text-white/60"
             }`}
           >
             {t.label}
@@ -227,23 +227,23 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
       {/* List */}
       {filtered.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="font-serif text-[15px] font-light text-charcoal-deep/40">No hay candidaturas aún.</p>
+          <p className="font-serif text-[15px] font-light text-white/40">No hay candidaturas aún.</p>
         </div>
       ) : (
-        <div className="divide-y divide-black/8">
+        <div className="divide-y divide-white/10">
           {filtered.map((app) => (
             <div key={app.id} className="py-6 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
               <div className="space-y-2">
                 <div className="flex items-center gap-4 flex-wrap">
-                  <h3 className="font-serif text-[17px] font-light text-charcoal-deep">{app.name}</h3>
-                  <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-charcoal-deep/40 border border-black/15 px-2 py-0.5">
+                  <h3 className="font-serif text-[17px] font-light text-white">{app.name}</h3>
+                  <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/40 border border-white/15 px-2 py-0.5">
                     {app.type === "creator" ? "Creador" : "Casa"}
                   </span>
                   <StatusBadge status={app.status} />
                 </div>
 
                 <div className="flex items-center gap-5 flex-wrap">
-                  <a href={`mailto:${app.email}`} className="font-serif text-[13px] font-light text-charcoal-deep/60 hover:text-charcoal-deep transition-colors">
+                  <a href={`mailto:${app.email}`} className="font-serif text-[13px] font-light text-white/60 hover:text-white transition-colors">
                     {app.email}
                   </a>
                   {app.instagram && (
@@ -251,7 +251,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
                       href={`https://instagram.com/${app.instagram.replace("@", "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-serif text-[13px] font-light text-charcoal-deep/40 hover:text-charcoal-deep transition-colors"
+                      className="font-serif text-[13px] font-light text-white/40 hover:text-white transition-colors"
                     >
                       {app.instagram.startsWith("@") ? app.instagram : `@${app.instagram}`}
                     </a>
@@ -261,7 +261,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
                       href={app.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-serif text-[13px] font-light text-charcoal-deep/40 hover:text-charcoal-deep transition-colors"
+                      className="font-serif text-[13px] font-light text-white/40 hover:text-white transition-colors"
                     >
                       {app.website.replace(/^https?:\/\//, "")}
                     </a>
@@ -269,12 +269,12 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
                 </div>
 
                 {app.message && (
-                  <p className="font-serif text-[13px] font-light text-charcoal-deep/50 leading-relaxed max-w-2xl italic">
+                  <p className="font-serif text-[13px] font-light text-white/50 leading-relaxed max-w-2xl italic">
                     "{app.message}"
                   </p>
                 )}
 
-                <p className="font-serif text-[11px] text-charcoal-deep/30">
+                <p className="font-serif text-[11px] text-white/30">
                   {new Date(app.created_at).toLocaleDateString("es-ES", {
                     day: "numeric",
                     month: "long",
