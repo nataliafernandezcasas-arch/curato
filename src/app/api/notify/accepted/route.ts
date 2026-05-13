@@ -93,9 +93,7 @@ export async function POST(request: NextRequest) {
     await sendApplicationAccepted({
       to: creator.email,
       name: creator.full_name,
-      type: "influencer",
-      passUrl: passUrl || undefined,
-      googlePayUrl: googlePayUrl || undefined,
+      type: "creator",
     });
 
     return NextResponse.json({ success: true, passUrl, googlePayUrl, memberId });
