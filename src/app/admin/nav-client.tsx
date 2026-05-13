@@ -29,7 +29,7 @@ export default function AdminNavClient() {
           {t.navQR}
         </Link>
         <Link href="/admin/nuevo" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
-          Nuevo miembro
+          {t.navNewMember}
         </Link>
       </div>
       <div className="flex items-center gap-5">

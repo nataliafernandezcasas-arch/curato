@@ -168,6 +168,7 @@ export const translations = {
     admin: {
       navCandidatures: "Candidatures",
       navQR: "QR Invitation",
+      navNewMember: "Nouveau membre",
       navSignOut: "Quitter",
       pageLabel: "Curato · Admin",
       pageTitle: "Candidatures",
@@ -383,6 +384,7 @@ export const translations = {
     admin: {
       navCandidatures: "Applications",
       navQR: "QR Invitation",
+      navNewMember: "New member",
       navSignOut: "Sign out",
       pageLabel: "Curato · Admin",
       pageTitle: "Applications",
@@ -584,6 +586,7 @@ export const translations = {
     admin: {
       navCandidatures: "Candidaturas",
       navQR: "QR Invitación",
+      navNewMember: "Nuevo miembro",
       navSignOut: "Salir",
       pageLabel: "Curato · Admin",
       pageTitle: "Candidaturas",
