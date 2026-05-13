@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
 import ApplicationActions from "./actions";
+import CreditEditor from "./credit-editor";
 
 export const dynamic = "force-dynamic";
 
@@ -105,21 +106,34 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
       {/* Creator profile link */}
       {app.status === "approved" && creator && (
         <div className="mt-10 border border-champagne/20 bg-champagne/5 p-8">
-          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/60 mb-4">Perfil activo</p>
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <p className="font-serif text-[17px] font-light text-white">@{creator.handle || app.instagram?.replace("@", "")}</p>
-              <p className="font-serif text-[13px] text-white/40 mt-1">
-                {creator.followers != null && creator.followers > 0
-                  ? `${creator.followers >= 1000 ? `${(creator.followers / 1000).toFixed(1)}K` : creator.followers} seguidores`
-                  : "Seguidores no registrados"}
-                {" · "}
-                €{(creator.monthly_credit_cop ?? 0) - (creator.credit_used_cop ?? 0)} disponibles de €{creator.monthly_credit_cop ?? 0}
-              </p>
+          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/60 mb-6">Perfil activo</p>
+          <div className="flex items-start justify-between flex-wrap gap-6">
+            <div className="space-y-4">
+              <div>
+                <p className="font-serif text-[18px] font-light text-white">@{creator.handle || app.instagram?.replace("@", "")}</p>
+                {creator.followers != null && creator.followers > 0 && (
+                  <p className="font-serif text-[13px] text-white/35 mt-1">
+                    {creator.followers >= 1000 ? `${(creator.followers / 1000).toFixed(1)}K` : creator.followers} seguidores
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-8 flex-wrap">
+                <CreditEditor email={app.email} initialCredit={creator.monthly_credit_cop ?? 0} />
+                <div>
+                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-1">Disponible</p>
+                  <p className="font-serif text-[22px] font-light text-white/60">
+                    €{(creator.monthly_credit_cop ?? 0) - (creator.credit_used_cop ?? 0)}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-1">Usado</p>
+                  <p className="font-serif text-[22px] font-light text-white/40">€{creator.credit_used_cop ?? 0}</p>
+                </div>
+              </div>
             </div>
             <Link
               href={`/admin/creators/${encodeURIComponent(app.email)}`}
-              className="font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300"
+              className="font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300 self-start"
             >
               Ver dashboard →
             </Link>
