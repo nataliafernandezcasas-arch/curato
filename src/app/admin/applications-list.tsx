@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Trash } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
@@ -256,7 +257,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
             <div key={app.id} className="py-6 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
               <div className="space-y-2">
                 <div className="flex items-center gap-4 flex-wrap">
-                  <h3 className="font-serif text-[17px] font-light text-white">{app.name}</h3>
+                  <Link href={`/admin/applications/${app.id}`} className="font-serif text-[17px] font-light text-white hover:text-champagne transition-colors">{app.name}</Link>
                   <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/40 border border-white/15 px-2 py-0.5">
                     {app.type === "creator" ? t.typeCreator : t.typeHouse}
                   </span>
