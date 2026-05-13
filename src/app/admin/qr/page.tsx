@@ -49,9 +49,9 @@ function QRBlock({ label, url, filename }: { label: string; url: string; filenam
 
   return (
     <div>
-      <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-charcoal-deep/40 mb-5">{label}</p>
+      <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-champagne/50 mb-5">{label}</p>
 
-      <div className="bg-[#1A1A1A] p-10 inline-block">
+      <div className="bg-white/8 border border-white/10 p-10 inline-block">
         <div ref={ref}>
           <QRCode
             value={url}
@@ -63,7 +63,7 @@ function QRBlock({ label, url, filename }: { label: string; url: string; filenam
         </div>
       </div>
 
-      <p className="font-serif text-[11px] text-charcoal-deep/30 mt-2 mb-4 tracking-wide">{url}</p>
+      <p className="font-serif text-[11px] text-white/30 mt-3 mb-5 tracking-wide">{url}</p>
 
       <div className="flex gap-3">
         <button
@@ -74,7 +74,7 @@ function QRBlock({ label, url, filename }: { label: string; url: string; filenam
         </button>
         <button
           onClick={downloadSVG}
-          className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep/70 border border-black/20 px-5 py-2.5 hover:border-black/40 transition-all duration-200"
+          className="font-serif text-[11px] tracking-widest uppercase text-white/50 border border-white/20 px-5 py-2.5 hover:border-white/40 hover:text-white transition-all duration-200"
         >
           SVG
         </button>
@@ -87,9 +87,9 @@ export default function AdminQRPage() {
   return (
     <div className="max-w-[1100px] mx-auto px-5 py-16">
       <div className="mb-12">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-charcoal-deep/40 mb-3">Admin · QR Codes</p>
-        <h1 className="font-serif text-3xl font-light tracking-[0.2em] uppercase text-charcoal-deep">Codes QR</h1>
-        <p className="font-serif text-[13px] font-light text-charcoal-deep/40 mt-2">Beige champagne · fondo transparente · 800×800 px</p>
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-3">Admin · QR Codes</p>
+        <h1 className="font-serif text-3xl font-light tracking-[0.2em] uppercase text-white">Codes QR</h1>
+        <p className="font-serif text-[13px] font-light text-white/30 mt-2">Beige champagne · fond transparent · 800×800 px</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
