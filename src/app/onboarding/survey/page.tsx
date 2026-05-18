@@ -38,8 +38,11 @@ export default async function OnboardingSurveyPage() {
     redirect("/auth/sign-in?error=not_approved");
   }
 
-  // Link owner_id on first visit if it wasn't set already.
-  if (!creator.owner_id) {
+  // Always sync owner_id with the current auth session. Re-linking only
+  // when NULL leaves stale links pointing to orphaned auth users, which
+  // breaks the submit server action (it does `.eq("owner_id", user.id)`
+  // and returns `creator_not_found` on mismatch).
+  if (creator.owner_id !== user.id) {
     await admin.from("creators").update({ owner_id: user.id }).eq("id", creator.id);
     creator = { ...creator, owner_id: user.id };
   }

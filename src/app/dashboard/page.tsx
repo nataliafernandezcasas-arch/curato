@@ -24,7 +24,12 @@ export default async function DashboardPage() {
     .maybeSingle();
 
   if (creator && creator.partnership_stage !== "declined") {
-    if (!creator.owner_id) {
+    // Always sync owner_id with the current auth session. The earlier
+    // `!creator.owner_id` check only re-linked when NULL — if a stale
+    // user.id was set (e.g. an orphaned auth user that shares the email),
+    // server actions using the user client + `.eq("owner_id", user.id)`
+    // wouldn't find the row and would fail with `creator_not_found`.
+    if (creator.owner_id !== user.id) {
       await admin.from("creators").update({ owner_id: user.id }).eq("id", creator.id);
     }
     // First-time creators run through the onboarding survey before reaching
