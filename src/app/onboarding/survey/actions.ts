@@ -10,32 +10,61 @@ export async function submitSurvey(answers: SurveyAnswers): Promise<
   | { ok: true }
   | { ok: false; error: string }
 > {
-  // User client — used for the auth check and for the responses upsert
-  // (RLS on creator_survey_responses allows the creator to write their own
-  // rows via owner_id = auth.uid()).
+  // 1. Auth check — uses the user client to read the session cookie.
   const supabase = await createClient();
-
-  // 1. Auth check.
   const {
     data: { user },
     error: userErr,
   } = await supabase.auth.getUser();
-  if (userErr || !user) {
+  if (userErr || !user?.email) {
     return { ok: false, error: "not_authenticated" };
   }
 
-  // 2. Find the creator row owned by this auth user.
-  const { data: creator, error: creatorErr } = await supabase
+  // 2. Lookup the creator via ADMIN client — same pattern as page.tsx.
+  //    Using the user client + .eq("owner_id", user.id) only works when
+  //    creators.owner_id is perfectly in sync with the current session,
+  //    which fails as soon as an orphaned auth user pollutes the row.
+  //    Admin lookup matches by owner_id OR email, then we validate
+  //    ownership in code before doing anything destructive.
+  const admin = createAdminClient();
+  const emailLc = user.email.toLowerCase();
+  const { data: creator, error: creatorErr } = await admin
     .from("creators")
-    .select("id")
-    .eq("owner_id", user.id)
+    .select("id, owner_id, email, partnership_stage")
+    .or(`owner_id.eq.${user.id},email.eq.${emailLc}`)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
-  if (creatorErr || !creator) {
-    return { ok: false, error: "creator_not_found" };
+  if (creatorErr) {
+    console.error("[submitSurvey] creator lookup failed", creatorErr);
+    return { ok: false, error: `lookup:${creatorErr.code ?? "?"}:${creatorErr.message}` };
   }
 
-  // 3. Build payload — one row per (creator, question_slug). JSONB answer
+  if (!creator) {
+    return {
+      ok: false,
+      error: `creator_not_found:user=${user.id.slice(0, 8)}:email=${emailLc}`,
+    };
+  }
+
+  // Security: the matched creator's email must equal the session email.
+  // (If a malicious user somehow had a session whose user.id matched
+  // someone else's owner_id, the email check stops them.)
+  if ((creator.email ?? "").toLowerCase() !== emailLc) {
+    return { ok: false, error: "email_mismatch" };
+  }
+
+  if (creator.partnership_stage === "declined") {
+    return { ok: false, error: "declined" };
+  }
+
+  // 3. Auto-heal owner_id if it drifted (same logic as page.tsx).
+  if (creator.owner_id !== user.id) {
+    await admin.from("creators").update({ owner_id: user.id }).eq("id", creator.id);
+  }
+
+  // 4. Build payload — one row per (creator, question_slug). JSONB answer
   //    is always an array so the matching algo can do uniform set ops.
   const rows = Object.entries(answers)
     .filter(([, vals]) => Array.isArray(vals) && vals.length > 0)
@@ -50,10 +79,9 @@ export async function submitSurvey(answers: SurveyAnswers): Promise<
     return { ok: false, error: "no_answers" };
   }
 
-  // 4. Upsert via user client — RLS limits writes to the creator's own row.
-  //    The UNIQUE (creator_id, question_slug) constraint from migration 010
-  //    makes re-submission idempotent.
-  const { error: insertErr } = await supabase
+  // 5. Upsert via admin client — bypasses RLS but is gated by the
+  //    email-match security check above.
+  const { error: insertErr } = await admin
     .from("creator_survey_responses")
     .upsert(rows, { onConflict: "creator_id,question_slug" });
 
@@ -69,11 +97,7 @@ export async function submitSurvey(answers: SurveyAnswers): Promise<
     return { ok: false, error: `upsert:${insertErr.code ?? "?"}:${insertErr.message}` };
   }
 
-  // 5. Flip the completion flag. The creators table only allows admin writes
-  //    (per migration 009 policy "creators admin write"), so we use the
-  //    service-role client to bypass RLS here — gated by the fact that we
-  //    already verified `creator.owner_id === user.id` above.
-  const admin = createAdminClient();
+  // 6. Flip the completion flag.
   const { error: updateErr } = await admin
     .from("creators")
     .update({ onboarding_survey_completed_at: new Date().toISOString() })
@@ -87,8 +111,6 @@ export async function submitSurvey(answers: SurveyAnswers): Promise<
       code: updateErr.code,
       creator_id: creator.id,
     });
-    // Responses were saved; surfacing this lets the client retry the
-    // completed_at flip without re-submitting answers.
     return { ok: false, error: `flag:${updateErr.code ?? "?"}:${updateErr.message}` };
   }
 
