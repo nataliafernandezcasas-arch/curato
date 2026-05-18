@@ -114,7 +114,9 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
     setSubmitError(null);
     const res = await submitSurvey(answers);
     if (!res.ok) {
-      setSubmitError(t.error);
+      // Surface the actual server-side error code so we can diagnose
+      // why the upsert / completion flag flip failed.
+      setSubmitError(`${t.error} (${res.error})`);
       setSubmitting(false);
       return;
     }
@@ -223,7 +225,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
                 options={current.options}
                 lang={lang}
                 selected={currentAnswers}
-                onToggle={(v) => toggleOption(v, "single")}
+                onToggle={(v) => toggleOption(v, "multi")}
               />
             ) : (
               <ChipsGrid

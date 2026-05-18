@@ -58,7 +58,15 @@ export async function submitSurvey(answers: SurveyAnswers): Promise<
     .upsert(rows, { onConflict: "creator_id,question_slug" });
 
   if (insertErr) {
-    return { ok: false, error: insertErr.message };
+    console.error("[submitSurvey] upsert failed", {
+      message: insertErr.message,
+      details: insertErr.details,
+      hint: insertErr.hint,
+      code: insertErr.code,
+      creator_id: creator.id,
+      row_count: rows.length,
+    });
+    return { ok: false, error: `upsert:${insertErr.code ?? "?"}:${insertErr.message}` };
   }
 
   // 5. Flip the completion flag. The creators table only allows admin writes
@@ -72,9 +80,16 @@ export async function submitSurvey(answers: SurveyAnswers): Promise<
     .eq("id", creator.id);
 
   if (updateErr) {
+    console.error("[submitSurvey] completion flag update failed", {
+      message: updateErr.message,
+      details: updateErr.details,
+      hint: updateErr.hint,
+      code: updateErr.code,
+      creator_id: creator.id,
+    });
     // Responses were saved; surfacing this lets the client retry the
     // completed_at flip without re-submitting answers.
-    return { ok: false, error: `completion_flag_failed:${updateErr.message}` };
+    return { ok: false, error: `flag:${updateErr.code ?? "?"}:${updateErr.message}` };
   }
 
   return { ok: true };
