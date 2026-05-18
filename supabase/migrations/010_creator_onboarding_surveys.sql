@@ -111,7 +111,28 @@ CREATE INDEX IF NOT EXISTS creators_survey_pending_idx
 
 
 -- ----------------------------------------------------------------------------
--- 5. RLS
+-- 5. GRANTs (drift recovery)
+-- ----------------------------------------------------------------------------
+-- Tables created via raw CREATE TABLE in SQL Editor (vs via the Supabase
+-- Studio Table UI) don't inherit Supabase's default GRANTs to anon /
+-- authenticated / service_role. RLS only runs AFTER the role has table-level
+-- access, so without explicit GRANTs every query against these tables — even
+-- from the service_role admin client — returns "permission denied for table".
+--
+-- These statements re-grant what Supabase Studio would have set automatically.
+-- They're idempotent (re-running GRANT doesn't fail).
+
+GRANT ALL ON survey_questions          TO service_role;
+GRANT ALL ON creator_survey_responses  TO service_role;
+GRANT ALL ON venue_tags                TO service_role;
+
+GRANT SELECT                          ON survey_questions          TO anon, authenticated;
+GRANT SELECT                          ON venue_tags                TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE  ON creator_survey_responses  TO authenticated;
+
+
+-- ----------------------------------------------------------------------------
+-- 6. RLS
 -- ----------------------------------------------------------------------------
 ALTER TABLE survey_questions         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE creator_survey_responses ENABLE ROW LEVEL SECURITY;
@@ -157,7 +178,7 @@ CREATE POLICY "venue_tags admin"
 
 
 -- ----------------------------------------------------------------------------
--- 6. Seed — 10 onboarding survey questions
+-- 7. Seed — 10 onboarding survey questions
 -- ----------------------------------------------------------------------------
 -- Edit question wording HERE, not in Studio. Re-applying this migration will
 -- overwrite the production rows with whatever's below (ON CONFLICT DO UPDATE).
