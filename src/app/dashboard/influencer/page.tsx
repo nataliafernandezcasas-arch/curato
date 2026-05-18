@@ -109,13 +109,13 @@ export default function InfluencerDashboard() {
             <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-champagne">
               Adresses
             </Link>
-            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/30 hover:text-champagne transition-colors">
+            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/75 hover:text-champagne transition-colors">
               Mes visites
             </Link>
           </div>
           <button
             onClick={signOut}
-            className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/30 hover:text-champagne transition-colors"
+            className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/75 hover:text-champagne transition-colors"
           >
             <SignOut size={14} />
             Sortir
@@ -136,7 +136,7 @@ export default function InfluencerDashboard() {
 
               {/* Left: name + handle */}
               <div>
-                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/40 mb-3">
+                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/90 mb-3">
                   Bonjour
                 </p>
                 <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.15em] uppercase text-white leading-none mb-3">
@@ -147,7 +147,7 @@ export default function InfluencerDashboard() {
                     href={`https://instagram.com/${profile.handle}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-serif text-[13px] text-champagne/40 hover:text-champagne transition-colors tracking-widest"
+                    className="font-serif text-[13px] text-champagne/90 hover:text-champagne transition-colors tracking-widest"
                   >
                     @{profile.handle}
                   </a>
@@ -160,10 +160,10 @@ export default function InfluencerDashboard() {
                 {/* Followers */}
                 {profile?.followers != null && profile.followers > 0 && (
                   <div className="text-right">
-                    <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">
+                    <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/75 mb-1">
                       Abonnés
                     </p>
-                    <p className="font-serif text-[32px] font-light text-white/70 leading-none">
+                    <p className="font-serif text-[32px] font-light text-white leading-none">
                       {formatFollowers(profile.followers)}
                     </p>
                   </div>
@@ -176,14 +176,14 @@ export default function InfluencerDashboard() {
 
                 {/* Credit */}
                 <div className="text-right">
-                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">
+                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/75 mb-1">
                     Crédit disponible
                   </p>
                   <p className="font-serif text-[32px] font-light text-champagne leading-none">
                     €{remaining}
                   </p>
                   {monthlyCredit > 0 && (
-                    <p className="font-serif text-[11px] text-white/25 mt-1">
+                    <p className="font-serif text-[11px] text-white/75 mt-1">
                       sur €{monthlyCredit} ce mois
                     </p>
                   )}
@@ -212,7 +212,7 @@ export default function InfluencerDashboard() {
               className={`font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
                 catFilter === c
                   ? "bg-champagne text-charcoal-deep"
-                  : "text-white/30 border border-white/10 hover:border-champagne/30 hover:text-champagne"
+                  : "text-white/85 border border-white/25 hover:border-champagne/60 hover:text-champagne"
               }`}
             >
               {c === "all" ? "Toutes" : CAT_LABELS[c]}
@@ -221,7 +221,7 @@ export default function InfluencerDashboard() {
         </div>
 
         {/* Label */}
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/30 mb-8">
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/90 mb-8">
           Adresses sélectionnées · Paris
         </p>
 
@@ -239,11 +239,11 @@ export default function InfluencerDashboard() {
             ))}
           </div>
         ) : offers.length === 0 ? (
-          <div className="text-center py-24 border border-white/5">
-            <p className="font-serif text-[15px] font-light text-white/30 mb-2">
+          <div className="text-center py-24 border border-white/15">
+            <p className="font-serif text-[16px] font-light text-white/95 mb-2">
               Aucune adresse disponible pour le moment.
             </p>
-            <p className="font-serif text-[13px] font-light text-white/15 italic">
+            <p className="font-serif text-[13px] font-light text-white/70 italic">
               De nouvelles adresses arrivent chaque saison.
             </p>
           </div>
@@ -277,16 +277,16 @@ export default function InfluencerDashboard() {
                   <h3 className="font-serif text-[17px] font-light text-white mb-1 group-hover:text-champagne transition-colors">
                     {offer.title}
                   </h3>
-                  <p className="font-serif text-[12px] text-white/30 mb-3 tracking-wide">
+                  <p className="font-serif text-[12px] text-white/75 mb-3 tracking-wide">
                     {offer.comercios?.name}
                   </p>
                   {offer.description && (
-                    <p className="font-serif text-[13px] font-light text-white/40 leading-relaxed mb-4 line-clamp-2">
+                    <p className="font-serif text-[13px] font-light text-white/85 leading-relaxed mb-4 line-clamp-2">
                       {offer.description}
                     </p>
                   )}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/8">
-                    <div className="flex items-center gap-1.5 text-white/25">
+                  <div className="flex items-center justify-between pt-4 border-t border-white/15">
+                    <div className="flex items-center gap-1.5 text-white/75">
                       <MapPin size={12} />
                       <span className="font-serif text-[12px] font-light">{offer.address}</span>
                     </div>
@@ -303,7 +303,7 @@ export default function InfluencerDashboard() {
                     )}
                   </div>
                   {offer.visit_value_cop > 0 && (
-                    <p className="font-serif text-[11px] text-champagne/40 mt-3">
+                    <p className="font-serif text-[11px] text-champagne/90 mt-3">
                       Jusqu'à €{offer.visit_value_cop}
                     </p>
                   )}
