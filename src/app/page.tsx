@@ -63,7 +63,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-[clamp(2.1rem,10vw,7rem)] font-light tracking-[0.35em] uppercase leading-[1] text-text-primary mb-8 max-w-[800px]"
+              className="font-serif text-[clamp(2.1rem,9vw,6.5rem)] font-light tracking-[0.18em] uppercase leading-[1.05] text-text-primary mb-8 max-w-[1000px]"
             >
               {t.heroTitle1}
               <br />

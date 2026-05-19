@@ -13,8 +13,8 @@ export const translations = {
     },
     home: {
       badge: "Paris · Sur invitation",
-      heroTitle1: "Jamais une campagne.",
-      heroTitle2: "Toujours une histoire.",
+      heroTitle1: "Jamais une campagne.",
+      heroTitle2: "Toujours une histoire.",
       heroSubtitle: "Un écosystème vivant qui unit créateurs et maisons d'exception, pour qu'ils construisent quelque chose ensemble.",
       ctaCreator: "Je raconte des histoires",
       ctaMaison: "J'ouvre mes portes",
@@ -245,8 +245,8 @@ export const translations = {
     },
     home: {
       badge: "Paris · By invitation",
-      heroTitle1: "Never a campaign.",
-      heroTitle2: "Always a story.",
+      heroTitle1: "Never a campaign.",
+      heroTitle2: "Always a story.",
       heroSubtitle: "A living ecosystem that bridges creators and exceptional houses, so they may build something together.",
       ctaCreator: "I tell stories",
       ctaMaison: "I open my doors",
@@ -477,8 +477,8 @@ export const translations = {
     },
     home: {
       badge: "París · Por invitación",
-      heroTitle1: "Jamás una campaña.",
-      heroTitle2: "Siempre una historia.",
+      heroTitle1: "Jamás una campaña.",
+      heroTitle2: "Siempre una historia.",
       heroSubtitle: "Un ecosistema vivo que une creadores y casas de excepción, para que construyan algo juntos.",
       ctaCreator: "Cuento historias",
       ctaMaison: "Abro mis puertas",

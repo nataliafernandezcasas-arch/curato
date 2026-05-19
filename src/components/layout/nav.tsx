@@ -46,17 +46,17 @@ export default function Nav() {
               key={l.href}
               href={l.href}
               className={`font-serif text-[14px] font-light px-4 py-1.5 tracking-wider transition-all duration-300 ${
-                path === l.href ? "text-champagne" : "text-white/60 hover:text-champagne"
+                path === l.href ? "text-champagne" : "text-white/90 hover:text-champagne"
               }`}
             >
               {l.label}
             </Link>
           ))}
-          <div className="w-px h-4 bg-white/15 mx-3" />
+          <div className="w-px h-4 bg-white/25 mx-3" />
           {/* Language toggle */}
           <button
             onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
-            className="font-serif text-[12px] font-light tracking-widest text-white/40 hover:text-champagne transition-colors mr-3"
+            className="font-serif text-[12px] font-light tracking-widest text-white/75 hover:text-champagne transition-colors mr-3"
           >
             {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
           </button>
@@ -72,7 +72,7 @@ export default function Nav() {
         <div className="flex md:hidden items-center gap-3">
           <button
             onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
-            className="font-serif text-[12px] font-light tracking-widest text-white/40 hover:text-champagne transition-colors"
+            className="font-serif text-[12px] font-light tracking-widest text-white/75 hover:text-champagne transition-colors"
           >
             {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
           </button>
@@ -91,7 +91,7 @@ export default function Nav() {
               href={l.href}
               onClick={() => setOpen(false)}
               className={`block font-serif text-[18px] font-light py-2 tracking-wider transition-all ${
-                path === l.href ? "text-champagne" : "text-white/60"
+                path === l.href ? "text-champagne" : "text-white/90"
               }`}
             >
               {l.label}
