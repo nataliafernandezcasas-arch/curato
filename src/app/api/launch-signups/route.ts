@@ -12,10 +12,20 @@ function isProfile(v: unknown): v is Profile {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { full_name, email, whatsapp, profile, instagram_handle, source } = body;
+    const { full_name, email, whatsapp, profile, instagram_handle, source, age_confirmed, terms_accepted } = body;
 
     if (!full_name || !email || !whatsapp || !isProfile(profile)) {
       return NextResponse.json({ error: "Faltan datos. Revisa los campos obligatorios." }, { status: 400 });
+    }
+
+    // RGPD: 18+ attestation required (declared in /privacidad section 11).
+    if (age_confirmed !== true) {
+      return NextResponse.json({ error: "Debes tener 18 años cumplidos para inscribirte." }, { status: 400 });
+    }
+
+    // Express acceptance of Terms required (declared in /condiciones section 3).
+    if (terms_accepted !== true) {
+      return NextResponse.json({ error: "Debes aceptar las Condiciones Generales para inscribirte." }, { status: 400 });
     }
 
     const normalizedEmail = String(email).toLowerCase().trim();

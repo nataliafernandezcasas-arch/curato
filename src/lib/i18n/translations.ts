@@ -10,6 +10,8 @@ export const translations = {
     footer: {
       tagline: "Paris, France · Sur invitation",
       copyright: `© ${new Date().getFullYear()} Curato. Tous droits réservés.`,
+      privacy: "Confidentialité",
+      terms: "Conditions",
     },
     home: {
       badge: "Paris · Sur invitation",
@@ -142,6 +144,11 @@ export const translations = {
       optional: "— facultatif",
       whyPlaceholder: "Quelques mots sur vous et votre univers…",
       describePlaceholder: "Votre histoire, votre adresse, ce qui vous rend unique…",
+      ageLabel: "J'atteste avoir 18 ans révolus.",
+      ageRequired: "Vous devez avoir 18 ans révolus pour candidater.",
+      termsLabel: "J'accepte les",
+      termsLink: "Conditions Générales",
+      termsRequired: "Vous devez accepter les Conditions Générales pour candidater.",
       submitBtn: "Envoyer ma candidature",
       submitting: "Envoi en cours…",
       note: "Chaque candidature est étudiée manuellement.",
@@ -230,6 +237,11 @@ export const translations = {
       error: "Quelque chose a échoué. Réessayez dans un instant.",
       doneTitle: "Tout est prêt.",
       doneSubtitle: "Nous préparons votre carnet personnalisé.",
+      privacyNotice:
+        "Vos réponses sont enregistrées dans notre base de données pour vous présenter des recommandations personnalisées. Seul Curato y accède. Vous pouvez demander leur suppression en écrivant à hello@curatocollective.com. Plus d'infos :",
+      privacyPolicyLink: "Politique de confidentialité",
+      consentLabel: "J'accepte",
+      consentRequiredHint: "Veuillez accepter pour continuer.",
     },
   },
 
@@ -242,6 +254,8 @@ export const translations = {
     footer: {
       tagline: "Paris, France · By invitation",
       copyright: `© ${new Date().getFullYear()} Curato. All rights reserved.`,
+      privacy: "Privacy",
+      terms: "Terms",
     },
     home: {
       badge: "Paris · By invitation",
@@ -374,6 +388,11 @@ export const translations = {
       optional: "— optional",
       whyPlaceholder: "A few words about you and your world…",
       describePlaceholder: "Your story, your address, what makes you unique…",
+      ageLabel: "I confirm I am 18 years old or older.",
+      ageRequired: "You must be 18 or older to apply.",
+      termsLabel: "I accept the",
+      termsLink: "Terms and Conditions",
+      termsRequired: "You must accept the Terms and Conditions to apply.",
       submitBtn: "Send my application",
       submitting: "Sending…",
       note: "Every application is reviewed manually.",
@@ -462,6 +481,11 @@ export const translations = {
       error: "Something went wrong. Try again in a moment.",
       doneTitle: "All set.",
       doneSubtitle: "We're preparing your personalised catalogue.",
+      privacyNotice:
+        "Your answers are stored in our database to show you personalised recommendations. Only Curato has access to them. You can request deletion by writing to hello@curatocollective.com. More info:",
+      privacyPolicyLink: "Privacy Policy",
+      consentLabel: "I accept",
+      consentRequiredHint: "Please accept to continue.",
     },
   },
 
@@ -474,6 +498,8 @@ export const translations = {
     footer: {
       tagline: "París, Francia · Por invitación",
       copyright: `© ${new Date().getFullYear()} Curato. Todos los derechos reservados.`,
+      privacy: "Privacidad",
+      terms: "Condiciones",
     },
     home: {
       badge: "París · Por invitación",
@@ -606,6 +632,11 @@ export const translations = {
       optional: "— opcional",
       whyPlaceholder: "Unas palabras sobre ti y tu universo…",
       describePlaceholder: "Tu historia, tu dirección, lo que te hace único…",
+      ageLabel: "Confirmo que tengo 18 años cumplidos.",
+      ageRequired: "Debes tener 18 años cumplidos para candidarte.",
+      termsLabel: "Acepto las",
+      termsLink: "Condiciones Generales",
+      termsRequired: "Debes aceptar las Condiciones Generales para candidarte.",
       submitBtn: "Enviar mi candidatura",
       submitting: "Enviando…",
       note: "Cada candidatura se estudia manualmente.",
@@ -694,6 +725,11 @@ export const translations = {
       error: "Algo falló. Inténtalo en un momento.",
       doneTitle: "Todo listo.",
       doneSubtitle: "Estamos preparando tu carnet personalizado.",
+      privacyNotice:
+        "Tus respuestas se guardan en nuestra base de datos para mostrarte recomendaciones personalizadas. Solo Curato accede a ellas. Puedes pedir que las borremos escribiendo a hello@curatocollective.com. Para más info:",
+      privacyPolicyLink: "Política de Privacidad",
+      consentLabel: "Acepto",
+      consentRequiredHint: "Marca la casilla para continuar.",
     },
   },
 } as const;

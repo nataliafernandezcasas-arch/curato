@@ -175,7 +175,23 @@ function notificationEmail(name: string, typeLabel: string, email: string, insta
 }
 
 export async function POST(req: NextRequest) {
-  const { type, name, email, instagram, website, message } = await req.json();
+  const { type, name, email, instagram, website, message, age_confirmed, terms_accepted } = await req.json();
+
+  // RGPD: 18+ attestation required (declared in /privacidad section 11).
+  if (age_confirmed !== true) {
+    return NextResponse.json(
+      { error: "Vous devez avoir 18 ans révolus pour candidater." },
+      { status: 400 }
+    );
+  }
+
+  // Express acceptance of Terms required (declared in /condiciones section 3).
+  if (terms_accepted !== true) {
+    return NextResponse.json(
+      { error: "Vous devez accepter les Conditions Générales pour candidater." },
+      { status: 400 }
+    );
+  }
 
   const typeLabel = type === "creator" ? "Créateur · Créatrice" : "Maison · Commerce";
   const normalizedEmail = email.toLowerCase().trim();
