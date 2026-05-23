@@ -6,8 +6,20 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
     const email = body.email?.toLowerCase().trim();
+    const phylloConsent = body.phyllo_consent;
 
     if (!email) return NextResponse.json({ error: "Email requerido" }, { status: 400 });
+
+    // RGPD: explicit consent required before processing Instagram data via Phyllo
+    // (declared in /privacidad sections 4 and 5). The connect-Instagram UI MUST
+    // present a dedicated consent checkbox and send `phyllo_consent: true` here.
+    // If you remove this check, update the privacy policy first.
+    if (phylloConsent !== true) {
+      return NextResponse.json(
+        { error: "Le consentement explicite est requis pour connecter votre compte Instagram." },
+        { status: 400 }
+      );
+    }
 
     const admin = createAdminClient();
     const { data: creator, error: creatorErr } = await admin

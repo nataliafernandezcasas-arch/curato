@@ -69,13 +69,15 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [consented, setConsented] = useState(false);
 
   const total = questions.length;
   const current = questions[step];
   const currentAnswers = answers[current?.slug ?? ""] ?? [];
-  const canProceed = !current?.is_required || currentAnswers.length > 0;
+  const answersOk = !current?.is_required || currentAnswers.length > 0;
   const isLast = step === total - 1;
   const isFirst = step === 0;
+  const canProceed = answersOk && (!isLast || consented);
   const progressPct = ((step + 1) / total) * 100;
 
   // ── Option selection
@@ -237,13 +239,61 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
             )}
 
             {/* Required hint only after the user tried to advance */}
-            {!canProceed && current.is_required && (
+            {!answersOk && current.is_required && (
               <p className="font-serif text-[12px] italic text-copper/70 mt-6 tracking-wide">
                 {t.requiredHint}
               </p>
             )}
           </motion.div>
         </AnimatePresence>
+
+        {/* Privacy notice — only on the first step */}
+        {isFirst && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="font-serif text-[12px] font-light text-white/40 leading-relaxed tracking-wide mt-12 pt-6 border-t border-white/8"
+          >
+            {t.privacyNotice}{" "}
+            <Link
+              href="/privacidad"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-champagne/70 hover:text-champagne underline underline-offset-2 transition-colors"
+            >
+              {t.privacyPolicyLink}
+            </Link>
+          </motion.p>
+        )}
+
+        {/* Consent checkbox — only on the last step */}
+        {isLast && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.4 }}
+            className="mt-10 pt-6 border-t border-white/8"
+          >
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={consented}
+                onChange={(e) => setConsented(e.target.checked)}
+                className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
+              />
+              <span className="font-serif text-[13px] font-light text-white/70 leading-relaxed tracking-wide group-hover:text-white/90 transition-colors">
+                {t.consentLabel}
+                <span className="text-copper/70"> *</span>
+              </span>
+            </label>
+            {!consented && (
+              <p className="font-serif text-[11px] italic text-white/30 mt-3 ml-7 tracking-wide">
+                {t.consentRequiredHint}
+              </p>
+            )}
+          </motion.div>
+        )}
       </main>
 
       {/* ── Footer: nav buttons + error ── */}

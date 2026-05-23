@@ -17,6 +17,8 @@ type Type = "creator" | "maison" | null;
 export default function CandidaturePage() {
   const [type, setType] = useState<Type>(null);
   const [form, setForm] = useState({ name: "", email: "", instagram: "", website: "", message: "" });
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -25,6 +27,14 @@ export default function CandidaturePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!ageConfirmed) {
+      setError(t.ageRequired);
+      return;
+    }
+    if (!termsAccepted) {
+      setError(t.termsRequired);
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -39,6 +49,8 @@ export default function CandidaturePage() {
           instagram: form.instagram || null,
           website: form.website || null,
           message: form.message || null,
+          age_confirmed: true,
+          terms_accepted: true,
         }),
       });
 
@@ -188,14 +200,51 @@ export default function CandidaturePage() {
               />
             </div>
 
+            {/* Age 18+ attestation (RGPD) */}
+            <label className="flex items-start gap-3 cursor-pointer group pt-2">
+              <input
+                type="checkbox"
+                checked={ageConfirmed}
+                onChange={(e) => setAgeConfirmed(e.target.checked)}
+                className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
+              />
+              <span className="font-serif text-[13px] font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
+                {t.ageLabel}
+                <span className="text-copper/70"> *</span>
+              </span>
+            </label>
+
+            {/* Terms & Conditions acceptance */}
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
+              />
+              <span className="font-serif text-[13px] font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
+                {t.termsLabel}{" "}
+                <Link
+                  href="/condiciones"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-champagne/80 hover:text-champagne underline underline-offset-2 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {t.termsLink}
+                </Link>
+                <span className="text-copper/70"> *</span>
+              </span>
+            </label>
+
             {error && (
               <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">{error}</p>
             )}
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
+              disabled={loading || !ageConfirmed || !termsAccepted}
+              className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t.submitting : t.submitBtn}
             </button>
