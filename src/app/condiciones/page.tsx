@@ -2,7 +2,6 @@
 
 import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
-import { Info } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { termsContent } from "@/lib/i18n/terms";
 
@@ -42,27 +41,6 @@ export default function TermsPage() {
             <p className="font-serif text-[12px] font-light italic tracking-wide text-text-muted">
               {t.lastUpdatedLabel} · {t.lastUpdated}
             </p>
-          </div>
-        </section>
-
-        {/* ── DRAFT NOTICE ── */}
-        <section className="px-5 pt-10">
-          <div className="max-w-[860px] mx-auto">
-            <div className="flex items-start gap-4 border border-copper/30 bg-copper/5 px-5 py-4">
-              <Info
-                size={18}
-                weight="light"
-                className="text-copper/80 mt-0.5 shrink-0"
-              />
-              <div>
-                <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-copper/80 mb-2">
-                  {t.draftNoticeTitle}
-                </p>
-                <p className="font-serif text-[13px] font-light text-text-secondary leading-relaxed">
-                  {t.draftNoticeBody}
-                </p>
-              </div>
-            </div>
           </div>
         </section>
 
