@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   //    would block them entirely. We let everyone through except declined.
   const { data: creator } = await admin
     .from("creators")
-    .select("id, owner_id, stage, partnership_stage, onboarding_survey_completed_at")
+    .select("id, owner_id, stage, partnership_stage, welcome_completed_at, onboarding_survey_completed_at")
     .eq("email", emailLc)
     .order("created_at", { ascending: false })
     .limit(1)
@@ -32,9 +32,15 @@ export default async function DashboardPage() {
     if (creator.owner_id !== user.id) {
       await admin.from("creators").update({ owner_id: user.id }).eq("id", creator.id);
     }
-    // First-time creators run through the onboarding survey before reaching
-    // the personalised feed. Re-routing here (server-side) keeps the gate
-    // tight even if a user types /dashboard/influencer in their URL bar.
+    // First-time creators must complete the welcome flow (10-slide dossier +
+    // explicit T&C / Privacy acceptance) before anything else. Without this
+    // gate they could land on the survey or the feed having never seen the
+    // model or accepted the contracts, which is also an RGPD problem.
+    if (!creator.welcome_completed_at) {
+      redirect("/onboarding/welcome");
+    }
+    // Then they take the onboarding survey before reaching the feed. Both
+    // gates are enforced server-side here so URL-typing doesn't bypass them.
     if (!creator.onboarding_survey_completed_at) {
       redirect("/onboarding/survey");
     }
