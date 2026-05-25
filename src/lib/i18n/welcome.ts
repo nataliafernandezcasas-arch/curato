@@ -6,27 +6,80 @@
 // (T&C + Privacy checkboxes) lives at the bottom of the same scroll. No
 // wizard, no pagination — the storyteller reads at their own pace.
 //
-// JPGs live in /public/onboarding/. They were exported directly from the
-// designer's PDF, so the text and visuals are already baked into each image.
-// Our code does not overlay any text on the slides — it just renders them.
+// JPGs live in /public/onboarding/{lang}/ where {lang} is fr | en | es.
+// Each language is a full export of the dossier from Canva — the text and
+// visuals are baked into each image, so our code never overlays text on
+// top of the slides. Spanish is not yet ready; falls back to French.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const welcomeSlides: { src: string; alt: string }[] = [
-  { src: "/onboarding/slide-01-cover.jpg", alt: "Curato — Pour les Storytellers" },
-  { src: "/onboarding/slide-02-confidentialite.jpg", alt: "Document confidentiel" },
-  { src: "/onboarding/slide-03-fonctionne.jpg", alt: "Comment ça fonctionne" },
-  { src: "/onboarding/slide-04-categories.jpg", alt: "Catégories : Hôtellerie, Gastronomie, Bien-être, Conscience" },
-  { src: "/onboarding/slide-05-credits.jpg", alt: "Vous recevez vos crédits · Vous racontez" },
-  { src: "/onboarding/slide-06-calibre.jpg", alt: "Calibré à votre audience" },
-  { src: "/onboarding/slide-07-engagements-1.jpg", alt: "Vos engagements (1/2)" },
-  { src: "/onboarding/slide-08-engagements-2.jpg", alt: "Vos engagements (2/2)" },
-  { src: "/onboarding/slide-09-recevez.jpg", alt: "Ce que vous recevez" },
-  { src: "/onboarding/slide-10-rejoindre.jpg", alt: "Rejoindre Curato" },
+import type { Lang } from "./translations";
+
+type Slide = { src: string; alt: string };
+
+// Slide sources indexed by language. The 10 file names are identical across
+// languages (slide-01.jpg through slide-10.jpg), only the folder changes.
+function slidesFor(lang: "fr" | "en"): Slide[] {
+  const alts = lang === "fr" ? altsFr : altsEn;
+  return Array.from({ length: 10 }, (_, i) => {
+    const n = String(i + 1).padStart(2, "0");
+    return { src: `/onboarding/${lang}/slide-${n}.jpg`, alt: alts[i] };
+  });
+}
+
+const altsFr = [
+  "Curato — Pour les Storytellers",
+  "Document confidentiel",
+  "Comment ça fonctionne",
+  "Catégories : Hôtellerie, Gastronomie, Bien-être, Conscience",
+  "Vous recevez vos crédits · Vous racontez",
+  "Calibré à votre audience",
+  "Vos engagements (1/2)",
+  "Vos engagements (2/2)",
+  "Ce que vous recevez",
+  "Rejoindre Curato",
 ];
 
-// Labels for the acceptance section at the bottom of the scroll. Kept FR-only
-// for now since the dossier itself is FR-only.
-export const welcomeLabels = {
+const altsEn = [
+  "Curato — For Storytellers",
+  "Confidential document",
+  "How it works",
+  "Categories: Hospitality, Gastronomy, Wellness, Mindfulness",
+  "You receive your credits · You tell the story",
+  "Calibrated to your audience",
+  "Your commitments (1/2)",
+  "Your commitments (2/2)",
+  "What you receive",
+  "Join Curato",
+];
+
+// Returns the slide list for the user's language. Falls back to FR (legally
+// binding) for languages not yet translated, so we never break the flow.
+export function getWelcomeSlides(lang: Lang): Slide[] {
+  if (lang === "en") return slidesFor("en");
+  // ES not yet ready — fall back to FR.
+  return slidesFor("fr");
+}
+
+// ─── Labels per language ─────────────────────────────────────────────────────
+// Used by the acceptance block at the bottom of the scroll. FR is the legally
+// binding default; EN ships now; ES falls back to FR until ready.
+
+type Labels = {
+  acceptEyebrow: string;
+  acceptTitle: string;
+  acceptIntro: string;
+  termsLabel: string;
+  termsLink: string;
+  privacyLabel: string;
+  privacyLink: string;
+  required: string;
+  enterCurato: string;
+  submitting: string;
+  errorGeneric: string;
+  errorMustAccept: string;
+};
+
+const labelsFr: Labels = {
   acceptEyebrow: "Dernière étape",
   acceptTitle: "Pour finaliser votre arrivée",
   acceptIntro:
@@ -42,3 +95,26 @@ export const welcomeLabels = {
   errorMustAccept:
     "Merci d'accepter les Conditions Générales et la Politique de Confidentialité pour continuer.",
 };
+
+const labelsEn: Labels = {
+  acceptEyebrow: "Last step",
+  acceptTitle: "To finalise your arrival",
+  acceptIntro:
+    "Before discovering the address book and starting your first season, please confirm that you have read and accepted our two founding documents.",
+  termsLabel: "I have read and accept the",
+  termsLink: "Terms and Conditions",
+  privacyLabel: "I have read and accept the",
+  privacyLink: "Privacy Policy",
+  required: "*",
+  enterCurato: "Enter Curato",
+  submitting: "One moment…",
+  errorGeneric: "Something went wrong. Try again in a moment.",
+  errorMustAccept:
+    "Please accept the Terms and Conditions and the Privacy Policy to continue.",
+};
+
+export function getWelcomeLabels(lang: Lang): Labels {
+  if (lang === "en") return labelsEn;
+  // ES not ready — fall back to FR (legally binding default).
+  return labelsFr;
+}

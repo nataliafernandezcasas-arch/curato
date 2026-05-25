@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check } from "@phosphor-icons/react";
-import { welcomeSlides, welcomeLabels } from "@/lib/i18n/welcome";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { getWelcomeSlides, getWelcomeLabels } from "@/lib/i18n/welcome";
 import { completeWelcome } from "./actions";
 
 // Single scrollable page: the 10 PDF pages exported as JPGs are stacked
@@ -16,8 +17,17 @@ import { completeWelcome } from "./actions";
 // regardless of viewport, the file sizes are already under 350KB each (so
 // they're network-friendly), and Next/Image's optimization can soften the
 // typography in the rasterized text on each slide.
+const LANG_OPTIONS = [
+  { key: "fr" as const, label: "FR" },
+  { key: "en" as const, label: "EN" },
+  { key: "es" as const, label: "ES" },
+];
+
 export default function WelcomeClient() {
   const router = useRouter();
+  const { lang, setLang } = useLang();
+  const welcomeSlides = getWelcomeSlides(lang);
+  const welcomeLabels = getWelcomeLabels(lang);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
@@ -47,6 +57,30 @@ export default function WelcomeClient() {
 
   return (
     <div className="min-h-[100dvh] bg-charcoal-deep text-white">
+      {/* Floating language switcher — fixed top-right, subtle.
+          Lets the storyteller switch between FR/EN/ES without breaking
+          the scroll. ES currently falls back to FR (Canva translation
+          pending). Pointer-events-none on the wrapper so it never blocks
+          the underlying scroll/click; the buttons themselves opt back in. */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2 pointer-events-none">
+        {LANG_OPTIONS.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setLang(key)}
+            className={`pointer-events-auto font-serif text-[11px] tracking-[0.25em] px-2.5 py-1.5 rounded-sm backdrop-blur-md transition-colors ${
+              lang === key
+                ? "bg-champagne/90 text-charcoal-deep"
+                : "bg-black/40 text-white/70 hover:text-white"
+            }`}
+            aria-label={`Switch to ${label}`}
+            aria-pressed={lang === key}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {/* Stacked slides — full bleed, no gaps */}
       <section aria-label="Dossier Curato">
         {welcomeSlides.map((slide, i) => (
