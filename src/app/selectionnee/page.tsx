@@ -6,9 +6,9 @@ import type { Metadata } from "next";
 import SelectedClient from "./selected-client";
 
 export const metadata: Metadata = {
-  title: "Vous avez été sélectionnée · Curato",
+  title: "Vous faites partie de la sélection · Curato",
   description:
-    "Curato ne se postule pas. Si vous lisez ces mots, c'est que vous avez été choisie pour la première vague.",
+    "Curato ne se postule pas. Si vous lisez ces mots, c'est que votre univers nous parle et que vous faites partie de la première vague.",
   // No index — this page is meant to be reached only via personal invitation.
   // We don't want it surfacing in search results next to /candidature.
   robots: { index: false, follow: false },
