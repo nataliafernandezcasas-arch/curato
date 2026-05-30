@@ -80,7 +80,7 @@ const fr: FaqContent = {
     audienceLabel: "Storytellers",
     audienceTitle: "Pour les créateurs",
     audienceIntro:
-      "Vous avez été repérée ou vous souhaitez postuler. Voici les réponses aux questions les plus posées avant de rejoindre le cercle.",
+      "Que ce soit suite à notre invitation ou par votre propre démarche, voici les réponses aux questions les plus posées avant de rejoindre le cercle.",
     sections: [
       {
         id: "creators-credit",
@@ -117,8 +117,8 @@ const fr: FaqContent = {
             a: "La réservation se fait via la plateforme Curato. Les détails précis du flow sont en cours de finalisation et vous seront communiqués au lancement.",
           },
           {
-            q: "Puis-je venir accompagnée ?",
-            a: "Oui. Vous pouvez venir accompagnée de la personne de votre choix. Il suffit de nous prévenir en amont afin que nous puissions ajuster la réservation auprès de la maison.",
+            q: "Puis-je venir avec quelqu'un ?",
+            a: "Oui. Vous pouvez venir avec la personne de votre choix. Il suffit de nous prévenir en amont afin que nous puissions ajuster la réservation auprès de la maison.",
           },
           {
             q: "Puis-je visiter deux fois la même maison ?",
@@ -139,7 +139,7 @@ const fr: FaqContent = {
         title: "La publication",
         items: [
           {
-            q: "Suis-je obligée de publier après une visite ?",
+            q: "La publication est-elle obligatoire après une visite ?",
             a: "Oui. La publication fait partie intégrante de l'engagement Curato : 2 stories Instagram dans les 24 heures suivant votre visite, avec mention de la maison et de Curato. C'est la contrepartie du crédit que vous recevez.",
           },
           {
@@ -553,7 +553,7 @@ const es: FaqContent = {
     audienceLabel: "Storytellers",
     audienceTitle: "Para creadores",
     audienceIntro:
-      "Has sido seleccionada o quieres postular. Aquí están las respuestas a las preguntas más frecuentes antes de unirte al círculo.",
+      "Ya sea tras nuestra invitación o por iniciativa propia, aquí están las respuestas a las preguntas más frecuentes antes de unirte al círculo.",
     sections: [
       {
         id: "creators-credit",
@@ -569,7 +569,7 @@ const es: FaqContent = {
           },
           {
             q: "¿Qué pasa si la cuenta supera mi crédito?",
-            a: "Pagas la diferencia tú misma, directamente a la casa. Mantienes la libertad de disfrutar una experiencia más amplia de lo que cubre tu crédito, sabiendo que el complemento corre por tu cuenta.",
+            a: "Pagas la diferencia directamente a la casa. Mantienes la libertad de disfrutar una experiencia más amplia de lo que cubre tu crédito, sabiendo que el complemento corre por tu cuenta.",
           },
           {
             q: "¿Cuándo se renueva mi crédito?",
@@ -577,7 +577,7 @@ const es: FaqContent = {
           },
           {
             q: "¿Puedo acumular mi crédito si no lo uso?",
-            a: "Sí, parcialmente. Un crédito no utilizado puede acumularse hasta el final del segundo mes. Más allá, se pierde. Para mantenerte activa en el programa, debes usar al menos el 60 % de tu crédito mensual cada mes.",
+            a: "Sí, parcialmente. Un crédito no utilizado puede acumularse hasta el final del segundo mes. Más allá, se pierde. Para mantener tu cuenta activa en el programa, debes usar al menos el 60 % de tu crédito mensual cada mes.",
           },
         ],
       },
@@ -612,7 +612,7 @@ const es: FaqContent = {
         title: "La publicación",
         items: [
           {
-            q: "¿Estoy obligada a publicar después de una visita?",
+            q: "¿Es obligatorio publicar después de una visita?",
             a: "Sí. La publicación forma parte integral del compromiso Curato: 2 stories de Instagram en las 24 horas siguientes a la visita, con mención de la casa y de Curato. Es la contrapartida del crédito que recibes.",
           },
           {
