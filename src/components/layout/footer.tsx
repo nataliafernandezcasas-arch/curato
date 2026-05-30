@@ -26,6 +26,7 @@ export default function Footer() {
             <Link href="/creadores" className="hover:text-champagne transition-colors">{t.nav.creators}</Link>
             <Link href="/casas" className="hover:text-champagne transition-colors">{t.nav.maisons}</Link>
             <Link href="/auth/sign-in" className="hover:text-champagne transition-colors">{t.nav.access}</Link>
+            <Link href="/faq" className="hover:text-champagne transition-colors">{t.footer.faq}</Link>
             <Link href="/privacidad" className="hover:text-champagne transition-colors">{t.footer.privacy}</Link>
             <Link href="/condiciones" className="hover:text-champagne transition-colors">{t.footer.terms}</Link>
           </div>

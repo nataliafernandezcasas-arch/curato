@@ -10,6 +10,7 @@ export const translations = {
     footer: {
       tagline: "Paris, France · Sur invitation",
       copyright: `© ${new Date().getFullYear()} Curato. Tous droits réservés.`,
+      faq: "Questions fréquentes",
       privacy: "Confidentialité",
       terms: "Conditions",
     },
@@ -264,6 +265,7 @@ export const translations = {
     footer: {
       tagline: "Paris, France · By invitation",
       copyright: `© ${new Date().getFullYear()} Curato. All rights reserved.`,
+      faq: "FAQ",
       privacy: "Privacy",
       terms: "Terms",
     },
@@ -518,6 +520,7 @@ export const translations = {
     footer: {
       tagline: "París, Francia · Por invitación",
       copyright: `© ${new Date().getFullYear()} Curato. Todos los derechos reservados.`,
+      faq: "Preguntas frecuentes",
       privacy: "Privacidad",
       terms: "Condiciones",
     },
