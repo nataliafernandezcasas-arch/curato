@@ -83,8 +83,8 @@ export const translations = {
       creditTitle: "Calibré à votre audience.",
       creditParas: [
         "Chaque mois, vous recevez un crédit personnel calibré à votre audience.",
-        "Vous choisissez librement où l'utiliser parmi les maisons curées de notre carnet.",
-        "Chaque maison fixe le tarif de l'expérience qu'elle propose. À titre indicatif, un dîner curé se situe autour de 150 €, une nuit en hôtel boutique autour de 300 €, un soin bien-être autour de 250 €.",
+        "Vous choisissez librement où l'utiliser parmi les maisons triées à la main de notre carnet.",
+        "Chaque maison fixe le tarif de l'expérience qu'elle propose. À titre indicatif, un dîner se situe autour de 150 €, une nuit en hôtel boutique autour de 300 €, un soin bien-être autour de 250 €.",
         "Vous pouvez répartir votre crédit entre une ou deux maisons dans le mois, avec une limite d'une visite par adresse.",
         "Si l'expérience que vous choisissez dépasse votre crédit, vous pouvez librement couvrir la différence.",
         "Le montant exact de votre crédit vous est communiqué individuellement lors de votre admission.",
@@ -115,7 +115,7 @@ export const translations = {
       benefits: [
         { num: "01", title: "Visites authentiques", body: "Des créateurs vérifiés qui ont sincèrement choisi votre maison. Aucun brief imposé, aucune coordination de votre côté." },
         { num: "02", title: "Contenu éditorial", body: "Stories, reels, posts publiés sur leurs réseaux avec mention à votre maison. Vous disposez de 90 jours de droits exclusifs d'utilisation." },
-        { num: "03", title: "Visibilité curé", body: "Votre adresse figure dans le carnet Curato, distribué aux créateurs sélectionnés à Paris. Une présence discrète, ciblée, efficace." },
+        { num: "03", title: "Diffusion ciblée", body: "Votre adresse figure dans le carnet Curato, distribué aux créateurs sélectionnés à Paris. Une présence discrète, ciblée, efficace." },
       ],
       whyLabel: "Pourquoi Curato",
       whyItems: [
