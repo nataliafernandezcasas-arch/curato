@@ -223,7 +223,7 @@ const fr: FaqContent = {
             a: "Le storyteller choisit librement, en parcourant le carnet Curato. Il n'y a pas d'attribution algorithmique : votre maison est sélectionnée par affinité éditoriale.",
           },
           {
-            q: "Combien de visites par mois suis-je sûre de recevoir ?",
+            q: "Combien de visites par mois sont garanties ?",
             a: "Curato vous garantit un minimum de 5 visites de storytellers par mois. Si ce seuil n'est pas atteint sur un mois donné, le mois suivant vous est offert. Si trois mois consécutifs passent sans atteindre les 5 visites, cela signifie que votre maison ne suscite pas l'intérêt des storytellers et votre participation au programme prend fin.",
           },
           {
