@@ -75,8 +75,8 @@ export const translations = {
       steps: [
         { num: "01", title: "Sélection", desc: "Curato sélectionne les créateurs parisiens dont l'univers correspond à l'esthétique de la plateforme. Chaque profil est étudié avec soin." },
         { num: "02", title: "Crédit mensuel", desc: "Une fois accepté, vous recevez un crédit mensuel en EUR utilisable dans les adresses sélectionnées du carnet Curato à Paris." },
-        { num: "03", title: "Visite libre", desc: "Vous choisissez où aller, quand y aller. Aucun brief, aucune obligation de publier, la visite doit d'abord vous appartenir." },
-        { num: "04", title: "Contenu naturel", desc: "Si l'expérience vous inspire, vous publiez. Stories, reels, posts. Le contenu naît de l'expérience, pas d'une commande." },
+        { num: "03", title: "Visite libre", desc: "Vous choisissez où aller, quand y aller. Aucun brief, aucune validation préalable. En contrepartie, vous publiez 2 stories dans les 24h, en mentionnant la maison." },
+        { num: "04", title: "Contenu naturel", desc: "Stories, reels, posts publiés naturellement à la suite de votre visite. Le contenu naît de l'expérience vécue, pas d'une commande." },
       ],
       creditLabel: "Le fonctionnement du crédit",
       creditTitle: "Calibré à votre audience.",
@@ -329,8 +329,8 @@ export const translations = {
       steps: [
         { num: "01", title: "Selection", desc: "Curato selects Parisian creators whose universe aligns with the platform's aesthetic. Every profile is reviewed with care." },
         { num: "02", title: "Monthly credit", desc: "Once accepted, you receive a monthly credit in EUR to use at Curato's selected addresses across Paris." },
-        { num: "03", title: "Free visit", desc: "You choose where to go, when to go. No brief, no obligation to post, the visit belongs to you first." },
-        { num: "04", title: "Natural content", desc: "If the experience inspires you, you publish. Stories, reels, posts. Content born from experience, not from a brief." },
+        { num: "03", title: "Free visit", desc: "You choose where to go, when to go. No brief, no prior approval. In return, you publish 2 stories within 24 hours, mentioning the maison." },
+        { num: "04", title: "Natural content", desc: "Stories, reels, posts published naturally after your visit. Content born from the experience, not from a brief." },
       ],
       creditLabel: "How the credit works",
       creditTitle: "Calibrated to your audience.",
@@ -583,8 +583,8 @@ export const translations = {
       steps: [
         { num: "01", title: "Selección", desc: "Curato selecciona creadores parisinos cuyo universo coincide con la estética de la plataforma. Cada perfil se estudia con cuidado." },
         { num: "02", title: "Crédito mensual", desc: "Una vez aceptado, recibes un crédito mensual en EUR para usar en las direcciones seleccionadas del carnet Curato en París." },
-        { num: "03", title: "Visita libre", desc: "Tú eliges adónde ir, cuándo ir. Sin brief, sin obligación de publicar, la visita te pertenece primero." },
-        { num: "04", title: "Contenido natural", desc: "Si la experiencia te inspira, publicas. Stories, reels, posts. El contenido nace de la experiencia, no de un encargo." },
+        { num: "03", title: "Visita libre", desc: "Tú eliges adónde ir, cuándo ir. Sin brief, sin validación previa. A cambio, publicas 2 stories en las 24h, mencionando la maison." },
+        { num: "04", title: "Contenido natural", desc: "Stories, reels, posts publicados naturalmente tras tu visita. El contenido nace de la experiencia vivida, no de un encargo." },
       ],
       creditLabel: "Cómo funciona el crédito",
       creditTitle: "Calibrado a tu audiencia.",
