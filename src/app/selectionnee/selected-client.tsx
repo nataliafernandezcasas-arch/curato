@@ -44,15 +44,15 @@ type Copy = {
 
 const fr: Copy = {
   eyebrow: "Première vague · Sur invitation personnelle",
-  title1: "Vous faites partie",
-  title2: "de la sélection.",
+  title1: "Vous avez été",
+  title2: "sélectionné.",
   intro:
-    "Curato ne se postule pas. Nous choisissons chaque storyteller à la main, parmi celles et ceux dont l'univers nous semble juste pour ce que nous construisons à Paris. Si vous lisez ces mots, c'est que votre univers nous parle.",
+    "Curato ne se postule pas. Chaque storyteller est choisi à la main, parmi ceux dont l'univers nous semble juste pour ce que nous construisons à Paris. Si vous lisez ces mots, c'est que votre regard nous a touchés.",
   pillarsLabel: "Ce que cela signifie",
   pillars: [
     {
       title: "Crédit doublé, à vie",
-      desc: "La première vague bénéficie d'un crédit mensuel doublé tant que le compte reste actif. Un privilège que nous ne ré-ouvrirons pas.",
+      desc: "Les premiers storytellers bénéficient d'un crédit mensuel doublé tant que leur compte reste actif. Un privilège que nous ne ré-ouvrirons pas.",
     },
     {
       title: "Aucun brief, aucune validation",
@@ -65,7 +65,7 @@ const fr: Copy = {
   ],
   ctaLabel: "Pour confirmer votre place",
   ctaBtn: "Continuer",
-  ctaNote: "Nous revenons vers vous sous 48 heures.",
+  ctaNote: "Vous serez recontacté sous 48 heures.",
   closing:
     "Si vous préférez en parler avant, écrivez-nous simplement en réponse à notre message. Nous prendrons le temps qu'il faut.",
   signedBy: "Natalia, fondatrice de Curato",
@@ -102,15 +102,15 @@ const en: Copy = {
 
 const es: Copy = {
   eyebrow: "Primera ola · Por invitación personal",
-  title1: "Formas parte",
-  title2: "de la selección.",
+  title1: "Has sido",
+  title2: "seleccionado.",
   intro:
-    "A Curato no se postula. Elegimos a cada storyteller a mano, entre aquellas y aquellos cuyo universo encaja con lo que estamos construyendo en París. Si estás leyendo esto, es porque tu universo nos llega.",
+    "A Curato no se postula. Cada storyteller es elegido a mano, entre aquellos cuyo universo encaja con lo que estamos construyendo en París. Si estás leyendo esto, es porque tu mirada nos llegó.",
   pillarsLabel: "Lo que esto significa",
   pillars: [
     {
       title: "Crédito doblado, de por vida",
-      desc: "La primera ola recibe un crédito mensual doblado mientras la cuenta siga activa. Un privilegio que no volveremos a abrir.",
+      desc: "Los primeros storytellers reciben un crédito mensual doblado mientras la cuenta siga activa. Un privilegio que no volveremos a abrir.",
     },
     {
       title: "Sin brief, sin validación",
