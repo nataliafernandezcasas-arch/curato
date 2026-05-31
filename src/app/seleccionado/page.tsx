@@ -10,7 +10,7 @@ import SelectedClient from "../selectionnee/selected-client";
 export const metadata: Metadata = {
   title: "Has sido seleccionado.a · Curato",
   description:
-    "A Curato no se postula. Si estás leyendo esto, es porque fuiste elegido.a para la primera ola.",
+    "A nuestra primera ola no se postula, la elegimos nosotros. Si estás leyendo esto, es porque fuiste elegido.a.",
   robots: { index: false, follow: false },
 };
 
