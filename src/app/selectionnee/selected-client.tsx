@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
 
@@ -136,19 +136,31 @@ function copyFor(lang: Lang): Copy {
 }
 
 export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
-  const { lang, setLang } = useLang();
+  const { setLang: setContextLang } = useLang();
 
-  // The URL is the source of truth for which language we land in: a
-  // storyteller who clicked /selected gets EN even if her last visit set
-  // FR via localStorage. Run once on mount, only if the URL disagrees with
-  // the stored preference.
+  // We use local state seeded with initialLang (from the URL) instead of
+  // reading the language from the global LanguageContext. The reason is SSR:
+  // the global context defaults to "fr" on the server and on the very first
+  // client render, then reads localStorage in useEffect. That meant the
+  // initial HTML for /selected and /seleccionada was served in French, with
+  // a flicker to the right language only after JS hydration. With local
+  // state, the very first paint (server AND client hydration) is in the
+  // correct language, no flicker, and SEO crawlers see the right content.
+  const [lang, setLocalLang] = useState<Lang>(initialLang);
+
+  // Sync the global context to the URL's language on mount, so the rest of
+  // the app (nav, footer, links into other pages) lands in the same language
+  // when the storyteller clicks away from this page.
   useEffect(() => {
-    if (lang !== initialLang) setLang(initialLang);
-    // We deliberately run this once per mount per route. Including `lang`
-    // in the deps would create a fight if the user manually switches —
-    // they'd be snapped back to initialLang on every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialLang]);
+    setContextLang(initialLang);
+  }, [initialLang, setContextLang]);
+
+  // Language switcher updates both the local state (controls THIS page's
+  // rendering) and the global context (carries the choice to other pages).
+  function handleLangChange(next: Lang) {
+    setLocalLang(next);
+    setContextLang(next);
+  }
 
   const t = copyFor(lang);
 
@@ -180,7 +192,7 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
           <button
             key={key}
             type="button"
-            onClick={() => setLang(key)}
+            onClick={() => handleLangChange(key)}
             className={`pointer-events-auto font-serif text-[11px] tracking-[0.25em] px-2.5 py-1.5 rounded-sm backdrop-blur-md transition-colors ${
               lang === key
                 ? "bg-champagne/90 text-charcoal-deep"
