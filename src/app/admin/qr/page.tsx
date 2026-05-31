@@ -6,6 +6,12 @@ import QRCode from "react-qr-code";
 const QRS = [
   { label: "Homepage", url: "https://curatocollective.com", filename: "curato-homepage-qr" },
   { label: "Invitación", url: "https://curatocollective.com/invitacion", filename: "curato-invitation-qr" },
+  // Première vague — pour les invitations personnelles (DM, carton, etc.).
+  // URLs canoniques en masculin ; les anciennes en féminin (/selectionnee
+  // /seleccionada) restent accessibles comme alias pour les DM déjà envoyés.
+  { label: "Sélectionné.e (FR)", url: "https://curatocollective.com/selectionne", filename: "curato-selectionne-fr-qr" },
+  { label: "Selected (EN)", url: "https://curatocollective.com/selected", filename: "curato-selected-en-qr" },
+  { label: "Seleccionado.a (ES)", url: "https://curatocollective.com/seleccionado", filename: "curato-seleccionado-es-qr" },
 ];
 
 function QRBlock({ label, url, filename }: { label: string; url: string; filename: string }) {
