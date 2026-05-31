@@ -47,7 +47,7 @@ const fr: Copy = {
   title1: "Vous avez été",
   title2: "sélectionné.e.",
   intro:
-    "Curato ne se postule pas. Chaque storyteller est choisi.e à la main, parmi celles et ceux dont l'univers nous semble juste pour ce que nous construisons à Paris. Si vous lisez ces mots, c'est que votre regard nous a touché.e.s.",
+    "Notre première vague ne se postule pas. On la choisit, à la main. Chaque storyteller est sélectionné.e parmi celles et ceux dont l'univers nous semble juste pour ce que nous construisons à Paris. Si vous lisez ces mots, c'est que votre regard nous a touché.e.s.",
   pillarsLabel: "Ce que cela signifie",
   pillars: [
     {
@@ -76,7 +76,7 @@ const en: Copy = {
   title1: "You have been",
   title2: "selected.",
   intro:
-    "Curato isn't something you apply to. Every storyteller is hand-picked, chosen from those whose universe feels right for what we're building in Paris. If you're reading this, it's because your work caught us.",
+    "You don't apply to our first wave. We choose it, by hand. Every storyteller is selected from those whose universe feels right for what we're building in Paris. If you're reading this, it's because your work caught us.",
   pillarsLabel: "What this means",
   pillars: [
     {
@@ -105,7 +105,7 @@ const es: Copy = {
   title1: "Has sido",
   title2: "seleccionado.a.",
   intro:
-    "A Curato no se postula. Cada storyteller es elegido.a a mano, entre aquellas y aquellos cuyo universo encaja con lo que estamos construyendo en París. Si estás leyendo esto, es porque tu mirada nos llegó.",
+    "A nuestra primera ola no se postula. La elegimos nosotros, a mano. Cada storyteller es seleccionado.a entre aquellas y aquellos cuyo universo encaja con lo que estamos construyendo en París. Si estás leyendo esto, es porque tu mirada nos llegó.",
   pillarsLabel: "Lo que esto significa",
   pillars: [
     {
