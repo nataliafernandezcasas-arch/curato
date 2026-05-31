@@ -6,9 +6,9 @@ import type { Metadata } from "next";
 import SelectedClient from "../selectionnee/selected-client";
 
 export const metadata: Metadata = {
-  title: "Formas parte de la selección · Curato",
+  title: "Has sido seleccionado.a · Curato",
   description:
-    "A Curato no se postula. Si estás leyendo esto, es porque tu universo nos llega y formas parte de la primera ola.",
+    "A Curato no se postula. Si estás leyendo esto, es porque fuiste elegido.a para la primera ola.",
   robots: { index: false, follow: false },
 };
 
