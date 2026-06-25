@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
+import { suggestedBudgetEUR } from "@/lib/credits";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE = "https://curatocollective.com";
@@ -184,10 +185,17 @@ export async function PATCH(request: NextRequest) {
   const ok = await isAdmin();
   if (!ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const { id, status, followers } = await request.json();
+  const { id, status, followers, budget } = await request.json();
   if (!id || !["approved", "rejected", "deleted", "pending"].includes(status)) {
     return NextResponse.json({ error: "Parámetros inválidos" }, { status: 400 });
   }
+
+  // Monthly budget in EUR: use the value the admin set, else derive it from the
+  // follower count (Micro 500 / Nano 750 / Mid 1000 / Macro 3000).
+  const monthlyBudget =
+    typeof budget === "number" && budget >= 0
+      ? budget
+      : suggestedBudgetEUR(typeof followers === "number" ? followers : 0);
 
   const supabase = createAdminClient();
 
@@ -242,7 +250,7 @@ export async function PATCH(request: NextRequest) {
         email: app.email,
         handle,
         stage: "active",
-        monthly_credit_cop: 300,
+        monthly_credit_cop: monthlyBudget,
         credit_used_cop: 0,
         ...(followers != null ? { followers } : {}),
       }, { onConflict: "email" });

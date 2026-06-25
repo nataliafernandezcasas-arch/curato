@@ -166,57 +166,15 @@ export async function sendApplicationAccepted(opts: AcceptedOpts) {
   return sendEmail(to, `Curato · Bienvenue, ${firstName}`, html);
 }
 
-// ── 3. Launch event confirmation (22 juillet 2026, Paris) ────────────────────
-
-const LAUNCH_EVENT = {
-  title: "CURATO LAUNCH · PARIS",
-  description: "Vous avez été sélectionné pour vivre en exclusivité le lancement de Curato à Paris.",
-  location: "Paris, France — lieu confirmé à l'inscription",
-  // 22 July 2026 19:00 CEST (UTC+2) → 17:00 UTC; 3h duration
-  startUTC: "20260722T170000Z",
-  endUTC:   "20260722T200000Z",
-};
-
-function icsEscape(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
-}
-
-function buildLaunchICS(attendeeEmail: string, attendeeName: string): string {
-  const uid = `curato-launch-${Buffer.from(attendeeEmail.toLowerCase()).toString("hex")}@curatocollective.com`;
-  const lines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Curato//Launch Event//FR",
-    "CALSCALE:GREGORIAN",
-    "METHOD:REQUEST",
-    "BEGIN:VEVENT",
-    `UID:${uid}`,
-    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`,
-    `DTSTART:${LAUNCH_EVENT.startUTC}`,
-    `DTEND:${LAUNCH_EVENT.endUTC}`,
-    `SUMMARY:${icsEscape(LAUNCH_EVENT.title)}`,
-    `DESCRIPTION:${icsEscape(LAUNCH_EVENT.description)}`,
-    `LOCATION:${icsEscape(LAUNCH_EVENT.location)}`,
-    "ORGANIZER;CN=Curato:mailto:hello@curatocollective.com",
-    `ATTENDEE;CN=${icsEscape(attendeeName)};RSVP=TRUE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION:mailto:${attendeeEmail}`,
-    "STATUS:CONFIRMED",
-    "TRANSP:OPAQUE",
-    "SEQUENCE:0",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ];
-  return lines.join("\r\n");
-}
+// ── 3. Launch event confirmation ─────────────────────────────────────────────
 
 export async function sendLaunchEventConfirmation(to: string, name: string) {
   const firstName = (name || "").split(" ")[0] || "invité";
-  const ics = buildLaunchICS(to, name || to);
-  const icsB64 = Buffer.from(ics, "utf8").toString("base64");
 
   const html = wrap(`
     <tr><td style="padding:40px 40px 0;">
       <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Vous êtes confirmé
+        Vous êtes inscrit
       </p>
       <h1 style="margin:0;font-family:${FONT};font-size:30px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.2;">
         À bientôt,<br/>${firstName}.
@@ -225,33 +183,224 @@ export async function sendLaunchEventConfirmation(to: string, name: string) {
     <tr><td style="padding:20px 40px 0;">
       <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
         Nous avons bien enregistré votre inscription au lancement de Curato.
-        L'invitation au calendrier est jointe à cet email.
+        Vous serez prévenu par email dès que la date est confirmée.
       </p>
     </td></tr>
     <tr><td style="padding:28px 40px 0;">
       <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
         <tr><td style="padding:24px 28px;">
-          <p style="margin:0 0 4px;font-family:${FONT_SANS};font-size:10px;color:${C.faint};letter-spacing:0.3em;text-transform:uppercase;">Save the date</p>
-          <p style="margin:12px 0 4px;font-family:${FONT};font-size:20px;font-weight:400;color:${C.white};">Paris</p>
-          <p style="margin:0 0 12px;font-family:${FONT_SANS};font-size:11px;color:${C.muted};letter-spacing:0.2em;text-transform:uppercase;">mercredi</p>
-          <p style="margin:0 0 16px;font-family:${FONT};font-size:40px;font-weight:400;color:${C.champagne};line-height:1;letter-spacing:0.02em;">22.07.2026</p>
+          <p style="margin:0 0 4px;font-family:${FONT_SANS};font-size:10px;color:${C.faint};letter-spacing:0.3em;text-transform:uppercase;">Lancement</p>
+          <p style="margin:12px 0 16px;font-family:${FONT};font-size:20px;font-weight:400;color:${C.white};">Paris</p>
           <div style="height:1px;background-color:${C.border};margin-bottom:14px;"></div>
-          <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">19h00 · Lieu confirmé prochainement</p>
+          <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};font-style:italic;">Date confirmée prochainement</p>
         </td></tr>
       </table>
     </td></tr>
     <tr><td style="padding:24px 40px 40px;">
       <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Si le fichier .ics joint ne s'ouvre pas automatiquement, ajoutez-le manuellement depuis votre application Calendrier.
+        Places limitées. La confirmation définitive vous sera envoyée avec tous les détails.
       </p>
     </td></tr>
   `);
 
-  return sendEmail(to, "Curato · Lancement Paris · 22 juillet", html, [
+  return sendEmail(to, "Curato · Lancement Paris", html);
+}
+
+// ── 4. Reservation request received (storyteller) ─────────────────────────────
+export async function sendReservationRequested(opts: {
+  to: string;
+  firstName: string;
+  maisonName: string;
+  whenLabel: string;
+  partySize: number;
+}) {
+  const { to, firstName, maisonName, whenLabel, partySize } = opts;
+
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        Demande reçue · Request received
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:28px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        Bien reçu, ${firstName}.
+      </h1>
+    </td></tr>
+    <tr><td style="padding:20px 40px 0;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
+        Votre demande de réservation a bien été transmise. Vous recevrez une confirmation très bientôt.
+      </p>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
+        <tr><td style="padding:24px 28px;">
+          <p style="margin:0 0 4px;font-family:${FONT_SANS};font-size:10px;color:${C.faint};letter-spacing:0.3em;text-transform:uppercase;">Maison</p>
+          <p style="margin:6px 0 16px;font-family:${FONT};font-size:20px;color:${C.white};">${maisonName}</p>
+          <div style="height:1px;background-color:${C.border};margin-bottom:14px;"></div>
+          <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${whenLabel} · ${partySize} pers.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="padding:24px 40px 40px;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
+        Cette demande est en cours de validation. Rien n'est encore confirmé.
+      </p>
+    </td></tr>
+  `);
+
+  return sendEmail(to, `Curato · Demande envoyée, ${maisonName}`, html);
+}
+
+// ── 5. Reservation request — admin alert (Natalia) ────────────────────────────
+export async function sendReservationAdminAlert(opts: {
+  to: string;
+  creatorName: string;
+  creatorHandle: string | null;
+  maisonName: string;
+  whenLabel: string;
+  partySize: number;
+  note: string | null;
+}) {
+  const { to, creatorName, creatorHandle, maisonName, whenLabel, partySize, note } = opts;
+
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        Nouvelle demande
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:24px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        ${creatorName}${creatorHandle ? ` <span style="color:${C.muted};">· @${creatorHandle}</span>` : ""}
+      </h1>
+    </td></tr>
+    <tr><td style="padding:24px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
+        <tr><td style="padding:24px 28px;">
+          <p style="margin:0 0 6px;font-family:${FONT};font-size:18px;color:${C.white};">${maisonName}</p>
+          <p style="margin:0 0 12px;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${whenLabel} · ${partySize} pers.</p>
+          ${note ? `<div style="height:1px;background-color:${C.border};margin:6px 0 12px;"></div><p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};font-style:italic;">« ${note} »</p>` : ""}
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <table cellpadding="0" cellspacing="0"><tr><td style="background-color:${C.champagne};">
+        <a href="${SITE_URL}/admin/reservations" style="display:inline-block;padding:14px 32px;font-family:${FONT_SANS};color:#1C1A18;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.25em;text-transform:uppercase;">
+          Gérer la demande
+        </a>
+      </td></tr></table>
+    </td></tr>
+    <tr><td style="padding:24px 40px 40px;"></td></tr>
+  `);
+
+  return sendEmail(to, `Curato · Nouvelle demande, ${maisonName}`, html);
+}
+
+// ── 6. Reservation confirmed (storyteller) — with calendar ────────────────────
+export async function sendReservationConfirmed(opts: {
+  to: string;
+  firstName: string;
+  maisonName: string;
+  address: string | null;
+  whenLabel: string;
+  googleUrl: string;
+  ics: string;
+}) {
+  const { to, firstName, maisonName, address, whenLabel, googleUrl, ics } = opts;
+
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        Confirmé · Confirmed
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:28px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        C'est confirmé, ${firstName}.
+      </h1>
+    </td></tr>
+    <tr><td style="padding:20px 40px 0;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
+        Votre réservation est confirmée. Nous avons hâte de vous y retrouver.
+      </p>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
+        <tr><td style="padding:24px 28px;">
+          <p style="margin:6px 0 8px;font-family:${FONT};font-size:20px;color:${C.white};">${maisonName}</p>
+          <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${whenLabel}</p>
+          ${address ? `<p style="margin:8px 0 0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${address}</p>` : ""}
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <table cellpadding="0" cellspacing="0"><tr><td style="background-color:${C.champagne};">
+        <a href="${googleUrl}" style="display:inline-block;padding:14px 28px;font-family:${FONT_SANS};color:#1C1A18;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.2em;text-transform:uppercase;">
+          Ajouter à Google Calendar
+        </a>
+      </td></tr></table>
+    </td></tr>
+    <tr><td style="padding:14px 40px 40px;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;">
+        Pour Apple Calendar / Outlook, ouvrez le fichier <span style="color:${C.muted};">reservation-curato.ics</span> joint à cet email.
+      </p>
+    </td></tr>
+  `);
+
+  const attachments = [
     {
-      filename: "curato-launch-paris.ics",
-      content: icsB64,
-      content_type: "text/calendar; method=REQUEST; charset=UTF-8",
+      filename: "reservation-curato.ics",
+      content: Buffer.from(ics).toString("base64"),
+      content_type: "text/calendar",
     },
-  ]);
+  ];
+
+  return sendEmail(to, `Curato · Réservation confirmée, ${maisonName}`, html, attachments);
+}
+
+// ── 7. Reservation — alternative créneaux proposed (storyteller) ──────────────
+export async function sendReservationAlternatives(opts: {
+  to: string;
+  firstName: string;
+  maisonName: string;
+  slots: { label: string; url: string }[];
+}) {
+  const { to, firstName, maisonName, slots } = opts;
+
+  const slotRows = slots
+    .map(
+      (s) => `
+      <tr><td style="padding:0 0 10px;">
+        <table cellpadding="0" cellspacing="0" width="100%"><tr><td style="border:1px solid ${C.border};">
+          <a href="${s.url}" style="display:block;padding:14px 22px;font-family:${FONT_SANS};font-size:14px;color:${C.white};text-decoration:none;">
+            <span style="color:${C.champagne};">→</span> ${s.label}
+          </a>
+        </td></tr></table>
+      </td></tr>`
+    )
+    .join("");
+
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        Autres créneaux
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        Un autre moment, ${firstName} ?
+      </h1>
+    </td></tr>
+    <tr><td style="padding:20px 40px 0;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
+        Le créneau demandé chez <span style="color:${C.white};">${maisonName}</span> n'était pas disponible.
+        Voici les disponibilités proposées, choisissez celle qui vous convient :
+      </p>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        ${slotRows}
+      </table>
+    </td></tr>
+    <tr><td style="padding:18px 40px 40px;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
+        Aucune ne convient ? Vous pouvez aussi proposer une autre date depuis votre espace.
+      </p>
+    </td></tr>
+  `);
+
+  return sendEmail(to, `Curato · Autres créneaux, ${maisonName}`, html);
 }

@@ -2,20 +2,50 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MapPin, Phone, SignOut } from "@phosphor-icons/react";
+import { MapPin, SignOut } from "@phosphor-icons/react";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations, Lang } from "@/lib/i18n/translations";
+import { isBeforeLaunch, LAUNCH_AT } from "@/lib/launch";
 
-type Offer = {
+const LANGS: { key: Lang; label: string }[] = [
+  { key: "fr", label: "FR" },
+  { key: "en", label: "EN" },
+  { key: "es", label: "ES" },
+];
+
+// A maison = a signed venue from `comercios` (is_reservable = true).
+type Maison = {
   id: string;
-  title: string;
-  description: string;
-  category: string;
-  address: string;
-  reservation_phone: string;
-  photos: string[];
-  visit_value_cop: number;
-  available_hours: string;
-  comercios: { name: string } | null;
+  name: string;
+  arrondissement: string | null;
+  address: string | null;
+  description: string | null;
+  photos: string[] | null;
+  website_url: string | null;
+  signed_at: string | null;
+  category_id: string | null;
 };
+
+// Canonical category UUIDs are fixed in migration 009 — map them directly to
+// their slug instead of embedding the `categories` relation. The display label
+// is resolved per-language from the slug.
+const CATEGORY_BY_ID: Record<string, string> = {
+  "00000000-0000-0000-0000-0000000ca701": "hoteles",
+  "00000000-0000-0000-0000-0000000ca702": "gastronomia",
+  "00000000-0000-0000-0000-0000000ca703": "wellness",
+  "00000000-0000-0000-0000-0000000ca704": "belleza",
+};
+
+const SLUG_LABEL_KEY = {
+  gastronomia: "catGastronomy",
+  hoteles: "catHotels",
+  wellness: "catWellness",
+  belleza: "catBeauty",
+} as const;
+
+function slugOf(maison: Maison): string | null {
+  return maison.category_id ? CATEGORY_BY_ID[maison.category_id] ?? null : null;
+}
 
 type Profile = {
   full_name: string | null;
@@ -25,16 +55,21 @@ type Profile = {
   followers: number | null;
 };
 
-const CAT_LABELS: Record<string, string> = {
-  gastronomy: "Gastronomie",
-  beauty: "Beauté",
-  wellness: "Bien-être",
-  hospitality: "Hôtellerie",
-  fashion: "Mode",
-  art: "Art & Culture",
-};
+// Category filter buttons: slug + the translation key for its label.
+const FILTERS = [
+  { slug: "all", key: "catAll" },
+  { slug: "gastronomia", key: "catGastronomy" },
+  { slug: "hoteles", key: "catHotels" },
+  { slug: "wellness", key: "catWellness" },
+  { slug: "belleza", key: "catBeauty" },
+] as const;
 
-const CAT_KEYS = ["all", "gastronomy", "beauty", "wellness", "hospitality", "fashion", "art"];
+// A maison is flagged "Nouveau" if it was signed within the last 45 days.
+function isNew(signedAt: string | null): boolean {
+  if (!signedAt) return false;
+  const signed = new Date(signedAt).getTime();
+  return Date.now() - signed < 45 * 24 * 60 * 60 * 1000;
+}
 
 function formatFollowers(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -43,11 +78,34 @@ function formatFollowers(n: number): string {
 }
 
 export default function InfluencerDashboard() {
-  const [offers, setOffers] = useState<Offer[]>([]);
+  const { lang, setLang } = useLang();
+  const t = translations[lang].dashboard;
+
+  const [maisons, setMaisons] = useState<Maison[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [catFilter, setCatFilter] = useState("all");
-  const [offersLoading, setOffersLoading] = useState(true);
+  const [maisonsLoading, setMaisonsLoading] = useState(true);
+  const [preview, setPreview] = useState(false);
+
+  // Before launch, accepted storytellers see a "coming soon" screen instead of
+  // the catalogue. ?preview=1 bypasses it for internal preview.
+  useEffect(() => {
+    setPreview(new URLSearchParams(window.location.search).has("preview"));
+  }, []);
+  const gated = isBeforeLaunch() && !preview;
+  const launchDateLabel = LAUNCH_AT.toLocaleDateString(lang, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Europe/Paris",
+  });
+
+  function catLabel(slug: string | null): string {
+    if (!slug) return "";
+    const key = SLUG_LABEL_KEY[slug as keyof typeof SLUG_LABEL_KEY];
+    return key ? t[key] : "";
+  }
 
   useEffect(() => {
     async function loadProfile() {
@@ -69,19 +127,34 @@ export default function InfluencerDashboard() {
   }, []);
 
   useEffect(() => {
-    async function loadOffers() {
-      setOffersLoading(true);
+    async function loadMaisons() {
+      setMaisonsLoading(true);
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
 
-      let q = supabase.from("offers").select("*, comercios(name)").eq("is_active", true);
-      if (catFilter !== "all") q = q.eq("category", catFilter);
-      const { data } = await q.order("created_at", { ascending: false });
-      setOffers((data || []) as unknown as Offer[]);
-      setOffersLoading(false);
+      // RLS ("comercios public catalog") already restricts a storyteller to
+      // is_reservable = true rows; the explicit filter keeps it unambiguous.
+      // Category filtering is done client-side — the catalogue is small and it
+      // avoids filtering the joined `categories` rows instead of the parent.
+      const { data, error } = await supabase
+        .from("comercios")
+        .select(
+          "id, name, arrondissement, address, description, photos, website_url, signed_at, category_id"
+        )
+        .eq("is_reservable", true)
+        .order("signed_at", { ascending: false, nullsFirst: false });
+
+      if (error) console.error("Maisons query failed:", error);
+      setMaisons((data || []) as unknown as Maison[]);
+      setMaisonsLoading(false);
     }
-    loadOffers();
-  }, [catFilter]);
+    loadMaisons();
+  }, []);
+
+  const filteredMaisons =
+    catFilter === "all"
+      ? maisons
+      : maisons.filter((m) => slugOf(m) === catFilter);
 
   async function signOut() {
     const { createClient } = await import("@/lib/supabase/client");
@@ -107,19 +180,35 @@ export default function InfluencerDashboard() {
             </Link>
             <div className="w-px h-3 bg-white/10" />
             <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-champagne">
-              Adresses
+              {t.navAddresses}
             </Link>
-            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/75 hover:text-champagne transition-colors">
-              Mes visites
+            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/30 hover:text-champagne transition-colors">
+              {t.navVisits}
             </Link>
           </div>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/75 hover:text-champagne transition-colors"
-          >
-            <SignOut size={14} />
-            Sortir
-          </button>
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2.5">
+              {LANGS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setLang(key)}
+                  className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
+                    lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="w-px h-3 bg-white/10" />
+            <button
+              onClick={signOut}
+              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/30 hover:text-champagne transition-colors"
+            >
+              <SignOut size={14} />
+              {t.signOut}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -136,18 +225,18 @@ export default function InfluencerDashboard() {
 
               {/* Left: name + handle */}
               <div>
-                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/90 mb-3">
-                  Bonjour
+                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/40 mb-3">
+                  {t.greeting}
                 </p>
                 <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.15em] uppercase text-white leading-none mb-3">
-                  {profile?.full_name || profile?.handle || "Créateur"}
+                  {profile?.full_name || profile?.handle || t.defaultName}
                 </h1>
                 {profile?.handle && (
                   <a
                     href={`https://instagram.com/${profile.handle}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-serif text-[13px] text-champagne/90 hover:text-champagne transition-colors tracking-widest"
+                    className="font-serif text-[13px] text-champagne/40 hover:text-champagne transition-colors tracking-widest"
                   >
                     @{profile.handle}
                   </a>
@@ -160,10 +249,10 @@ export default function InfluencerDashboard() {
                 {/* Followers */}
                 {profile?.followers != null && profile.followers > 0 && (
                   <div className="text-right">
-                    <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/75 mb-1">
-                      Abonnés
+                    <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">
+                      {t.followers}
                     </p>
-                    <p className="font-serif text-[32px] font-light text-white leading-none">
+                    <p className="font-serif text-[32px] font-light text-white/70 leading-none">
                       {formatFollowers(profile.followers)}
                     </p>
                   </div>
@@ -176,15 +265,15 @@ export default function InfluencerDashboard() {
 
                 {/* Credit */}
                 <div className="text-right">
-                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/75 mb-1">
-                    Crédit disponible
+                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">
+                    {t.creditAvailable}
                   </p>
                   <p className="font-serif text-[32px] font-light text-champagne leading-none">
                     €{remaining}
                   </p>
                   {monthlyCredit > 0 && (
-                    <p className="font-serif text-[11px] text-white/75 mt-1">
-                      sur €{monthlyCredit} ce mois
+                    <p className="font-serif text-[11px] text-white/25 mt-1">
+                      {t.creditOf.replace("{total}", String(monthlyCredit))}
                     </p>
                   )}
                 </div>
@@ -203,30 +292,44 @@ export default function InfluencerDashboard() {
           )}
         </div>
 
+        {gated ? (
+          <div className="text-center py-24 md:py-32 border border-white/8">
+            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/50 mb-6">
+              {t.comingSoonKicker}
+            </p>
+            <h2 className="font-serif text-[26px] md:text-[34px] font-light tracking-[0.1em] text-white mb-6">
+              {t.comingSoonTitle}
+            </h2>
+            <p className="font-serif text-[14px] md:text-[15px] font-light text-white/40 leading-relaxed max-w-[440px] mx-auto px-6">
+              {t.comingSoonBody.replace("{date}", launchDateLabel)}
+            </p>
+          </div>
+        ) : (
+        <>
         {/* ── Category filters ── */}
         <div className="flex gap-1 mb-8 flex-wrap">
-          {CAT_KEYS.map((c) => (
+          {FILTERS.map((f) => (
             <button
-              key={c}
-              onClick={() => setCatFilter(c)}
+              key={f.slug}
+              onClick={() => setCatFilter(f.slug)}
               className={`font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
-                catFilter === c
+                catFilter === f.slug
                   ? "bg-champagne text-charcoal-deep"
-                  : "text-white/85 border border-white/25 hover:border-champagne/60 hover:text-champagne"
+                  : "text-white/30 border border-white/10 hover:border-champagne/30 hover:text-champagne"
               }`}
             >
-              {c === "all" ? "Toutes" : CAT_LABELS[c]}
+              {t[f.key]}
             </button>
           ))}
         </div>
 
         {/* Label */}
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/90 mb-8">
-          Adresses sélectionnées · Paris
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/30 mb-8">
+          {t.selectedAddresses}
         </p>
 
-        {/* ── Offers grid ── */}
-        {offersLoading ? (
+        {/* ── Maisons grid ── */}
+        {maisonsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
             {[1, 2, 3].map((i) => (
               <div key={i} className="bg-charcoal-deep">
@@ -238,79 +341,81 @@ export default function InfluencerDashboard() {
               </div>
             ))}
           </div>
-        ) : offers.length === 0 ? (
-          <div className="text-center py-24 border border-white/15">
-            <p className="font-serif text-[16px] font-light text-white/95 mb-2">
-              Aucune adresse disponible pour le moment.
+        ) : filteredMaisons.length === 0 ? (
+          <div className="text-center py-24 border border-white/5">
+            <p className="font-serif text-[15px] font-light text-white/30 mb-2">
+              {t.emptyTitle}
             </p>
-            <p className="font-serif text-[13px] font-light text-white/70 italic">
-              De nouvelles adresses arrivent chaque saison.
+            <p className="font-serif text-[13px] font-light text-white/15 italic">
+              {t.emptySubtitle}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
-            {offers.map((offer) => (
-              <div key={offer.id} className="bg-charcoal-deep group relative overflow-hidden">
-                {/* Photo */}
-                <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden relative">
-                  {offer.photos?.[0] ? (
-                    <img
-                      src={offer.photos[0]}
-                      alt={offer.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-white/15">
-                        {CAT_LABELS[offer.category] ?? offer.category}
-                      </p>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <span className="absolute bottom-3 left-4 font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70">
-                    {CAT_LABELS[offer.category] ?? offer.category}
-                  </span>
-                </div>
-
-                {/* Info */}
-                <div className="p-6">
-                  <h3 className="font-serif text-[17px] font-light text-white mb-1 group-hover:text-champagne transition-colors">
-                    {offer.title}
-                  </h3>
-                  <p className="font-serif text-[12px] text-white/75 mb-3 tracking-wide">
-                    {offer.comercios?.name}
-                  </p>
-                  {offer.description && (
-                    <p className="font-serif text-[13px] font-light text-white/85 leading-relaxed mb-4 line-clamp-2">
-                      {offer.description}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/15">
-                    <div className="flex items-center gap-1.5 text-white/75">
-                      <MapPin size={12} />
-                      <span className="font-serif text-[12px] font-light">{offer.address}</span>
-                    </div>
-                    {offer.reservation_phone && (
-                      <a
-                        href={`https://wa.me/${offer.reservation_phone.replace(/\D/g, "")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-4 py-2 hover:bg-copper hover:text-white transition-all duration-300"
-                      >
-                        <Phone size={12} />
-                        Réserver
-                      </a>
+            {filteredMaisons.map((maison) => {
+              const label = catLabel(slugOf(maison));
+              return (
+                <Link
+                  key={maison.id}
+                  href={`/dashboard/influencer/maison/${maison.id}`}
+                  className="bg-charcoal-deep group relative overflow-hidden block"
+                >
+                  {/* Photo */}
+                  <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden relative">
+                    {maison.photos?.[0] ? (
+                      <img
+                        src={maison.photos[0]}
+                        alt={maison.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-white/15">
+                          {label}
+                        </p>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <span className="absolute bottom-3 left-4 font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70">
+                      {label}
+                    </span>
+                    {isNew(maison.signed_at) && (
+                      <span className="absolute top-3 right-3 font-serif text-[9px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-2.5 py-1">
+                        {t.badgeNew}
+                      </span>
                     )}
                   </div>
-                  {offer.visit_value_cop > 0 && (
-                    <p className="font-serif text-[11px] text-champagne/90 mt-3">
-                      Jusqu'à €{offer.visit_value_cop}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
+
+                  {/* Info */}
+                  <div className="p-6">
+                    <h3 className="font-serif text-[17px] font-light text-white mb-1 group-hover:text-champagne transition-colors">
+                      {maison.name}
+                    </h3>
+                    {maison.arrondissement && (
+                      <p className="font-serif text-[12px] text-white/30 mb-3 tracking-wide">
+                        Paris {maison.arrondissement}
+                      </p>
+                    )}
+                    {maison.description && (
+                      <p className="font-serif text-[13px] font-light text-white/40 leading-relaxed mb-4 line-clamp-3">
+                        {maison.description}
+                      </p>
+                    )}
+                    {maison.address && (
+                      <div className="flex items-start gap-1.5 text-white/25 pt-4 border-t border-white/8">
+                        <MapPin size={12} className="mt-0.5 shrink-0" />
+                        <span className="font-serif text-[12px] font-light leading-snug">
+                          {maison.address}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
