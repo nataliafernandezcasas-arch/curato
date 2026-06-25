@@ -25,6 +25,9 @@ export default function AdminNavClient() {
         <Link href="/admin" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
           {t.navCandidatures}
         </Link>
+        <Link href="/admin/reservations" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
+          {t.navReservations}
+        </Link>
         <Link href="/admin/qr" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
           {t.navQR}
         </Link>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Trash } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
+import { suggestedBudgetEUR } from "@/lib/credits";
 
 type Application = {
   id: string;
@@ -43,11 +44,24 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
   const [loading, setLoading] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [followers, setFollowers] = useState("");
+  const [budget, setBudget] = useState("");
+  const [budgetTouched, setBudgetTouched] = useState(false);
+
+  // Typing the follower count auto-fills the suggested budget, until the admin
+  // edits the budget by hand (then we stop overwriting it).
+  function onFollowersChange(v: string) {
+    setFollowers(v);
+    if (!budgetTouched) {
+      const n = parseInt(v) || 0;
+      setBudget(n > 0 ? String(suggestedBudgetEUR(n)) : "");
+    }
+  }
 
   async function update(status: string) {
     setLoading(status);
     setErr(null);
     try {
+      const isCreatorApprove = status === "approved" && app.type === "creator";
       const res = await fetch("/api/admin/applications", {
         method: "PATCH",
         credentials: "include",
@@ -55,7 +69,8 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
         body: JSON.stringify({
           id: app.id,
           status,
-          followers: status === "approved" && app.type === "creator" ? parseInt(followers) || 0 : undefined,
+          followers: isCreatorApprove ? parseInt(followers) || 0 : undefined,
+          budget: isCreatorApprove ? parseInt(budget) || 0 : undefined,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -98,13 +113,22 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
     return (
       <div className="space-y-2">
         {app.type === "creator" && (
-          <input
-            type="number"
-            value={followers}
-            onChange={(e) => setFollowers(e.target.value)}
-            placeholder={t.followersPlaceholderShort}
-            className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
-          />
+          <>
+            <input
+              type="number"
+              value={followers}
+              onChange={(e) => onFollowersChange(e.target.value)}
+              placeholder={t.followersPlaceholderShort}
+              className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+            />
+            <input
+              type="number"
+              value={budget}
+              onChange={(e) => { setBudget(e.target.value); setBudgetTouched(true); }}
+              placeholder="Budget € / mois"
+              className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+            />
+          </>
         )}
         <div className="flex items-center gap-3">
           <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-40">
@@ -122,13 +146,22 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
   return (
     <div className="space-y-2">
       {app.type === "creator" && (
-        <input
-          type="number"
-          value={followers}
-          onChange={(e) => setFollowers(e.target.value)}
-          placeholder={t.followersPlaceholder}
-          className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
-        />
+        <>
+          <input
+            type="number"
+            value={followers}
+            onChange={(e) => onFollowersChange(e.target.value)}
+            placeholder={t.followersPlaceholder}
+            className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+          />
+          <input
+            type="number"
+            value={budget}
+            onChange={(e) => { setBudget(e.target.value); setBudgetTouched(true); }}
+            placeholder="Budget € / mois"
+            className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+          />
+        </>
       )}
       <div className="flex items-center gap-3">
         <button
