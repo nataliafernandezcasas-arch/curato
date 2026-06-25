@@ -10,19 +10,39 @@ export default async function DashboardPage() {
   const admin = createAdminClient();
   const emailLc = user.email.toLowerCase();
 
-  // 1. Approved creator?
+  // 1. Match against ANY creator row for this email (newest first). Migration
+  //    009 introduced `partnership_stage` (enum) alongside the legacy `stage`
+  //    text column. Imports from Notion arrive with partnership_stage='prospect'
+  //    and stage=NULL, so the old `stage IN ('verified','active')` filter
+  //    would block them entirely. We let everyone through except declined.
   const { data: creator } = await admin
     .from("creators")
-    .select("id, owner_id, stage")
+    .select("id, owner_id, stage, partnership_stage, welcome_completed_at, onboarding_survey_completed_at")
     .eq("email", emailLc)
-    .in("stage", ["verified", "active"])
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (creator) {
-    if (!creator.owner_id) {
+  if (creator && creator.partnership_stage !== "declined") {
+    // Always sync owner_id with the current auth session. The earlier
+    // `!creator.owner_id` check only re-linked when NULL — if a stale
+    // user.id was set (e.g. an orphaned auth user that shares the email),
+    // server actions using the user client + `.eq("owner_id", user.id)`
+    // wouldn't find the row and would fail with `creator_not_found`.
+    if (creator.owner_id !== user.id) {
       await admin.from("creators").update({ owner_id: user.id }).eq("id", creator.id);
+    }
+    // First-time creators must complete the welcome flow (10-slide dossier +
+    // explicit T&C / Privacy acceptance) before anything else. Without this
+    // gate they could land on the survey or the feed having never seen the
+    // model or accepted the contracts, which is also an RGPD problem.
+    if (!creator.welcome_completed_at) {
+      redirect("/onboarding/welcome");
+    }
+    // Then they take the onboarding survey before reaching the feed. Both
+    // gates are enforced server-side here so URL-typing doesn't bypass them.
+    if (!creator.onboarding_survey_completed_at) {
+      redirect("/onboarding/survey");
     }
     redirect("/dashboard/influencer");
   }

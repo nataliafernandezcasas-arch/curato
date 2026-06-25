@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle } from "@phosphor-icons/react";
 
@@ -21,6 +22,8 @@ export default function LaunchForm() {
   const [whatsapp, setWhatsapp] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [instagram, setInstagram] = useState("");
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -33,6 +36,14 @@ export default function LaunchForm() {
     e.preventDefault();
     if (!profile) {
       setError("Veuillez sélectionner votre profil.");
+      return;
+    }
+    if (!ageConfirmed) {
+      setError("Vous devez avoir 18 ans révolus pour vous inscrire.");
+      return;
+    }
+    if (!termsAccepted) {
+      setError("Vous devez accepter les Conditions Générales pour vous inscrire.");
       return;
     }
     setLoading(true);
@@ -48,6 +59,8 @@ export default function LaunchForm() {
           profile,
           instagram_handle: instagram || undefined,
           source,
+          age_confirmed: true,
+          terms_accepted: true,
         }),
       });
       const data = await res.json();
@@ -189,6 +202,43 @@ export default function LaunchForm() {
         </div>
       </div>
 
+      {/* Age 18+ attestation (RGPD) */}
+      <label className="flex items-start gap-3 cursor-pointer group pt-1">
+        <input
+          type="checkbox"
+          checked={ageConfirmed}
+          onChange={(e) => setAgeConfirmed(e.target.checked)}
+          className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
+        />
+        <span className="font-serif text-[12px] font-light text-white/60 leading-relaxed group-hover:text-white/80 transition-colors">
+          J&apos;atteste avoir 18 ans révolus.
+          <span className="text-copper/70"> *</span>
+        </span>
+      </label>
+
+      {/* Terms & Conditions acceptance */}
+      <label className="flex items-start gap-3 cursor-pointer group">
+        <input
+          type="checkbox"
+          checked={termsAccepted}
+          onChange={(e) => setTermsAccepted(e.target.checked)}
+          className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
+        />
+        <span className="font-serif text-[12px] font-light text-white/60 leading-relaxed group-hover:text-white/80 transition-colors">
+          J&apos;accepte les{" "}
+          <Link
+            href="/condiciones"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-champagne/80 hover:text-champagne underline underline-offset-2 transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Conditions Générales
+          </Link>
+          <span className="text-copper/70"> *</span>
+        </span>
+      </label>
+
       {/* Error */}
       {error && (
         <p className="font-serif text-[12px] text-red-400/80">{error}</p>
@@ -197,8 +247,8 @@ export default function LaunchForm() {
       {/* Submit */}
       <button
         type="submit"
-        disabled={loading}
-        className="w-full font-serif text-[12px] tracking-[0.3em] uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40"
+        disabled={loading || !ageConfirmed || !termsAccepted}
+        className="w-full font-serif text-[12px] tracking-[0.3em] uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {loading ? "…" : "Confirmer ma présence"}
       </button>

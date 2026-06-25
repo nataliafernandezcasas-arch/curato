@@ -64,6 +64,29 @@ export default function CreadoresPage() {
           </div>
         </section>
 
+        {/* CREDIT MECHANIC */}
+        <section className="py-28 px-5 bg-charcoal-deep border-t border-border">
+          <div className="max-w-[860px] mx-auto">
+            <motion.p {...fade()} className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-8">
+              {t.creditLabel}
+            </motion.p>
+            <motion.h2 {...fade(0.1)} className="font-serif text-3xl md:text-4xl font-light tracking-[0.28em] uppercase leading-[1.15] text-text-primary mb-14">
+              {t.creditTitle}
+            </motion.h2>
+            <div className="space-y-7">
+              {t.creditParas.map((p, i) => (
+                <motion.p
+                  key={i}
+                  {...fade(i * 0.05)}
+                  className="font-serif text-[17px] font-light text-text-secondary leading-relaxed"
+                >
+                  {p}
+                </motion.p>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* PHOTO BREAK */}
         <section className="relative h-[60vh] overflow-hidden">
           <img src="/Background Image 7.jpeg" alt="" className="w-full h-full object-cover object-bottom" />

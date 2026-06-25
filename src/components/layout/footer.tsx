@@ -22,10 +22,13 @@ export default function Footer() {
               {t.footer.tagline}
             </p>
           </div>
-          <div className="flex gap-8 text-[12px] text-text-muted font-serif font-light tracking-widest">
+          <div className="flex flex-wrap gap-x-8 gap-y-3 text-[12px] text-text-muted font-serif font-light tracking-widest">
             <Link href="/creadores" className="hover:text-champagne transition-colors">{t.nav.creators}</Link>
             <Link href="/casas" className="hover:text-champagne transition-colors">{t.nav.maisons}</Link>
             <Link href="/auth/sign-in" className="hover:text-champagne transition-colors">{t.nav.access}</Link>
+            <Link href="/faq" className="hover:text-champagne transition-colors">{t.footer.faq}</Link>
+            <Link href="/privacidad" className="hover:text-champagne transition-colors">{t.footer.privacy}</Link>
+            <Link href="/condiciones" className="hover:text-champagne transition-colors">{t.footer.terms}</Link>
           </div>
         </div>
         <div className="border-t border-border mt-10 pt-8">
