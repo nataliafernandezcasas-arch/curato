@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createPhylloUser, createSDKToken } from "@/lib/phyllo/client";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const email = body.email?.toLowerCase().trim();
     const phylloConsent = body.phyllo_consent;
-
-    if (!email) return NextResponse.json({ error: "Email requerido" }, { status: 400 });
 
     // RGPD: explicit consent required before processing Instagram data via Phyllo
     // (declared in /privacidad sections 4 and 5). The connect-Instagram UI MUST
@@ -21,16 +19,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Identify the caller from their session (not a client-sent email), then
+    // match the creator by the auth link first, email as a fallback.
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+
     const admin = createAdminClient();
     const { data: creator, error: creatorErr } = await admin
       .from("creators")
       .select("id, full_name, email, phyllo_account_id")
-      .eq("email", email)
-      .single();
+      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .maybeSingle();
 
     if (!creator) {
-      console.error("Creator not found for email:", email, creatorErr?.message);
-      return NextResponse.json({ error: "No encontramos tu cuenta. Asegúrate de estar logueado con el email correcto." }, { status: 404 });
+      console.error("Creator not found for user:", user.id, creatorErr?.message);
+      return NextResponse.json({ error: "No encontramos tu cuenta." }, { status: 404 });
     }
 
     // If already has Phyllo account, just create new SDK token
@@ -46,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     // Create new Phyllo user
     const phylloUser = await createPhylloUser(
-      creator.full_name || email,
+      creator.full_name || creator.email || user.email || "creator",
       `midi-${creator.id}`
     );
 

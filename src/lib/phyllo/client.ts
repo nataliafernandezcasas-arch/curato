@@ -38,3 +38,18 @@ export async function createSDKToken(userId: string) {
     }),
   });
 }
+
+// Connected accounts for a Phyllo user (one per linked social platform).
+export async function getPhylloAccounts(phylloUserId: string) {
+  return phylloFetch(`/v1/accounts?user_id=${encodeURIComponent(phylloUserId)}&limit=50`, {
+    method: "GET",
+  });
+}
+
+// Profile (IDENTITY product) for a connected account: handle, follower count,
+// and engagement metrics. Field shape is logged on first sync to confirm.
+export async function getPhylloProfile(accountId: string) {
+  return phylloFetch(`/v1/profiles?account_id=${encodeURIComponent(accountId)}`, {
+    method: "GET",
+  });
+}
