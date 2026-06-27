@@ -6,6 +6,8 @@ import { MapPin, SignOut } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT } from "@/lib/launch";
+import ConnectInstagram from "./connect-instagram";
+import SuggestVenue from "./suggest-venue";
 
 const LANGS: { key: Lang; label: string }[] = [
   { key: "fr", label: "FR" },
@@ -114,10 +116,13 @@ export default function InfluencerDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setProfileLoading(false); return; }
 
+      // Find the creator by the auth link (owner_id) first, then email. Using
+      // owner_id keeps the profile working even if the creator's email differs
+      // from the login email.
       const { data: creator } = await supabase
         .from("creators")
         .select("full_name, handle, monthly_credit_cop, credit_used_cop, followers")
-        .eq("email", (user.email || "").toLowerCase())
+        .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
         .maybeSingle();
 
       setProfile(creator);
@@ -182,7 +187,7 @@ export default function InfluencerDashboard() {
             <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-champagne">
               {t.navAddresses}
             </Link>
-            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/30 hover:text-champagne transition-colors">
+            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
               {t.navVisits}
             </Link>
           </div>
@@ -193,7 +198,7 @@ export default function InfluencerDashboard() {
                   key={key}
                   onClick={() => setLang(key)}
                   className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
-                    lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
+                    lang === key ? "text-champagne" : "text-white/55 hover:text-white/60"
                   }`}
                 >
                   {label}
@@ -203,7 +208,7 @@ export default function InfluencerDashboard() {
             <div className="w-px h-3 bg-white/10" />
             <button
               onClick={signOut}
-              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/30 hover:text-champagne transition-colors"
+              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/55 hover:text-champagne transition-colors"
             >
               <SignOut size={14} />
               {t.signOut}
@@ -225,7 +230,7 @@ export default function InfluencerDashboard() {
 
               {/* Left: name + handle */}
               <div>
-                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/40 mb-3">
+                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/65 mb-3">
                   {t.greeting}
                 </p>
                 <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.15em] uppercase text-white leading-none mb-3">
@@ -236,7 +241,7 @@ export default function InfluencerDashboard() {
                     href={`https://instagram.com/${profile.handle}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-serif text-[13px] text-champagne/40 hover:text-champagne transition-colors tracking-widest"
+                    className="font-serif text-[13px] text-champagne/65 hover:text-champagne transition-colors tracking-widest"
                   >
                     @{profile.handle}
                   </a>
@@ -249,7 +254,7 @@ export default function InfluencerDashboard() {
                 {/* Followers */}
                 {profile?.followers != null && profile.followers > 0 && (
                   <div className="text-right">
-                    <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">
+                    <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/45 mb-1">
                       {t.followers}
                     </p>
                     <p className="font-serif text-[32px] font-light text-white/70 leading-none">
@@ -265,14 +270,14 @@ export default function InfluencerDashboard() {
 
                 {/* Credit */}
                 <div className="text-right">
-                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">
+                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/45 mb-1">
                     {t.creditAvailable}
                   </p>
                   <p className="font-serif text-[32px] font-light text-champagne leading-none">
                     €{remaining}
                   </p>
                   {monthlyCredit > 0 && (
-                    <p className="font-serif text-[11px] text-white/25 mt-1">
+                    <p className="font-serif text-[11px] text-white/45 mt-1">
                       {t.creditOf.replace("{total}", String(monthlyCredit))}
                     </p>
                   )}
@@ -292,17 +297,24 @@ export default function InfluencerDashboard() {
           )}
         </div>
 
+        {/* Connect Instagram (Phyllo) */}
+        {!profileLoading && profile && <ConnectInstagram connected={false} />}
+
         {gated ? (
           <div className="text-center py-24 md:py-32 border border-white/8">
-            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/50 mb-6">
+            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/70 mb-6">
               {t.comingSoonKicker}
             </p>
             <h2 className="font-serif text-[26px] md:text-[34px] font-light tracking-[0.1em] text-white mb-6">
               {t.comingSoonTitle}
             </h2>
-            <p className="font-serif text-[14px] md:text-[15px] font-light text-white/40 leading-relaxed max-w-[440px] mx-auto px-6">
+            <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
               {t.comingSoonBody.replace("{date}", launchDateLabel)}
             </p>
+
+            <div className="mt-12 pt-12 border-t border-white/8 max-w-[460px] mx-auto">
+              <SuggestVenue />
+            </div>
           </div>
         ) : (
         <>
@@ -315,7 +327,7 @@ export default function InfluencerDashboard() {
               className={`font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
                 catFilter === f.slug
                   ? "bg-champagne text-charcoal-deep"
-                  : "text-white/30 border border-white/10 hover:border-champagne/30 hover:text-champagne"
+                  : "text-white/55 border border-white/10 hover:border-champagne/30 hover:text-champagne"
               }`}
             >
               {t[f.key]}
@@ -324,7 +336,7 @@ export default function InfluencerDashboard() {
         </div>
 
         {/* Label */}
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/30 mb-8">
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/55 mb-8">
           {t.selectedAddresses}
         </p>
 
@@ -343,10 +355,10 @@ export default function InfluencerDashboard() {
           </div>
         ) : filteredMaisons.length === 0 ? (
           <div className="text-center py-24 border border-white/5">
-            <p className="font-serif text-[15px] font-light text-white/30 mb-2">
+            <p className="font-serif text-[15px] font-light text-white/55 mb-2">
               {t.emptyTitle}
             </p>
-            <p className="font-serif text-[13px] font-light text-white/15 italic">
+            <p className="font-serif text-[13px] font-light text-white/35 italic">
               {t.emptySubtitle}
             </p>
           </div>
@@ -370,7 +382,7 @@ export default function InfluencerDashboard() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-white/15">
+                        <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-white/35">
                           {label}
                         </p>
                       </div>
@@ -392,17 +404,17 @@ export default function InfluencerDashboard() {
                       {maison.name}
                     </h3>
                     {maison.arrondissement && (
-                      <p className="font-serif text-[12px] text-white/30 mb-3 tracking-wide">
+                      <p className="font-serif text-[12px] text-white/55 mb-3 tracking-wide">
                         Paris {maison.arrondissement}
                       </p>
                     )}
                     {maison.description && (
-                      <p className="font-serif text-[13px] font-light text-white/40 leading-relaxed mb-4 line-clamp-3">
+                      <p className="font-serif text-[13px] font-light text-white/60 leading-relaxed mb-4 line-clamp-3">
                         {maison.description}
                       </p>
                     )}
                     {maison.address && (
-                      <div className="flex items-start gap-1.5 text-white/25 pt-4 border-t border-white/8">
+                      <div className="flex items-start gap-1.5 text-white/45 pt-4 border-t border-white/8">
                         <MapPin size={12} className="mt-0.5 shrink-0" />
                         <span className="font-serif text-[12px] font-light leading-snug">
                           {maison.address}

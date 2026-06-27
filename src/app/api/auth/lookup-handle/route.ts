@@ -6,7 +6,9 @@ export async function POST(request: NextRequest) {
   if (!handle) return NextResponse.json({ error: "Identifiant requis" }, { status: 400 });
 
   const supabase = createAdminClient();
-  const clean = handle.replace("@", "").trim().toLowerCase();
+  // Strip only a LEADING @ (so "@apercu" → "apercu") without touching the @ in
+  // an email address — otherwise email sign-in for creators/maisons breaks.
+  const clean = handle.trim().toLowerCase().replace(/^@/, "");
 
   // 1. Try creators by handle
   const { data: creator } = await supabase

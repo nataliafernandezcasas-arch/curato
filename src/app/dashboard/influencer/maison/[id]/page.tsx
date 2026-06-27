@@ -87,12 +87,12 @@ function ReserveModal({ maison, onClose, initialSlot }: { maison: Maison; onClos
       <div className="bg-charcoal-mid border border-white/10 w-full max-w-lg p-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between mb-6">
           <div>
-            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-2">
+            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70 mb-2">
               {t.modalTitle}
             </p>
             <h3 className="font-serif text-xl font-light text-white">{maison.name}</h3>
           </div>
-          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors mt-1">
+          <button onClick={onClose} className="text-white/55 hover:text-white transition-colors mt-1">
             <X size={18} />
           </button>
         </div>
@@ -158,7 +158,7 @@ function ReserveModal({ maison, onClose, initialSlot }: { maison: Maison; onClos
 
             <div>
               <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-                {t.note} <span className="text-white/20 normal-case tracking-normal">{t.optional}</span>
+                {t.note} <span className="text-white/45 normal-case tracking-normal">{t.optional}</span>
               </label>
               <textarea
                 value={note}
@@ -170,7 +170,7 @@ function ReserveModal({ maison, onClose, initialSlot }: { maison: Maison; onClos
             </div>
 
             {cat && (
-              <p className="font-serif text-[12px] text-white/30">
+              <p className="font-serif text-[12px] text-white/55">
                 {t.indicativeCost.replace("{n}", String(isHotel ? cat.credits * nights : cat.credits))}
               </p>
             )}
@@ -263,7 +263,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
             <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-white/50 hover:text-champagne transition-colors">
               {td.navAddresses}
             </Link>
-            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/30 hover:text-champagne transition-colors">
+            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
               {td.navVisits}
             </Link>
           </div>
@@ -274,7 +274,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   key={key}
                   onClick={() => setLang(key)}
                   className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
-                    lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
+                    lang === key ? "text-champagne" : "text-white/55 hover:text-white/60"
                   }`}
                 >
                   {label}
@@ -282,7 +282,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
               ))}
             </div>
             <div className="w-px h-3 bg-white/10" />
-            <button onClick={signOut} className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/30 hover:text-champagne transition-colors">
+            <button onClick={signOut} className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/55 hover:text-champagne transition-colors">
               <SignOut size={14} />
               {td.signOut}
             </button>
@@ -291,20 +291,20 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
       </nav>
 
       <div className="max-w-[1000px] mx-auto px-5 py-10">
-        <Link href="/dashboard/influencer" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/30 hover:text-champagne transition-colors mb-8">
+        <Link href="/dashboard/influencer" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/55 hover:text-champagne transition-colors mb-8">
           <ArrowLeft size={14} />
           {t.backToAll}
         </Link>
 
         {gated ? (
           <div className="text-center py-24 md:py-32 border border-white/8">
-            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/50 mb-6">
+            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/70 mb-6">
               {td.comingSoonKicker}
             </p>
             <h2 className="font-serif text-[26px] md:text-[34px] font-light tracking-[0.1em] text-white mb-6">
               {td.comingSoonTitle}
             </h2>
-            <p className="font-serif text-[14px] md:text-[15px] font-light text-white/40 leading-relaxed max-w-[440px] mx-auto px-6">
+            <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
               {td.comingSoonBody.replace("{date}", launchDateLabel)}
             </p>
           </div>
@@ -315,7 +315,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
           </div>
         ) : !maison ? (
           <div className="text-center py-24 border border-white/5">
-            <p className="font-serif text-[15px] font-light text-white/30">{t.notFound}</p>
+            <p className="font-serif text-[15px] font-light text-white/55">{t.notFound}</p>
           </div>
         ) : (
           <>
@@ -325,7 +325,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                 <img src={maison.photos[0]} alt={maison.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <p className="font-serif text-[12px] tracking-[0.3em] uppercase text-white/15">{catLabelText}</p>
+                  <p className="font-serif text-[12px] tracking-[0.3em] uppercase text-white/35">{catLabelText}</p>
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -343,7 +343,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   {maison.name}
                 </h1>
                 {maison.arrondissement && (
-                  <p className="font-serif text-[13px] text-white/30 tracking-wide mb-6">Paris {maison.arrondissement}</p>
+                  <p className="font-serif text-[13px] text-white/55 tracking-wide mb-6">Paris {maison.arrondissement}</p>
                 )}
 
                 {maison.description && (
@@ -355,7 +355,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                 {/* Map */}
                 {maison.address && (
                   <div className="mb-8">
-                    <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/40 mb-3">{t.location}</p>
+                    <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/65 mb-3">{t.location}</p>
                     <div className="aspect-[16/9] border border-white/10 overflow-hidden">
                       <iframe
                         title="map"
@@ -374,7 +374,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
               <div className="md:col-span-1">
                 <div className="border border-white/10 p-6 sticky top-20 space-y-5">
                   {maison.address && (
-                    <div className="flex items-start gap-2 text-white/40">
+                    <div className="flex items-start gap-2 text-white/60">
                       <MapPin size={14} className="mt-0.5 shrink-0" />
                       <span className="font-serif text-[13px] font-light leading-snug">{maison.address}</span>
                     </div>
@@ -384,7 +384,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                       href={maison.website_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-white/40 hover:text-champagne transition-colors"
+                      className="flex items-center gap-2 text-white/60 hover:text-champagne transition-colors"
                     >
                       <GlobeSimple size={14} className="shrink-0" />
                       <span className="font-serif text-[13px] font-light truncate">{maison.website_url.replace(/^https?:\/\//, "")}</span>
@@ -397,7 +397,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   >
                     {t.requestReservation}
                   </button>
-                  <p className="font-serif text-[11px] font-light text-white/25 leading-relaxed text-center">
+                  <p className="font-serif text-[11px] font-light text-white/45 leading-relaxed text-center">
                     {t.willBeConfirmed}
                   </p>
                 </div>
