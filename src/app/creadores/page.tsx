@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { motion } from "framer-motion";
+import { ParallaxImage, MouseParallaxImage } from "@/components/home/motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 
@@ -24,7 +25,7 @@ export default function CreadoresPage() {
       <main>
 
         {/* HERO */}
-        <section className="relative h-[92vh] flex items-end pb-20 overflow-hidden">
+        <section className="relative min-h-[92vh] flex items-end pt-36 pb-20 overflow-hidden">
           <div className="absolute inset-0">
             <img src="/Background Image 4.jpeg" alt="" className="w-full h-full object-cover object-center" />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-black/50 to-black/20" />
@@ -88,10 +89,12 @@ export default function CreadoresPage() {
         </section>
 
         {/* PHOTO BREAK */}
-        <section className="relative h-[60vh] overflow-hidden">
-          <img src="/Background Image 7.jpeg" alt="" className="w-full h-full object-cover object-bottom" />
-          <div className="absolute inset-0 bg-black/30" />
-        </section>
+        <ParallaxImage
+          src="/creadores-break.jpeg"
+          className="h-[60vh]"
+          strength={110}
+          overlay="bg-black/25"
+        />
 
         {/* WHAT YOU RECEIVE */}
         <section className="py-28 px-5 bg-charcoal-mid">
@@ -118,23 +121,17 @@ export default function CreadoresPage() {
 
         {/* QUOTE */}
         <section className="relative py-36 overflow-hidden">
-          <div className="absolute inset-0">
-            <img src="/Background Image 3.jpeg" alt="" className="w-full h-full object-cover object-center" />
-            <div className="absolute inset-0 bg-black/65" />
-          </div>
+          <ParallaxImage src="/verde.jpg" className="absolute inset-0" strength={22} zoom={1.7} overlay="bg-black/55" />
           <div className="relative z-10 max-w-[900px] mx-auto px-5 text-center">
             <motion.p {...fade()} className="font-serif text-3xl md:text-5xl font-light tracking-[0.28em] leading-[1.3] text-champagne italic">
-              "{t.quoteText}"
+              {`"${t.quoteText}"`}
             </motion.p>
           </div>
         </section>
 
         {/* CTA */}
         <section className="relative py-36 overflow-hidden">
-          <div className="absolute inset-0">
-            <img src="/Background Image 4.jpeg" alt="" className="w-full h-full object-cover object-center" />
-            <div className="absolute inset-0 bg-black/65" />
-          </div>
+          <MouseParallaxImage src="/Background Image 4.jpeg" className="absolute inset-0" strength={8} overlay="bg-black/65" />
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 text-center">
             <motion.h2 {...fade()} className="font-serif text-4xl md:text-6xl font-light tracking-[0.35em] uppercase leading-[1.1] text-text-primary mb-6">
               {t.ctaTitle}

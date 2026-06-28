@@ -37,7 +37,11 @@ export async function GET() {
       .eq("stage", "active")
       .order("followers", { ascending: false, nullsFirst: false });
 
-    const rows = creators ?? [];
+    // Only real signed creators: must have a name or an Instagram handle
+    // (filters out empty/incomplete creator rows).
+    const rows = (creators ?? []).filter(
+      (c) => (c.full_name && c.full_name.trim()) || (c.handle && c.handle.trim())
+    );
     const ids = rows.map((c) => c.id);
 
     // Content type from the onboarding survey (answer is a JSONB array of slugs).

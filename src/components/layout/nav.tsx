@@ -35,7 +35,7 @@ export default function Nav() {
           <img
             src="/logo-curato-simple.png"
             alt="curato"
-            style={{ height: "14px", width: "auto", display: "block" }}
+            style={{ height: "16.4px", width: "auto", display: "block" }}
           />
         </Link>
 

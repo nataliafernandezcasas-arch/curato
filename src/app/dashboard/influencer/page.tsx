@@ -174,7 +174,7 @@ export default function InfluencerDashboard() {
   const usedPercent = monthlyCredit > 0 ? Math.min((usedCredit / monthlyCredit) * 100, 100) : 0;
 
   return (
-    <div className="min-h-[100dvh] bg-charcoal-deep">
+    <div className="min-h-[100dvh]">
 
       {/* Nav */}
       <nav className="border-b border-white/10 px-5 h-14 flex items-center bg-black/30 backdrop-blur-sm sticky top-0 z-40">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { motion } from "framer-motion";
+import { ParallaxImage, RevealLine } from "@/components/home/motion";
 import { ArrowRight } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
@@ -42,8 +43,8 @@ export default function Home() {
             className="absolute inset-0"
           >
             <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
-            <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-charcoal-deep/50 to-charcoal-deep/10" />
-            <div className="absolute inset-0 bg-gradient-to-r from-charcoal-deep/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep/80 via-charcoal-deep/25 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-charcoal-deep/45 to-transparent" />
           </motion.div>
 
           <div className="flex-1 min-h-[80px]" />
@@ -59,16 +60,10 @@ export default function Home() {
               {t.badge}
             </motion.span>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-serif text-[clamp(2.1rem,9vw,6.5rem)] font-light tracking-[0.18em] uppercase leading-[1.05] text-text-primary mb-8 max-w-[1000px]"
-            >
-              {t.heroTitle1}
-              <br />
-              <span className="text-champagne">{t.heroTitle2}</span>
-            </motion.h1>
+            <h1 className="font-serif text-[clamp(2.1rem,9vw,6.5rem)] font-light tracking-[0.18em] uppercase leading-[1.05] text-text-primary mb-8 max-w-[1000px]">
+              <RevealLine delay={0.65}>{t.heroTitle1}</RevealLine>
+              <RevealLine delay={0.8} className="text-champagne">{t.heroTitle2}</RevealLine>
+            </h1>
 
             <motion.p
               initial={{ opacity: 0 }}
@@ -96,13 +91,17 @@ export default function Home() {
         </section>
 
         {/* ── PHOTO INTERLUDE ── */}
-        <motion.section {...fadeIn()} className="w-full h-[70vh] md:h-[90vh] overflow-hidden relative">
-          <img src="/Background Image 4.jpeg" alt="" className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-charcoal-deep/30" />
-          <div className="absolute bottom-10 left-0 right-0 text-center">
-            <span className="font-serif text-[11px] font-light tracking-[0.4em] uppercase text-champagne/50">{t.photoCaption}</span>
-          </div>
-        </motion.section>
+        <ParallaxImage
+          src="/Background Image 4.jpeg"
+          className="w-full h-[70vh] md:h-[90vh]"
+          strength={90}
+          overlay="bg-charcoal-deep/30"
+          caption={
+            <div className="absolute bottom-10 left-0 right-0 text-center z-10">
+              <span className="font-serif text-[11px] font-light tracking-[0.4em] uppercase text-champagne/50">{t.photoCaption}</span>
+            </div>
+          }
+        />
 
         {/* ── LE MODÈLE ── */}
         <section className="py-28 md:py-36 border-t border-border">
@@ -134,14 +133,8 @@ export default function Home() {
 
         {/* ── PHOTO PAIR ── */}
         <section className="grid grid-cols-2 h-[60vh] md:h-[80vh]">
-          <motion.div {...fadeIn()} className="overflow-hidden relative">
-            <img src="/Background Image 7.jpeg" alt="" className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-[2s]" />
-            <div className="absolute inset-0 bg-charcoal-deep/20" />
-          </motion.div>
-          <motion.div {...fadeIn(0.15)} className="overflow-hidden relative">
-            <img src="/Background Image 3.jpeg" alt="" className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-[2s]" />
-            <div className="absolute inset-0 bg-charcoal-deep/20" />
-          </motion.div>
+          <ParallaxImage src="/Background Image 7.jpeg" className="h-full" strength={70} overlay="bg-charcoal-deep/20" />
+          <ParallaxImage src="/Background Image 3.jpeg" className="h-full" strength={110} overlay="bg-charcoal-deep/20" />
         </section>
 
         {/* ── MANIFESTE ── */}
@@ -204,9 +197,8 @@ export default function Home() {
         </section>
 
         {/* ── QUOTE ── */}
-        <motion.section {...fadeIn()} className="relative h-[75vh] md:h-[95vh] overflow-hidden flex items-center justify-center">
-          <img src="/Background Image 6.jpeg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-charcoal-deep/55" />
+        <section className="relative h-[75vh] md:h-[95vh] overflow-hidden flex items-center justify-center">
+          <ParallaxImage src="/Background Image 6.jpeg" className="absolute inset-0" strength={110} overlay="bg-charcoal-deep/55" />
           <div className="relative z-10 text-center px-5 max-w-[700px] mx-auto">
             <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.4em] uppercase text-champagne/50 mb-8">
               {t.visionLabel}
@@ -216,7 +208,7 @@ export default function Home() {
               <span className="text-champagne">{t.visionTitle2}</span>
             </motion.h2>
           </div>
-        </motion.section>
+        </section>
 
         {/* ── CATÉGORIES ── */}
         <section className="py-28 border-t border-border">
@@ -244,23 +236,14 @@ export default function Home() {
 
         {/* ── MOSAÏQUE ── */}
         <section className="grid grid-cols-12 h-[70vh] md:h-[85vh]">
-          <motion.div {...fadeIn()} className="col-span-5 overflow-hidden relative">
-            <img src="/Background image 1.jpeg" alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-[2s]" />
-          </motion.div>
-          <motion.div {...fadeIn(0.1)} className="col-span-4 overflow-hidden relative">
-            <img src="/Background Image 5.jpeg" alt="" className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-[2s]" />
-          </motion.div>
-          <motion.div {...fadeIn(0.2)} className="col-span-3 overflow-hidden relative">
-            <img src="/Background Image 8.jpeg" alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-[2s]" />
-          </motion.div>
+          <ParallaxImage src="/Background image 1.jpeg" className="col-span-5 h-full" strength={70} />
+          <ParallaxImage src="/Background Image 5.jpeg" className="col-span-4 h-full" strength={130} imgClassName="object-top" />
+          <ParallaxImage src="/Background Image 8.jpeg" className="col-span-3 h-full" strength={95} />
         </section>
 
         {/* ── CTA FINAL ── */}
         <section className="relative py-36 md:py-48 overflow-hidden">
-          <div className="absolute inset-0">
-            <img src="/Background Image 8.jpeg" alt="" className="w-full h-full object-cover object-center" />
-            <div className="absolute inset-0 bg-charcoal-deep/75" />
-          </div>
+          <ParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={90} overlay="bg-charcoal-deep/75" />
           <div className="relative z-10 max-w-[1200px] mx-auto px-5">
             <motion.div {...fade()} className="flex flex-col md:flex-row items-start md:items-end justify-between gap-12">
               <div className="max-w-[520px]">
