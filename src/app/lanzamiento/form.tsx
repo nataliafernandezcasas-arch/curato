@@ -87,17 +87,9 @@ export default function LaunchForm() {
         </h2>
         <p className="font-serif text-[14px] font-light text-white/50 leading-relaxed mb-6">
           Un email de confirmation vous sera envoyé.<br />
-          À bientôt le{" "}
-          <span className="text-champagne">22 juillet à Paris</span>.
+          Vous serez prévenu dès que la date est{" "}
+          <span className="text-champagne">confirmée</span>.
         </p>
-        <a
-          href={googleCalendarUrl()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 hover:text-champagne transition-colors"
-        >
-          Ajouter au calendrier →
-        </a>
       </div>
     );
   }
@@ -256,17 +248,3 @@ export default function LaunchForm() {
   );
 }
 
-function googleCalendarUrl() {
-  // 22 July 2026 19:00 Paris (CEST = UTC+2) → 17:00 UTC; 3h duration
-  const start = "20260722T170000Z";
-  const end = "20260722T200000Z";
-  const urlParams = new URLSearchParams({
-    action: "TEMPLATE",
-    text: "Lancement Curato · Paris",
-    dates: `${start}/${end}`,
-    details:
-      "Vous avez été sélectionné pour vivre en exclusivité le lancement de Curato — l'écosystème où les créateurs et les maisons qu'ils aiment se rencontrent.",
-    location: "Paris, France",
-  });
-  return `https://www.google.com/calendar/render?${urlParams.toString()}`;
-}

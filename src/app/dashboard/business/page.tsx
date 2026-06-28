@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SignOut } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
+import MaisonProfile from "./maison-profile";
 
 const LANGS: { key: Lang; label: string }[] = [
   { key: "fr", label: "FR" },
@@ -40,8 +41,9 @@ export default function MaisonDashboard() {
   const { lang, setLang } = useLang();
   const t = translations[lang].business;
 
-  const [tab, setTab] = useState<"roster" | "visitors">("roster");
+  const [tab, setTab] = useState<"roster" | "visitors" | "profile">("roster");
   const [roster, setRoster] = useState<RosterItem[]>([]);
+  const [maisonName, setMaisonName] = useState("");
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [visitorsLoaded, setVisitorsLoaded] = useState(false);
@@ -53,6 +55,7 @@ export default function MaisonDashboard() {
         const res = await fetch("/api/maison/roster");
         const data = await res.json();
         setRoster(data.roster ?? []);
+        setMaisonName(data.maison ?? "");
       } catch {
         setRoster([]);
       } finally {
@@ -125,16 +128,20 @@ export default function MaisonDashboard() {
         </div>
       </nav>
 
-      <div className="max-w-[1100px] mx-auto px-5 py-12">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">{t.kicker}</p>
+      <div className="max-w-[1280px] mx-auto px-8 py-12">
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">
+          {tab === "profile" ? t.tabProfile : t.kicker}
+        </p>
         <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.12em] uppercase text-white leading-none mb-3">
-          {t.title}
+          {tab === "profile" ? maisonName || t.tabProfile : t.title}
         </h1>
-        <p className="font-serif text-[14px] font-light text-white/55 mb-8">{t.subtitle}</p>
+        {tab !== "profile" && (
+          <p className="font-serif text-[14px] font-light text-white/55 mb-8">{t.subtitle}</p>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8">
-          {([["roster", t.tabRoster], ["visitors", t.tabVisitors]] as const).map(([key, label]) => (
+          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["profile", t.tabProfile]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -197,6 +204,8 @@ export default function MaisonDashboard() {
               ))}
             </div>
           )
+        ) : tab === "profile" ? (
+          <MaisonProfile t={t} />
         ) : visitorsLoading ? (
           <div className="space-y-8">
             {[1, 2].map((i) => (
@@ -208,7 +217,7 @@ export default function MaisonDashboard() {
             <p className="font-serif text-[15px] font-light text-white/55">{t.visitorsEmpty}</p>
           </div>
         ) : (
-          <div className="space-y-12 max-w-[760px]">
+          <div className="space-y-12 max-w-[920px] mx-auto">
             {visitors.map((v) => (
               <div key={v.id}>
                 <div className="grid grid-cols-2 gap-1.5">

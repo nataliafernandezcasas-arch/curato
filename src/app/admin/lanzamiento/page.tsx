@@ -60,7 +60,7 @@ export default async function AdminLanzamientoPage() {
       {/* Header */}
       <div className="mb-10">
         <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-champagne/40 mb-3">
-          Admin · Lancement · 22 juillet · Paris
+          Admin · Lancement · Paris
         </p>
         <h1 className="font-serif text-3xl font-light tracking-[0.2em] uppercase text-white">
           {signups.length}{" "}
