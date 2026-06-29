@@ -187,8 +187,11 @@ export function RevealLine({
   delay?: number;
   className?: string;
 }) {
+  // box-content + horizontal padding cancelled by negative margin: gives the
+  // mask horizontal slack so wide lines (e.g. "UNE CAMPAGNE.") aren't clipped
+  // on the sides, while overflow-hidden still masks the vertical slide reveal.
   return (
-    <span className="block overflow-hidden">
+    <span className="box-content block overflow-hidden px-[0.75em] -mx-[0.75em]">
       <motion.span
         initial={{ y: "110%" }}
         animate={{ y: "0%" }}

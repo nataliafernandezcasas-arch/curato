@@ -44,7 +44,7 @@ export default async function DashboardPage() {
     if (!creator.onboarding_survey_completed_at) {
       redirect("/onboarding/survey");
     }
-    redirect("/dashboard/influencer");
+    redirect("/dashboard/storyteller");
   }
 
   // 2. Approved comercio?

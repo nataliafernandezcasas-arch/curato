@@ -49,7 +49,7 @@ export default async function OnboardingSurveyPage() {
 
   // Already done? Send them to the feed.
   if (creator.onboarding_survey_completed_at) {
-    redirect("/dashboard/influencer");
+    redirect("/dashboard/storyteller");
   }
 
   // Load active questions ordered by position. We capture the error so
