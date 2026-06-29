@@ -124,7 +124,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
     }
     setDone(true);
     // Brief celebratory pause, then off to the feed.
-    setTimeout(() => router.push("/dashboard/influencer"), 1500);
+    setTimeout(() => router.push("/dashboard/storyteller"), 1500);
   }
 
   // ── Done screen

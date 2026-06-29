@@ -213,10 +213,10 @@ export default function MesVisites() {
               <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
             </Link>
             <div className="w-px h-3 bg-white/10" />
-            <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
+            <Link href="/dashboard/storyteller" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
               {td.navAddresses}
             </Link>
-            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-champagne">
+            <Link href="/dashboard/storyteller/visits" className="font-serif text-[12px] tracking-wider text-champagne">
               {td.navVisits}
             </Link>
           </div>

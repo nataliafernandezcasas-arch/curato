@@ -51,7 +51,7 @@ export default function WelcomeClient() {
       return;
     }
     // Onto the survey. The server-side guard in /onboarding/survey then
-    // forwards to /dashboard/influencer once the survey is filled.
+    // forwards to /dashboard/storyteller once the survey is filled.
     router.push("/onboarding/survey");
   }
 

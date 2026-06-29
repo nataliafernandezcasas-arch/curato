@@ -260,10 +260,10 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
               <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
             </Link>
             <div className="w-px h-3 bg-white/10" />
-            <Link href="/dashboard/influencer" className="font-serif text-[12px] tracking-wider text-white/50 hover:text-champagne transition-colors">
+            <Link href="/dashboard/storyteller" className="font-serif text-[12px] tracking-wider text-white/50 hover:text-champagne transition-colors">
               {td.navAddresses}
             </Link>
-            <Link href="/dashboard/influencer/visits" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
+            <Link href="/dashboard/storyteller/visits" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
               {td.navVisits}
             </Link>
           </div>
@@ -291,7 +291,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
       </nav>
 
       <div className="max-w-[1000px] mx-auto px-5 py-10">
-        <Link href="/dashboard/influencer" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/55 hover:text-champagne transition-colors mb-8">
+        <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/55 hover:text-champagne transition-colors mb-8">
           <ArrowLeft size={14} />
           {t.backToAll}
         </Link>

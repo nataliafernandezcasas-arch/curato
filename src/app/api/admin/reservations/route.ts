@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
           maisonName,
           slots: slots.map((s) => ({
             label: formatLocal(s.local),
-            url: `${SITE_URL}/dashboard/influencer/maison/${r.venue_id}?slot=${encodeURIComponent(s.local)}`,
+            url: `${SITE_URL}/dashboard/storyteller/maison/${r.venue_id}?slot=${encodeURIComponent(s.local)}`,
           })),
         });
       }

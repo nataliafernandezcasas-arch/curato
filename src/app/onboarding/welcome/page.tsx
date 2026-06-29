@@ -49,7 +49,7 @@ export default async function OnboardingWelcomePage() {
     if (!creator.onboarding_survey_completed_at) {
       redirect("/onboarding/survey");
     }
-    redirect("/dashboard/influencer");
+    redirect("/dashboard/storyteller");
   }
 
   return <WelcomeClient />;
