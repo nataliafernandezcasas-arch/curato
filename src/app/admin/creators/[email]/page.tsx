@@ -34,7 +34,7 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
   // Fetch creator
   const { data: creator } = await supabase
     .from("creators")
-    .select("id, full_name, handle, email, monthly_credit_cop, credit_used_cop, followers, stage")
+    .select("id, full_name, handle, email, monthly_credit_cop, credit_used_cop, followers, stage, instagram_connected, phyllo_connected_at, followers_count, engagement_rate, engagement_rate_updated_at")
     .eq("email", email)
     .maybeSingle();
 
@@ -65,6 +65,15 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
   const totalVisits = visits?.length ?? 0;
   const completedVisits = visits?.filter(v => v.status === "completed").length ?? 0;
   const allProofs = visits?.flatMap(v => (v.content_proof_urls ?? [])) ?? [];
+
+  // Instagram / Phyllo connection
+  const igConnected = creator.instagram_connected === true;
+  const phylloFollowers = creator.followers_count ?? null;
+  const engagementPct = creator.engagement_rate != null ? (creator.engagement_rate * 100).toFixed(1) : null;
+  const connectedDate = creator.phyllo_connected_at
+    ? new Date(creator.phyllo_connected_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+  const fmtK = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K` : `${n}`);
 
   return (
     <main className="max-w-[900px] mx-auto px-5 py-14">
@@ -141,6 +150,36 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
             <p className="font-serif text-2xl font-light text-white">{s.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Instagram · Phyllo */}
+      <div className="border border-white/10 bg-white/5 p-6 md:p-8 mb-10">
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Instagram · Phyllo</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div>
+            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">Estado</p>
+            {igConnected ? (
+              <>
+                <p className="font-serif text-[15px] font-light text-champagne">Conectado</p>
+                {connectedDate && <p className="font-serif text-[12px] text-white/30 mt-0.5">{connectedDate}</p>}
+              </>
+            ) : (
+              <p className="font-serif text-[15px] font-light text-white/40">No conectado</p>
+            )}
+          </div>
+          <div>
+            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">Engagement</p>
+            <p className="font-serif text-[15px] font-light text-white">
+              {engagementPct != null ? `${engagementPct}%` : <span className="text-white/40">Pendiente</span>}
+            </p>
+          </div>
+          <div>
+            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">Seguidores (Phyllo)</p>
+            <p className="font-serif text-[15px] font-light text-white">
+              {phylloFollowers != null ? fmtK(phylloFollowers) : <span className="text-white/40">N/D</span>}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Content proofs gallery */}
