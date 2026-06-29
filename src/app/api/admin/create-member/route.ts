@@ -74,7 +74,7 @@ function welcomeEmail(params: {
               ${isCreator ? "Handle" : "Email"}
             </p>
             <p style="margin:0 0 22px;font-size:17px;font-weight:300;color:#CBB78F;letter-spacing:0.05em;">
-              ${isCreator ? `@${identifier}` : identifier}
+              ${isCreator ? `@${identifier}` : `<a href="mailto:${identifier}" style="color:#CBB78F;text-decoration:none;">${identifier}</a>`}
             </p>
             <p style="margin:0 0 6px;font-size:12px;color:#5a5040;letter-spacing:0.05em;">Mot de passe temporaire</p>
             <p style="margin:0 0 16px;font-size:17px;font-weight:300;color:#CBB78F;letter-spacing:0.12em;">${tempPassword}</p>
@@ -92,7 +92,7 @@ function welcomeEmail(params: {
       </td></tr>
 
       <tr><td style="background-color:#141414;padding:28px 48px;">
-        <p style="margin:0;font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#4a4030;">Paris · Sur invitation · curatocollective.com</p>
+        <p style="margin:0;font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#4a4030;">Paris · Sur invitation · <a href="${BASE}" style="color:#4a4030;text-decoration:none;">curatocollective.com</a></p>
       </td></tr>
 
     </table>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { InstagramLogo, CheckCircle } from "@phosphor-icons/react";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations } from "@/lib/i18n/translations";
 
 const SDK_SRC = "https://cdn.getphyllo.com/connect/v2/phyllo-connect.js";
 const PHYLLO_ENV = "staging"; // must match the Phyllo account environment (Staging)
@@ -29,6 +31,8 @@ function loadSdk(): Promise<void> {
 }
 
 export default function ConnectInstagram({ connected }: { connected: boolean }) {
+  const { lang } = useLang();
+  const t = translations[lang].dashboard;
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
     connected ? "done" : "idle"
@@ -42,7 +46,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       const { createClient } = await import("@/lib/supabase/client");
       const { data: { user } } = await createClient().auth.getUser();
       if (!user?.email) {
-        setError("Session expirée. Reconnectez-vous.");
+        setError(t.igErrorSession);
         setStatus("error");
         return;
       }
@@ -54,7 +58,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       });
       const data = await res.json();
       if (!res.ok || !data.sdk_token) {
-        setError(data.error || "Erreur lors de l'initialisation.");
+        setError(data.error || t.igErrorInit);
         setStatus("error");
         return;
       }
@@ -87,14 +91,14 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       pc.on("exit", (_reason: string, _userId: string) => setStatus((s) => (s === "done" ? s : "idle")));
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       pc.on("connectionFailure", (_reason: string, _workPlatformId: string, _userId: string) => {
-        setError("La connexion a échoué. Réessayez.");
+        setError(t.igErrorFailed);
         setStatus("error");
       });
 
       pc.open();
     } catch (e) {
       console.error("Phyllo connect error:", e);
-      setError(`Erreur: ${e instanceof Error ? e.message : String(e)}`);
+      setError(t.igErrorFailed);
       setStatus("error");
     }
   }
@@ -104,7 +108,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       <div className="border border-champagne/20 bg-champagne/5 px-6 py-4 mb-10 flex items-center gap-3">
         <CheckCircle size={18} weight="thin" className="text-champagne shrink-0" />
         <p className="font-serif text-[13px] font-light text-white/70">
-          Votre Instagram est connecté. Merci !
+          {t.igConnected}
         </p>
       </div>
     );
@@ -115,9 +119,9 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       <div className="flex items-start gap-3 mb-4">
         <InstagramLogo size={20} weight="thin" className="text-champagne shrink-0 mt-0.5" />
         <div>
-          <p className="font-serif text-[14px] text-white mb-1">Connectez votre Instagram</p>
+          <p className="font-serif text-[14px] text-white mb-1">{t.igTitle}</p>
           <p className="font-serif text-[12px] font-light text-white/60 leading-relaxed">
-            Pour valider votre profil, reliez votre compte Instagram en toute sécurité via Phyllo.
+            {t.igDesc}
           </p>
         </div>
       </div>
@@ -130,8 +134,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
           className="mt-1 accent-champagne"
         />
         <span className="font-serif text-[11px] font-light text-white/60 leading-relaxed">
-          J'autorise Curato à accéder aux données publiques de mon compte (abonnés, engagement)
-          via Phyllo, conformément à la politique de confidentialité.
+          {t.igConsent}
         </span>
       </label>
 
@@ -146,7 +149,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
         disabled={!consent || status === "loading"}
         className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {status === "loading" ? "Connexion…" : "Connecter mon Instagram"}
+        {status === "loading" ? t.igConnecting : t.igButton}
       </button>
     </div>
   );
