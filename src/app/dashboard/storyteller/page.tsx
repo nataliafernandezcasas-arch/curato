@@ -55,6 +55,7 @@ type Profile = {
   monthly_credit_cop: number | null;
   credit_used_cop: number | null;
   followers: number | null;
+  instagram_connected: boolean | null;
 };
 
 // Category filter buttons: slug + the translation key for its label.
@@ -121,7 +122,7 @@ export default function InfluencerDashboard() {
       // from the login email.
       const { data: creator } = await supabase
         .from("creators")
-        .select("full_name, handle, monthly_credit_cop, credit_used_cop, followers")
+        .select("full_name, handle, monthly_credit_cop, credit_used_cop, followers, instagram_connected")
         .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
         .maybeSingle();
 
@@ -298,7 +299,7 @@ export default function InfluencerDashboard() {
         </div>
 
         {/* Connect Instagram (Phyllo) */}
-        {!profileLoading && profile && <ConnectInstagram connected={false} />}
+        {!profileLoading && profile && <ConnectInstagram connected={!!profile.instagram_connected} />}
 
         {gated ? (
           <div className="text-center py-24 md:py-32 border border-white/8">
