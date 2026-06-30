@@ -3,7 +3,7 @@ export type Lang = "fr" | "en" | "es";
 export const translations = {
   fr: {
     nav: {
-      creators: "Créateurs",
+      creators: "Storytellers",
       maisons: "Maisons",
       access: "Accéder",
     },
@@ -373,7 +373,7 @@ export const translations = {
 
   en: {
     nav: {
-      creators: "Creators",
+      creators: "Storytellers",
       maisons: "Houses",
       access: "Sign in",
     },
@@ -743,7 +743,7 @@ export const translations = {
 
   es: {
     nav: {
-      creators: "Creadores",
+      creators: "Storytellers",
       maisons: "Casas",
       access: "Acceder",
     },
