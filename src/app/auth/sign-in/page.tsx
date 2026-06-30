@@ -106,8 +106,8 @@ export default function SignInPage() {
   return (
     <div className="min-h-[100dvh] relative flex items-center justify-center px-5">
       <div className="absolute inset-0">
-        <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-charcoal-deep/80 backdrop-blur-sm" />
+        <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover object-center" />
+        <div className="absolute inset-0 bg-charcoal-deep/70" />
       </div>
 
       {/* Language switcher */}
