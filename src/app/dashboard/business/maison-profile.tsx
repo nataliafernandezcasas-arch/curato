@@ -35,6 +35,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const [preview, setPreview] = useState(false);
   const dragFrom = useRef<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
+  const [fileDrag, setFileDrag] = useState(false);
 
   useEffect(() => {
     fetch("/api/maison/profile")
@@ -206,7 +207,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         ) : (
           <>
             {photos.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-1.5 mb-10">
+              <div className="columns-2 md:columns-3 gap-1.5 mb-10">
                 {photos.map((url, i) => (
                   // eslint-disable-next-line @next/next/no-img-element
                   <a
@@ -214,9 +215,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`block overflow-hidden bg-charcoal-mid ${i === 0 ? "col-span-2 md:col-span-2 row-span-2 aspect-square md:aspect-auto" : "aspect-square"}`}
+                    className="block overflow-hidden bg-charcoal-mid mb-1.5 break-inside-avoid"
                   >
-                    <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                    <img src={url} alt="" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700" />
                   </a>
                 ))}
               </div>
@@ -262,17 +263,22 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
           </div>
           <p className="font-serif text-[12px] font-light text-white/40 mb-4">{t.profilePhotosHint}</p>
 
-          <div className="grid grid-cols-4 gap-2">
+          <div
+            onDragOver={(e) => { if (e.dataTransfer.types.includes("Files")) { e.preventDefault(); setFileDrag(true); } }}
+            onDragLeave={(e) => { if (e.currentTarget === e.target) setFileDrag(false); }}
+            onDrop={(e) => { if (e.dataTransfer.files?.length) { e.preventDefault(); uploadPhotos(e.dataTransfer.files); } setFileDrag(false); }}
+            className={`grid grid-cols-3 gap-2 transition-all ${fileDrag ? "ring-2 ring-champagne/60 ring-offset-2 ring-offset-charcoal-deep" : ""}`}
+          >
             {photos.map((url, i) => (
               <div
                 key={url}
                 draggable
                 onDragStart={(e) => { dragFrom.current = i; e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", String(i)); }}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(i); }}
+                onDragOver={(e) => { if (!e.dataTransfer.types.includes("Files")) { e.preventDefault(); setDragOver(i); } }}
                 onDragLeave={() => setDragOver((d) => (d === i ? null : d))}
-                onDrop={() => handleDrop(i)}
+                onDrop={(e) => { if (e.dataTransfer.files?.length) { e.preventDefault(); uploadPhotos(e.dataTransfer.files); setFileDrag(false); } else handleDrop(i); }}
                 onDragEnd={() => { dragFrom.current = null; setDragOver(null); }}
-                className={`relative overflow-hidden bg-charcoal-mid group cursor-move transition-all ${i === 0 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"} ${dragOver === i ? "ring-2 ring-champagne/70" : ""}`}
+                className={`relative aspect-square overflow-hidden bg-charcoal-mid group cursor-move transition-all ${dragOver === i ? "ring-2 ring-champagne/70" : ""}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" className="w-full h-full object-cover pointer-events-none" />
