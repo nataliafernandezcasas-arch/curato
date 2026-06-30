@@ -42,7 +42,7 @@ export default function Home() {
             transition={{ duration: 1.6 }}
             className="absolute inset-0"
           >
-            <MouseParallaxImage src="/hero-floral.jpeg" className="absolute inset-0" strength={7} />
+            <MouseParallaxImage src="/hero-floral.jpeg" className="absolute inset-0" strength={10} />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep/80 via-charcoal-deep/25 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-charcoal-deep/45 to-transparent" />
           </motion.div>
