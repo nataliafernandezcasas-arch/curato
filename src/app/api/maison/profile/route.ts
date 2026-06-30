@@ -36,27 +36,41 @@ export async function GET() {
   }
 }
 
-// Update the description.
+// Update the description/links, and/or reorder the photos.
 export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
 
-    const { description, website, instagram } = await request.json();
+    const body = await request.json();
     const admin = createAdminClient();
     const maison = await getMaison(admin, user.id, user.email || "");
     if (!maison) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 
-    await admin
-      .from("comercios")
-      .update({
-        description: (description || "").slice(0, 2000),
-        website_url: (website || "").trim().slice(0, 300) || null,
-        contact_instagram: (instagram || "").trim().slice(0, 100) || null,
-      })
-      .eq("id", maison.id);
-    return NextResponse.json({ ok: true });
+    const update: Record<string, unknown> = {};
+
+    if ("description" in body || "website" in body || "instagram" in body) {
+      update.description = (body.description || "").slice(0, 2000);
+      update.website_url = (body.website || "").trim().slice(0, 300) || null;
+      update.contact_instagram = (body.instagram || "").trim().slice(0, 100) || null;
+    }
+
+    // Reorder: only permute existing photos, never inject new URLs.
+    let photos: string[] | undefined;
+    if (Array.isArray(body.photos)) {
+      const current: string[] = maison.photos ?? [];
+      const known = new Set(current);
+      const reordered = (body.photos as string[]).filter((u) => known.has(u));
+      for (const u of current) if (!reordered.includes(u)) reordered.push(u);
+      update.photos = reordered;
+      photos = reordered;
+    }
+
+    if (Object.keys(update).length) {
+      await admin.from("comercios").update(update).eq("id", maison.id);
+    }
+    return NextResponse.json({ ok: true, photos });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
   }
