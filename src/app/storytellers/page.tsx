@@ -27,7 +27,7 @@ export default function CreadoresPage() {
         {/* HERO */}
         <section className="relative min-h-[92vh] flex items-end pt-36 pb-20 overflow-hidden">
           <div className="absolute inset-0">
-            <MouseParallaxImage src="/Background Image 4.jpeg" className="absolute inset-0" strength={7} />
+            <MouseParallaxImage src="/Background Image 4.jpeg" className="absolute inset-0" strength={10} />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-black/50 to-black/20" />
           </div>
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 w-full">
