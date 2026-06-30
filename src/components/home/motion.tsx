@@ -117,7 +117,7 @@ export function ParallaxImage({
         className={
           zoomed
             ? `absolute inset-0 w-full h-full object-cover object-center will-change-transform ${imgClassName}`
-            : `absolute left-0 top-[-18%] w-full h-[136%] object-cover object-center will-change-transform ${imgClassName}`
+            : `absolute left-0 top-[-30%] w-full h-[160%] object-cover object-center will-change-transform ${imgClassName}`
         }
       />
       {overlay && <div className={`absolute inset-0 ${overlay}`} />}

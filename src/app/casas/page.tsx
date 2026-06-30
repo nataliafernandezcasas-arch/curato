@@ -4,7 +4,7 @@ import Link from "next/link";
 import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { motion } from "framer-motion";
-import { ParallaxImage } from "@/components/home/motion";
+import { ParallaxImage, MouseParallaxImage } from "@/components/home/motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 
@@ -27,7 +27,7 @@ export default function ComerciosPage() {
         {/* HERO */}
         <section className="relative min-h-[92vh] flex items-end pt-36 pb-20 overflow-hidden">
           <div className="absolute inset-0">
-            <img src="/Background Image 8.jpeg" alt="" className="w-full h-full object-cover object-center" />
+            <MouseParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={7} />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-black/50 to-black/20" />
           </div>
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 w-full">
@@ -63,7 +63,7 @@ export default function ComerciosPage() {
         </section>
 
         {/* PHOTO BREAK */}
-        <ParallaxImage src="/Background Image 6.jpeg" className="h-[60vh]" strength={110} overlay="bg-black/30" />
+        <ParallaxImage src="/Background Image 6.jpeg" className="h-[60vh]" strength={135} overlay="bg-black/30" />
 
         {/* WHAT YOU RECEIVE */}
         <section className="py-28 px-5 bg-charcoal-deep border-t border-border">
@@ -85,8 +85,8 @@ export default function ComerciosPage() {
 
         {/* PHOTO PAIR */}
         <section className="grid grid-cols-2 h-[75vh]">
-          <ParallaxImage src="/Hotelerie.jpeg" className="h-full" strength={75} overlay="bg-black/20" />
-          <ParallaxImage src="/Conscience.jpeg" className="h-full" strength={120} overlay="bg-black/20" />
+          <ParallaxImage src="/Hotelerie.jpeg" className="h-full" strength={120} overlay="bg-black/20" />
+          <ParallaxImage src="/Conscience.jpeg" className="h-full" strength={165} overlay="bg-black/20" />
         </section>
 
         {/* WHY CURATO */}
@@ -111,10 +111,7 @@ export default function ComerciosPage() {
 
         {/* QUOTE */}
         <section className="relative py-36 overflow-hidden">
-          <div className="absolute inset-0">
-            <img src="/Background Image 5.jpeg" alt="" className="w-full h-full object-cover object-center" />
-            <div className="absolute inset-0 bg-black/65" />
-          </div>
+          <ParallaxImage src="/Background Image 5.jpeg" className="absolute inset-0" strength={130} overlay="bg-black/65" />
           <div className="relative z-10 max-w-[900px] mx-auto px-5 text-center">
             <motion.p {...fade()} className="font-serif text-3xl md:text-5xl font-light tracking-[0.28em] leading-[1.3] text-text-primary">
               {t.quote}
@@ -124,10 +121,7 @@ export default function ComerciosPage() {
 
         {/* CTA */}
         <section className="relative py-36 overflow-hidden">
-          <div className="absolute inset-0">
-            <img src="/Background Image 8.jpeg" alt="" className="w-full h-full object-cover object-center" />
-            <div className="absolute inset-0 bg-black/65" />
-          </div>
+          <MouseParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={10} overlay="bg-black/65" />
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 text-center">
             <motion.h2 {...fade()} className="font-serif text-4xl md:text-6xl font-light tracking-[0.35em] uppercase leading-[1.1] text-text-primary mb-6">
               {t.ctaTitle}

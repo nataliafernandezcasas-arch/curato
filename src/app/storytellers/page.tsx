@@ -27,7 +27,7 @@ export default function CreadoresPage() {
         {/* HERO */}
         <section className="relative min-h-[92vh] flex items-end pt-36 pb-20 overflow-hidden">
           <div className="absolute inset-0">
-            <img src="/Background Image 4.jpeg" alt="" className="w-full h-full object-cover object-center" />
+            <MouseParallaxImage src="/Background Image 4.jpeg" className="absolute inset-0" strength={7} />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-black/50 to-black/20" />
           </div>
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 w-full">
@@ -92,7 +92,7 @@ export default function CreadoresPage() {
         <ParallaxImage
           src="/creadores-break.jpeg"
           className="h-[60vh]"
-          strength={110}
+          strength={135}
           overlay="bg-black/25"
         />
 
@@ -121,7 +121,7 @@ export default function CreadoresPage() {
 
         {/* QUOTE */}
         <section className="relative py-36 overflow-hidden">
-          <ParallaxImage src="/verde.jpg" className="absolute inset-0" strength={22} zoom={1.7} overlay="bg-black/55" />
+          <ParallaxImage src="/verde.jpg" className="absolute inset-0" strength={32} zoom={1.7} overlay="bg-black/55" />
           <div className="relative z-10 max-w-[900px] mx-auto px-5 text-center">
             <motion.p {...fade()} className="font-serif text-3xl md:text-5xl font-light tracking-[0.28em] leading-[1.3] text-champagne italic">
               {`"${t.quoteText}"`}
@@ -131,7 +131,7 @@ export default function CreadoresPage() {
 
         {/* CTA */}
         <section className="relative py-36 overflow-hidden">
-          <MouseParallaxImage src="/Background Image 4.jpeg" className="absolute inset-0" strength={8} overlay="bg-black/65" />
+          <MouseParallaxImage src="/Background Image 4.jpeg" className="absolute inset-0" strength={10} overlay="bg-black/65" />
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 text-center">
             <motion.h2 {...fade()} className="font-serif text-4xl md:text-6xl font-light tracking-[0.35em] uppercase leading-[1.1] text-text-primary mb-6">
               {t.ctaTitle}

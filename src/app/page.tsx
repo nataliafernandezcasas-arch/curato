@@ -4,7 +4,7 @@ import Link from "next/link";
 import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { motion } from "framer-motion";
-import { ParallaxImage, RevealLine } from "@/components/home/motion";
+import { ParallaxImage, MouseParallaxImage, RevealLine } from "@/components/home/motion";
 import { ArrowRight } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
@@ -42,7 +42,7 @@ export default function Home() {
             transition={{ duration: 1.6 }}
             className="absolute inset-0"
           >
-            <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
+            <MouseParallaxImage src="/hero-floral.jpeg" className="absolute inset-0" strength={7} />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep/80 via-charcoal-deep/25 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-charcoal-deep/45 to-transparent" />
           </motion.div>
@@ -94,7 +94,7 @@ export default function Home() {
         <ParallaxImage
           src="/Background Image 4.jpeg"
           className="w-full h-[70vh] md:h-[90vh]"
-          strength={90}
+          strength={150}
           overlay="bg-charcoal-deep/30"
           caption={
             <div className="absolute bottom-10 left-0 right-0 text-center z-10">
@@ -133,8 +133,8 @@ export default function Home() {
 
         {/* ── PHOTO PAIR ── */}
         <section className="grid grid-cols-2 h-[60vh] md:h-[80vh]">
-          <ParallaxImage src="/Background Image 7.jpeg" className="h-full" strength={70} overlay="bg-charcoal-deep/20" />
-          <ParallaxImage src="/Background Image 3.jpeg" className="h-full" strength={110} overlay="bg-charcoal-deep/20" />
+          <ParallaxImage src="/Background Image 7.jpeg" className="h-full" strength={115} overlay="bg-charcoal-deep/20" />
+          <ParallaxImage src="/Background Image 3.jpeg" className="h-full" strength={155} overlay="bg-charcoal-deep/20" />
         </section>
 
         {/* ── MANIFESTE ── */}
@@ -198,7 +198,7 @@ export default function Home() {
 
         {/* ── QUOTE ── */}
         <section className="relative h-[75vh] md:h-[95vh] overflow-hidden flex items-center justify-center">
-          <ParallaxImage src="/Background Image 6.jpeg" className="absolute inset-0" strength={110} overlay="bg-charcoal-deep/55" />
+          <ParallaxImage src="/Background Image 6.jpeg" className="absolute inset-0" strength={155} overlay="bg-charcoal-deep/55" />
           <div className="relative z-10 text-center px-5 max-w-[700px] mx-auto">
             <motion.p {...fade()} className="font-serif text-[11px] font-light tracking-[0.4em] uppercase text-champagne/50 mb-8">
               {t.visionLabel}
@@ -236,14 +236,14 @@ export default function Home() {
 
         {/* ── MOSAÏQUE ── */}
         <section className="grid grid-cols-12 h-[70vh] md:h-[85vh]">
-          <ParallaxImage src="/Background image 1.jpeg" className="col-span-5 h-full" strength={70} />
-          <ParallaxImage src="/Background Image 5.jpeg" className="col-span-4 h-full" strength={130} imgClassName="object-top" />
-          <ParallaxImage src="/Background Image 8.jpeg" className="col-span-3 h-full" strength={95} />
+          <ParallaxImage src="/Background image 1.jpeg" className="col-span-5 h-full" strength={115} />
+          <ParallaxImage src="/Background Image 5.jpeg" className="col-span-4 h-full" strength={175} imgClassName="object-top" />
+          <ParallaxImage src="/Background Image 8.jpeg" className="col-span-3 h-full" strength={145} />
         </section>
 
         {/* ── CTA FINAL ── */}
         <section className="relative py-36 md:py-48 overflow-hidden">
-          <ParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={90} overlay="bg-charcoal-deep/75" />
+          <ParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={130} overlay="bg-charcoal-deep/75" />
           <div className="relative z-10 max-w-[1200px] mx-auto px-5">
             <motion.div {...fade()} className="flex flex-col md:flex-row items-start md:items-end justify-between gap-12">
               <div className="max-w-[520px]">

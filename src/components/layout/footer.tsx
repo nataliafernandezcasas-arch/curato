@@ -22,8 +22,8 @@ export default function Footer() {
   const sx = useSpring(mx, { stiffness: 60, damping: 20 });
   const sy = useSpring(my, { stiffness: 60, damping: 20 });
   // Image drifts a few % opposite the cursor for a parallax feel.
-  const imgX = useTransform(sx, [0, 1], ["3%", "-3%"]);
-  const imgY = useTransform(sy, [0, 1], ["3%", "-3%"]);
+  const imgX = useTransform(sx, [0, 1], ["6%", "-6%"]);
+  const imgY = useTransform(sy, [0, 1], ["6%", "-6%"]);
 
   function onMove(e: React.MouseEvent) {
     const rect = ref.current?.getBoundingClientRect();
@@ -48,7 +48,7 @@ export default function Footer() {
         <motion.img
           src="/footer-floral.jpeg"
           alt=""
-          style={{ x: imgX, y: imgY, scale: 1.12 }}
+          style={{ x: imgX, y: imgY, scale: 1.2 }}
           className="w-full h-full object-cover object-center will-change-transform"
         />
         <div className="absolute inset-0 bg-charcoal-deep/60" />
