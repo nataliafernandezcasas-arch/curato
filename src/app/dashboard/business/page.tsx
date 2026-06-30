@@ -175,10 +175,16 @@ export default function MaisonDashboard() {
           {tab === "profile" ? t.tabProfile : t.kicker}
         </p>
         <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.12em] uppercase text-white leading-none mb-3">
-          {tab === "profile" ? maisonName || t.tabProfile : t.title}
+          {tab === "profile"
+            ? maisonName || t.tabProfile
+            : tab === "directory"
+            ? t.directoryTitle
+            : t.title}
         </h1>
         {tab !== "profile" && (
-          <p className="font-serif text-[14px] font-light text-white/55 mb-8">{t.subtitle}</p>
+          <p className="font-serif text-[14px] font-light text-white/55 mb-8">
+            {tab === "directory" ? t.directorySubtitle : t.subtitle}
+          </p>
         )}
 
         {/* Tabs */}
