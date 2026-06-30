@@ -2,10 +2,30 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SignOut } from "@phosphor-icons/react";
+import { SignOut, GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import MaisonProfile from "./maison-profile";
+
+// Category UUID (migration 009) → translation key in the `dashboard` section.
+const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness" | "catBeauty"> = {
+  "00000000-0000-0000-0000-0000000ca701": "catHotels",
+  "00000000-0000-0000-0000-0000000ca702": "catGastronomy",
+  "00000000-0000-0000-0000-0000000ca703": "catWellness",
+  "00000000-0000-0000-0000-0000000ca704": "catBeauty",
+};
+
+type MaisonCard = {
+  id: string;
+  name: string;
+  photos: string[];
+  description: string;
+  website: string;
+  instagram: string;
+  arrondissement: string | null;
+  address: string | null;
+  categoryId: string | null;
+};
 
 const LANGS: { key: Lang; label: string }[] = [
   { key: "fr", label: "FR" },
@@ -41,13 +61,22 @@ export default function MaisonDashboard() {
   const { lang, setLang } = useLang();
   const t = translations[lang].business;
 
-  const [tab, setTab] = useState<"roster" | "visitors" | "profile">("roster");
+  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory">("roster");
   const [roster, setRoster] = useState<RosterItem[]>([]);
   const [maisonName, setMaisonName] = useState("");
   const [loading, setLoading] = useState(true);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [visitorsLoaded, setVisitorsLoaded] = useState(false);
   const [visitorsLoading, setVisitorsLoading] = useState(false);
+  const [directory, setDirectory] = useState<MaisonCard[]>([]);
+  const [directoryLoaded, setDirectoryLoaded] = useState(false);
+  const [directoryLoading, setDirectoryLoading] = useState(false);
+  const [selected, setSelected] = useState<MaisonCard | null>(null);
+
+  function placeOf(m: MaisonCard): string {
+    const cat = m.categoryId ? translations[lang].dashboard[CATEGORY_KEY[m.categoryId]] : "";
+    return [m.arrondissement ? `Paris ${m.arrondissement}` : "Paris", cat].filter(Boolean).join(" · ");
+  }
 
   useEffect(() => {
     async function load() {
@@ -77,6 +106,19 @@ export default function MaisonDashboard() {
         setVisitorsLoading(false);
       });
   }, [tab, visitorsLoaded]);
+
+  useEffect(() => {
+    if (tab !== "directory" || directoryLoaded) return;
+    setDirectoryLoading(true);
+    fetch("/api/maison/directory")
+      .then((r) => r.json())
+      .then((d) => setDirectory(d.maisons ?? []))
+      .catch(() => setDirectory([]))
+      .finally(() => {
+        setDirectoryLoaded(true);
+        setDirectoryLoading(false);
+      });
+  }, [tab, directoryLoaded]);
 
   function fmtDate(iso: string): string {
     return new Date(iso).toLocaleDateString(lang, {
@@ -141,7 +183,7 @@ export default function MaisonDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8">
-          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["profile", t.tabProfile]] as const).map(([key, label]) => (
+          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["profile", t.tabProfile]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -206,6 +248,39 @@ export default function MaisonDashboard() {
           )
         ) : tab === "profile" ? (
           <MaisonProfile t={t} lang={lang} />
+        ) : tab === "directory" ? (
+          directoryLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-charcoal-deep/60 border border-white/8 h-72 animate-pulse" />
+              ))}
+            </div>
+          ) : directory.length === 0 ? (
+            <div className="text-center py-24 border border-white/10">
+              <p className="font-serif text-[15px] font-light text-white/55">{t.directoryEmpty}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {directory.map((m) => (
+                <button
+                  key={m.id}
+                  onClick={() => setSelected(m)}
+                  className="text-left group border border-white/10 bg-charcoal-deep/60 overflow-hidden hover:border-champagne/30 transition-colors"
+                >
+                  <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
+                    {m.photos[0] && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.photos[0]} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    )}
+                  </div>
+                  <div className="p-5">
+                    <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60 mb-1">{placeOf(m)}</p>
+                    <h3 className="font-serif text-[18px] font-light text-white">{m.name}</h3>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )
         ) : visitorsLoading ? (
           <div className="space-y-8">
             {[1, 2].map((i) => (
@@ -247,6 +322,69 @@ export default function MaisonDashboard() {
           </div>
         )}
       </div>
+
+      {/* Maison profile modal (directory) */}
+      {selected && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 sm:p-8"
+          onClick={() => setSelected(null)}
+        >
+          <div className="relative w-full max-w-[680px] bg-charcoal-deep border border-white/10 my-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setSelected(null)}
+              aria-label="Fermer"
+              className="absolute top-3 right-3 z-10 p-2 bg-black/50 text-white/70 hover:text-white transition-colors"
+            >
+              <X size={18} />
+            </button>
+            <div className="relative aspect-[16/9] bg-charcoal-mid">
+              {selected.photos[0] && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={selected.photos[0]} alt="" className="w-full h-full object-cover" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-charcoal-deep/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/70 mb-1">{placeOf(selected)}</p>
+                <h3 className="font-serif text-[26px] font-light tracking-[0.12em] uppercase text-white leading-none">{selected.name}</h3>
+              </div>
+            </div>
+            <div className="p-6 space-y-6">
+              {selected.description && (
+                <p className="font-serif text-[15px] font-light text-white/70 leading-relaxed">{selected.description}</p>
+              )}
+              {selected.photos.length > 1 && (
+                <div className="grid grid-cols-3 gap-1.5">
+                  {selected.photos.slice(1).map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-charcoal-mid">
+                      <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                    </a>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2 border-t border-white/8">
+                {selected.website && (
+                  <a href={selected.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
+                    <GlobeSimple size={15} />
+                    <span className="font-serif text-[13px]">{selected.website.replace(/^https?:\/\//, "")}</span>
+                  </a>
+                )}
+                {selected.instagram.replace(/^@/, "").trim() && (
+                  <a href={`https://instagram.com/${selected.instagram.replace(/^@/, "").trim()}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
+                    <InstagramLogo size={15} />
+                    <span className="font-serif text-[13px]">@{selected.instagram.replace(/^@/, "").trim()}</span>
+                  </a>
+                )}
+                {selected.address && (
+                  <span className="inline-flex items-center gap-2 text-white/45 font-serif text-[13px]">
+                    <MapPin size={14} /> {selected.address}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
