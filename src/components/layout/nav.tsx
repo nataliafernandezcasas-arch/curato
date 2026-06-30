@@ -14,7 +14,7 @@ export default function Nav() {
   const t = translations[lang].nav;
 
   const links = [
-    { href: "/creadores", label: t.creators },
+    { href: "/storytellers", label: t.creators },
     { href: "/casas", label: t.maisons },
   ];
 

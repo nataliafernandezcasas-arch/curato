@@ -73,7 +73,7 @@ export default function Footer() {
             </p>
           </div>
           <div className="flex flex-wrap gap-x-8 gap-y-3 text-[12px] text-text-primary/80 font-light tracking-widest">
-            <Link href="/creadores" className={linkCls}>{t.nav.creators}</Link>
+            <Link href="/storytellers" className={linkCls}>{t.nav.creators}</Link>
             <Link href="/casas" className={linkCls}>{t.nav.maisons}</Link>
             <Link href="/auth/sign-in" className={linkCls}>{t.nav.access}</Link>
             <Link href="/faq" className={linkCls}>{t.footer.faq}</Link>
