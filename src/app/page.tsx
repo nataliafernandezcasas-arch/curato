@@ -80,7 +80,7 @@ export default function Home() {
               transition={{ delay: 1.2, duration: 0.8 }}
               className="flex flex-wrap gap-4"
             >
-              <Link href="/creadores" className="group inline-flex items-center gap-3 bg-champagne text-charcoal-deep font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:bg-copper hover:text-white transition-all duration-400">
+              <Link href="/storytellers" className="group inline-flex items-center gap-3 bg-champagne text-charcoal-deep font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:bg-copper hover:text-white transition-all duration-400">
                 {t.ctaCreator} <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link href="/casas" className="inline-flex items-center gap-3 border border-champagne/30 text-champagne font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:border-champagne/60 hover:bg-champagne/5 transition-all duration-400">
@@ -170,7 +170,7 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/creadores" className="group/link inline-flex items-center gap-2 font-serif text-[12px] font-light tracking-widest uppercase text-champagne hover:text-copper transition-colors">
+                <Link href="/storytellers" className="group/link inline-flex items-center gap-2 font-serif text-[12px] font-light tracking-widest uppercase text-champagne hover:text-copper transition-colors">
                   {t.learnMore} <ArrowRight size={13} className="group-hover/link:translate-x-0.5 transition-transform" />
                 </Link>
               </motion.div>
@@ -256,7 +256,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col gap-3 shrink-0">
-                <Link href="/creadores" className="group inline-flex items-center gap-3 bg-champagne text-charcoal-deep font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:bg-copper hover:text-white transition-all duration-400">
+                <Link href="/storytellers" className="group inline-flex items-center gap-3 bg-champagne text-charcoal-deep font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:bg-copper hover:text-white transition-all duration-400">
                   {t.ctaCreatorBtn} <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                 </Link>
                 <Link href="/casas" className="inline-flex items-center gap-3 border border-champagne/25 text-champagne/70 font-serif text-[13px] font-light tracking-widest uppercase px-8 py-4 hover:border-champagne/50 hover:text-champagne transition-all duration-400">

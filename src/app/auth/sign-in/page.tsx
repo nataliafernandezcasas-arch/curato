@@ -236,7 +236,7 @@ export default function SignInPage() {
         {mode === "signin" && (
           <p className="text-center mt-10 font-serif text-[12px] font-light text-text-muted tracking-wide">
             {t.notMember}{" "}
-            <Link href="/creadores" className="text-champagne hover:text-copper transition-colors">
+            <Link href="/storytellers" className="text-champagne hover:text-copper transition-colors">
               {t.requestInvite}
             </Link>
           </p>
