@@ -205,7 +205,7 @@ export default function MaisonDashboard() {
             </div>
           )
         ) : tab === "profile" ? (
-          <MaisonProfile t={t} />
+          <MaisonProfile t={t} lang={lang} />
         ) : visitorsLoading ? (
           <div className="space-y-8">
             {[1, 2].map((i) => (

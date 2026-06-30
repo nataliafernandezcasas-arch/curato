@@ -8,7 +8,7 @@ const BUCKET = "maison-photos";
 async function getMaison(adminClient: ReturnType<typeof createAdminClient>, userId: string, email: string) {
   const { data } = await adminClient
     .from("comercios")
-    .select("id, name, description, photos, website_url, contact_instagram")
+    .select("id, name, description, photos, website_url, contact_instagram, arrondissement, address, category_id")
     .or(`owner_id.eq.${userId},email.eq.${email.toLowerCase()}`)
     .maybeSingle();
   return data;
@@ -30,6 +30,9 @@ export async function GET() {
       photos: maison.photos ?? [],
       website: maison.website_url ?? "",
       instagram: maison.contact_instagram ?? "",
+      arrondissement: maison.arrondissement ?? null,
+      address: maison.address ?? null,
+      categoryId: maison.category_id ?? null,
     });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
