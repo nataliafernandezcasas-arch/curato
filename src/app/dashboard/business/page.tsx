@@ -94,7 +94,7 @@ export default function MaisonDashboard() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-charcoal-deep">
+    <div className="min-h-[100dvh]">
       {/* Nav */}
       <nav className="border-b border-white/10 px-5 h-14 flex items-center bg-black/30 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-[1100px] mx-auto w-full flex items-center justify-between">
