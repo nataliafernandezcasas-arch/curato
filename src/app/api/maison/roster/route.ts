@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPhylloAccounts, getPhylloProfile } from "@/lib/phyllo/client";
+import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
 
 // Content-type survey slugs → display labels (FR).
 const CONTENT_LABELS: Record<string, string> = {
@@ -61,11 +61,12 @@ export async function GET() {
       );
     }
 
-    // Profile photos live in Phyllo, not our DB. Fetch them for connected
-    // creators in parallel; best-effort, so a slow/absent Phyllo just yields no
-    // photo (the UI falls back to an initials monogram). Non-connected demo
-    // creators have no photo source at all.
-    const avatarById = new Map<string, string>();
+    // Photo, bio, reach and latest posts live in Phyllo, not our DB. Fetch them
+    // for connected creators in parallel; best-effort, so a slow/absent Phyllo
+    // just yields no extras (the UI falls back to an initials monogram). The
+    // non-connected demo creators have no Phyllo source.
+    type Extra = { avatar: string | null; bio: string | null; avgReach: number | null; posts3: { url: string | null; thumbnail: string | null }[] };
+    const extraById = new Map<string, Extra>();
     await Promise.all(
       rows
         .filter((c) => c.instagram_connected && c.phyllo_account_id)
@@ -74,17 +75,26 @@ export async function GET() {
             const accounts = await getPhylloAccounts(c.phyllo_account_id as string);
             const account = accounts?.data?.[0];
             if (!account?.id) return;
-            const profileRes = await getPhylloProfile(account.id);
-            const img = profileRes?.data?.[0]?.image_url;
-            if (typeof img === "string" && img) avatarById.set(c.id as string, img);
+            const [profileRes, contentsRes] = await Promise.all([
+              getPhylloProfile(account.id),
+              getPhylloContents(account.id, 50),
+            ]);
+            const { metrics } = summarizeMetrics(profileRes?.data?.[0], contentsRes?.data ?? [], "");
+            extraById.set(c.id as string, {
+              avatar: metrics.imageUrl,
+              bio: metrics.bio,
+              avgReach: metrics.avgReach,
+              posts3: metrics.recentPosts.slice(0, 3).map((p) => ({ url: p.url, thumbnail: p.thumbnail })),
+            });
           } catch {
-            /* leave photo empty */
+            /* leave extras empty */
           }
         })
     );
 
     const roster = rows.map((c) => {
       const er = c.engagement_rate as number | null;
+      const x = extraById.get(c.id as string);
       return {
         id: c.id as string,
         name: (c.full_name as string | null) || (c.handle ? `@${c.handle}` : "—"),
@@ -95,7 +105,10 @@ export async function GET() {
         igConnected: Boolean(c.instagram_connected),
         // engagement_rate is stored as a fraction (0.05 = 5%); expose the %.
         engagement: er != null ? Math.round(er * 1000) / 10 : null,
-        avatar: avatarById.get(c.id as string) ?? null,
+        avatar: x?.avatar ?? null,
+        bio: x?.bio ?? null,
+        avgReach: x?.avgReach ?? null,
+        posts3: x?.posts3 ?? [],
       };
     });
 
