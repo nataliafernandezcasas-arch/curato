@@ -63,6 +63,20 @@ export async function getPhylloContents(accountId: string, limit = 50) {
   );
 }
 
+// One recent publication, with its own performance figures.
+export type PostSummary = {
+  url: string | null;
+  thumbnail: string | null;
+  type: string | null; // FEED / REELS / IMAGE / VIDEO ...
+  caption: string | null;
+  likes: number | null;
+  comments: number | null;
+  reach: number | null;
+  views: number | null;
+  publishedAt: string | null;
+  sponsored: boolean;
+};
+
 // The metrics a maison sees on a storyteller, derived from the Phyllo profile +
 // recent content. Reach is the clearest "visibility" signal; engagement is the
 // audience-quality signal. Stories are excluded so likes/comments are comparable.
@@ -70,15 +84,19 @@ export type StorytellerMetrics = {
   imageUrl: string | null;
   bio: string | null;
   website: string | null;
+  fullName: string | null;
   isBusiness: boolean;
+  isVerified: boolean;
   followers: number | null;
   following: number | null;
   posts: number | null;
   engagementPct: number | null; // (likes + comments) / followers, feed posts
   avgReach: number | null; // avg organic reach per feed post
+  avgViews: number | null; // avg views per feed post (reels/video)
   avgLikes: number | null;
   avgComments: number | null;
   postsSampled: number;
+  recentPosts: PostSummary[];
   syncedAt: string;
 };
 
@@ -96,6 +114,8 @@ export function summarizeMetrics(
   let comments = 0;
   let reachSum = 0;
   let reachN = 0;
+  let viewsSum = 0;
+  let viewsN = 0;
   for (const it of feed) {
     const e = (it.engagement ?? {}) as Record<string, number | null>;
     likes += e.like_count ?? 0;
@@ -104,13 +124,39 @@ export function summarizeMetrics(
       reachSum += e.reach_organic_count;
       reachN += 1;
     }
+    if (e.view_count != null) {
+      viewsSum += e.view_count;
+      viewsN += 1;
+    }
   }
   const n = feed.length;
   const avgLikes = n ? Math.round(likes / n) : null;
   const avgComments = n ? Math.round(comments / n) : null;
   const avgReach = reachN ? Math.round(reachSum / reachN) : null;
+  const avgViews = viewsN ? Math.round(viewsSum / viewsN) : null;
   const engagementRate =
     n && followers ? (likes + comments) / n / followers : null;
+
+  // Newest first; keep the 12 most recent feed publications for the gallery.
+  const recentPosts: PostSummary[] = feed
+    .slice()
+    .sort((a, b) => String(b.published_at ?? "").localeCompare(String(a.published_at ?? "")))
+    .slice(0, 12)
+    .map((it) => {
+      const e = (it.engagement ?? {}) as Record<string, number | null>;
+      return {
+        url: (it.url as string | null) ?? null,
+        thumbnail: (it.thumbnail_url as string | null) ?? (it.media_url as string | null) ?? null,
+        type: (it.type as string | null) ?? null,
+        caption: (it.title as string | null) ?? (it.description as string | null) ?? null,
+        likes: e.like_count ?? null,
+        comments: e.comment_count ?? null,
+        reach: e.reach_organic_count ?? null,
+        views: e.view_count ?? null,
+        publishedAt: (it.published_at as string | null) ?? null,
+        sponsored: Boolean(it.sponsored),
+      };
+    });
 
   return {
     engagementRate,
@@ -118,15 +164,19 @@ export function summarizeMetrics(
       imageUrl: (profile?.image_url as string | null) ?? null,
       bio: (profile?.introduction as string | null) ?? null,
       website: (profile?.website as string | null) ?? null,
+      fullName: (profile?.full_name as string | null) ?? null,
       isBusiness: Boolean(profile?.is_business),
+      isVerified: Boolean(profile?.is_verified),
       followers,
       following: (rep.following_count as number | null) ?? null,
       posts: (rep.content_count as number | null) ?? null,
       engagementPct: engagementRate != null ? Math.round(engagementRate * 1000) / 10 : null,
       avgReach,
+      avgViews,
       avgLikes,
       avgComments,
       postsSampled: n,
+      recentPosts,
       syncedAt: nowIso,
     },
   };
