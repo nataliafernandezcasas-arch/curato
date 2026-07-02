@@ -7,6 +7,7 @@ import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import MaisonProfile from "./maison-profile";
 import MaisonOffer from "./maison-offer";
+import type { StorytellerMetrics } from "@/lib/phyllo/client";
 
 // Category UUID (migration 009) → translation key in the `dashboard` section.
 const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness" | "catBeauty"> = {
@@ -77,6 +78,26 @@ export default function MaisonDashboard() {
   const [directoryLoaded, setDirectoryLoaded] = useState(false);
   const [directoryLoading, setDirectoryLoading] = useState(false);
   const [selected, setSelected] = useState<MaisonCard | null>(null);
+  const [teller, setTeller] = useState<RosterItem | null>(null);
+  const [tellerMetrics, setTellerMetrics] = useState<StorytellerMetrics | null>(null);
+  const [tellerLoading, setTellerLoading] = useState(false);
+  const [tellerConnected, setTellerConnected] = useState(true);
+
+  function openTeller(c: RosterItem) {
+    setTeller(c);
+    setTellerMetrics(null);
+    setTellerConnected(c.igConnected);
+    if (!c.igConnected) return;
+    setTellerLoading(true);
+    fetch(`/api/maison/storyteller/${c.id}`)
+      .then((r) => r.json())
+      .then((d) => {
+        setTellerConnected(Boolean(d.connected));
+        setTellerMetrics(d.metrics ?? null);
+      })
+      .catch(() => setTellerMetrics(null))
+      .finally(() => setTellerLoading(false));
+  }
 
   function placeOf(m: MaisonCard): string {
     const cat = m.categoryId ? translations[lang].dashboard[CATEGORY_KEY[m.categoryId]] : "";
@@ -226,7 +247,11 @@ export default function MaisonDashboard() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5">
               {roster.map((c) => (
-                <div key={c.id} className="bg-charcoal-deep p-6">
+                <div
+                  key={c.id}
+                  onClick={() => openTeller(c)}
+                  className="bg-charcoal-deep p-6 cursor-pointer hover:bg-white/[0.03] transition-colors"
+                >
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
@@ -246,6 +271,7 @@ export default function MaisonDashboard() {
                           href={`https://instagram.com/${c.handle}`}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
                           className="font-serif text-[13px] text-champagne/70 hover:text-champagne transition-colors"
                         >
                           @{c.handle}
@@ -420,6 +446,115 @@ export default function MaisonDashboard() {
                   </span>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Storyteller metrics modal */}
+      {teller && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 sm:p-8"
+          onClick={() => setTeller(null)}
+        >
+          <div className="relative w-full max-w-[560px] bg-charcoal-deep border border-white/10 my-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setTeller(null)}
+              aria-label="Fermer"
+              className="absolute top-3 right-3 z-10 p-2 bg-black/40 text-white/70 hover:text-white transition-colors"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="p-6 sm:p-8">
+              {/* Identity */}
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-charcoal-mid shrink-0 border border-white/10">
+                  {tellerMetrics?.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={tellerMetrics.imageUrl} alt="" className="w-full h-full object-cover" />
+                  ) : null}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-serif text-[22px] font-light text-white truncate">{teller.name}</h3>
+                    {teller.igConnected && <InstagramLogo size={15} weight="fill" className="text-champagne/70 shrink-0" />}
+                  </div>
+                  {teller.handle && (
+                    <a
+                      href={`https://instagram.com/${teller.handle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-serif text-[13px] text-champagne/70 hover:text-champagne transition-colors"
+                    >
+                      @{teller.handle}
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Bio */}
+              {tellerMetrics?.bio && (
+                <p className="font-serif text-[14px] font-light text-white/65 leading-relaxed mt-5 whitespace-pre-line">
+                  {tellerMetrics.bio}
+                </p>
+              )}
+
+              {/* Content categories */}
+              {teller.content.length > 0 && (
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {teller.content.map((tag) => (
+                    <span key={tag} className="font-serif text-[11px] tracking-wide text-white/70 border border-white/12 px-3 py-1">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Metrics */}
+              {!teller.igConnected ? (
+                <p className="font-serif text-[13px] font-light text-white/45 mt-6 italic">{t.stNotConnected}</p>
+              ) : tellerLoading ? (
+                <div className="grid grid-cols-2 gap-px bg-white/5 mt-6">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="bg-charcoal-deep h-20 animate-pulse" />
+                  ))}
+                </div>
+              ) : tellerMetrics ? (
+                <>
+                  <div className="grid grid-cols-2 gap-px bg-white/8 mt-6">
+                    <div className="bg-charcoal-deep p-4">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.followers}</p>
+                      <p className="font-serif text-[24px] font-light text-white/90 mt-1">{formatFollowers(tellerMetrics.followers)}</p>
+                    </div>
+                    <div className="bg-charcoal-deep p-4">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stReach}</p>
+                      <p className="font-serif text-[24px] font-light text-champagne mt-1">
+                        {tellerMetrics.avgReach != null ? formatFollowers(tellerMetrics.avgReach) : "—"}
+                      </p>
+                      <p className="font-serif text-[10px] text-white/40 mt-0.5">{t.stPerPost}</p>
+                    </div>
+                    <div className="bg-charcoal-deep p-4">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.engagement}</p>
+                      <p className="font-serif text-[24px] font-light text-white/90 mt-1">
+                        {tellerMetrics.engagementPct != null ? `${tellerMetrics.engagementPct}%` : "—"}
+                      </p>
+                      <p className="font-serif text-[10px] text-white/40 mt-0.5">
+                        {t.stLikesComments
+                          .replace("{likes}", String(tellerMetrics.avgLikes ?? 0))
+                          .replace("{comments}", String(tellerMetrics.avgComments ?? 0))}
+                      </p>
+                    </div>
+                    <div className="bg-charcoal-deep p-4">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stPosts}</p>
+                      <p className="font-serif text-[24px] font-light text-white/90 mt-1">{tellerMetrics.posts ?? "—"}</p>
+                    </div>
+                  </div>
+                  <p className="font-serif text-[11px] font-light text-white/40 leading-relaxed mt-4">{t.stHint}</p>
+                </>
+              ) : (
+                <p className="font-serif text-[13px] font-light text-white/45 mt-6 italic">{t.stUnavailable}</p>
+              )}
             </div>
           </div>
         </div>
