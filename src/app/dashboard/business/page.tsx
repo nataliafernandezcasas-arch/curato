@@ -500,6 +500,24 @@ export default function MaisonDashboard() {
                 </p>
               )}
 
+              {/* Website + account type */}
+              {(tellerMetrics?.website || tellerMetrics?.isBusiness || tellerMetrics?.isVerified) && (
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4">
+                  {tellerMetrics?.website && (
+                    <a href={tellerMetrics.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
+                      <GlobeSimple size={14} />
+                      <span className="font-serif text-[13px]">{tellerMetrics.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
+                    </a>
+                  )}
+                  {tellerMetrics?.isVerified && (
+                    <span className="font-serif text-[11px] tracking-[0.15em] uppercase text-champagne/70">{t.stVerifiedBadge}</span>
+                  )}
+                  {tellerMetrics?.isBusiness && (
+                    <span className="font-serif text-[11px] tracking-[0.15em] uppercase text-white/45">{t.stBusiness}</span>
+                  )}
+                </div>
+              )}
+
               {/* Content categories */}
               {teller.content.length > 0 && (
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -522,21 +540,29 @@ export default function MaisonDashboard() {
                 </div>
               ) : tellerMetrics ? (
                 <>
-                  <div className="grid grid-cols-2 gap-px bg-white/8 mt-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-white/8 mt-6">
                     <div className="bg-charcoal-deep p-4">
                       <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.followers}</p>
-                      <p className="font-serif text-[24px] font-light text-white/90 mt-1">{formatFollowers(tellerMetrics.followers)}</p>
+                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">{formatFollowers(tellerMetrics.followers)}</p>
+                    </div>
+                    <div className="bg-charcoal-deep p-4">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stFollowing}</p>
+                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">{formatFollowers(tellerMetrics.following)}</p>
+                    </div>
+                    <div className="bg-charcoal-deep p-4">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stPosts}</p>
+                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">{tellerMetrics.posts ?? "—"}</p>
                     </div>
                     <div className="bg-charcoal-deep p-4">
                       <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stReach}</p>
-                      <p className="font-serif text-[24px] font-light text-champagne mt-1">
+                      <p className="font-serif text-[22px] font-light text-champagne mt-1">
                         {tellerMetrics.avgReach != null ? formatFollowers(tellerMetrics.avgReach) : "—"}
                       </p>
                       <p className="font-serif text-[10px] text-white/40 mt-0.5">{t.stPerPost}</p>
                     </div>
                     <div className="bg-charcoal-deep p-4">
                       <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.engagement}</p>
-                      <p className="font-serif text-[24px] font-light text-white/90 mt-1">
+                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">
                         {tellerMetrics.engagementPct != null ? `${tellerMetrics.engagementPct}%` : "—"}
                       </p>
                       <p className="font-serif text-[10px] text-white/40 mt-0.5">
@@ -546,11 +572,49 @@ export default function MaisonDashboard() {
                       </p>
                     </div>
                     <div className="bg-charcoal-deep p-4">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stPosts}</p>
-                      <p className="font-serif text-[24px] font-light text-white/90 mt-1">{tellerMetrics.posts ?? "—"}</p>
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stViews}</p>
+                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">
+                        {tellerMetrics.avgViews != null ? formatFollowers(tellerMetrics.avgViews) : "—"}
+                      </p>
+                      <p className="font-serif text-[10px] text-white/40 mt-0.5">{t.stPerPost}</p>
                     </div>
                   </div>
                   <p className="font-serif text-[11px] font-light text-white/40 leading-relaxed mt-4">{t.stHint}</p>
+
+                  {/* Recent publications */}
+                  {tellerMetrics.recentPosts.length > 0 && (
+                    <div className="mt-8">
+                      <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/60 mb-4">{t.stRecent}</p>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {tellerMetrics.recentPosts.map((p, i) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <a
+                            key={i}
+                            href={p.url ?? undefined}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative block aspect-square overflow-hidden bg-charcoal-mid"
+                          >
+                            {p.thumbnail && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={p.thumbnail} alt="" className="w-full h-full object-cover" />
+                            )}
+                            {p.sponsored && (
+                              <span className="absolute top-1 left-1 font-serif text-[8px] tracking-[0.15em] uppercase bg-champagne text-charcoal-deep px-1.5 py-0.5">
+                                {t.stSponsored}
+                              </span>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
+                              <div className="font-serif text-[10px] text-white/90 leading-tight">
+                                {p.reach != null && <div className="text-champagne">{formatFollowers(p.reach)} {t.stReachShort}</div>}
+                                <div>♥ {formatFollowers(p.likes)} · {formatFollowers(p.comments)} 💬</div>
+                              </div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <p className="font-serif text-[13px] font-light text-white/45 mt-6 italic">{t.stUnavailable}</p>
