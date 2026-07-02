@@ -45,7 +45,16 @@ type RosterItem = {
   content: string[];
   igConnected: boolean;
   engagement: number | null;
+  avatar: string | null;
 };
+
+// Initials for the monogram fallback when a creator has no Phyllo photo.
+function initials(name: string): string {
+  const parts = name.replace(/^@/, "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "·";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 type Visitor = {
   id: string;
@@ -253,7 +262,16 @@ export default function MaisonDashboard() {
                   className="bg-charcoal-deep p-6 cursor-pointer hover:bg-white/[0.03] transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div>
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-charcoal-mid border border-white/10 flex items-center justify-center">
+                        {c.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={c.avatar} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="font-serif text-[14px] tracking-wide text-champagne/70">{initials(c.name)}</span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-serif text-[18px] font-light text-white">{c.name}</h3>
                         {c.igConnected && (
@@ -277,6 +295,7 @@ export default function MaisonDashboard() {
                           @{c.handle}
                         </a>
                       )}
+                      </div>
                     </div>
                     <div className="flex items-start gap-6 shrink-0 text-right">
                       <div>
