@@ -341,31 +341,6 @@ export default function MaisonDashboard() {
                     </div>
                   )}
 
-                  {/* Bio / profession */}
-                  {c.bio && (
-                    <p className="mt-4 font-serif text-[13px] font-light text-white/60 leading-relaxed line-clamp-2 whitespace-pre-line">
-                      {c.bio}
-                    </p>
-                  )}
-
-                  {/* Why this profile serves a maison */}
-                  {(() => {
-                    const args = whyArguments(c, t);
-                    return args.length ? (
-                      <div className="mt-4">
-                        <p className="font-serif text-[9px] tracking-[0.3em] uppercase text-champagne/50 mb-2">{t.whyTitle}</p>
-                        <ul className="space-y-1">
-                          {args.map((a, i) => (
-                            <li key={i} className="font-serif text-[12px] font-light text-white/65 flex gap-2">
-                              <span className="text-champagne/50">·</span>
-                              <span>{a}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null;
-                  })()}
-
                   {/* 3 latest publications */}
                   {c.posts3.length > 0 && (
                     <div className="mt-4 grid grid-cols-3 gap-1.5">
