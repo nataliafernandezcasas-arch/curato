@@ -22,7 +22,7 @@ export async function GET() {
 
     const { data } = await admin
       .from("comercios")
-      .select("id, name, photos, description, website_url, contact_instagram, arrondissement, address, category_id")
+      .select("id, name, photos, description, description_en, description_es, website_url, contact_instagram, arrondissement, address, category_id")
       .eq("is_reservable", true)
       .order("name");
 
@@ -34,6 +34,8 @@ export async function GET() {
         name: (m.name as string) || "",
         photos: (m.photos as string[] | null) ?? [],
         description: (m.description as string | null) ?? "",
+        descriptionEn: (m.description_en as string | null) ?? "",
+        descriptionEs: (m.description_es as string | null) ?? "",
         website: (m.website_url as string | null) ?? "",
         instagram: (m.contact_instagram as string | null) ?? "",
         arrondissement: (m.arrondissement as string | null) ?? null,
