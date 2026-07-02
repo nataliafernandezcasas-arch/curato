@@ -46,6 +46,9 @@ type RosterItem = {
   igConnected: boolean;
   engagement: number | null;
   avatar: string | null;
+  bio: string | null;
+  avgReach: number | null;
+  posts3: { url: string | null; thumbnail: string | null }[];
 };
 
 // Initials for the monogram fallback when a creator has no Phyllo photo.
@@ -70,6 +73,23 @@ function formatFollowers(n: number | null): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
   return String(n);
+}
+
+type BizStrings = (typeof translations)[Lang]["business"];
+
+// Why this storyteller is worth a maison's attention, built from the data we
+// have. Reach/engagement come from Phyllo (connected creators); audience +
+// content fit work for everyone, so even demo creators get an argument or two.
+function whyArguments(
+  c: { followers: number | null; engagement: number | null; avgReach: number | null; content: string[] },
+  t: BizStrings
+): string[] {
+  const out: string[] = [];
+  if (c.avgReach != null) out.push(t.whyReach.replace("{n}", formatFollowers(c.avgReach)));
+  if (c.engagement != null) out.push(t.whyEngagement.replace("{pct}", String(c.engagement)));
+  if (c.content.length) out.push(t.whyContent.replace("{cats}", c.content.slice(0, 3).join(", ")));
+  if (c.followers) out.push(t.whyAudience.replace("{n}", formatFollowers(c.followers)));
+  return out;
 }
 
 export default function MaisonDashboard() {
@@ -317,6 +337,52 @@ export default function MaisonDashboard() {
                         <span key={tag} className="font-serif text-[11px] tracking-wide text-white/70 border border-white/12 px-3 py-1">
                           {tag}
                         </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Bio / profession */}
+                  {c.bio && (
+                    <p className="mt-4 font-serif text-[13px] font-light text-white/60 leading-relaxed line-clamp-2 whitespace-pre-line">
+                      {c.bio}
+                    </p>
+                  )}
+
+                  {/* Why this profile serves a maison */}
+                  {(() => {
+                    const args = whyArguments(c, t);
+                    return args.length ? (
+                      <div className="mt-4">
+                        <p className="font-serif text-[9px] tracking-[0.3em] uppercase text-champagne/50 mb-2">{t.whyTitle}</p>
+                        <ul className="space-y-1">
+                          {args.map((a, i) => (
+                            <li key={i} className="font-serif text-[12px] font-light text-white/65 flex gap-2">
+                              <span className="text-champagne/50">·</span>
+                              <span>{a}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null;
+                  })()}
+
+                  {/* 3 latest publications */}
+                  {c.posts3.length > 0 && (
+                    <div className="mt-4 grid grid-cols-3 gap-1.5">
+                      {c.posts3.map((p, i) => (
+                        <a
+                          key={i}
+                          href={p.url ?? undefined}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="block aspect-square overflow-hidden bg-charcoal-mid"
+                        >
+                          {p.thumbnail && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.thumbnail} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                          )}
+                        </a>
                       ))}
                     </div>
                   )}
@@ -599,6 +665,27 @@ export default function MaisonDashboard() {
                     </div>
                   </div>
                   <p className="font-serif text-[11px] font-light text-white/40 leading-relaxed mt-4">{t.stHint}</p>
+
+                  {/* Why this profile serves a maison */}
+                  {(() => {
+                    const args = whyArguments(
+                      { followers: tellerMetrics.followers, engagement: tellerMetrics.engagementPct, avgReach: tellerMetrics.avgReach, content: teller.content },
+                      t
+                    );
+                    return args.length ? (
+                      <div className="mt-6 border border-champagne/20 bg-champagne/[0.04] p-5">
+                        <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/70 mb-3">{t.whyTitle}</p>
+                        <ul className="space-y-1.5">
+                          {args.map((a, i) => (
+                            <li key={i} className="font-serif text-[13px] font-light text-white/75 flex gap-2.5">
+                              <span className="text-champagne/60">·</span>
+                              <span>{a}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null;
+                  })()}
 
                   {/* Recent publications */}
                   {tellerMetrics.recentPosts.length > 0 && (
