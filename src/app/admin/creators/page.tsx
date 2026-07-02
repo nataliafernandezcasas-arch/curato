@@ -25,6 +25,8 @@ export default async function AdminCreatorsPage() {
     admin
       .from("creators")
       .select("id, full_name, handle, email, followers, monthly_credit_cop, instagram_connected, engagement_rate, partnership_stage")
+      // Only accepted creators (active members), never prospects/empty imports.
+      .in("stage", ["active", "activo"])
       .order("full_name", { ascending: true }),
     admin.from("reservations").select("creator_id, venue_id, status, slot_start"),
     admin.from("comercios").select("id, name"),
