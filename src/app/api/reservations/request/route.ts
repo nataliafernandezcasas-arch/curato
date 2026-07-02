@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendReservationRequested, sendReservationAdminAlert } from "@/lib/emails";
+import { isOpenSlot } from "@/lib/availability";
 
 // Where new-request alerts are sent (the Curato inbox Natalia manages).
 const ADMIN_INBOX = "hello@curatocollective.com";
@@ -48,11 +49,27 @@ export async function POST(request: NextRequest) {
     // 3. Validate the venue is a live, reservable maison.
     const { data: venue } = await admin
       .from("comercios")
-      .select("id, name, category_id, is_reservable")
+      .select("id, name, category_id, is_reservable, availability, blocked_slots")
       .eq("id", venueId)
       .maybeSingle();
     if (!venue || !venue.is_reservable) {
       return NextResponse.json({ error: "Maison indisponible." }, { status: 404 });
+    }
+
+    // Slot must fall inside the maison's availability (if configured) and not be
+    // blocked or already taken.
+    if (!isOpenSlot(slotStart, venue.availability ?? [], venue.blocked_slots ?? [])) {
+      return NextResponse.json({ error: "Créneau indisponible." }, { status: 409 });
+    }
+    const { data: clash } = await admin
+      .from("reservations")
+      .select("id")
+      .eq("venue_id", venue.id)
+      .eq("slot_start", slotStart)
+      .in("status", ["pending_review", "confirmed"])
+      .maybeSingle();
+    if (clash) {
+      return NextResponse.json({ error: "Créneau déjà réservé." }, { status: 409 });
     }
 
     // 4. Compute the credit cost from the venue's category (hotels bill per night).
