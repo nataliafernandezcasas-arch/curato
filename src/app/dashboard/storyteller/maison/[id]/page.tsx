@@ -6,6 +6,9 @@ import { MapPin, ArrowLeft, SignOut, GlobeSimple, X, CheckCircle } from "@phosph
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT } from "@/lib/launch";
+import { parisParts, AvailWindow } from "@/lib/availability";
+
+type MaisonAvail = { availability: AvailWindow[]; blocked: { date: string }[]; taken: string[] };
 
 const LANGS: { key: Lang; label: string }[] = [
   { key: "fr", label: "FR" },
@@ -56,6 +59,56 @@ function ReserveModal({ maison, onClose, initialSlot }: { maison: Maison; onClos
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [avail, setAvail] = useState<MaisonAvail | null>(null);
+  const [selDate, setSelDate] = useState("");
+
+  useEffect(() => {
+    fetch(`/api/maison/${maison.id}/availability`)
+      .then((r) => r.json())
+      .then((d) => setAvail(d))
+      .catch(() => {});
+  }, [maison.id]);
+
+  // Time-slot booking is used when the maison has weekly windows (and it isn't a
+  // hotel, which books per arrival night). Otherwise the free datetime input.
+  const hasSchedule = !isHotel && (avail?.availability?.length ?? 0) > 0;
+
+  const availDates = (() => {
+    if (!hasSchedule || !avail) return [] as { ymd: string; dow: number; d: Date }[];
+    const days = new Set(avail.availability.map((w) => w.day));
+    const blocked = new Set(avail.blocked.map((b) => b.date));
+    const now = new Date();
+    const list: { ymd: string; dow: number; d: Date }[] = [];
+    for (let i = 0; i < 28; i++) {
+      const d = new Date(now);
+      d.setDate(now.getDate() + i);
+      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      if (days.has(d.getDay()) && !blocked.has(ymd)) list.push({ ymd, dow: d.getDay(), d });
+    }
+    return list;
+  })();
+
+  const slotTimes = (() => {
+    if (!hasSchedule || !avail || !selDate) return [] as { label: string; iso: string }[];
+    const date = availDates.find((x) => x.ymd === selDate);
+    if (!date) return [];
+    const takenKeys = new Set(avail.taken.map((iso) => { const p = parisParts(iso); return `${p.ymd} ${p.hm}`; }));
+    const out: { label: string; iso: string }[] = [];
+    for (const w of avail.availability.filter((x) => x.day === date.dow)) {
+      const [sh, sm] = w.start.split(":").map(Number);
+      const [eh, em] = w.end.split(":").map(Number);
+      for (let mins = sh * 60 + sm; mins < eh * 60 + em; mins += 30) {
+        const hh = String(Math.floor(mins / 60)).padStart(2, "0");
+        const mm = String(mins % 60).padStart(2, "0");
+        const dt = new Date(date.d);
+        dt.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
+        if (dt.getTime() <= Date.now()) continue;
+        if (takenKeys.has(`${selDate} ${hh}:${mm}`)) continue;
+        out.push({ label: `${hh}:${mm}`, iso: dt.toISOString() });
+      }
+    }
+    return out;
+  })();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -119,14 +172,52 @@ function ReserveModal({ maison, onClose, initialSlot }: { maison: Maison; onClos
               <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
                 {isHotel ? t.arrivalDate : t.dateTime}
               </label>
-              <input
-                type="datetime-local"
-                value={slot}
-                onChange={(e) => setSlot(e.target.value)}
-                required
-                step={1800}
-                className="w-full px-5 py-4 border border-border bg-charcoal-deep/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors"
-              />
+              {hasSchedule ? (
+                <>
+                  <select
+                    value={selDate}
+                    onChange={(e) => { setSelDate(e.target.value); setSlot(""); }}
+                    className="w-full px-5 py-4 border border-border bg-charcoal-deep/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors"
+                  >
+                    <option value="">{t.chooseDate}</option>
+                    {availDates.map((d) => (
+                      <option key={d.ymd} value={d.ymd}>
+                        {d.d.toLocaleDateString(lang, { weekday: "long", day: "numeric", month: "long" })}
+                      </option>
+                    ))}
+                  </select>
+                  {selDate &&
+                    (slotTimes.length ? (
+                      <div className="grid grid-cols-4 gap-1.5 mt-3">
+                        {slotTimes.map((ts) => (
+                          <button
+                            key={ts.iso}
+                            type="button"
+                            onClick={() => setSlot(ts.iso)}
+                            className={`font-serif text-[13px] py-2 border transition-colors ${
+                              slot === ts.iso
+                                ? "bg-champagne text-charcoal-deep border-champagne"
+                                : "border-white/15 text-white/70 hover:border-champagne/40 hover:text-champagne"
+                            }`}
+                          >
+                            {ts.label}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="font-serif text-[13px] text-white/45 mt-3">{t.noSlots}</p>
+                    ))}
+                </>
+              ) : (
+                <input
+                  type="datetime-local"
+                  value={slot}
+                  onChange={(e) => setSlot(e.target.value)}
+                  required
+                  step={1800}
+                  className="w-full px-5 py-4 border border-border bg-charcoal-deep/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors"
+                />
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
