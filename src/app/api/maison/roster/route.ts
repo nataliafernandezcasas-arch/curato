@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getPhylloAccounts, getPhylloProfile } from "@/lib/phyllo/client";
 
 // Content-type survey slugs → display labels (FR).
 const CONTENT_LABELS: Record<string, string> = {
@@ -33,7 +34,7 @@ export async function GET() {
     // Signed / accepted creators.
     const { data: creators } = await admin
       .from("creators")
-      .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected")
+      .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id")
       .eq("stage", "active")
       .order("followers", { ascending: false, nullsFirst: false });
 
@@ -60,6 +61,28 @@ export async function GET() {
       );
     }
 
+    // Profile photos live in Phyllo, not our DB. Fetch them for connected
+    // creators in parallel; best-effort, so a slow/absent Phyllo just yields no
+    // photo (the UI falls back to an initials monogram). Non-connected demo
+    // creators have no photo source at all.
+    const avatarById = new Map<string, string>();
+    await Promise.all(
+      rows
+        .filter((c) => c.instagram_connected && c.phyllo_account_id)
+        .map(async (c) => {
+          try {
+            const accounts = await getPhylloAccounts(c.phyllo_account_id as string);
+            const account = accounts?.data?.[0];
+            if (!account?.id) return;
+            const profileRes = await getPhylloProfile(account.id);
+            const img = profileRes?.data?.[0]?.image_url;
+            if (typeof img === "string" && img) avatarById.set(c.id as string, img);
+          } catch {
+            /* leave photo empty */
+          }
+        })
+    );
+
     const roster = rows.map((c) => {
       const er = c.engagement_rate as number | null;
       return {
@@ -72,6 +95,7 @@ export async function GET() {
         igConnected: Boolean(c.instagram_connected),
         // engagement_rate is stored as a fraction (0.05 = 5%); expose the %.
         engagement: er != null ? Math.round(er * 1000) / 10 : null,
+        avatar: avatarById.get(c.id as string) ?? null,
       };
     });
 
