@@ -6,6 +6,7 @@ import { SignOut, GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import MaisonProfile from "./maison-profile";
+import MaisonOffer from "./maison-offer";
 
 // Category UUID (migration 009) → translation key in the `dashboard` section.
 const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness" | "catBeauty"> = {
@@ -61,7 +62,7 @@ export default function MaisonDashboard() {
   const { lang, setLang } = useLang();
   const t = translations[lang].business;
 
-  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory">("roster");
+  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory" | "offer">("roster");
   const [roster, setRoster] = useState<RosterItem[]>([]);
   const [maisonName, setMaisonName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -179,9 +180,11 @@ export default function MaisonDashboard() {
             ? maisonName || t.tabProfile
             : tab === "directory"
             ? t.directoryTitle
+            : tab === "offer"
+            ? t.tabOffer
             : t.title}
         </h1>
-        {tab !== "profile" && (
+        {tab !== "profile" && tab !== "offer" && (
           <p className="font-serif text-[14px] font-light text-white/55 mb-8">
             {tab === "directory" ? t.directorySubtitle : t.subtitle}
           </p>
@@ -189,7 +192,7 @@ export default function MaisonDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8">
-          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["profile", t.tabProfile]] as const).map(([key, label]) => (
+          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["profile", t.tabProfile], ["offer", t.tabOffer]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -254,6 +257,8 @@ export default function MaisonDashboard() {
           )
         ) : tab === "profile" ? (
           <MaisonProfile t={t} lang={lang} />
+        ) : tab === "offer" ? (
+          <MaisonOffer t={t} lang={lang} />
         ) : tab === "directory" ? (
           directoryLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
