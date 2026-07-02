@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPhylloAccounts, getPhylloProfile } from "@/lib/phyllo/client";
+import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
 
 // Called right after the Phyllo Connect SDK reports an account connected.
 // Pulls the connected account's profile (followers + engagement) and stores it
@@ -33,41 +33,30 @@ export async function POST() {
       return NextResponse.json({ error: "Aucun compte connecté pour le moment." }, { status: 404 });
     }
 
-    // 2. Pull the profile (followers + engagement).
-    const profileRes = await getPhylloProfile(account.id);
-    console.log("Phyllo profile raw:", JSON.stringify(profileRes).slice(0, 1200));
+    // 2. Pull the profile (followers, photo, bio) and recent content (engagement).
+    const [profileRes, contentsRes] = await Promise.all([
+      getPhylloProfile(account.id),
+      getPhylloContents(account.id, 50),
+    ]);
     const profile = profileRes?.data?.[0] ?? profileRes;
+    const contents = contentsRes?.data ?? [];
 
-    // Field names confirmed against the sandbox response on first connection;
-    // we read a few likely shapes defensively.
-    const followers =
-      profile?.reputation?.follower_count ??
-      profile?.follower_count ??
-      null;
-    const engagementRate =
-      profile?.engagement?.engagement_rate ??
-      profile?.engagement_rate ??
-      profile?.reputation?.engagement_rate ??
-      null;
+    const now = new Date().toISOString();
+    const { engagementRate, metrics } = summarizeMetrics(profile, contents, now);
 
     const update: Record<string, unknown> = {
       instagram_connected: true,
-      phyllo_connected_at: new Date().toISOString(),
+      phyllo_connected_at: now,
     };
-    if (typeof followers === "number") update.followers_count = followers;
+    if (typeof metrics.followers === "number") update.followers_count = metrics.followers;
     if (typeof engagementRate === "number") {
-      // Phyllo may return a percentage (e.g. 4.2) or a fraction (0.042).
-      update.engagement_rate = engagementRate > 1 ? engagementRate / 100 : engagementRate;
-      update.engagement_rate_updated_at = new Date().toISOString();
+      update.engagement_rate = engagementRate;
+      update.engagement_rate_updated_at = now;
     }
 
     await admin.from("creators").update(update).eq("id", creator.id);
 
-    return NextResponse.json({
-      ok: true,
-      followers: followers ?? null,
-      engagement_rate: update.engagement_rate ?? null,
-    });
+    return NextResponse.json({ ok: true, engagement_rate: engagementRate, metrics });
   } catch (err) {
     console.error("Phyllo sync-engagement error:", err);
     return NextResponse.json({ error: "Erreur lors de la synchronisation." }, { status: 500 });
