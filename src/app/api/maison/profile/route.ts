@@ -8,7 +8,7 @@ const BUCKET = "maison-photos";
 async function getMaison(adminClient: ReturnType<typeof createAdminClient>, userId: string, email: string) {
   const { data } = await adminClient
     .from("comercios")
-    .select("id, name, description, photos, website_url, contact_instagram, arrondissement, address, category_id")
+    .select("id, name, description, description_en, description_es, photos, website_url, contact_instagram, arrondissement, address, category_id")
     .or(`owner_id.eq.${userId},email.eq.${email.toLowerCase()}`)
     .maybeSingle();
   return data;
@@ -27,6 +27,8 @@ export async function GET() {
     return NextResponse.json({
       name: maison.name,
       description: maison.description ?? "",
+      descriptionEn: maison.description_en ?? "",
+      descriptionEs: maison.description_es ?? "",
       photos: maison.photos ?? [],
       website: maison.website_url ?? "",
       instagram: maison.contact_instagram ?? "",
@@ -55,6 +57,8 @@ export async function PATCH(request: NextRequest) {
 
     if ("description" in body || "website" in body || "instagram" in body) {
       update.description = (body.description || "").slice(0, 2000);
+      update.description_en = (body.descriptionEn || "").slice(0, 2000) || null;
+      update.description_es = (body.descriptionEs || "").slice(0, 2000) || null;
       update.website_url = (body.website || "").trim().slice(0, 300) || null;
       update.contact_instagram = (body.instagram || "").trim().slice(0, 100) || null;
     }

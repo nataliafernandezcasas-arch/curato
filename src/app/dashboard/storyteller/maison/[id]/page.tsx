@@ -19,6 +19,8 @@ type Maison = {
   arrondissement: string | null;
   address: string | null;
   description: string | null;
+  description_en: string | null;
+  description_es: string | null;
   photos: string[] | null;
   website_url: string | null;
   category_id: string | null;
@@ -221,7 +223,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
       const supabase = createClient();
       const { data } = await supabase
         .from("comercios")
-        .select("id, name, arrondissement, address, description, photos, website_url, category_id")
+        .select("id, name, arrondissement, address, description, description_en, description_es, photos, website_url, category_id")
         .eq("id", id)
         .eq("is_reservable", true)
         .maybeSingle();
@@ -242,6 +244,10 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const t = translations[lang].maison;
   const cat = maison?.category_id ? CATEGORY[maison.category_id] : null;
   const catLabelText = cat ? td[SLUG_LABEL_KEY[cat.slug]] : "";
+  // Description in the storyteller's language, falling back to French.
+  const desc = maison
+    ? (lang === "en" ? maison.description_en : lang === "es" ? maison.description_es : null) || maison.description
+    : null;
   const gated = isBeforeLaunch() && !preview;
   const launchDateLabel = LAUNCH_AT.toLocaleDateString(lang, {
     day: "numeric",
@@ -346,9 +352,9 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   <p className="font-serif text-[13px] text-white/55 tracking-wide mb-6">Paris {maison.arrondissement}</p>
                 )}
 
-                {maison.description && (
+                {desc && (
                   <p className="font-serif text-[15px] font-light text-white/60 leading-relaxed mb-8">
-                    {maison.description}
+                    {desc}
                   </p>
                 )}
 

@@ -21,6 +21,8 @@ type MaisonCard = {
   name: string;
   photos: string[];
   description: string;
+  descriptionEn: string;
+  descriptionEs: string;
   website: string;
   instagram: string;
   arrondissement: string | null;
@@ -77,6 +79,9 @@ export default function MaisonDashboard() {
   function placeOf(m: MaisonCard): string {
     const cat = m.categoryId ? translations[lang].dashboard[CATEGORY_KEY[m.categoryId]] : "";
     return [m.arrondissement ? `Paris ${m.arrondissement}` : "Paris", cat].filter(Boolean).join(" · ");
+  }
+  function descOf(m: MaisonCard): string {
+    return (lang === "en" ? m.descriptionEn : lang === "es" ? m.descriptionEs : "") || m.description;
   }
 
   useEffect(() => {
@@ -360,8 +365,8 @@ export default function MaisonDashboard() {
               </div>
             </div>
             <div className="p-6 space-y-6">
-              {selected.description && (
-                <p className="font-serif text-[15px] font-light text-white/70 leading-relaxed">{selected.description}</p>
+              {descOf(selected) && (
+                <p className="font-serif text-[15px] font-light text-white/70 leading-relaxed">{descOf(selected)}</p>
               )}
               {selected.photos.length > 1 && (
                 <div className="grid grid-cols-3 gap-1.5">

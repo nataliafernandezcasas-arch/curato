@@ -22,6 +22,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [description, setDescription] = useState("");
+  const [descriptionEn, setDescriptionEn] = useState("");
+  const [descriptionEs, setDescriptionEs] = useState("");
+  const [descLang, setDescLang] = useState<"fr" | "en" | "es">("fr");
   const [website, setWebsite] = useState("");
   const [instagram, setInstagram] = useState("");
   const [name, setName] = useState("");
@@ -45,6 +48,8 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         const desc = d.description ?? "";
         setPhotos(p);
         setDescription(desc);
+        setDescriptionEn(d.descriptionEn ?? "");
+        setDescriptionEs(d.descriptionEs ?? "");
         setWebsite(d.website ?? "");
         setInstagram(d.instagram ?? "");
         setName(d.name ?? "");
@@ -130,7 +135,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
       const res = await fetch("/api/maison/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description, website, instagram }),
+        body: JSON.stringify({ description, descriptionEn, descriptionEs, website, instagram }),
       });
       if (res.ok) setEditing(false);
     } finally {
@@ -152,6 +157,11 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const catKey = categoryId ? CATEGORY_KEY[categoryId] : null;
   const catLabel = catKey ? translations[lang].dashboard[catKey] : "";
   const place = [arrondissement ? `Paris ${arrondissement}` : "Paris", catLabel].filter(Boolean).join(" · ");
+  const descValue = descLang === "fr" ? description : descLang === "en" ? descriptionEn : descriptionEs;
+  const setDescValue = (v: string) =>
+    descLang === "fr" ? setDescription(v) : descLang === "en" ? setDescriptionEn(v) : setDescriptionEs(v);
+  // Storyteller-facing copy: the maison's current app language, falling back to FR.
+  const previewDesc = lang === "en" ? descriptionEn || description : lang === "es" ? descriptionEs || description : description;
 
   // ── STORYTELLER PREVIEW (how the venue appears to creators) ─────────────────
   function StorytellerPreview() {
@@ -170,9 +180,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             <h3 className="font-serif text-[26px] font-light tracking-[0.12em] uppercase text-white leading-none">{name}</h3>
           </div>
         </div>
-        {description && (
+        {previewDesc && (
           <p className="font-serif text-[14px] font-light text-white/65 leading-relaxed p-6">
-            {description.length > 240 ? `${description.slice(0, 240)}…` : description}
+            {previewDesc.length > 240 ? `${previewDesc.slice(0, 240)}…` : previewDesc}
           </p>
         )}
       </div>
@@ -223,9 +233,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               </div>
             )}
 
-            {description && (
+            {previewDesc && (
               <p className="font-serif text-[17px] font-light text-white/75 leading-relaxed max-w-[720px] mb-10">
-                {description}
+                {previewDesc}
               </p>
             )}
 
@@ -315,18 +325,38 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         <div>
           <div className="flex items-baseline justify-between mb-3">
             <label className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70">{t.profileDescription}</label>
-            <span className={`font-serif text-[12px] ${descOk ? "text-champagne/60" : "text-copper/80"}`}>
-              {descLen}/{MIN_DESC}
+            <span className={`font-serif text-[12px] ${descLang === "fr" ? (descOk ? "text-champagne/60" : "text-copper/80") : "text-white/40"}`}>
+              {descValue.trim().length}/{MIN_DESC}
             </span>
           </div>
+          <div className="flex gap-1.5 mb-3">
+            {(["fr", "en", "es"] as const).map((lg) => {
+              const filled = (lg === "fr" ? description : lg === "en" ? descriptionEn : descriptionEs).trim().length > 0;
+              return (
+                <button
+                  key={lg}
+                  onClick={() => setDescLang(lg)}
+                  className={`font-serif text-[11px] tracking-[0.15em] uppercase px-3 py-1.5 border transition-all ${
+                    descLang === lg
+                      ? "bg-champagne text-charcoal-deep border-champagne"
+                      : `border-white/12 hover:border-champagne/30 ${filled ? "text-champagne/70" : "text-white/45"}`
+                  }`}
+                >
+                  {lg}{filled && descLang !== lg ? " ·" : ""}
+                </button>
+              );
+            })}
+          </div>
           <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={descValue}
+            onChange={(e) => setDescValue(e.target.value)}
             rows={6}
             placeholder={t.profileDescPlaceholder}
             className={`${inputCls} resize-none leading-relaxed`}
           />
-          <p className="font-serif text-[12px] font-light text-white/40 mt-2">{t.profileDescMin}</p>
+          <p className="font-serif text-[12px] font-light text-white/40 mt-2">
+            {descLang === "fr" ? t.profileDescMin : t.profileDescOptional}
+          </p>
         </div>
 
         {/* Links */}
