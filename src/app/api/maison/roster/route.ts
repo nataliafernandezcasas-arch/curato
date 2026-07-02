@@ -33,7 +33,7 @@ export async function GET() {
     // Signed / accepted creators.
     const { data: creators } = await admin
       .from("creators")
-      .select("id, full_name, handle, followers")
+      .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected")
       .eq("stage", "active")
       .order("followers", { ascending: false, nullsFirst: false });
 
@@ -60,13 +60,20 @@ export async function GET() {
       );
     }
 
-    const roster = rows.map((c) => ({
-      id: c.id as string,
-      name: (c.full_name as string | null) || (c.handle ? `@${c.handle}` : "—"),
-      handle: (c.handle as string | null) ?? null,
-      followers: (c.followers as number | null) ?? null,
-      content: contentByCreator.get(c.id) ?? [],
-    }));
+    const roster = rows.map((c) => {
+      const er = c.engagement_rate as number | null;
+      return {
+        id: c.id as string,
+        name: (c.full_name as string | null) || (c.handle ? `@${c.handle}` : "—"),
+        handle: (c.handle as string | null) ?? null,
+        // Prefer the live Phyllo count when we have one; otherwise the survey figure.
+        followers: (c.followers_count as number | null) ?? (c.followers as number | null) ?? null,
+        content: contentByCreator.get(c.id) ?? [],
+        igConnected: Boolean(c.instagram_connected),
+        // engagement_rate is stored as a fraction (0.05 = 5%); expose the %.
+        engagement: er != null ? Math.round(er * 1000) / 10 : null,
+      };
+    });
 
     return NextResponse.json({ maison: maison.name, roster });
   } catch (err) {

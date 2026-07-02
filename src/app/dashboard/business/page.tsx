@@ -42,6 +42,8 @@ type RosterItem = {
   handle: string | null;
   followers: number | null;
   content: string[];
+  igConnected: boolean;
+  engagement: number | null;
 };
 
 type Visitor = {
@@ -64,7 +66,7 @@ export default function MaisonDashboard() {
   const { lang, setLang } = useLang();
   const t = translations[lang].business;
 
-  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory" | "offer">("roster");
+  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory">("roster");
   const [roster, setRoster] = useState<RosterItem[]>([]);
   const [maisonName, setMaisonName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -185,11 +187,9 @@ export default function MaisonDashboard() {
             ? maisonName || t.tabProfile
             : tab === "directory"
             ? t.directoryTitle
-            : tab === "offer"
-            ? t.tabOffer
             : t.title}
         </h1>
-        {tab !== "profile" && tab !== "offer" && (
+        {tab !== "profile" && (
           <p className="font-serif text-[14px] font-light text-white/55 mb-8">
             {tab === "directory" ? t.directorySubtitle : t.subtitle}
           </p>
@@ -197,7 +197,7 @@ export default function MaisonDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8">
-          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["profile", t.tabProfile], ["offer", t.tabOffer]] as const).map(([key, label]) => (
+          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["profile", t.tabProfile]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -229,7 +229,18 @@ export default function MaisonDashboard() {
                 <div key={c.id} className="bg-charcoal-deep p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="font-serif text-[18px] font-light text-white">{c.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-serif text-[18px] font-light text-white">{c.name}</h3>
+                        {c.igConnected && (
+                          <span
+                            title={t.igVerified}
+                            className="inline-flex items-center gap-1 border border-champagne/30 text-champagne/80 px-2 py-0.5 rounded-full"
+                          >
+                            <InstagramLogo size={11} weight="fill" />
+                            <span className="font-serif text-[9px] tracking-[0.15em] uppercase">{t.igVerified}</span>
+                          </span>
+                        )}
+                      </div>
                       {c.handle && (
                         <a
                           href={`https://instagram.com/${c.handle}`}
@@ -241,9 +252,17 @@ export default function MaisonDashboard() {
                         </a>
                       )}
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.followers}</p>
-                      <p className="font-serif text-[20px] font-light text-white/85">{formatFollowers(c.followers)}</p>
+                    <div className="flex items-start gap-6 shrink-0 text-right">
+                      <div>
+                        <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.followers}</p>
+                        <p className="font-serif text-[20px] font-light text-white/85">{formatFollowers(c.followers)}</p>
+                      </div>
+                      {c.engagement != null && (
+                        <div>
+                          <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.engagement}</p>
+                          <p className="font-serif text-[20px] font-light text-white/85">{c.engagement}%</p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -261,9 +280,13 @@ export default function MaisonDashboard() {
             </div>
           )
         ) : tab === "profile" ? (
-          <MaisonProfile t={t} lang={lang} />
-        ) : tab === "offer" ? (
-          <MaisonOffer t={t} lang={lang} />
+          <div className="space-y-16">
+            <MaisonProfile t={t} lang={lang} />
+            <div className="pt-4 border-t border-white/10">
+              <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-8">{t.tabOffer}</p>
+              <MaisonOffer t={t} lang={lang} />
+            </div>
+          </div>
         ) : tab === "directory" ? (
           directoryLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
