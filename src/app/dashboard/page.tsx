@@ -66,6 +66,17 @@ export default async function DashboardPage() {
     if (Object.keys(updates).length > 0) {
       await admin.from("comercios").update(updates).eq("id", comercio.id);
     }
+    // First-login commitment: the maison must sign the 3-month / 299 €/month
+    // agreement before reaching the dashboard. Defensive — if the column isn't
+    // there yet (migration pending), the query errors and we let them through.
+    const { data: commit, error: commitErr } = await admin
+      .from("comercios")
+      .select("commitment_accepted_at")
+      .eq("id", comercio.id)
+      .maybeSingle();
+    if (!commitErr && commit && !commit.commitment_accepted_at) {
+      redirect("/onboarding/maison");
+    }
     redirect("/dashboard/business");
   }
 
