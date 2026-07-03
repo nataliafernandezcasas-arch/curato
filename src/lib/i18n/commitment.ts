@@ -28,6 +28,14 @@ export type CommitmentLabels = {
   errorMustAccept: string;
   errorMustSign: string;
   errorGeneric: string;
+  // Record: PDF + confirmation email copy
+  signedBy: string;
+  dateWord: string;
+  pdfFooter: string;
+  emailSubject: string;
+  emailHeading: string;
+  emailIntro: string;
+  emailConfirmNote: string;
 };
 
 const LABELS: Record<Lang, CommitmentLabels> = {
@@ -53,6 +61,15 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     errorMustAccept: "Merci d'accepter les conditions d'engagement pour continuer.",
     errorMustSign: "Merci de saisir votre nom complet comme signature.",
     errorGeneric: "Une erreur est survenue. Réessayez.",
+    signedBy: "Signé par",
+    dateWord: "Date",
+    pdfFooter: "Curato · Paris · curatocollective.com",
+    emailSubject: "Curato · Votre engagement est signé",
+    emailHeading: "Engagement confirmé",
+    emailIntro:
+      "Merci, et bienvenue dans le cercle Curato. Voici le récapitulatif de votre engagement, dont une copie signée est jointe en PDF.",
+    emailConfirmNote:
+      "Conservez ce document. Pour toute question, écrivez-nous à hello@curatocollective.com.",
   },
   en: {
     dossierEyebrow: "The dossier",
@@ -76,6 +93,15 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     errorMustAccept: "Please accept the commitment terms to continue.",
     errorMustSign: "Please type your full name as a signature.",
     errorGeneric: "Something went wrong. Please try again.",
+    signedBy: "Signed by",
+    dateWord: "Date",
+    pdfFooter: "Curato · Paris · curatocollective.com",
+    emailSubject: "Curato · Your commitment is signed",
+    emailHeading: "Commitment confirmed",
+    emailIntro:
+      "Thank you, and welcome to the Curato circle. Here is a summary of your commitment; a signed copy is attached as a PDF.",
+    emailConfirmNote:
+      "Please keep this document. For any question, write to us at hello@curatocollective.com.",
   },
   es: {
     dossierEyebrow: "El dossier",
@@ -99,6 +125,15 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     errorMustAccept: "Acepta las condiciones de compromiso para continuar.",
     errorMustSign: "Escribe tu nombre completo como firma.",
     errorGeneric: "Ocurrió un error. Inténtalo de nuevo.",
+    signedBy: "Firmado por",
+    dateWord: "Fecha",
+    pdfFooter: "Curato · Paris · curatocollective.com",
+    emailSubject: "Curato · Tu compromiso está firmado",
+    emailHeading: "Compromiso confirmado",
+    emailIntro:
+      "Gracias, y bienvenida al círculo Curato. Aquí tienes el resumen de tu compromiso; se adjunta una copia firmada en PDF.",
+    emailConfirmNote:
+      "Conserva este documento. Para cualquier duda, escríbenos a hello@curatocollective.com.",
   },
 };
 

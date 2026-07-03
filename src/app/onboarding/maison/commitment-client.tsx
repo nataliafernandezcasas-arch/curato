@@ -37,7 +37,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
     setSubmitting(true);
     setError(null);
 
-    const res = await signCommitment({ accepted, signatory });
+    const res = await signCommitment({ accepted, signatory, lang });
     if (!res.ok) {
       setError(res.error === "must_sign" ? l.errorMustSign : res.error === "must_accept" ? l.errorMustAccept : `${l.errorGeneric} (${res.error})`);
       setSubmitting(false);
