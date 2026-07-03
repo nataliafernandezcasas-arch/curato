@@ -3,7 +3,18 @@
 
 import type { Lang } from "./translations";
 
+// The maison presentation dossier (8 pages, exported from the Canva PDF). Shown
+// as stacked slides at the top of the commitment step, mirroring the creators'
+// welcome dossier. French only for now (like the creators', ES/EN fall back).
+export const MAISON_DOSSIER_SLIDES: string[] = Array.from(
+  { length: 8 },
+  (_, i) => `/onboarding/maison/slide-${i + 1}.jpg`
+);
+export const MAISON_DOSSIER_PDF = "/onboarding/maison/dossier-curato-maison.pdf";
+
 export type CommitmentLabels = {
+  dossierEyebrow: string;
+  downloadLabel: string;
   eyebrow: string;
   title: string;
   intro: string;
@@ -21,6 +32,8 @@ export type CommitmentLabels = {
 
 const LABELS: Record<Lang, CommitmentLabels> = {
   fr: {
+    dossierEyebrow: "Le dossier",
+    downloadLabel: "Télécharger le dossier (PDF)",
     eyebrow: "Dernière étape",
     title: "Votre engagement Curato",
     intro:
@@ -42,6 +55,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     errorGeneric: "Une erreur est survenue. Réessayez.",
   },
   en: {
+    dossierEyebrow: "The dossier",
+    downloadLabel: "Download the dossier (PDF)",
     eyebrow: "Last step",
     title: "Your Curato commitment",
     intro:
@@ -63,6 +78,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     errorGeneric: "Something went wrong. Please try again.",
   },
   es: {
+    dossierEyebrow: "El dossier",
+    downloadLabel: "Descargar el dossier (PDF)",
     eyebrow: "Último paso",
     title: "Tu compromiso con Curato",
     intro:
