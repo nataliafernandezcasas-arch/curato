@@ -31,6 +31,9 @@ export default function AdminNavClient() {
         <Link href="/admin/creators" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
           {t.navCreators}
         </Link>
+        <Link href="/admin/maisons" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
+          {t.navMaisons}
+        </Link>
         <Link href="/admin/suggestions" className="font-serif text-[12px] tracking-wider text-white/60 hover:text-white transition-colors">
           {t.navSuggestions}
         </Link>

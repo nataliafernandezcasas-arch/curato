@@ -404,3 +404,75 @@ export async function sendReservationAlternatives(opts: {
 
   return sendEmail(to, `Curato · Autres créneaux, ${maisonName}`, html);
 }
+
+// ── Maison commitment signed ──────────────────────────────────────────────────
+// Sent to a maison right after they sign the commitment. Carries the signed
+// agreement as a PDF attachment and repeats the terms in the body as a record.
+type MaisonCommitmentOpts = {
+  to: string;
+  subject: string;
+  heading: string;
+  intro: string;
+  maisonName: string;
+  terms: string[];
+  signatory: string;
+  signedByLabel: string;
+  whenLabel: string;
+  dateLabel: string;
+  confirmNote: string;
+  pdfBase64: string;
+  pdfFilename: string;
+};
+
+export async function sendMaisonCommitment(opts: MaisonCommitmentOpts) {
+  const termsHtml = opts.terms
+    .map(
+      (term, i) => `
+      <tr><td style="padding:0 0 14px;">
+        <table cellpadding="0" cellspacing="0"><tr>
+          <td valign="top" style="padding-right:14px;font-family:${FONT};font-size:13px;color:${C.champagne};">${String(i + 1).padStart(2, "0")}</td>
+          <td style="font-family:${FONT_SANS};font-size:14px;color:${C.white};line-height:1.6;">${term}</td>
+        </tr></table>
+      </td></tr>`
+    )
+    .join("");
+
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        ${opts.heading}
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        ${opts.maisonName}
+      </h1>
+    </td></tr>
+    <tr><td style="padding:18px 40px 0;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
+        ${opts.intro}
+      </p>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <div style="height:1px;background-color:${C.border};"></div>
+    </td></tr>
+    <tr><td style="padding:26px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0">${termsHtml}</table>
+    </td></tr>
+    <tr><td style="padding:14px 40px 0;">
+      <div style="height:1px;background-color:${C.border};"></div>
+    </td></tr>
+    <tr><td style="padding:22px 40px 40px;">
+      <p style="margin:0 0 4px;font-family:${FONT_SANS};font-size:11px;color:${C.faint};letter-spacing:0.15em;text-transform:uppercase;">
+        ${opts.signedByLabel}
+      </p>
+      <p style="margin:0 0 14px;font-family:${FONT};font-size:20px;color:${C.white};">${opts.signatory}</p>
+      <p style="margin:0 0 18px;font-family:${FONT_SANS};font-size:12px;color:${C.muted};">${opts.dateLabel}: ${opts.whenLabel}</p>
+      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
+        ${opts.confirmNote}
+      </p>
+    </td></tr>
+  `);
+
+  return sendEmail(opts.to, opts.subject, html, [
+    { filename: opts.pdfFilename, content: opts.pdfBase64, content_type: "application/pdf" },
+  ]);
+}
