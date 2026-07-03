@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check } from "@phosphor-icons/react";
+import { Check, DownloadSimple } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
-import { getCommitmentLabels } from "@/lib/i18n/commitment";
+import { getCommitmentLabels, MAISON_DOSSIER_SLIDES, MAISON_DOSSIER_PDF } from "@/lib/i18n/commitment";
 import { signCommitment } from "./actions";
 
 const LANG_OPTIONS = [
@@ -47,14 +47,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
   }
 
   return (
-    <div className="relative min-h-[100dvh] text-white">
-      {/* Floral backdrop, matching the maison dashboard */}
-      <div className="fixed inset-0 -z-10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-charcoal-deep/80" />
-      </div>
-
+    <div className="min-h-[100dvh] bg-charcoal-deep text-white">
       {/* Language switcher */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
         {LANG_OPTIONS.map(({ key, label }) => (
@@ -72,7 +65,34 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
         ))}
       </div>
 
-      <div className="max-w-[640px] mx-auto px-5 py-24 md:py-32">
+      {/* Presentation dossier — stacked full-bleed pages */}
+      <section aria-label="Dossier Curato">
+        {MAISON_DOSSIER_SLIDES.map((src, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={src} src={src} alt="" loading={i === 0 ? "eager" : "lazy"} className="block w-full h-auto" />
+        ))}
+      </section>
+
+      {/* Download the dossier */}
+      <div className="text-center py-10 border-t border-white/10">
+        <a
+          href={MAISON_DOSSIER_PDF}
+          download
+          className="inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.2em] uppercase text-champagne/80 hover:text-champagne border border-champagne/30 hover:border-champagne/60 px-6 py-3 transition-colors"
+        >
+          <DownloadSimple size={15} />
+          {l.downloadLabel}
+        </a>
+      </div>
+
+      {/* Commitment + signature band, over the floral backdrop */}
+      <section className="relative border-t border-white/10 overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-charcoal-deep/85" />
+        </div>
+        <div className="max-w-[640px] mx-auto px-5 py-24 md:py-28">
         <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">{l.eyebrow}</p>
         <h1 className="font-serif text-[clamp(1.9rem,5vw,2.8rem)] font-light tracking-[0.14em] uppercase leading-tight mb-6">
           {l.title}
@@ -142,7 +162,8 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
             {!submitting && <Check size={14} weight="bold" />}
           </button>
         </div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
