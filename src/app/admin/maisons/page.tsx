@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import ComingSoonToggle from "./coming-soon-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ type Comercio = {
   subscription_plan: string | null;
   commitment_accepted_at?: string | null;
   commitment_signatory?: string | null;
+  coming_soon?: boolean | null;
 };
 
 export default async function AdminMaisonsPage() {
@@ -81,6 +83,9 @@ export default async function AdminMaisonsPage() {
                       <p className={`font-serif text-[14px] ${isSigned ? "text-emerald-400" : "text-white/45"}`}>
                         {isSigned ? "Signé" : "Non signé"}
                       </p>
+                    </div>
+                    <div className="self-center">
+                      <ComingSoonToggle id={m.id} initial={Boolean(m.coming_soon)} />
                     </div>
                   </div>
                 </div>

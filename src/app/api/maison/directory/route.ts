@@ -20,30 +20,76 @@ export async function GET() {
       .maybeSingle();
     if (!self) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 
-    const { data } = await admin
+    // Prefer the coming_soon-aware query; fall back to the old shape if the
+    // column isn't there yet (migration 025 pending) so the directory keeps working.
+    const primary = await admin
       .from("comercios")
-      .select("id, name, photos, description, description_en, description_es, website_url, contact_instagram, arrondissement, address, category_id")
-      .eq("is_reservable", true)
+      .select("id, name, photos, description, description_en, description_es, website_url, contact_instagram, arrondissement, address, category_id, is_reservable, coming_soon")
+      .or("is_reservable.eq.true,coming_soon.eq.true")
       .order("name");
+    let data: unknown[] | null = primary.data;
+    if (primary.error) {
+      const fb = await admin
+        .from("comercios")
+        .select("id, name, photos, description, description_en, description_es, website_url, contact_instagram, arrondissement, address, category_id, is_reservable")
+        .eq("is_reservable", true)
+        .order("name");
+      data = fb.data;
+    }
 
-    // Show other maisons that have started a profile (a photo or a description).
-    const maisons = (data ?? [])
-      .filter((m) => m.id !== self.id && ((m.photos?.length ?? 0) > 0 || (m.description || "").trim().length > 0))
-      .map((m) => ({
-        id: m.id as string,
-        name: (m.name as string) || "",
-        photos: (m.photos as string[] | null) ?? [],
-        description: (m.description as string | null) ?? "",
-        descriptionEn: (m.description_en as string | null) ?? "",
-        descriptionEs: (m.description_es as string | null) ?? "",
-        website: (m.website_url as string | null) ?? "",
-        instagram: (m.contact_instagram as string | null) ?? "",
-        arrondissement: (m.arrondissement as string | null) ?? null,
-        address: (m.address as string | null) ?? null,
-        categoryId: (m.category_id as string | null) ?? null,
-      }));
+    type Row = {
+      id: string; name: string | null; photos: string[] | null;
+      description: string | null; description_en: string | null; description_es: string | null;
+      website_url: string | null; contact_instagram: string | null;
+      arrondissement: string | null; address: string | null; category_id: string | null;
+      is_reservable: boolean | null; coming_soon: boolean | null;
+    };
 
-    return NextResponse.json({ maisons });
+    const real: Record<string, unknown>[] = [];
+    const teasers: Record<string, unknown>[] = [];
+
+    for (const m of (data ?? []) as Row[]) {
+      if (m.id === self.id) continue;
+
+      // A hidden maison appears only as a blurred "coming soon" teaser: its
+      // name and details are withheld, keeping just the category / area hint and
+      // one photo (blurred client-side) so it reads as a real house on the way.
+      if (m.coming_soon) {
+        teasers.push({
+          id: m.id,
+          comingSoon: true,
+          name: "",
+          photos: (m.photos ?? []).slice(0, 1),
+          description: "", descriptionEn: "", descriptionEs: "",
+          website: "", instagram: "",
+          arrondissement: m.arrondissement ?? null,
+          address: null,
+          categoryId: m.category_id ?? null,
+        });
+        continue;
+      }
+
+      // Regular directory entry: signed maison with a started profile.
+      if (m.is_reservable && ((m.photos?.length ?? 0) > 0 || (m.description || "").trim().length > 0)) {
+        real.push({
+          id: m.id,
+          comingSoon: false,
+          name: m.name || "",
+          photos: m.photos ?? [],
+          description: m.description ?? "",
+          descriptionEn: m.description_en ?? "",
+          descriptionEs: m.description_es ?? "",
+          website: m.website_url ?? "",
+          instagram: m.contact_instagram ?? "",
+          arrondissement: m.arrondissement ?? null,
+          address: m.address ?? null,
+          categoryId: m.category_id ?? null,
+        });
+      }
+    }
+
+    // Real houses first, teasers after.
+    return NextResponse.json({ maisons: [...real, ...teasers] });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
   }

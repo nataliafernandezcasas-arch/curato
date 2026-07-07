@@ -47,7 +47,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     intro:
       "Avant d'accéder à votre espace, confirmez les conditions de votre partenariat avec Curato.",
     terms: [
-      "Un abonnement mensuel de 299 € pour rejoindre le cercle Curato.",
+      "Les 15 premiers jours vous sont offerts.",
+      "Puis un abonnement mensuel de 299 € pour rejoindre le cercle Curato.",
       "Un engagement initial de 3 mois minimum.",
       "À l'issue de ces 3 mois, l'abonnement se poursuit au mois et reste résiliable à tout moment.",
     ],
@@ -79,7 +80,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     intro:
       "Before entering your space, confirm the terms of your partnership with Curato.",
     terms: [
-      "A monthly subscription of 299 € to join the Curato circle.",
+      "Your first 15 days are free.",
+      "Then a monthly subscription of 299 € to join the Curato circle.",
       "An initial commitment of 3 months minimum.",
       "After these 3 months, the subscription continues month to month and can be cancelled at any time.",
     ],
@@ -111,7 +113,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     intro:
       "Antes de entrar a tu espacio, confirma las condiciones de tu alianza con Curato.",
     terms: [
-      "Una suscripción mensual de 299 € para unirte al círculo Curato.",
+      "Los primeros 15 días son gratis.",
+      "Luego una suscripción mensual de 299 € para unirte al círculo Curato.",
       "Un compromiso inicial de 3 meses mínimo.",
       "Pasados esos 3 meses, la suscripción continúa mes a mes y se puede cancelar en cualquier momento.",
     ],

@@ -29,6 +29,7 @@ type MaisonCard = {
   arrondissement: string | null;
   address: string | null;
   categoryId: string | null;
+  comingSoon?: boolean;
 };
 
 const LANGS: { key: Lang; label: string }[] = [
@@ -386,24 +387,50 @@ export default function MaisonDashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {directory.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => setSelected(m)}
-                  className="text-left group border border-white/10 bg-charcoal-deep/60 overflow-hidden hover:border-champagne/30 transition-colors"
-                >
-                  <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
-                    {m.photos[0] && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.photos[0]} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                    )}
+              {directory.map((m) =>
+                m.comingSoon ? (
+                  <div
+                    key={m.id}
+                    className="relative border border-white/10 bg-charcoal-deep/60 overflow-hidden select-none"
+                  >
+                    <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
+                      {m.photos[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={m.photos[0]} alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-60" />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-40" />
+                      )}
+                      <div className="absolute inset-0 bg-charcoal-deep/50 flex items-center justify-center">
+                        <span className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/80 border border-champagne/30 px-4 py-2">
+                          {t.directoryComingSoon}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/50 mb-1">{placeOf(m)}</p>
+                      <div className="h-[1.1em] w-2/3 bg-white/10 rounded-sm" />
+                    </div>
                   </div>
-                  <div className="p-5">
-                    <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60 mb-1">{placeOf(m)}</p>
-                    <h3 className="font-serif text-[18px] font-light text-white">{m.name}</h3>
-                  </div>
-                </button>
-              ))}
+                ) : (
+                  <button
+                    key={m.id}
+                    onClick={() => setSelected(m)}
+                    className="text-left group border border-white/10 bg-charcoal-deep/60 overflow-hidden hover:border-champagne/30 transition-colors"
+                  >
+                    <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
+                      {m.photos[0] && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={m.photos[0]} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      )}
+                    </div>
+                    <div className="p-5">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60 mb-1">{placeOf(m)}</p>
+                      <h3 className="font-serif text-[18px] font-light text-white">{m.name}</h3>
+                    </div>
+                  </button>
+                )
+              )}
             </div>
           )
         ) : visitorsLoading ? (
