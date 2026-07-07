@@ -77,7 +77,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
       <div className="text-center py-10 border-t border-white/10">
         <a
           href={MAISON_DOSSIER_PDF}
-          download
+          download="Curato - Adresses sélectionnées FR.pdf"
           className="inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.2em] uppercase text-champagne/80 hover:text-champagne border border-champagne/30 hover:border-champagne/60 px-6 py-3 transition-colors"
         >
           <DownloadSimple size={15} />
