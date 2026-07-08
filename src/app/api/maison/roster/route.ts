@@ -31,12 +31,23 @@ export async function GET() {
       .maybeSingle();
     if (!maison) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 
-    // Signed / accepted creators.
-    const { data: creators } = await admin
+    // Signed / accepted creators. Prefer the roster-hidden-aware query; fall
+    // back to the old shape if the column isn't there yet (migration 026 pending).
+    const primary = await admin
       .from("creators")
-      .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id")
+      .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id, hidden_from_roster")
       .eq("stage", "active")
+      .eq("hidden_from_roster", false)
       .order("followers", { ascending: false, nullsFirst: false });
+    let creators = primary.data;
+    if (primary.error) {
+      const fb = await admin
+        .from("creators")
+        .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id")
+        .eq("stage", "active")
+        .order("followers", { ascending: false, nullsFirst: false });
+      creators = fb.data as typeof primary.data;
+    }
 
     // Only real signed creators: must have a name or an Instagram handle
     // (filters out empty/incomplete creator rows).

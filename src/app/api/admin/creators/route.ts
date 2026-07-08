@@ -24,6 +24,9 @@ export async function PATCH(request: NextRequest) {
   if (body.monthly_credit_cop != null && !isNaN(Number(body.monthly_credit_cop))) {
     update.monthly_credit_cop = Number(body.monthly_credit_cop);
   }
+  if (typeof body.hidden_from_roster === "boolean") {
+    update.hidden_from_roster = body.hidden_from_roster;
+  }
 
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "Rien à mettre à jour" }, { status: 400 });
