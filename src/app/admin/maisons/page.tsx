@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import ComingSoonToggle from "./coming-soon-toggle";
+import MaisonsList, { MaisonItem } from "./maisons-list";
 
 export const dynamic = "force-dynamic";
 
@@ -32,100 +32,52 @@ type Comercio = {
 export default async function AdminMaisonsPage() {
   const admin = createAdminClient();
 
-  // select("*") so the page keeps working even if the commitment columns don't
-  // exist yet (migration pending) — the fields just come back undefined.
+  // select("*") so the page keeps working even if newer columns don't exist yet.
   const { data } = await admin
     .from("comercios")
     .select("*")
     .eq("stage", "activo")
     .order("name", { ascending: true });
 
-  const list = (data ?? []) as Comercio[];
-  const signed = list.filter((m) => m.commitment_accepted_at);
+  const rows = (data ?? []) as Comercio[];
 
-  // Account / connection status: does the maison have a login, and have they
-  // signed in yet? Keyed by email.
+  // Account / connection status keyed by email.
   const { data: users } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const lastSignInByEmail = new Map<string, string | null>();
   for (const u of users?.users ?? []) {
     if (u.email) lastSignInByEmail.set(u.email.toLowerCase(), u.last_sign_in_at ?? null);
   }
-  const connected = list.filter((m) => m.email && lastSignInByEmail.get(m.email.toLowerCase()));
+
+  const maisons: MaisonItem[] = rows.map((m) => {
+    const email = (m.email || "").toLowerCase();
+    const hasAccount = Boolean(m.email && lastSignInByEmail.has(email));
+    const lastSignIn = m.email ? lastSignInByEmail.get(email) : null;
+    return {
+      id: m.id,
+      name: m.name || "",
+      email: m.email || "",
+      place: m.arrondissement ? `Paris ${m.arrondissement}` : "",
+      planLabel: m.subscription_plan ? PLAN_LABEL[m.subscription_plan] ?? m.subscription_plan : "—",
+      isSigned: Boolean(m.commitment_accepted_at),
+      signatory: m.commitment_signatory || "",
+      signedDate: fmtDate(m.commitment_accepted_at ?? null),
+      comingSoon: Boolean(m.coming_soon),
+      account: lastSignIn ? "connected" : hasAccount ? "never" : "none",
+      lastSignIn: lastSignIn ? fmtDate(lastSignIn) : "",
+    };
+  });
+
+  const signedCount = maisons.filter((m) => m.isSigned).length;
+  const connectedCount = maisons.filter((m) => m.account === "connected").length;
 
   return (
     <div className="max-w-[1100px] mx-auto px-5 py-12">
       <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-3">
-        {list.length} maisons · {signed.length} signées · {connected.length} connectées
+        {maisons.length} maisons · {signedCount} signées · {connectedCount} connectées
       </p>
       <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white mb-10">Maisons</h1>
 
-      {list.length === 0 ? (
-        <div className="text-center py-20 border border-white/10">
-          <p className="font-serif text-[14px] font-light text-white/65">Aucune maison pour le moment.</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {list.map((m) => {
-            const isSigned = Boolean(m.commitment_accepted_at);
-            const hasAccount = Boolean(m.email && lastSignInByEmail.has(m.email.toLowerCase()));
-            const lastSignIn = m.email ? lastSignInByEmail.get(m.email.toLowerCase()) : null;
-            return (
-              <div key={m.id} className="border border-white/10 bg-black/40 p-6">
-                <div className="flex items-start justify-between flex-wrap gap-4">
-                  {/* Identity */}
-                  <div>
-                    <p className="font-serif text-[18px] font-light text-white">{m.name || "—"}</p>
-                    <p className="font-serif text-[13px] text-white/65 mt-1">
-                      {m.email || ""}
-                      {m.arrondissement ? ` · Paris ${m.arrondissement}` : ""}
-                    </p>
-                  </div>
-
-                  {/* Commitment */}
-                  <div className="flex items-center gap-6 text-right">
-                    <div>
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Formule</p>
-                      <p className="font-serif text-[14px] text-champagne">
-                        {m.subscription_plan ? PLAN_LABEL[m.subscription_plan] ?? m.subscription_plan : "—"}
-                      </p>
-                    </div>
-                    <div className="min-w-[110px]">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Compte</p>
-                      <p className={`font-serif text-[14px] ${lastSignIn ? "text-emerald-400" : hasAccount ? "text-amber-300" : "text-white/40"}`}>
-                        {lastSignIn ? "Connectée" : hasAccount ? "Jamais entrée" : "Pas de compte"}
-                      </p>
-                      {lastSignIn && <p className="font-serif text-[11px] text-white/30 mt-0.5">{fmtDate(lastSignIn)}</p>}
-                    </div>
-                    <div className="min-w-[110px]">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Engagement</p>
-                      <p className={`font-serif text-[14px] ${isSigned ? "text-emerald-400" : "text-white/45"}`}>
-                        {isSigned ? "Signé" : "Non signé"}
-                      </p>
-                    </div>
-                    <div className="self-center">
-                      <ComingSoonToggle id={m.id} initial={Boolean(m.coming_soon)} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Signature detail */}
-                {isSigned && (
-                  <div className="mt-5 pt-4 border-t border-white/15 flex flex-wrap gap-x-10 gap-y-2">
-                    <div>
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70 mb-1">Signé par</p>
-                      <p className="font-serif text-[15px] text-white/85">{m.commitment_signatory || "—"}</p>
-                    </div>
-                    <div>
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70 mb-1">Date</p>
-                      <p className="font-serif text-[15px] text-white/85">{fmtDate(m.commitment_accepted_at ?? null)}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <MaisonsList maisons={maisons} />
     </div>
   );
 }
