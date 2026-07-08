@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
 import CreatorEditForm from "./edit-form";
+import CreatorRosterToggle from "./roster-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,10 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
     .eq("email", email)
     .maybeSingle();
   if (!creator) return notFound();
+
+  // Roster-hidden flag, read defensively (column may not exist yet).
+  const { data: hiddenRow } = await supabase.from("creators").select("hidden_from_roster").eq("id", creator.id).maybeSingle();
+  const hiddenFromRoster = Boolean(hiddenRow?.hidden_from_roster);
 
   // Reservations (the places they visited) + venue names, fetched separately to
   // avoid embed ambiguity.
@@ -154,16 +159,19 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
         )}
         <p className="font-serif text-[11px] text-white/25 mb-2">€{usedCredit} dépensés ce mois</p>
 
-        <CreatorEditForm
-          email={creator.email as string}
-          initial={{
-            full_name: creator.full_name ?? "",
-            handle: creator.handle ?? "",
-            followers: creator.followers ?? null,
-            monthly_credit_cop: creator.monthly_credit_cop ?? null,
-            stage: creator.stage ?? "active",
-          }}
-        />
+        <div className="flex items-center gap-3 flex-wrap">
+          <CreatorEditForm
+            email={creator.email as string}
+            initial={{
+              full_name: creator.full_name ?? "",
+              handle: creator.handle ?? "",
+              followers: creator.followers ?? null,
+              monthly_credit_cop: creator.monthly_credit_cop ?? null,
+              stage: creator.stage ?? "active",
+            }}
+          />
+          <CreatorRosterToggle email={creator.email as string} initial={hiddenFromRoster} />
+        </div>
       </div>
 
       {/* Stats */}

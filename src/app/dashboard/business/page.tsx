@@ -97,7 +97,7 @@ export default function MaisonDashboard() {
   const { lang, setLang } = useLang();
   const t = translations[lang].business;
 
-  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory">("roster");
+  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory">("profile");
   const [roster, setRoster] = useState<RosterItem[]>([]);
   const [maisonName, setMaisonName] = useState("");
   const [loading, setLoading] = useState(true);
