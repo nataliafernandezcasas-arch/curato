@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin } from "@phosphor-icons/react";
+import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check } from "@phosphor-icons/react";
 import { translations, Lang } from "@/lib/i18n/translations";
 
 type T = Record<string, string>;
@@ -261,7 +261,30 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
 
   // ── EDIT FORM ─────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-[1100px] mx-auto grid lg:grid-cols-[1fr_360px] gap-12 items-start">
+    <div className="max-w-[1100px] mx-auto">
+      {/* Let's get started — guided checklist while the profile is incomplete */}
+      {(!photosOk || !descOk) && (
+        <div className="border border-champagne/25 bg-champagne/[0.04] p-6 md:p-8 mb-10">
+          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-2">{t.gsEyebrow}</p>
+          <h2 className="font-serif text-[22px] md:text-[26px] font-light tracking-[0.06em] text-white mb-2">{t.gsTitle}</h2>
+          <p className="font-serif text-[14px] font-light text-white/60 leading-relaxed mb-6 max-w-[640px]">{t.gsSubtitle}</p>
+          <div className="space-y-3">
+            {[
+              { done: photosOk, label: t.gsStepPhotos.replace("{n}", String(photos.length)) },
+              { done: descOk, label: t.gsStepDesc.replace("{n}", String(descLen)) },
+            ].map((s, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${s.done ? "bg-champagne border-champagne text-charcoal-deep" : "border-white/25 text-transparent"}`}>
+                  <Check size={12} weight="bold" />
+                </span>
+                <span className={`font-serif text-[14px] ${s.done ? "text-white/45 line-through" : "text-white/85"}`}>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="grid lg:grid-cols-[1fr_360px] gap-12 items-start">
       <div className="space-y-12">
         {/* Photos */}
         <div>
@@ -396,6 +419,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         {place && (
           <p className="font-serif text-[11px] text-white/35 mt-3 flex items-center gap-1.5"><MapPin size={12} /> {place}</p>
         )}
+      </div>
       </div>
     </div>
   );
