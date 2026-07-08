@@ -138,9 +138,20 @@ export function summarizeMetrics(
     n && followers ? (likes + comments) / n / followers : null;
 
   // Newest first; keep the 12 most recent feed publications for the gallery.
+  // Drop items that repeat a caption we've already shown — Phyllo (especially
+  // staging) can return the same reel several times with different ids, which
+  // looks like duplicate photos in the gallery.
+  const seenCaptions = new Set<string>();
   const recentPosts: PostSummary[] = feed
     .slice()
     .sort((a, b) => String(b.published_at ?? "").localeCompare(String(a.published_at ?? "")))
+    .filter((it) => {
+      const cap = String((it.title as string) ?? (it.description as string) ?? "").trim().toLowerCase();
+      if (!cap) return true;
+      if (seenCaptions.has(cap)) return false;
+      seenCaptions.add(cap);
+      return true;
+    })
     .slice(0, 12)
     .map((it) => {
       const e = (it.engagement ?? {}) as Record<string, number | null>;
