@@ -248,7 +248,7 @@ export default function MaisonDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8">
-          {([["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["profile", t.tabProfile]] as const).map(([key, label]) => (
+          {([["profile", t.tabProfile], ["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
