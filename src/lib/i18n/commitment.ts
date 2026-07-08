@@ -21,7 +21,10 @@ export type CommitmentLabels = {
   terms: string[]; // the bullet points of what they commit to
   signatureLabel: string;
   signaturePlaceholder: string;
-  acceptLabel: string; // "{maison}" is replaced with the maison name
+  acceptLabel: string; // "{maison}" is replaced with the maison name; ends before the linked docs
+  termsLink: string;
+  acceptAndThe: string; // connector between the two document links
+  privacyLink: string;
   required: string;
   submit: string;
   submitting: string;
@@ -55,7 +58,10 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     signatureLabel: "Signature — saisissez votre nom complet",
     signaturePlaceholder: "Prénom et nom",
     acceptLabel:
-      "J'ai lu et j'accepte, au nom de {maison}, les conditions d'engagement ci-dessus.",
+      "J'ai lu et j'accepte, au nom de {maison}, les conditions d'engagement ci-dessus, ainsi que les",
+    termsLink: "Conditions Générales",
+    acceptAndThe: "et la",
+    privacyLink: "Politique de Confidentialité",
     required: "*",
     submit: "Signer et entrer",
     submitting: "Signature…",
@@ -88,7 +94,10 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     signatureLabel: "Signature — type your full name",
     signaturePlaceholder: "First and last name",
     acceptLabel:
-      "I have read and accept, on behalf of {maison}, the commitment terms above.",
+      "I have read and accept, on behalf of {maison}, the commitment terms above, as well as the",
+    termsLink: "Terms & Conditions",
+    acceptAndThe: "and the",
+    privacyLink: "Privacy Policy",
     required: "*",
     submit: "Sign and enter",
     submitting: "Signing…",
@@ -121,7 +130,10 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     signatureLabel: "Firma — escribe tu nombre completo",
     signaturePlaceholder: "Nombre y apellido",
     acceptLabel:
-      "He leído y acepto, en nombre de {maison}, las condiciones de compromiso anteriores.",
+      "He leído y acepto, en nombre de {maison}, las condiciones de compromiso anteriores, así como los",
+    termsLink: "Términos y Condiciones",
+    acceptAndThe: "y la",
+    privacyLink: "Política de Privacidad",
     required: "*",
     submit: "Firmar y entrar",
     submitting: "Firmando…",

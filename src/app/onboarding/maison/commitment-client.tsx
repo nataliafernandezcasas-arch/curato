@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, DownloadSimple } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -137,7 +138,14 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
               className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
             />
             <span className="font-serif text-[14px] md:text-[15px] font-light text-white/75 leading-relaxed tracking-wide group-hover:text-white transition-colors">
-              {l.acceptLabel.replace("{maison}", maisonName || "Curato")}
+              {l.acceptLabel.replace("{maison}", maisonName || "Curato")}{" "}
+              <Link href="/condiciones" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-champagne/90 hover:text-champagne underline underline-offset-2">
+                {l.termsLink}
+              </Link>{" "}
+              {l.acceptAndThe}{" "}
+              <Link href="/privacidad" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-champagne/90 hover:text-champagne underline underline-offset-2">
+                {l.privacyLink}
+              </Link>
               <span className="text-copper/70"> {l.required}</span>
             </span>
           </label>
