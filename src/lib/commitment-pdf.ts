@@ -16,6 +16,7 @@ export async function buildCommitmentPdf(input: {
   title: string;
   intro: string;
   terms: string[];
+  acceptance: string;
   labels: { signedBy: string; date: string; footer: string };
   lang: string;
 }): Promise<string> {
@@ -109,6 +110,11 @@ export async function buildCommitmentPdf(input: {
     timeZone: "Europe/Paris",
   });
   page.drawText(`${input.labels.date}: ${when}`, { x: M, y, size: 10, font: serif, color: MUTED });
+
+  // Acceptance note (terms of engagement + T&C + privacy)
+  y -= 30;
+  page.drawRectangle({ x: M, y: y + 14, width: maxW, height: 0.5, color: rgb(0.85, 0.83, 0.8) });
+  drawWrapped(input.acceptance, serif, 9, M, MUTED, 13, maxW);
 
   // Footer
   const footer = input.labels.footer;

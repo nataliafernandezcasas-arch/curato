@@ -73,6 +73,7 @@ export async function signCommitment(input: {
       title: l.title,
       intro: l.intro,
       terms: l.terms,
+      acceptance: l.pdfAcceptance.replace("{maison}", maisonName),
       labels: { signedBy: l.signedBy, date: l.dateWord, footer: l.pdfFooter },
       lang,
     });
