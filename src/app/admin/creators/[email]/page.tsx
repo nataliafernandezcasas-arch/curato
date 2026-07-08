@@ -58,6 +58,7 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
 
   // Images they posted: live Instagram feed via Phyllo + any Curato visit content.
   let phylloPosts: { url: string | null; thumbnail: string | null }[] = [];
+  let phylloAvatar: string | null = null;
   if (creator.instagram_connected && creator.phyllo_account_id) {
     try {
       const accounts = await getPhylloAccounts(creator.phyllo_account_id);
@@ -65,12 +66,21 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
       if (acc?.id) {
         const [p, c] = await Promise.all([getPhylloProfile(acc.id), getPhylloContents(acc.id, 50)]);
         const { metrics } = summarizeMetrics(p?.data?.[0], c?.data ?? [], "");
+        phylloAvatar = metrics.imageUrl;
         phylloPosts = metrics.recentPosts.map((x) => ({ url: x.url, thumbnail: x.thumbnail }));
       }
     } catch {
       /* Phyllo best-effort */
     }
   }
+  const initials = (creator.full_name || creator.handle || "?")
+    .replace(/^@/, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w: string) => w[0])
+    .join("")
+    .toUpperCase();
   const visitPhotos = res.flatMap((r) => (r.content_photo_paths as string[] | null) ?? []).filter((u) => typeof u === "string" && /^https?:\/\//.test(u));
 
   const igConnected = creator.instagram_connected === true;
@@ -87,17 +97,40 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
       {/* Hero card */}
       <div className="border border-white/10 bg-white/5 p-8 md:p-10 mb-8">
         <div className="flex items-start justify-between flex-wrap gap-6 mb-6">
-          <div>
-            <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-3">
-              Créateur · Curato{creator.stage === "archived" ? " · Archivé" : ""}
-            </p>
-            <h1 className="font-serif text-3xl font-light tracking-[0.25em] uppercase text-white mb-2">{creator.full_name || "—"}</h1>
-            {creator.handle && (
-              <a href={`https://instagram.com/${creator.handle}`} target="_blank" rel="noopener noreferrer" className="font-serif text-[14px] text-champagne/60 hover:text-champagne transition-colors">
-                @{creator.handle}
-              </a>
-            )}
-            <p className="font-serif text-[13px] text-white/30 mt-1">{creator.email}</p>
+          <div className="flex items-start gap-5">
+            {/* Instagram profile photo (Phyllo) — falls back to initials */}
+            <div className="w-[72px] h-[72px] rounded-full overflow-hidden shrink-0 bg-white/5 border border-white/10 flex items-center justify-center">
+              {phylloAvatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={phylloAvatar} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="font-serif text-[20px] text-champagne/60">{initials}</span>
+              )}
+            </div>
+            <div>
+              <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-3">
+                Créateur · Curato{creator.stage === "archived" ? " · Archivé" : ""}
+              </p>
+              <h1 className="font-serif text-3xl font-light tracking-[0.25em] uppercase text-white mb-2">{creator.full_name || "—"}</h1>
+              {creator.handle && (
+                <a href={`https://instagram.com/${creator.handle}`} target="_blank" rel="noopener noreferrer" className="font-serif text-[14px] text-champagne/60 hover:text-champagne transition-colors">
+                  @{creator.handle}
+                </a>
+              )}
+              <p className="font-serif text-[13px] text-white/30 mt-1">{creator.email}</p>
+
+              {/* 3 latest posts */}
+              {phylloPosts.length > 0 && (
+                <div className="flex gap-1.5 mt-4">
+                  {phylloPosts.slice(0, 3).map((p, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <a key={i} href={p.url ?? undefined} target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-white/5 overflow-hidden block shrink-0 hover:opacity-80 transition-opacity">
+                      {p.thumbnail && <img src={p.thumbnail} alt="" className="w-full h-full object-cover" />}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="text-right">
             {creator.followers != null && creator.followers > 0 && (
