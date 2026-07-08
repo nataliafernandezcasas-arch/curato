@@ -43,10 +43,19 @@ export default async function AdminMaisonsPage() {
   const list = (data ?? []) as Comercio[];
   const signed = list.filter((m) => m.commitment_accepted_at);
 
+  // Account / connection status: does the maison have a login, and have they
+  // signed in yet? Keyed by email.
+  const { data: users } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  const lastSignInByEmail = new Map<string, string | null>();
+  for (const u of users?.users ?? []) {
+    if (u.email) lastSignInByEmail.set(u.email.toLowerCase(), u.last_sign_in_at ?? null);
+  }
+  const connected = list.filter((m) => m.email && lastSignInByEmail.get(m.email.toLowerCase()));
+
   return (
     <div className="max-w-[1100px] mx-auto px-5 py-12">
       <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-3">
-        {list.length} maisons · {signed.length} signées
+        {list.length} maisons · {signed.length} signées · {connected.length} connectées
       </p>
       <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white mb-10">Maisons</h1>
 
@@ -58,6 +67,8 @@ export default async function AdminMaisonsPage() {
         <div className="space-y-4">
           {list.map((m) => {
             const isSigned = Boolean(m.commitment_accepted_at);
+            const hasAccount = Boolean(m.email && lastSignInByEmail.has(m.email.toLowerCase()));
+            const lastSignIn = m.email ? lastSignInByEmail.get(m.email.toLowerCase()) : null;
             return (
               <div key={m.id} className="border border-white/10 bg-black/40 p-6">
                 <div className="flex items-start justify-between flex-wrap gap-4">
@@ -78,7 +89,14 @@ export default async function AdminMaisonsPage() {
                         {m.subscription_plan ? PLAN_LABEL[m.subscription_plan] ?? m.subscription_plan : "—"}
                       </p>
                     </div>
-                    <div className="min-w-[120px]">
+                    <div className="min-w-[110px]">
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Compte</p>
+                      <p className={`font-serif text-[14px] ${lastSignIn ? "text-emerald-400" : hasAccount ? "text-amber-300" : "text-white/40"}`}>
+                        {lastSignIn ? "Connectée" : hasAccount ? "Jamais entrée" : "Pas de compte"}
+                      </p>
+                      {lastSignIn && <p className="font-serif text-[11px] text-white/30 mt-0.5">{fmtDate(lastSignIn)}</p>}
+                    </div>
+                    <div className="min-w-[110px]">
                       <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Engagement</p>
                       <p className={`font-serif text-[14px] ${isSigned ? "text-emerald-400" : "text-white/45"}`}>
                         {isSigned ? "Signé" : "Non signé"}
