@@ -79,16 +79,14 @@ export default function SignInPage() {
     setError("");
 
     try {
-      const email = await resolveEmail();
-      // Always show the same confirmation, even if the handle is unknown, so
-      // we don't leak which accounts exist.
-      if (email) {
-        const { createClient } = await import("@/lib/supabase/client");
-        const supabase = createClient();
-        await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/callback?next=/auth/change-password`,
-        });
-      }
+      // Reset email is sent via our own endpoint (Resend), not Supabase's
+      // rate-limited built-in mailer. Always show the same confirmation so we
+      // don't leak which accounts exist.
+      await fetch("/api/auth/reset-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ handle }),
+      });
       setResetSent(true);
     } catch {
       setError(t.errorConnection);
