@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +43,11 @@ export default async function AdminCreatorsPage() {
     visitsByCreator.set(r.creator_id, list);
   }
 
-  const list = creators ?? [];
+  // Only real profiles: must have a name or an Instagram handle. This hides the
+  // empty placeholder rows that were seeded/imported.
+  const list = (creators ?? []).filter(
+    (c) => (c.full_name && c.full_name.trim()) || (c.handle && c.handle.trim())
+  );
 
   return (
     <div className="max-w-[1100px] mx-auto px-5 py-12">
@@ -63,8 +68,9 @@ export default async function AdminCreatorsPage() {
             const visits = visitsByCreator.get(c.id) ?? [];
             const engagement =
               typeof c.engagement_rate === "number" ? `${(c.engagement_rate * 100).toFixed(1)}%` : null;
-            return (
-              <div key={c.id} className="border border-white/10 bg-black/40 p-6">
+            const cls = "block border border-white/10 bg-black/40 p-6 hover:border-champagne/30 hover:bg-black/60 transition-colors";
+            const inner = (
+              <>
                 <div className="flex items-start justify-between flex-wrap gap-4">
                   {/* Identity */}
                   <div>
@@ -117,6 +123,15 @@ export default async function AdminCreatorsPage() {
                     </div>
                   </div>
                 )}
+              </>
+            );
+            return c.email ? (
+              <Link key={c.id} href={`/admin/creators/${encodeURIComponent(c.email)}`} className={cls}>
+                {inner}
+              </Link>
+            ) : (
+              <div key={c.id} className={cls}>
+                {inner}
               </div>
             );
           })}
