@@ -35,6 +35,7 @@ export type CommitmentLabels = {
   signedBy: string;
   dateWord: string;
   pdfFooter: string;
+  pdfAcceptance: string; // "{maison}" replaced; states T&C + privacy acceptance
   emailSubject: string;
   emailHeading: string;
   emailIntro: string;
@@ -71,6 +72,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     signedBy: "Signé par",
     dateWord: "Date",
     pdfFooter: "Curato · Paris · curatocollective.com",
+    pdfAcceptance:
+      "En signant, {maison} accepte les conditions d'engagement ci-dessus, ainsi que les Conditions Générales et la Politique de Confidentialité de Curato.",
     emailSubject: "Curato · Votre engagement est signé",
     emailHeading: "Engagement confirmé",
     emailIntro:
@@ -107,6 +110,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     signedBy: "Signed by",
     dateWord: "Date",
     pdfFooter: "Curato · Paris · curatocollective.com",
+    pdfAcceptance:
+      "By signing, {maison} accepts the commitment terms above, as well as Curato's Terms & Conditions and Privacy Policy.",
     emailSubject: "Curato · Your commitment is signed",
     emailHeading: "Commitment confirmed",
     emailIntro:
@@ -143,6 +148,8 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     signedBy: "Firmado por",
     dateWord: "Fecha",
     pdfFooter: "Curato · Paris · curatocollective.com",
+    pdfAcceptance:
+      "Al firmar, {maison} acepta las condiciones de compromiso anteriores, así como los Términos y Condiciones y la Política de Privacidad de Curato.",
     emailSubject: "Curato · Tu compromiso está firmado",
     emailHeading: "Compromiso confirmado",
     emailIntro:
