@@ -18,14 +18,16 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Magic link / token_hash flow (generateLink)
+  // Magic link / token_hash flow (generateLink). Respect `next` so a recovery
+  // link lands on /auth/change-password, not the dashboard — otherwise the user
+  // is signed in but never sets a new password and the reset does nothing.
   if (token_hash && type) {
     const { error } = await supabase.auth.verifyOtp({
       token_hash,
       type: type as "email" | "magiclink" | "recovery" | "invite",
     });
     if (!error) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL(next, request.url));
     }
   }
 

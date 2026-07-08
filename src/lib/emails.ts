@@ -476,3 +476,36 @@ export async function sendMaisonCommitment(opts: MaisonCommitmentOpts) {
     { filename: opts.pdfFilename, content: opts.pdfBase64, content_type: "application/pdf" },
   ]);
 }
+
+// ── Password reset ────────────────────────────────────────────────────────────
+// Sent via Resend (reliable) instead of Supabase's built-in auth email. The
+// resetUrl is a Supabase recovery action link that lands on /auth/change-password.
+export async function sendPasswordReset(to: string, resetUrl: string) {
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        Réinitialisation
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        Nouveau mot de passe
+      </h1>
+    </td></tr>
+    <tr><td style="padding:18px 40px 0;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
+        Vous avez demandé à réinitialiser votre mot de passe Curato. Cliquez ci-dessous pour en choisir un nouveau. Ce lien expire dans 1 heure.
+      </p>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <a href="${resetUrl}" style="display:inline-block;font-family:${FONT_SANS};font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:${C.bg};background-color:${C.champagne};text-decoration:none;padding:14px 28px;">
+        Choisir un nouveau mot de passe
+      </a>
+    </td></tr>
+    <tr><td style="padding:24px 40px 40px;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
+        Si vous n'êtes pas à l'origine de cette demande, ignorez cet email : votre mot de passe reste inchangé.
+      </p>
+    </td></tr>
+  `);
+
+  return sendEmail(to, "Curato · Réinitialisation de votre mot de passe", html);
+}
