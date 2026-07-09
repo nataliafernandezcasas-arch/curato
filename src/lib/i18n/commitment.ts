@@ -6,11 +6,19 @@ import type { Lang } from "./translations";
 // The maison presentation dossier (8 pages, exported from the Canva PDF). Shown
 // as stacked slides at the top of the commitment step, mirroring the creators'
 // welcome dossier. French only for now (like the creators', ES/EN fall back).
-export const MAISON_DOSSIER_SLIDES: string[] = Array.from(
-  { length: 8 },
-  (_, i) => `/onboarding/maison/slide-${i + 1}.jpg`
-);
-export const MAISON_DOSSIER_PDF = "/onboarding/maison/dossier-curato-maison.pdf";
+// English has its own translated deck; French and Spanish share the French one.
+export function getMaisonDossierSlides(lang: Lang): string[] {
+  const dir = lang === "en" ? "/onboarding/maison/en" : "/onboarding/maison";
+  return Array.from({ length: 8 }, (_, i) => `${dir}/slide-${i + 1}.jpg`);
+}
+export function getMaisonDossierPdf(lang: Lang): string {
+  return lang === "en"
+    ? "/onboarding/maison/dossier-curato-maison-en.pdf"
+    : "/onboarding/maison/dossier-curato-maison.pdf";
+}
+export function getMaisonDossierFilename(lang: Lang): string {
+  return lang === "en" ? "Curato - Selected Addresses EN.pdf" : "Curato - Adresses sélectionnées FR.pdf";
+}
 
 export type CommitmentLabels = {
   dossierEyebrow: string;

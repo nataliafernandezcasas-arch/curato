@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, DownloadSimple } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
-import { getCommitmentLabels, MAISON_DOSSIER_SLIDES, MAISON_DOSSIER_PDF } from "@/lib/i18n/commitment";
+import { getCommitmentLabels, getMaisonDossierSlides, getMaisonDossierPdf, getMaisonDossierFilename } from "@/lib/i18n/commitment";
 import { signCommitment } from "./actions";
 
 const LANG_OPTIONS = [
@@ -18,6 +18,9 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
   const router = useRouter();
   const { lang, setLang } = useLang();
   const l = getCommitmentLabels(lang);
+  const dossierSlides = getMaisonDossierSlides(lang);
+  const dossierPdf = getMaisonDossierPdf(lang);
+  const dossierFilename = getMaisonDossierFilename(lang);
 
   const [signatory, setSignatory] = useState("");
   const [accepted, setAccepted] = useState(false);
@@ -68,7 +71,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
 
       {/* Presentation dossier — stacked full-bleed pages */}
       <section aria-label="Dossier Curato">
-        {MAISON_DOSSIER_SLIDES.map((src, i) => (
+        {dossierSlides.map((src, i) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img key={src} src={src} alt="" loading={i === 0 ? "eager" : "lazy"} className="block w-full h-auto" />
         ))}
@@ -77,8 +80,8 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
       {/* Download the dossier */}
       <div className="text-center py-10 border-t border-white/10">
         <a
-          href={MAISON_DOSSIER_PDF}
-          download="Curato - Adresses sélectionnées FR.pdf"
+          href={dossierPdf}
+          download={dossierFilename}
           className="inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.2em] uppercase text-champagne/80 hover:text-champagne border border-champagne/30 hover:border-champagne/60 px-6 py-3 transition-colors"
         >
           <DownloadSimple size={15} />
