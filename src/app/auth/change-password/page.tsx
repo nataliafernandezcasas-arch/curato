@@ -3,8 +3,19 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations, Lang } from "@/lib/i18n/translations";
+
+const LANGS: { key: Lang; label: string }[] = [
+  { key: "fr", label: "FR" },
+  { key: "en", label: "EN" },
+  { key: "es", label: "ES" },
+];
 
 export default function ChangePasswordPage() {
+  const { lang, setLang } = useLang();
+  const t = translations[lang].changePassword;
+
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,11 +26,11 @@ export default function ChangePasswordPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 8) {
-      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      setError(t.errorMin);
       return;
     }
     if (password !== confirm) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(t.errorMatch);
       return;
     }
     setLoading(true);
@@ -33,12 +44,12 @@ export default function ChangePasswordPage() {
         data: { force_password_change: false },
       });
       if (updateErr) {
-        setError("Erreur lors du changement. Veuillez réessayer.");
+        setError(t.errorUpdate);
         return;
       }
       window.location.href = "/dashboard";
     } catch {
-      setError("Erreur de connexion. Veuillez réessayer.");
+      setError(t.errorConnection);
     } finally {
       setLoading(false);
     }
@@ -51,23 +62,38 @@ export default function ChangePasswordPage() {
         <div className="absolute inset-0 bg-charcoal-deep/80 backdrop-blur-sm" />
       </div>
 
+      {/* Language switcher */}
+      <div className="absolute top-5 right-5 flex items-center gap-3 z-20">
+        {LANGS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setLang(key)}
+            className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
+              lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="relative z-10 w-full max-w-[400px]">
         <div className="text-center mb-12">
           <Link href="/" className="inline-block mb-8">
             <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
           </Link>
           <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
-            Bienvenue
+            {t.title}
           </h1>
           <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">
-            Choisissez votre mot de passe personnel
+            {t.subtitle}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-              Nouveau mot de passe
+              {t.newLabel}
             </label>
             <div className="relative">
               <input
@@ -82,7 +108,7 @@ export default function ChangePasswordPage() {
                 autoCorrect="off"
                 spellCheck={false}
                 className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50 pr-12"
-                placeholder="Minimum 8 caractères"
+                placeholder={t.newPlaceholder}
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-champagne transition-colors">
                 {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
@@ -92,7 +118,7 @@ export default function ChangePasswordPage() {
 
           <div>
             <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-              Confirmer le mot de passe
+              {t.confirmLabel}
             </label>
             <div className="relative">
               <input
@@ -125,7 +151,7 @@ export default function ChangePasswordPage() {
             disabled={loading}
             className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
           >
-            {loading ? "Enregistrement…" : "Accéder à Curato"}
+            {loading ? t.submitting : t.submit}
           </button>
         </form>
       </div>
