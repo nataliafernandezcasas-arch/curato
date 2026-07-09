@@ -76,6 +76,11 @@ export default function ChangePasswordPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
+                name="new-password"
+                autoComplete="new-password"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
                 className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50 pr-12"
                 placeholder="Minimum 8 caractères"
               />
@@ -95,6 +100,11 @@ export default function ChangePasswordPage() {
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 required
+                name="confirm-password"
+                autoComplete="new-password"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
                 className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50 pr-12"
                 placeholder="••••••••"
               />
