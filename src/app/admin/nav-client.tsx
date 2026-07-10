@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
@@ -27,6 +28,10 @@ export default function AdminNavClient() {
   const t = translations[lang].admin;
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Portals need document.body, which only exists after mount.
+  useEffect(() => setMounted(true), []);
 
   // Grouped as editorial sections inside a full-screen overlay.
   const groups: { id: string; label: string; items: { href: string; label: string }[] }[] = [
@@ -123,8 +128,9 @@ export default function AdminNavClient() {
         </div>
       </div>
 
-      {/* Full-screen overlay menu */}
-      {open && (
+      {/* Full-screen overlay menu, portaled to body so it escapes the
+          admin header's stacking context and covers the page. */}
+      {open && mounted && createPortal(
         <div className="fixed inset-0 z-[100] overflow-y-auto">
           {/* Backdrop: warm near-black with a soft burgundy vignette */}
           <div
@@ -215,7 +221,8 @@ export default function AdminNavClient() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
