@@ -18,7 +18,7 @@ export async function POST() {
     const admin = createAdminClient();
     const { data: creator } = await admin
       .from("creators")
-      .select("id, phyllo_account_id")
+      .select("id, phyllo_account_id, followers")
       .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
       .maybeSingle();
 
@@ -48,7 +48,16 @@ export async function POST() {
       instagram_connected: true,
       phyllo_connected_at: now,
     };
-    if (typeof metrics.followers === "number") update.followers_count = metrics.followers;
+    // Store the Phyllo follower count, but guard against implausibly low values
+    // (Phyllo staging sometimes returns e.g. 2 followers for a real 68k account).
+    // If we have a known survey figure and Phyllo's is far below it, skip it.
+    const surveyFollowers = (creator as { followers?: number | null }).followers ?? null;
+    if (
+      typeof metrics.followers === "number" &&
+      (!surveyFollowers || metrics.followers >= surveyFollowers * 0.3)
+    ) {
+      update.followers_count = metrics.followers;
+    }
     if (typeof engagementRate === "number") {
       update.engagement_rate = engagementRate;
       update.engagement_rate_updated_at = now;
