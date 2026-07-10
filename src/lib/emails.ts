@@ -509,3 +509,37 @@ export async function sendPasswordReset(to: string, resetUrl: string) {
 
   return sendEmail(to, "Curato · Réinitialisation de votre mot de passe", html);
 }
+
+// ── Admin alert: a maison opened its account (signed the commitment) ───────────
+export async function sendMaisonJoinedAdminAlert(opts: {
+  to: string;
+  maisonName: string;
+  signatory: string;
+  whenLabel: string;
+  planLabel: string;
+}) {
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        Nouvelle maison
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        ${opts.maisonName}
+      </h1>
+    </td></tr>
+    <tr><td style="padding:18px 40px 0;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
+        vient d'ouvrir son compte et de signer son engagement Curato.
+      </p>
+    </td></tr>
+    <tr><td style="padding:26px 40px 40px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="font-family:${FONT_SANS};font-size:13px;color:${C.white};">
+        <tr><td style="padding:6px 0;color:${C.muted};width:120px;">Signé par</td><td style="padding:6px 0;">${opts.signatory}</td></tr>
+        <tr><td style="padding:6px 0;color:${C.muted};">Formule</td><td style="padding:6px 0;">${opts.planLabel}</td></tr>
+        <tr><td style="padding:6px 0;color:${C.muted};">Date</td><td style="padding:6px 0;">${opts.whenLabel}</td></tr>
+      </table>
+    </td></tr>
+  `);
+
+  return sendEmail(opts.to, `Curato · Nouvelle maison signée : ${opts.maisonName}`, html);
+}

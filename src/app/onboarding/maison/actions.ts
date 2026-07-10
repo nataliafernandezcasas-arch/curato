@@ -5,7 +5,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCommitmentLabels } from "@/lib/i18n/commitment";
 import type { Lang } from "@/lib/i18n/translations";
 import { buildCommitmentPdf } from "@/lib/commitment-pdf";
-import { sendMaisonCommitment } from "@/lib/emails";
+import { sendMaisonCommitment, sendMaisonJoinedAdminAlert } from "@/lib/emails";
+
+// Where new-maison alerts are sent (the Curato inbox Natalia manages).
+const ADMIN_INBOX = "hello@curatocollective.com";
 
 // Closes the maison commitment step:
 //   - Verifies the current user is an active maison (comercio)
@@ -99,6 +102,15 @@ export async function signCommitment(input: {
       confirmNote: l.emailConfirmNote,
       pdfBase64,
       pdfFilename: "curato-engagement.pdf",
+    });
+
+    // Notify the Curato inbox that a maison just opened its account.
+    await sendMaisonJoinedAdminAlert({
+      to: ADMIN_INBOX,
+      maisonName,
+      signatory,
+      whenLabel,
+      planLabel: "299 €/mois",
     });
   } catch (mailErr) {
     // eslint-disable-next-line no-console
