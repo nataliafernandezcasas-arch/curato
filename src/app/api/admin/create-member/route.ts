@@ -5,6 +5,84 @@ import { isAdmin } from "@/lib/admin/auth";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
+// Public host used for email image srcs and for fetching the guide PDF to
+// attach. Hardcoded to the canonical prod host so assets resolve regardless of
+// the deploy env (localhost/preview).
+const ASSET_BASE = "https://www.curatocollective.com";
+
+type EmailLang = "fr" | "en";
+
+// Branded activation email for a new creator: darkened photo hero with the
+// logo on the right, the login credentials, and a call to connect Instagram.
+// The step-by-step guide is attached as a PDF (see fetchGuideBase64).
+function creatorWelcomeEmail(lang: EmailLang, params: { firstName: string; handle: string; tempPassword: string }) {
+  const { firstName, handle, tempPassword } = params;
+  const t = lang === "en"
+    ? {
+        eyebrow: "Creator · Storyteller",
+        h1: `Welcome,<br/>${firstName}.`,
+        p1: "Your Curato space is ready. Here are your credentials to log in, then connect your Instagram account.",
+        credsLabel: "Your credentials",
+        handleLabel: "Handle",
+        pwdLabel: "Temporary password",
+        pwdNote: "You'll choose a personal password on your first login.",
+        cta: "Access Curato",
+        note: "Once logged in, click \"Connect Instagram\". The attached guide walks you through every step. Each month, you'll also receive an overview of how your engagement and visibility are growing with Curato.",
+        sign: "Have a lovely day,<br/>Natalia",
+      }
+    : {
+        eyebrow: "Créateur · Storyteller",
+        h1: `Bienvenue,<br/>${firstName}.`,
+        p1: "Ton espace Curato est prêt. Voici tes identifiants pour te connecter, puis relier ton compte Instagram.",
+        credsLabel: "Tes identifiants",
+        handleLabel: "Handle",
+        pwdLabel: "Mot de passe temporaire",
+        pwdNote: "Tu choisiras un mot de passe personnel à la première connexion.",
+        cta: "Accéder à Curato",
+        note: "Une fois connecté·e, clique sur « Connecter Instagram ». Le guide en pièce jointe t'explique tout, étape par étape. Chaque mois, tu recevras aussi un aperçu de l'évolution de ton engagement et de ta visibilité grâce à Curato.",
+        sign: "Belle journée,<br/>Natalia",
+      };
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
+<body style="margin:0;padding:0;background-color:#2b2b28;font-family:Georgia,'Times New Roman',serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#2b2b28;"><tr><td align="center" style="padding:24px 12px;">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background-color:#1A1A1A;">
+  <tr><td style="padding:0;position:relative;height:210px;background-color:#111;">
+    <img src="${ASSET_BASE}/email-activation-bg.jpg" width="600" height="210" alt="" style="display:block;width:100%;height:210px;object-fit:cover;opacity:0.5;"/>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="position:absolute;top:0;left:0;height:210px;"><tr><td align="right" valign="middle" style="padding-right:64px;">
+      <img src="${ASSET_BASE}/logo-curato-simple.png" alt="curato" height="30" style="display:block;height:30px;width:auto;"/>
+    </td></tr></table>
+  </td></tr>
+  <tr><td style="padding:26px 46px 6px;"><p style="margin:0;font-size:11px;letter-spacing:0.35em;text-transform:uppercase;color:#CBB78F;">${t.eyebrow}</p></td></tr>
+  <tr><td style="padding:8px 46px 22px;"><h1 style="margin:0;font-size:31px;font-weight:400;color:#F0EBE0;letter-spacing:0.02em;line-height:1.15;">${t.h1}</h1></td></tr>
+  <tr><td style="padding:0 46px;"><p style="margin:0 0 22px;font-size:15px;line-height:1.75;color:#9a8f7f;">${t.p1}</p></td></tr>
+  <tr><td style="padding:0 46px 30px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #2a2a2a;"><tr><td style="padding:22px 26px;">
+      <p style="margin:0 0 16px;font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#5a5040;">${t.credsLabel}</p>
+      <p style="margin:0 0 4px;font-size:12px;color:#5a5040;">${t.handleLabel}</p>
+      <p style="margin:0 0 18px;font-size:17px;font-weight:400;color:#CBB78F;">@${handle}</p>
+      <p style="margin:0 0 4px;font-size:12px;color:#5a5040;">${t.pwdLabel}</p>
+      <p style="margin:0 0 14px;font-size:17px;font-weight:400;color:#CBB78F;letter-spacing:0.1em;">${tempPassword}</p>
+      <p style="margin:0;font-size:11px;color:#4a4030;line-height:1.6;">${t.pwdNote}</p>
+    </td></tr></table>
+  </td></tr>
+  <tr><td align="right" style="padding:0 64px 26px;"><a href="${ASSET_BASE}/auth/sign-in" style="display:inline-block;background-color:#CBB78F;color:#1A1A1A;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;padding:15px 32px;text-decoration:none;font-family:Georgia,serif;">${t.cta}</a></td></tr>
+  <tr><td style="padding:0 46px 40px;"><p style="margin:0;font-size:13px;line-height:1.75;color:#6f6558;">${t.note}<br/><br/>${t.sign}</p></td></tr>
+  <tr><td style="background-color:#141414;padding:22px 46px;"><p style="margin:0;font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:#4a4030;">Paris · Sur invitation · <a href="${ASSET_BASE}" style="color:#4a4030;text-decoration:none;">curatocollective.com</a></p></td></tr>
+</table></td></tr></table></body></html>`;
+}
+
+// Pulls the connect-Instagram guide PDF (served from /guides) and returns it as
+// base64 so it can be attached. Best-effort: a failure just omits the attachment.
+async function fetchGuideBase64(lang: EmailLang): Promise<string | null> {
+  try {
+    const res = await fetch(`${ASSET_BASE}/guides/curato-connect-instagram-${lang}.pdf`);
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer()).toString("base64");
+  } catch {
+    return null;
+  }
+}
 
 function welcomeEmail(params: {
   name: string;
@@ -108,6 +186,7 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json();
   const { type, name, email, handle, followers, monthly_credit } = body;
+  const emailLang: EmailLang = body.lang === "en" ? "en" : "fr";
 
   if (!type || !name || !email) {
     return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
@@ -174,17 +253,31 @@ export async function POST(request: NextRequest) {
 
   // 3. Send welcome email
   try {
-    await resend.emails.send({
-      from: "Curato <hello@curatocollective.com>",
-      to: emailLc,
-      subject: `Bienvenue dans Curato, ${name.split(" ")[0]}.`,
-      html: welcomeEmail({
-        name,
-        type: type === "maison" ? "maison" : "creator",
-        identifier: type === "creator" ? cleanHandle : emailLc,
-        tempPassword,
-      }),
-    });
+    const firstName = name.split(" ")[0];
+    if (type === "creator") {
+      // New creators get the branded activation email in the chosen language,
+      // with the connect-Instagram guide attached (best-effort).
+      const guide = await fetchGuideBase64(emailLang);
+      await resend.emails.send({
+        from: "Curato <hello@curatocollective.com>",
+        to: emailLc,
+        subject: emailLang === "en" ? `Welcome to Curato, ${firstName}.` : `Bienvenue dans Curato, ${firstName}.`,
+        html: creatorWelcomeEmail(emailLang, { firstName, handle: cleanHandle, tempPassword }),
+        attachments: guide
+          ? [{
+              filename: emailLang === "en" ? "Curato - Connect Instagram.pdf" : "Curato - Connecter Instagram.pdf",
+              content: guide,
+            }]
+          : undefined,
+      });
+    } else {
+      await resend.emails.send({
+        from: "Curato <hello@curatocollective.com>",
+        to: emailLc,
+        subject: `Bienvenue dans Curato, ${firstName}.`,
+        html: welcomeEmail({ name, type: "maison", identifier: emailLc, tempPassword }),
+      });
+    }
   } catch (emailErr) {
     console.error("Email error:", emailErr);
     // Don't fail — user is created, email is cosmetic

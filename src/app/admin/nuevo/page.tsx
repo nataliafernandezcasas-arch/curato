@@ -13,6 +13,7 @@ export default function AdminNuevoPage() {
   const [handle, setHandle] = useState("");
   const [followers, setFollowers] = useState("");
   const [credit, setCredit] = useState("300");
+  const [lang, setLang] = useState<"fr" | "en">("fr");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState<{ tempPassword: string; email: string } | null>(null);
@@ -34,6 +35,7 @@ export default function AdminNuevoPage() {
           handle: handle.trim().replace("@", ""),
           followers: followers ? parseInt(followers) : 0,
           monthly_credit: credit ? parseInt(credit) : 300,
+          lang,
         }),
       });
 
@@ -57,6 +59,7 @@ export default function AdminNuevoPage() {
     setHandle("");
     setFollowers("");
     setCredit("300");
+    setLang("fr");
     setError("");
   }
 
@@ -224,6 +227,26 @@ export default function AdminNuevoPage() {
                     min="0"
                   />
                 </div>
+              </div>
+            </div>
+
+            <div>
+              <p className={labelClass}>Langue de l&apos;email &amp; du guide</p>
+              <div className="grid grid-cols-2 gap-px bg-white/10">
+                {(["fr", "en"] as const).map((l) => (
+                  <button
+                    key={l}
+                    type="button"
+                    onClick={() => setLang(l)}
+                    className={`py-3 font-serif text-[12px] tracking-[0.25em] uppercase transition-all duration-200 ${
+                      lang === l
+                        ? "bg-champagne text-charcoal-deep"
+                        : "bg-white/5 text-white/40 hover:text-white/70"
+                    }`}
+                  >
+                    {l === "fr" ? "Français" : "English"}
+                  </button>
+                ))}
               </div>
             </div>
           </>
