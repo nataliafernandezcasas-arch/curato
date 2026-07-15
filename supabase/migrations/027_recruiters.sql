@@ -60,6 +60,15 @@ DROP POLICY IF EXISTS rp_insert_own ON recruiter_prospects;
 CREATE POLICY rp_insert_own ON recruiter_prospects
   FOR INSERT WITH CHECK (recruiter_id IN (SELECT id FROM recruiters WHERE owner_id = auth.uid()));
 
+-- ---------------------------------------------------------------------------
+-- Grants: service_role (used by the admin client in all API routes) needs full
+-- access; authenticated is additionally constrained by the RLS policies above.
+-- ---------------------------------------------------------------------------
+GRANT ALL ON ALL TABLES    IN SCHEMA public TO service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;
+GRANT SELECT, INSERT, UPDATE ON recruiters         TO authenticated;
+GRANT SELECT, INSERT         ON recruiter_prospects TO authenticated;
+
 -- ============================================================================
 -- End of 027_recruiters.sql
 -- ============================================================================
