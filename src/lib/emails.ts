@@ -586,6 +586,21 @@ export async function sendRecruiterWelcome(to: string, o: { name: string; email:
   return sendEmail(to, `Bienvenue dans Curato, ${first(o.name)}.`, html);
 }
 
+// A second role added to an existing account (e.g. a storyteller who becomes
+// a recruiter). No new password — they keep their usual login.
+export async function sendRecruiterSecondRole(to: string, o: { name: string }) {
+  const html = recruiterCard(
+    "Espace Recruiter",
+    `Bonjour, ${first(o.name)}.`,
+    [
+      `Vous avez désormais aussi accès à l'espace Recruiter de Curato, avec votre compte habituel.`,
+      `Connectez-vous comme d'habitude. Un lien « Espaces » en haut de votre tableau de bord vous permet de basculer entre vos différents espaces.`,
+    ],
+    { label: "Accéder à mon espace", url: `${SITE_URL}/auth/sign-in` }
+  );
+  return sendEmail(to, "Curato · Votre espace Recruiter est activé", html);
+}
+
 // Step 1 (submitted) — to the recruiter
 export async function sendRecruiterProspectSubmitted(to: string, o: { recruiterName: string; maisonName: string }) {
   const html = recruiterCard(

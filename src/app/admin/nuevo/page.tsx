@@ -16,7 +16,7 @@ export default function AdminNuevoPage() {
   const [lang, setLang] = useState<"fr" | "en">("fr");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState<{ tempPassword: string; email: string } | null>(null);
+  const [success, setSuccess] = useState<{ tempPassword: string | null; email: string } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -86,17 +86,25 @@ export default function AdminNuevoPage() {
             <span className="text-champagne">{success.email}</span>.
           </p>
 
-          <div className="border border-white/10 bg-white/5 p-6 mb-8">
-            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-4">
-              Mot de passe temporaire
-            </p>
-            <p className="font-serif text-[22px] font-light text-champagne tracking-widest">
-              {success.tempPassword}
-            </p>
-            <p className="font-serif text-[11px] text-white/25 mt-3">
-              Le membre devra le changer à la première connexion.
-            </p>
-          </div>
+          {success.tempPassword ? (
+            <div className="border border-white/10 bg-white/5 p-6 mb-8">
+              <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-4">
+                Mot de passe temporaire
+              </p>
+              <p className="font-serif text-[22px] font-light text-champagne tracking-widest">
+                {success.tempPassword}
+              </p>
+              <p className="font-serif text-[11px] text-white/25 mt-3">
+                Le membre devra le changer à la première connexion.
+              </p>
+            </div>
+          ) : (
+            <div className="border border-white/10 bg-white/5 p-6 mb-8">
+              <p className="font-serif text-[13px] font-light text-white/60 leading-relaxed">
+                Ce compte existait déjà : le membre garde son mot de passe habituel et retrouve ses espaces via le lien « Espaces » de son tableau de bord.
+              </p>
+            </div>
+          )}
 
           <div className="flex items-center gap-4">
             <button
