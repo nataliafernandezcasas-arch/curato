@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { SignOut } from "@phosphor-icons/react";
+import RoleSwitch from "../role-switch";
 
 type Prospect = {
   id: string;
@@ -102,9 +103,12 @@ export default function RecruiterDashboard() {
         <Link href="/">
           <img src="/logo-curato-simple.png" alt="curato" style={{ height: "13px", width: "auto", display: "block" }} />
         </Link>
-        <button onClick={signOut} className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/40 hover:text-white transition-colors">
-          <SignOut size={14} weight="thin" /> Déconnexion
-        </button>
+        <div className="flex items-center gap-6">
+          <RoleSwitch current="recruiter" />
+          <button onClick={signOut} className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/40 hover:text-white transition-colors">
+            <SignOut size={14} weight="thin" /> Déconnexion
+          </button>
+        </div>
       </div>
 
       <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">Espace Recruiter</p>

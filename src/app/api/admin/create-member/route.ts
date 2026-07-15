@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
-import { sendRecruiterWelcome } from "@/lib/emails";
+import { sendRecruiterWelcome, sendRecruiterSecondRole } from "@/lib/emails";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
@@ -209,17 +209,24 @@ export async function POST(request: NextRequest) {
   });
 
   let userId: string | null = authData?.user?.id ?? null;
+  let userExisted = false;
 
   if (authErr) {
-    // User might already exist — find and update
+    // User might already exist — find and (usually) re-issue credentials.
     const { data: listData } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
     const existing = listData?.users?.find((u) => u.email === emailLc);
     if (existing) {
       userId = existing.id;
-      await supabase.auth.admin.updateUserById(existing.id, {
-        password: tempPassword,
-        user_metadata: { force_password_change: true, handle: cleanHandle },
-      });
+      userExisted = true;
+      // Adding a recruiter role to an existing account (e.g. a storyteller who
+      // becomes a recruiter) must NOT reset their password — they keep their
+      // usual login. For creators/maisons we re-issue credentials as before.
+      if (type !== "recruiter") {
+        await supabase.auth.admin.updateUserById(existing.id, {
+          password: tempPassword,
+          user_metadata: { force_password_change: true, handle: cleanHandle },
+        });
+      }
     } else {
       return NextResponse.json({ error: `Error creando usuario: ${authErr.message}` }, { status: 500 });
     }
@@ -280,7 +287,12 @@ export async function POST(request: NextRequest) {
           : undefined,
       });
     } else if (type === "recruiter") {
-      await sendRecruiterWelcome(emailLc, { name, email: emailLc, tempPassword });
+      if (userExisted) {
+        // Existing account gaining the recruiter role: keep their password.
+        await sendRecruiterSecondRole(emailLc, { name });
+      } else {
+        await sendRecruiterWelcome(emailLc, { name, email: emailLc, tempPassword });
+      }
     } else {
       await resend.emails.send({
         from: "Curato <hello@curatocollective.com>",
@@ -294,5 +306,8 @@ export async function POST(request: NextRequest) {
     // Don't fail — user is created, email is cosmetic
   }
 
-  return NextResponse.json({ ok: true, tempPassword });
+  // When an existing account just gains the recruiter role, no new password was
+  // issued — signal that so the admin UI doesn't show a misleading one.
+  const passwordIssued = !(type === "recruiter" && userExisted);
+  return NextResponse.json({ ok: true, tempPassword: passwordIssued ? tempPassword : null });
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { MapPin, SignOut } from "@phosphor-icons/react";
+import RoleSwitch from "../role-switch";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT } from "@/lib/launch";
@@ -193,6 +194,7 @@ export default function InfluencerDashboard() {
             </Link>
           </div>
           <div className="flex items-center gap-5">
+            <RoleSwitch current="storyteller" />
             <div className="flex items-center gap-2.5">
               {LANGS.map(({ key, label }) => (
                 <button
