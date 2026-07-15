@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
+import { sendRecruiterWelcome } from "@/lib/emails";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
@@ -249,6 +250,14 @@ export async function POST(request: NextRequest) {
     }, { onConflict: "email" });
 
     if (dbErr) return NextResponse.json({ error: `Error DB: ${dbErr.message}` }, { status: 500 });
+  } else if (type === "recruiter") {
+    const { error: dbErr } = await supabase.from("recruiters").upsert({
+      full_name: name,
+      email: emailLc,
+      ...(userId ? { owner_id: userId } : {}),
+    }, { onConflict: "email" });
+
+    if (dbErr) return NextResponse.json({ error: `Error DB: ${dbErr.message}` }, { status: 500 });
   }
 
   // 3. Send welcome email
@@ -270,6 +279,8 @@ export async function POST(request: NextRequest) {
             }]
           : undefined,
       });
+    } else if (type === "recruiter") {
+      await sendRecruiterWelcome(emailLc, { name, email: emailLc, tempPassword });
     } else {
       await resend.emails.send({
         from: "Curato <hello@curatocollective.com>",

@@ -41,6 +41,7 @@ export default function AdminNavClient() {
       items: [
         { href: "/admin/creators", label: t.navCreators },
         { href: "/admin/maisons", label: t.navMaisons },
+        { href: "/admin/recruiters", label: "Recruiters" },
       ],
     },
     {

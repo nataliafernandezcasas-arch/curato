@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle } from "@phosphor-icons/react";
 
-type MemberType = "creator" | "maison";
+type MemberType = "creator" | "maison" | "recruiter";
 
 export default function AdminNuevoPage() {
   const [type, setType] = useState<MemberType>("creator");
@@ -137,19 +137,19 @@ export default function AdminNuevoPage() {
         {/* Type selector */}
         <div>
           <p className={labelClass}>Type de membre</p>
-          <div className="grid grid-cols-2 gap-px bg-white/10">
-            {(["creator", "maison"] as MemberType[]).map((t) => (
+          <div className="grid grid-cols-3 gap-px bg-white/10">
+            {(["creator", "maison", "recruiter"] as MemberType[]).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setType(t)}
-                className={`py-3.5 font-serif text-[12px] tracking-[0.25em] uppercase transition-all duration-200 ${
+                className={`py-3.5 font-serif text-[12px] tracking-[0.2em] uppercase transition-all duration-200 ${
                   type === t
                     ? "bg-champagne text-charcoal-deep"
                     : "bg-white/5 text-white/40 hover:text-white/70"
                 }`}
               >
-                {t === "creator" ? "Créateur" : "Maison"}
+                {t === "creator" ? "Créateur" : t === "maison" ? "Maison" : "Recruiter"}
               </button>
             ))}
           </div>
@@ -160,7 +160,7 @@ export default function AdminNuevoPage() {
         {/* Common fields */}
         <div>
           <label className={labelClass}>
-            {type === "creator" ? "Nom complet *" : "Nom de la maison *"}
+            {type === "maison" ? "Nom de la maison *" : "Nom complet *"}
           </label>
           <input
             type="text"
