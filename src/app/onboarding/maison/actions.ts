@@ -5,7 +5,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCommitmentLabels } from "@/lib/i18n/commitment";
 import type { Lang } from "@/lib/i18n/translations";
 import { buildCommitmentPdf } from "@/lib/commitment-pdf";
-import { sendMaisonCommitment, sendMaisonJoinedAdminAlert } from "@/lib/emails";
+import {
+  sendMaisonCommitment,
+  sendMaisonJoinedAdminAlert,
+  sendRecruiterMaisonSigned,
+  sendAdminRecruiterMaisonSigned,
+} from "@/lib/emails";
 
 // Where new-maison alerts are sent (the Curato inbox Natalia manages).
 const ADMIN_INBOX = "hello@curatocollective.com";
@@ -115,6 +120,37 @@ export async function signCommitment(input: {
   } catch (mailErr) {
     // eslint-disable-next-line no-console
     console.error("signCommitment email/pdf failed:", mailErr);
+  }
+
+  // If a recruiter brought this maison, mark the prospect signed and notify the
+  // recruiter (commission) and the admin. Best-effort.
+  try {
+    const maisonEmails = [comercio.email, user.email]
+      .filter(Boolean)
+      .map((e) => (e as string).toLowerCase());
+    const { data: prospect } = await admin
+      .from("recruiter_prospects")
+      .select("id, maison_name, recruiter_id")
+      .in("maison_email", maisonEmails)
+      .neq("status", "signed")
+      .limit(1)
+      .maybeSingle();
+    if (prospect) {
+      await admin.from("recruiter_prospects").update({ status: "signed" }).eq("id", prospect.id);
+      const { data: recruiter } = await admin
+        .from("recruiters")
+        .select("full_name, email")
+        .eq("id", prospect.recruiter_id)
+        .maybeSingle();
+      if (recruiter?.email) {
+        const recruiterName = recruiter.full_name || recruiter.email;
+        await sendRecruiterMaisonSigned(recruiter.email, { recruiterName, maisonName: prospect.maison_name });
+        await sendAdminRecruiterMaisonSigned(ADMIN_INBOX, { recruiterName, maisonName: prospect.maison_name });
+      }
+    }
+  } catch (recruiterErr) {
+    // eslint-disable-next-line no-console
+    console.error("recruiter attribution failed:", recruiterErr);
   }
 
   return { ok: true };

@@ -80,5 +80,21 @@ export default async function DashboardPage() {
     redirect("/dashboard/business");
   }
 
+  // 3. Recruiter? (commission-based maison sourcing)
+  const { data: recruiter } = await admin
+    .from("recruiters")
+    .select("id, owner_id")
+    .eq("email", emailLc)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (recruiter) {
+    if (recruiter.owner_id !== user.id) {
+      await admin.from("recruiters").update({ owner_id: user.id }).eq("id", recruiter.id);
+    }
+    redirect("/dashboard/recruiter");
+  }
+
   redirect("/auth/sign-in?error=not_approved");
 }

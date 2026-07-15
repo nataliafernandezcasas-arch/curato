@@ -543,3 +543,134 @@ export async function sendMaisonJoinedAdminAlert(opts: {
 
   return sendEmail(opts.to, `Curato · Nouvelle maison signée : ${opts.maisonName}`, html);
 }
+
+// ── Recruiters programme ───────────────────────────────────────────────────
+export const RECRUITER_COMMISSION_LABEL = "448,50 € (149,50 €/mois pendant 3 mois)";
+
+function recruiterCard(eyebrow: string, heading: string, paragraphs: string[], cta?: { label: string; url: string }) {
+  const paras = paragraphs
+    .map(
+      (p) =>
+        `<tr><td style="padding:16px 40px 0;"><p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">${p}</p></td></tr>`
+    )
+    .join("");
+  const button = cta
+    ? `<tr><td style="padding:26px 40px 0;"><a href="${cta.url}" style="display:inline-block;font-family:${FONT_SANS};font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:${C.bg};background-color:${C.champagne};padding:13px 26px;text-decoration:none;">${cta.label}</a></td></tr>`
+    : "";
+  return wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 18px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">${eyebrow}</p>
+      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">${heading}</h1>
+    </td></tr>
+    ${paras}
+    ${button}
+    <tr><td style="padding:34px 40px 40px;"></td></tr>
+  `);
+}
+
+const first = (name: string) => (name || "").trim().split(" ")[0] || "";
+const DASH = `${SITE_URL}/dashboard`;
+const ADMIN_RECRUITERS = `${SITE_URL}/admin/recruiters`;
+
+// Welcome — when an admin creates a recruiter account
+export async function sendRecruiterWelcome(to: string, o: { name: string; email: string; tempPassword: string }) {
+  const html = recruiterCard(
+    "Espace Recruiter",
+    `Bienvenue, ${first(o.name)}.`,
+    [
+      `Votre espace Recruiter Curato est prêt. Connectez-vous, proposez des maisons, et suivez vos commissions.`,
+      `Identifiant : ${o.email}<br/>Mot de passe temporaire : <span style="color:${C.champagne};letter-spacing:0.08em;">${o.tempPassword}</span><br/>Vous choisirez un mot de passe personnel à la première connexion.`,
+    ],
+    { label: "Accéder à mon espace", url: `${SITE_URL}/auth/sign-in` }
+  );
+  return sendEmail(to, `Bienvenue dans Curato, ${first(o.name)}.`, html);
+}
+
+// Step 1 (submitted) — to the recruiter
+export async function sendRecruiterProspectSubmitted(to: string, o: { recruiterName: string; maisonName: string }) {
+  const html = recruiterCard(
+    "En attente de validation",
+    o.maisonName,
+    [
+      `Bonjour ${first(o.recruiterName)}, nous avons bien reçu votre proposition.`,
+      `Notre équipe la valide sous peu. Vous recevrez un email dès qu'elle sera validée. Avant cela, merci de ne pas encore contacter la maison.`,
+    ],
+    { label: "Voir mes prospects", url: DASH }
+  );
+  return sendEmail(to, `Curato · Prospect reçu : ${o.maisonName}`, html);
+}
+
+// Step 1 (submitted) — to the admin
+export async function sendAdminProspectSubmitted(to: string, o: { recruiterName: string; maisonName: string; maisonEmail: string | null }) {
+  const html = recruiterCard(
+    "Prospect à valider",
+    o.maisonName,
+    [
+      `${o.recruiterName} vient de proposer cette maison.`,
+      `Email de la maison : ${o.maisonEmail || "non renseigné"}. Validez ou refusez depuis l'admin.`,
+    ],
+    { label: "Valider dans l'admin", url: ADMIN_RECRUITERS }
+  );
+  return sendEmail(to, `Curato · Prospect à valider : ${o.maisonName}`, html);
+}
+
+// Step 2/3 (approved or rejected) — to the recruiter
+export async function sendRecruiterProspectDecision(to: string, o: { recruiterName: string; maisonName: string; decision: "approved" | "rejected" }) {
+  if (o.decision === "approved") {
+    const html = recruiterCard(
+      "Validée, à contacter",
+      o.maisonName,
+      [
+        `Bonjour ${first(o.recruiterName)}, votre maison a été validée et vous est réservée.`,
+        `Vous pouvez maintenant la contacter. Bonne chance, et tenez-nous au courant.`,
+      ],
+      { label: "Voir mes prospects", url: DASH }
+    );
+    return sendEmail(to, `Curato · Maison validée : ${o.maisonName}`, html);
+  }
+  const html = recruiterCard(
+    "Non retenue",
+    o.maisonName,
+    [
+      `Bonjour ${first(o.recruiterName)}, cette maison n'a pas pu être retenue (déjà dans notre pipeline ou non éligible).`,
+      `Merci de ne pas la contacter. N'hésitez pas à en proposer d'autres !`,
+    ],
+    { label: "Proposer une maison", url: DASH }
+  );
+  return sendEmail(to, `Curato · Maison non retenue : ${o.maisonName}`, html);
+}
+
+// Step 2/3 (approved or rejected) — to the admin
+export async function sendAdminProspectDecision(to: string, o: { recruiterName: string; maisonName: string; decision: "approved" | "rejected" }) {
+  const word = o.decision === "approved" ? "validé" : "refusé";
+  const html = recruiterCard(
+    o.decision === "approved" ? "Maison validée" : "Maison refusée",
+    o.maisonName,
+    [`Vous avez ${word} la maison ${o.maisonName}, proposée par ${o.recruiterName}.`]
+  );
+  return sendEmail(to, `Curato · ${o.maisonName} ${o.decision === "approved" ? "validée" : "refusée"}`, html);
+}
+
+// Step 4 (signed) — to the recruiter
+export async function sendRecruiterMaisonSigned(to: string, o: { recruiterName: string; maisonName: string }) {
+  const html = recruiterCard(
+    "Maison signée",
+    o.maisonName,
+    [
+      `Bravo ${first(o.recruiterName)} ! La maison que vous avez apportée vient de signer.`,
+      `Votre commission : ${RECRUITER_COMMISSION_LABEL}. Elle est versée par virement au fil des paiements de la maison. Pensez à renseigner votre IBAN dans votre espace.`,
+    ],
+    { label: "Voir mes payouts", url: DASH }
+  );
+  return sendEmail(to, `Curato · Félicitations, ${o.maisonName} a signé !`, html);
+}
+
+// Step 4 (signed) — to the admin
+export async function sendAdminRecruiterMaisonSigned(to: string, o: { recruiterName: string; maisonName: string }) {
+  const html = recruiterCard(
+    "Maison signée (recruiter)",
+    o.maisonName,
+    [`La maison ${o.maisonName}, apportée par ${o.recruiterName}, vient de signer. Commission due : ${RECRUITER_COMMISSION_LABEL}.`]
+  );
+  return sendEmail(to, `Curato · ${o.maisonName} signée (apportée par ${o.recruiterName})`, html);
+}
