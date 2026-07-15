@@ -7,6 +7,7 @@ import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import MaisonProfile from "./maison-profile";
 import MaisonOffer from "./maison-offer";
+import MaisonBilling from "./maison-billing";
 import type { StorytellerMetrics } from "@/lib/phyllo/client";
 
 // Category UUID (migration 009) → translation key in the `dashboard` section.
@@ -97,7 +98,7 @@ export default function MaisonDashboard() {
   const { lang, setLang } = useLang();
   const t = translations[lang].business;
 
-  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory">("profile");
+  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory" | "billing">("profile");
   const [roster, setRoster] = useState<RosterItem[]>([]);
   const [maisonName, setMaisonName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -248,7 +249,7 @@ export default function MaisonDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8">
-          {([["profile", t.tabProfile], ["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory]] as const).map(([key, label]) => (
+          {([["profile", t.tabProfile], ["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["billing", "Facturation"]] as const).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
@@ -374,6 +375,8 @@ export default function MaisonDashboard() {
               <MaisonOffer t={t} lang={lang} />
             </div>
           </div>
+        ) : tab === "billing" ? (
+          <MaisonBilling />
         ) : tab === "directory" ? (
           directoryLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
