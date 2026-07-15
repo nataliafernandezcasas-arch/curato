@@ -48,6 +48,7 @@ export default function AdminNavClient() {
       id: "activite",
       label: t.navActivity,
       items: [
+        { href: "/admin/overview", label: "Vue d'ensemble" },
         { href: "/admin", label: t.navCandidatures },
         { href: "/admin/reservations", label: t.navReservations },
         { href: "/admin/suggestions", label: t.navSuggestions },
