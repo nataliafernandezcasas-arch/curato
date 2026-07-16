@@ -35,12 +35,6 @@ const C = {
 const FONT = `Georgia, 'Times New Roman', serif`;
 const FONT_SANS = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif`;
 
-// ── Wordmark ─────────────────────────────────────────────────────────────────
-function curatorWordmark() {
-  // Simple text wordmark — "curato" in small caps feel via letter-spacing
-  return `<span style="font-family:${FONT};font-size:18px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:lowercase;">curato</span>`;
-}
-
 // ── Email wrapper ─────────────────────────────────────────────────────────────
 function wrap(content: string) {
   return `<!DOCTYPE html><html lang="fr"><head>
@@ -48,17 +42,18 @@ function wrap(content: string) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body style="margin:0;padding:0;background-color:${C.bg};font-family:${FONT_SANS};">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:${C.bg};padding:48px 16px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:${C.bg};padding:0 16px 44px;">
   <tr><td align="center">
     <table width="100%" cellpadding="0" cellspacing="0" style="max-width:500px;">
 
-      <!-- Logo -->
-      <tr><td style="padding:0 0 32px;text-align:left;">
-        ${curatorWordmark()}
+      <!-- Hero: single image with the photo darkened and the logo baked in,
+           so it renders identically in every email client -->
+      <tr><td style="padding:0;font-size:0;line-height:0;">
+        <img src="https://www.curatocollective.com/email-hero.jpg" width="500" alt="curato" style="display:block;width:100%;height:auto;border:0;" />
       </td></tr>
 
       <!-- Card -->
-      <tr><td>
+      <tr><td style="padding:24px 0 0;">
         <table width="100%" cellpadding="0" cellspacing="0" style="background-color:${C.card};border:1px solid ${C.border};">
           ${content}
         </table>
@@ -557,49 +552,15 @@ function recruiterCard(eyebrow: string, heading: string, paragraphs: string[], c
   const button = cta
     ? `<tr><td style="padding:26px 40px 0;"><a href="${cta.url}" style="display:inline-block;font-family:${FONT_SANS};font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:${C.bg};background-color:${C.champagne};padding:13px 26px;text-decoration:none;">${cta.label}</a></td></tr>`
     : "";
-  const ASSET = "https://www.curatocollective.com";
-  return `<!DOCTYPE html><html lang="fr"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-<body style="margin:0;padding:0;background-color:${C.bg};font-family:${FONT_SANS};">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:${C.bg};padding:0 0 40px;">
-  <tr><td align="center">
-    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:500px;">
-
-      <!-- Photo hero with wordmark -->
-      <tr><td style="padding:0;position:relative;height:150px;background-color:#161311;">
-        <img src="${ASSET}/email-recruiter-bg.jpg" width="500" height="150" alt="" style="display:block;width:100%;height:150px;object-fit:cover;opacity:0.42;" />
-        <table width="100%" cellpadding="0" cellspacing="0" style="position:absolute;top:0;left:0;height:150px;">
-          <tr><td valign="middle" style="padding-left:40px;">
-            <span style="font-family:${FONT};font-size:20px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:lowercase;">curato</span>
-          </td></tr>
-        </table>
-      </td></tr>
-
-      <!-- Card -->
-      <tr><td style="padding:24px 16px 0;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:${C.card};border:1px solid ${C.border};">
-          <tr><td style="padding:40px 40px 0;">
-            <p style="margin:0 0 18px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">${eyebrow}</p>
-            <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">${heading}</h1>
-          </td></tr>
-          ${paras}
-          ${button}
-          <tr><td style="padding:34px 40px 40px;"></td></tr>
-        </table>
-      </td></tr>
-
-      <!-- Footer -->
-      <tr><td style="padding:22px 20px 0;">
-        <p style="margin:0;font-family:${FONT_SANS};font-size:11px;color:${C.faint};letter-spacing:0.15px;">
-          Curato · Paris · <a href="${ASSET}" style="color:${C.faint};text-decoration:none;">curatocollective.com</a>
-        </p>
-      </td></tr>
-
-    </table>
-  </td></tr>
-</table>
-</body></html>`;
+  return wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 18px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">${eyebrow}</p>
+      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">${heading}</h1>
+    </td></tr>
+    ${paras}
+    ${button}
+    <tr><td style="padding:34px 40px 40px;"></td></tr>
+  `);
 }
 
 const first = (name: string) => (name || "").trim().split(" ")[0] || "";
