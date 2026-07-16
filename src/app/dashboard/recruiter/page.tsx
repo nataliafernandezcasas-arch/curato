@@ -97,9 +97,9 @@ export default function RecruiterDashboard() {
   const firstName = (data?.recruiter.full_name || "").split(" ")[0];
 
   return (
-    <main className="min-h-[100dvh] max-w-[760px] mx-auto px-5 py-12">
+    <main className="min-h-[100dvh] max-w-[1120px] mx-auto px-6 md:px-8 py-10">
       {/* Header */}
-      <div className="flex items-center justify-between mb-14">
+      <div className="flex items-center justify-between mb-10">
         <Link href="/">
           <img src="/logo-curato-simple.png" alt="curato" style={{ height: "13px", width: "auto", display: "block" }} />
         </Link>
@@ -126,7 +126,7 @@ export default function RecruiterDashboard() {
           { k: "Par maison", v: eur(448.5) },
           { k: "Commission générée", v: loading ? "—" : eur(data?.earnings.total ?? 0) },
         ].map((c) => (
-          <div key={c.k} className="bg-black/30 px-5 py-6">
+          <div key={c.k} className="bg-black/30 px-7 py-8">
             <p className="font-serif text-[9px] tracking-[0.3em] uppercase text-white/35 mb-3">{c.k}</p>
             <p className="font-serif text-[20px] font-light text-champagne">{c.v}</p>
           </div>
@@ -134,7 +134,7 @@ export default function RecruiterDashboard() {
       </div>
 
       {/* Add a maison */}
-      <section className="border border-white/10 bg-black/20 p-6 mb-12">
+      <section className="border border-white/10 bg-black/20 p-8 mb-12">
         <h2 className="font-serif text-[15px] text-white mb-1">Proposer une maison</h2>
         <p className="font-serif text-[12px] font-light text-white/45 mb-5">
           Attendez la validation avant de la contacter (cela évite les doublons).
@@ -188,7 +188,7 @@ export default function RecruiterDashboard() {
       </section>
 
       {/* Payouts / IBAN */}
-      <section className="border border-white/10 bg-black/20 p-6">
+      <section className="border border-white/10 bg-black/20 p-8">
         <h2 className="font-serif text-[15px] text-white mb-1">Vos versements</h2>
         <p className="font-serif text-[12px] font-light text-white/45 mb-5">
           Les commissions sont versées par virement, au fil des paiements de chaque maison. Renseignez votre IBAN pour être payé.
