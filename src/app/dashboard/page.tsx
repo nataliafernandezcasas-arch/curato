@@ -93,6 +93,17 @@ export default async function DashboardPage() {
     if (recruiter.owner_id !== user.id) {
       await admin.from("recruiters").update({ owner_id: user.id }).eq("id", recruiter.id);
     }
+    // First-login commitment: the recruiter must sign the programme (accept +
+    // lieu + date) before the dashboard. Defensive — if the column isn't there
+    // yet (migration pending), the query errors and we let them through.
+    const { data: rc, error: rcErr } = await admin
+      .from("recruiters")
+      .select("commitment_accepted_at")
+      .eq("id", recruiter.id)
+      .maybeSingle();
+    if (!rcErr && rc && !rc.commitment_accepted_at) {
+      redirect("/onboarding/recruiter");
+    }
     redirect("/dashboard/recruiter");
   }
 
