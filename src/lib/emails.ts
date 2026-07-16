@@ -28,41 +28,45 @@ const C = {
   champagne: "#CBB78F",   // primary accent
   copper:    "#B56E2E",   // warm copper
   white:     "#F5F0E8",   // warm white body text
-  muted:     "#7A7168",   // muted text
-  faint:     "#4A4640",   // very muted
+  muted:     "#CBC3B6",   // light warm grey (legible over the photo background)
+  faint:     "#968A7C",   // muted footer text
 };
 
-const FONT = `Georgia, 'Times New Roman', serif`;
-const FONT_SANS = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif`;
+// Brandbook typeface is Centaur. Its web substitute (used across the Curato
+// site) is Cormorant Garamond; clients that can't load it fall back to serif.
+// Everything is set in this one face to keep a single graphic line.
+const FONT = `'Cormorant Garamond', Georgia, 'Times New Roman', serif`;
+const FONT_SANS = FONT;
 
 // ── Email wrapper ─────────────────────────────────────────────────────────────
 function wrap(content: string) {
+  const ASSET = "https://www.curatocollective.com";
   return `<!DOCTYPE html><html lang="fr"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<style>@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');</style>
 </head>
-<body style="margin:0;padding:0;background-color:${C.bg};font-family:${FONT_SANS};">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:${C.bg};padding:0 16px 44px;">
-  <tr><td align="center">
-    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:500px;">
+<body style="margin:0;padding:0;background-color:#161311;font-family:${FONT};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#161311;">
+  <tr><td align="center" style="padding:0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" background="${ASSET}/email-bg-dark.jpg" style="max-width:560px;background-color:#161311;background-image:url('${ASSET}/email-bg-dark.jpg');background-position:center top;background-repeat:no-repeat;background-size:cover;">
 
-      <!-- Hero: single image with the photo darkened and the logo baked in,
-           so it renders identically in every email client -->
-      <tr><td style="padding:0;font-size:0;line-height:0;">
-        <img src="https://www.curatocollective.com/email-hero.jpg" width="500" alt="curato" style="display:block;width:100%;height:auto;border:0;" />
+      <!-- Logo over the darkened photo background -->
+      <tr><td align="center" style="padding:48px 40px 36px;">
+        <img src="${ASSET}/logo-curato-simple.png" alt="curato" height="22" style="display:block;height:22px;width:auto;border:0;" />
       </td></tr>
 
-      <!-- Card -->
-      <tr><td style="padding:24px 0 0;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:${C.card};border:1px solid ${C.border};">
+      <!-- Content -->
+      <tr><td style="padding:0 4px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           ${content}
         </table>
       </td></tr>
 
       <!-- Footer -->
-      <tr><td style="padding:28px 4px 0;">
-        <p style="margin:0;font-family:${FONT_SANS};font-size:11px;color:${C.faint};letter-spacing:0.15px;">
-          Curato · Paris · <a href="${SITE_URL}" style="color:${C.faint};text-decoration:none;">curatocollective.com</a>
+      <tr><td style="padding:36px 40px 48px;">
+        <p style="margin:0;font-family:${FONT};font-size:11px;color:${C.faint};letter-spacing:0.15px;">
+          Curato · Paris · <a href="${ASSET}" style="color:${C.faint};text-decoration:none;">curatocollective.com</a>
         </p>
       </td></tr>
 
