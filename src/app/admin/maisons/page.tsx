@@ -23,6 +23,10 @@ type Comercio = {
   name: string | null;
   email: string | null;
   arrondissement: string | null;
+  address?: string | null;
+  description?: string | null;
+  website_url?: string | null;
+  category_id?: string | null;
   subscription_plan: string | null;
   commitment_accepted_at?: string | null;
   commitment_signatory?: string | null;
@@ -64,6 +68,13 @@ export default async function AdminMaisonsPage() {
       comingSoon: Boolean(m.coming_soon),
       account: lastSignIn ? "connected" : hasAccount ? "never" : "none",
       lastSignIn: lastSignIn ? fmtDate(lastSignIn) : "",
+      // Raw fields for the admin edit form.
+      arrondissement: m.arrondissement || "",
+      address: m.address || "",
+      description: m.description || "",
+      websiteUrl: m.website_url || "",
+      categoryId: m.category_id || "",
+      subscriptionPlan: m.subscription_plan || "",
     };
   });
 
