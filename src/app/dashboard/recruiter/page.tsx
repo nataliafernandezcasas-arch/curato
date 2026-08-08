@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { SignOut } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import type { Lang } from "@/lib/i18n/translations";
 
 type Prospect = {
   id: string;
@@ -19,16 +21,135 @@ type Data = {
   earnings: { signedCount: number; perMaison: number; total: number };
 };
 
-const STATUS: Record<Prospect["effectiveStatus"], { label: string; dot: string; text: string }> = {
-  pending: { label: "En attente de validation", dot: "#C9A34B", text: "text-[#D8BE7E]" },
-  approved: { label: "Validée · à contacter", dot: "#7FA8C9", text: "text-[#9EC1DE]" },
-  rejected: { label: "Refusée", dot: "#B5564E", text: "text-[#D08A84]" },
-  signed: { label: "Signée", dot: "#6FA372", text: "text-[#9CC79E]" },
+// FR / EN / ES copy for the recruiter space.
+const T: Record<Lang, Record<string, string>> = {
+  fr: {
+    eyebrow: "Espace Recruiter",
+    hello: "Bonjour",
+    intro: "Proposez une maison, nous la validons, puis vous la contactez. Vous gagnez 50 % de l'abonnement (299 €) pendant 3 mois par maison signée.",
+    statSigned: "Maisons signées",
+    statPerMaison: "Par maison",
+    statCommission: "Commission générée",
+    proposeTitle: "Proposer une maison",
+    proposeSub: "Attendez la validation avant de la contacter (cela évite les doublons).",
+    lblName: "Nom de la maison *",
+    phName: "Le Comptoir du Marais",
+    lblEmail: "Email de la maison",
+    phEmail: "contact@lamaison.com",
+    lblNotes: "Notes (optionnel)",
+    phNotes: "Adresse, contact, arrondissement…",
+    btnPropose: "Proposer la maison",
+    btnProposing: "Envoi…",
+    msgProposed: "Maison proposée. Nous la validons sous peu.",
+    msgError: "Une erreur est survenue. Réessayez.",
+    myMaisons: "Mes maisons",
+    loading: "Chargement…",
+    empty: "Vous n'avez pas encore proposé de maison.",
+    stPending: "En attente de validation",
+    stApproved: "Validée · à contacter",
+    stRejected: "Refusée",
+    stSigned: "Signée",
+    payoutsTitle: "Vos versements",
+    payoutsSub: "Les commissions sont versées par virement, au fil des paiements de chaque maison. Renseignez votre IBAN pour être payé.",
+    lblIban: "IBAN",
+    phIban: "FR76 ...",
+    msgIbanSaved: "IBAN enregistré.",
+    msgIbanError: "Erreur, réessayez.",
+    btnSaveIban: "Enregistrer l'IBAN",
+    signOut: "Déconnexion",
+  },
+  en: {
+    eyebrow: "Recruiter space",
+    hello: "Hello",
+    intro: "Propose a maison, we validate it, then you contact it. You earn 50% of the subscription (€299) for 3 months per signed maison.",
+    statSigned: "Signed maisons",
+    statPerMaison: "Per maison",
+    statCommission: "Commission earned",
+    proposeTitle: "Propose a maison",
+    proposeSub: "Wait for validation before contacting it (this avoids duplicates).",
+    lblName: "Maison name *",
+    phName: "Le Comptoir du Marais",
+    lblEmail: "Maison email",
+    phEmail: "contact@lamaison.com",
+    lblNotes: "Notes (optional)",
+    phNotes: "Address, contact, arrondissement…",
+    btnPropose: "Propose the maison",
+    btnProposing: "Sending…",
+    msgProposed: "Maison proposed. We'll validate it shortly.",
+    msgError: "Something went wrong. Please try again.",
+    myMaisons: "My maisons",
+    loading: "Loading…",
+    empty: "You haven't proposed any maison yet.",
+    stPending: "Awaiting validation",
+    stApproved: "Validated · to contact",
+    stRejected: "Declined",
+    stSigned: "Signed",
+    payoutsTitle: "Your payouts",
+    payoutsSub: "Commissions are paid by bank transfer, as each maison pays. Enter your IBAN to get paid.",
+    lblIban: "IBAN",
+    phIban: "FR76 ...",
+    msgIbanSaved: "IBAN saved.",
+    msgIbanError: "Error, please try again.",
+    btnSaveIban: "Save IBAN",
+    signOut: "Sign out",
+  },
+  es: {
+    eyebrow: "Espacio Recruiter",
+    hello: "Hola",
+    intro: "Propón una maison, la validamos, y luego la contactas. Ganas el 50 % de la suscripción (299 €) durante 3 meses por cada maison firmada.",
+    statSigned: "Maisons firmadas",
+    statPerMaison: "Por maison",
+    statCommission: "Comisión generada",
+    proposeTitle: "Proponer una maison",
+    proposeSub: "Espera la validación antes de contactarla (así se evitan duplicados).",
+    lblName: "Nombre de la maison *",
+    phName: "Le Comptoir du Marais",
+    lblEmail: "Email de la maison",
+    phEmail: "contact@lamaison.com",
+    lblNotes: "Notas (opcional)",
+    phNotes: "Dirección, contacto, arrondissement…",
+    btnPropose: "Proponer la maison",
+    btnProposing: "Enviando…",
+    msgProposed: "Maison propuesta. La validamos pronto.",
+    msgError: "Ocurrió un error. Inténtalo de nuevo.",
+    myMaisons: "Mis maisons",
+    loading: "Cargando…",
+    empty: "Aún no has propuesto ninguna maison.",
+    stPending: "En espera de validación",
+    stApproved: "Validada · por contactar",
+    stRejected: "Rechazada",
+    stSigned: "Firmada",
+    payoutsTitle: "Tus pagos",
+    payoutsSub: "Las comisiones se pagan por transferencia, según los pagos de cada maison. Ingresa tu IBAN para recibir el pago.",
+    lblIban: "IBAN",
+    phIban: "FR76 ...",
+    msgIbanSaved: "IBAN guardado.",
+    msgIbanError: "Error, inténtalo de nuevo.",
+    btnSaveIban: "Guardar IBAN",
+    signOut: "Cerrar sesión",
+  },
 };
 
-const eur = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+// Status colour dots (labels come from the translation table by key).
+const STATUS_STYLE: Record<Prospect["effectiveStatus"], { dot: string; text: string; key: string }> = {
+  pending: { dot: "#C9A34B", text: "text-[#D8BE7E]", key: "stPending" },
+  approved: { dot: "#7FA8C9", text: "text-[#9EC1DE]", key: "stApproved" },
+  rejected: { dot: "#B5564E", text: "text-[#D08A84]", key: "stRejected" },
+  signed: { dot: "#6FA372", text: "text-[#9CC79E]", key: "stSigned" },
+};
+
+const LANGS: Lang[] = ["fr", "en", "es"];
+
+function eur(n: number, lang: Lang): string {
+  if (lang === "en") return "€" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const locale = lang === "es" ? "es-ES" : "fr-FR";
+  return n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+}
 
 export default function RecruiterDashboard() {
+  const { lang, setLang } = useLang();
+  const t = T[lang];
+
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,10 +187,10 @@ export default function RecruiterDashboard() {
     setAdding(false);
     if (res.ok) {
       setName(""); setEmail(""); setNotes("");
-      setAddMsg("Maison proposée. Nous la validons sous peu.");
+      setAddMsg(t.msgProposed);
       load();
     } else {
-      setAddMsg("Une erreur est survenue. Réessayez.");
+      setAddMsg(t.msgError);
     }
   }
 
@@ -81,7 +202,7 @@ export default function RecruiterDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "save_iban", iban }),
     });
-    setIbanMsg(res.ok ? "IBAN enregistré." : "Erreur, réessayez.");
+    setIbanMsg(res.ok ? t.msgIbanSaved : t.msgIbanError);
   }
 
   async function signOut() {
@@ -105,26 +226,39 @@ export default function RecruiterDashboard() {
         </Link>
         <div className="flex items-center gap-6">
           <RoleSwitch current="recruiter" />
+          <div className="flex items-center gap-2.5">
+            {LANGS.map((l) => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className={`font-serif text-[11px] tracking-[0.2em] uppercase transition-colors ${
+                  lang === l ? "text-champagne" : "text-white/40 hover:text-white/70"
+                }`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
           <button onClick={signOut} className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/40 hover:text-white transition-colors">
-            <SignOut size={14} weight="thin" /> Déconnexion
+            <SignOut size={14} weight="thin" /> {t.signOut}
           </button>
         </div>
       </div>
 
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">Espace Recruiter</p>
+      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">{t.eyebrow}</p>
       <h1 className="font-serif text-3xl font-light tracking-wide text-white mb-2">
-        Bonjour{firstName ? `, ${firstName}` : ""}.
+        {t.hello}{firstName ? `, ${firstName}` : ""}.
       </h1>
       <p className="font-serif text-[14px] font-light text-white/55 leading-relaxed mb-12">
-        Proposez une maison, nous la validons, puis vous la contactez. Vous gagnez 50 % de l&apos;abonnement (299 €) pendant 3 mois par maison signée.
+        {t.intro}
       </p>
 
       {/* Payouts summary */}
       <div className="grid grid-cols-3 gap-px bg-white/10 border border-white/10 mb-12">
         {[
-          { k: "Maisons signées", v: loading ? "—" : String(data?.earnings.signedCount ?? 0) },
-          { k: "Par maison", v: eur(448.5) },
-          { k: "Commission générée", v: loading ? "—" : eur(data?.earnings.total ?? 0) },
+          { k: t.statSigned, v: loading ? "—" : String(data?.earnings.signedCount ?? 0) },
+          { k: t.statPerMaison, v: eur(448.5, lang) },
+          { k: t.statCommission, v: loading ? "—" : eur(data?.earnings.total ?? 0, lang) },
         ].map((c) => (
           <div key={c.k} className="bg-black/30 px-7 py-8">
             <p className="font-serif text-[9px] tracking-[0.3em] uppercase text-white/35 mb-3">{c.k}</p>
@@ -135,39 +269,39 @@ export default function RecruiterDashboard() {
 
       {/* Add a maison */}
       <section className="border border-white/10 bg-black/20 p-8 mb-12">
-        <h2 className="font-serif text-[15px] text-white mb-1">Proposer une maison</h2>
+        <h2 className="font-serif text-[15px] text-white mb-1">{t.proposeTitle}</h2>
         <p className="font-serif text-[12px] font-light text-white/45 mb-5">
-          Attendez la validation avant de la contacter (cela évite les doublons).
+          {t.proposeSub}
         </p>
         <form onSubmit={addProspect} className="space-y-4">
           <div>
-            <label className={labelClass}>Nom de la maison *</label>
-            <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="Le Comptoir du Marais" required />
+            <label className={labelClass}>{t.lblName}</label>
+            <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder={t.phName} required />
           </div>
           <div>
-            <label className={labelClass}>Email de la maison</label>
-            <input className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="contact@lamaison.com" type="email" />
+            <label className={labelClass}>{t.lblEmail}</label>
+            <input className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.phEmail} type="email" />
           </div>
           <div>
-            <label className={labelClass}>Notes (optionnel)</label>
-            <input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Adresse, contact, arrondissement…" />
+            <label className={labelClass}>{t.lblNotes}</label>
+            <input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t.phNotes} />
           </div>
           {addMsg && <p className="font-serif text-[12px] text-champagne/80">{addMsg}</p>}
           <button type="submit" disabled={adding} className="font-serif text-[11px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40">
-            {adding ? "Envoi…" : "Proposer la maison"}
+            {adding ? t.btnProposing : t.btnPropose}
           </button>
         </form>
       </section>
 
       {/* Prospects list */}
       <section className="mb-12">
-        <h2 className="font-serif text-[15px] text-white mb-5">Mes maisons</h2>
+        <h2 className="font-serif text-[15px] text-white mb-5">{t.myMaisons}</h2>
         {loading ? (
-          <p className="font-serif text-[13px] text-white/40">Chargement…</p>
+          <p className="font-serif text-[13px] text-white/40">{t.loading}</p>
         ) : data && data.prospects.length > 0 ? (
           <div className="divide-y divide-white/8 border-y border-white/8">
             {data.prospects.map((p) => {
-              const s = STATUS[p.effectiveStatus];
+              const s = STATUS_STYLE[p.effectiveStatus];
               return (
                 <div key={p.id} className="flex items-center justify-between py-4 gap-4">
                   <div className="min-w-0">
@@ -176,31 +310,31 @@ export default function RecruiterDashboard() {
                   </div>
                   <div className={`shrink-0 inline-flex items-center gap-2 font-serif text-[12px] ${s.text}`}>
                     <span style={{ width: 8, height: 8, borderRadius: 9999, background: s.dot, display: "inline-block" }} />
-                    {s.label}
+                    {t[s.key]}
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          <p className="font-serif text-[13px] font-light text-white/40">Vous n&apos;avez pas encore proposé de maison.</p>
+          <p className="font-serif text-[13px] font-light text-white/40">{t.empty}</p>
         )}
       </section>
 
       {/* Payouts / IBAN */}
       <section className="border border-white/10 bg-black/20 p-8">
-        <h2 className="font-serif text-[15px] text-white mb-1">Vos versements</h2>
+        <h2 className="font-serif text-[15px] text-white mb-1">{t.payoutsTitle}</h2>
         <p className="font-serif text-[12px] font-light text-white/45 mb-5">
-          Les commissions sont versées par virement, au fil des paiements de chaque maison. Renseignez votre IBAN pour être payé.
+          {t.payoutsSub}
         </p>
         <form onSubmit={saveIban} className="space-y-4">
           <div>
-            <label className={labelClass}>IBAN</label>
-            <input className={inputClass} value={iban} onChange={(e) => setIban(e.target.value)} placeholder="FR76 ..." />
+            <label className={labelClass}>{t.lblIban}</label>
+            <input className={inputClass} value={iban} onChange={(e) => setIban(e.target.value)} placeholder={t.phIban} />
           </div>
           {ibanMsg && <p className="font-serif text-[12px] text-champagne/80">{ibanMsg}</p>}
           <button type="submit" className="font-serif text-[11px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300">
-            Enregistrer l&apos;IBAN
+            {t.btnSaveIban}
           </button>
         </form>
       </section>
