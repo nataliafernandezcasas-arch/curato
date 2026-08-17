@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Curato</title>
+    <!--
+      Offline / unreachable-site screen for the native shell.
+
+      Wired up through `server.errorPath` in capacitor.config.ts: Capacitor
+      loads this local file whenever the WebView fails to reach
+      curatocollective.com, instead of leaving a blank white page.
+
+      Everything is inline on purpose. This page renders precisely when the
+      network is gone, so a web font or a remote image would render nothing.
+    -->
+    <style>
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: #1a1a1a;
+        color: #f5efe4;
+        /* System serif: the brand face (Cormorant) can't be fetched offline. */
+        font-family: Georgia, "Times New Roman", serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: calc(32px + env(safe-area-inset-top, 0px)) calc(28px + env(safe-area-inset-right, 0px))
+                 calc(32px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
+      }
+
+      .wrap { width: 100%; max-width: 340px; }
+
+      .wordmark {
+        font-size: 20px;
+        font-weight: 300;
+        letter-spacing: 0.42em;
+        text-transform: uppercase;
+        color: #cbb78f;
+        /* Offsets the trailing letter-space so the word reads as centred. */
+        text-indent: 0.42em;
+        margin: 0;
+      }
+
+      .rule {
+        width: 34px;
+        height: 1px;
+        background: rgba(203, 183, 143, 0.4);
+        margin: 26px auto;
+      }
+
+      .message {
+        font-size: 15px;
+        font-weight: 300;
+        line-height: 1.75;
+        color: rgba(245, 239, 228, 0.72);
+        margin: 0;
+      }
+
+      .message + .message {
+        margin-top: 12px;
+        color: rgba(245, 239, 228, 0.34);
+        font-size: 13.5px;
+      }
+
+      button {
+        appearance: none;
+        -webkit-appearance: none;
+        margin-top: 34px;
+        width: 100%;
+        padding: 15px 20px;
+        border: 1px solid rgba(203, 183, 143, 0.45);
+        background: transparent;
+        color: #cbb78f;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      button:active { background: #cbb78f; color: #1a1a1a; }
+      button[disabled] { opacity: 0.45; }
+
+      @media (prefers-reduced-motion: reduce) {
+        button { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1 class="wordmark">curato</h1>
+      <div class="rule"></div>
+
+      <p class="message" lang="fr">
+        Pas de connexion pour l'instant.<br />
+        Curato vous attend.
+      </p>
+      <p class="message" lang="es">Sin conexión. Curato te espera.</p>
+
+      <button id="retry" type="button">Réessayer · Reintentar</button>
+    </div>
+
+    <script>
+      (function () {
+        var SITE = "https://www.curatocollective.com";
+        var button = document.getElementById("retry");
+
+        function retry() {
+          button.disabled = true;
+          button.textContent = "…";
+          // replace() so the offline page doesn't pile up in WebView history
+          // and reappear when the user swipes back.
+          window.location.replace(SITE);
+        }
+
+        button.addEventListener("click", retry);
+
+        // Reconnecting is the actual fix, so act on it without making the user
+        // hunt for the button. Only fires when the WebView regains the network.
+        window.addEventListener("online", retry);
+      })();
+    </script>
+  </body>
+</html>
