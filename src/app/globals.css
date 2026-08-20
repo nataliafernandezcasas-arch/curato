@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garant:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -24,7 +24,7 @@
   --color-cream-muted: rgba(42, 32, 28, 0.42);
   --color-cream-border: rgba(42, 32, 28, 0.12);
 
-  --font-serif: 'Cormorant Garant', Georgia, serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
 }
 
 html { scroll-behavior: smooth; }
@@ -32,7 +32,7 @@ html { scroll-behavior: smooth; }
 body {
   background: #1E1E1E;
   color: #F5EFE4;
-  font-family: 'Cormorant Garant', Georgia, serif;
+  font-family: 'Cormorant Garamond', Georgia, serif;
   -webkit-font-smoothing: antialiased;
 }
 
