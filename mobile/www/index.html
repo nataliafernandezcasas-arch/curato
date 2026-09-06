@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Curato</title>
+    <!--
+      Offline / unreachable-site screen for the native shell.
+
+      Wired up through `server.errorPath` in capacitor.config.ts: Capacitor
+      loads this local file whenever the WebView fails to reach
+      curatocollective.com, instead of leaving a blank white page.
+
+      The logo and the background are copies of the ones in /public, bundled
+      into the app next to this file. They have to be local: this page renders
+      precisely when there is no network, so anything fetched from the site
+      would come up empty. Same reason the CSS is inline and the brand face
+      (Cormorant) falls back to a system serif.
+
+      If the brand assets in /public change, re-copy them here.
+    -->
+    <style>
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        background: #1a1a1a;
+        color: #f5efe4;
+        font-family: Georgia, "Times New Roman", serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      body {
+        /* dvh, not 100%: a percentage height needs a definite height on <html>
+           to resolve against, so the content would sit at the top instead of
+           centring. dvh also tracks the WebView's real viewport. */
+        min-height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: calc(32px + env(safe-area-inset-top, 0px)) calc(28px + env(safe-area-inset-right, 0px))
+                 calc(32px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
+      }
+
+      /* Same floral backdrop as the sign-in screen, so losing connection still
+         looks like Curato rather than like an error page. */
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+      }
+
+      .backdrop img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+
+      .backdrop::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(26, 26, 26, 0.78);
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 340px;
+      }
+
+      .logo {
+        width: 132px;
+        height: auto;
+        opacity: 0.92;
+      }
+
+      .rule {
+        width: 34px;
+        height: 1px;
+        background: rgba(203, 183, 143, 0.4);
+        margin: 28px auto;
+      }
+
+      .message {
+        font-size: 15px;
+        font-weight: 300;
+        line-height: 1.75;
+        color: rgba(245, 239, 228, 0.78);
+        margin: 0;
+      }
+
+      .message + .message {
+        margin-top: 12px;
+        color: rgba(245, 239, 228, 0.36);
+        font-size: 13.5px;
+      }
+
+      button {
+        appearance: none;
+        -webkit-appearance: none;
+        margin-top: 34px;
+        width: 100%;
+        padding: 15px 20px;
+        border: 1px solid rgba(203, 183, 143, 0.45);
+        background: transparent;
+        color: #cbb78f;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      button:active { background: #cbb78f; color: #1a1a1a; }
+      button[disabled] { opacity: 0.45; }
+
+      @media (prefers-reduced-motion: reduce) {
+        button { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="backdrop"><img src="flor-bg.jpg" alt="" /></div>
+
+    <div class="wrap">
+      <img class="logo" src="logo-curato-simple.png" alt="Curato" />
+      <div class="rule"></div>
+
+      <p class="message" lang="fr">
+        Pas de connexion pour l'instant.<br />
+        Curato vous attend.
+      </p>
+      <p class="message" lang="es">Sin conexión. Curato te espera.</p>
+
+      <button id="retry" type="button">Réessayer · Reintentar</button>
+    </div>
+
+    <script>
+      (function () {
+        var SITE = "https://www.curatocollective.com";
+        var button = document.getElementById("retry");
+
+        function retry() {
+          button.disabled = true;
+          button.textContent = "…";
+          // replace() so the offline page doesn't pile up in WebView history
+          // and reappear when the user swipes back.
+          window.location.replace(SITE);
+        }
+
+        button.addEventListener("click", retry);
+
+        // Reconnecting is the actual fix, so act on it without making the user
+        // hunt for the button. Only fires when the WebView regains the network.
+        window.addEventListener("online", retry);
+      })();
+    </script>
+  </body>
+</html>

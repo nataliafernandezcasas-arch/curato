@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MapPin, ArrowLeft, SignOut, GlobeSimple, X, CheckCircle } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
-import { isBeforeLaunch, LAUNCH_AT } from "@/lib/launch";
+import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import { parisParts, AvailWindow } from "@/lib/availability";
 
 type MaisonAvail = { availability: AvailWindow[]; blocked: { date: string }[]; taken: string[] };
@@ -297,10 +297,10 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const [preview, setPreview] = useState(false);
 
   // A "?slot=" param (from a proposed-créneaux email) pre-fills + opens the form.
-  // "?preview=1" bypasses the pre-launch gate (internal preview).
+  // "?preview=1" and the native app both bypass the pre-launch gate.
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
-    setPreview(sp.has("preview"));
+    setPreview(canBypassLaunchGate());
     const slot = sp.get("slot");
     if (slot) {
       setInitialSlot(slot);
@@ -340,7 +340,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
     ? (lang === "en" ? maison.description_en : lang === "es" ? maison.description_es : null) || maison.description
     : null;
   const gated = isBeforeLaunch() && !preview;
-  const launchDateLabel = LAUNCH_AT.toLocaleDateString(lang, {
+  const launchDateLabel = LAUNCH_AT?.toLocaleDateString(lang, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -402,7 +402,9 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
               {td.comingSoonTitle}
             </h2>
             <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
-              {td.comingSoonBody.replace("{date}", launchDateLabel)}
+              {launchDateLabel
+                ? td.comingSoonBody.replace("{date}", launchDateLabel)
+                : td.comingSoonBodyNoDate}
             </p>
           </div>
         ) : loading ? (

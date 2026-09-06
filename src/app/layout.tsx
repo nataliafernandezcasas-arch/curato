@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
+import NativeShell from "./native-shell";
 
 export const metadata: Metadata = {
   title: "Curato — París",
@@ -29,10 +30,22 @@ export const metadata: Metadata = {
   },
 };
 
+// `viewportFit: "cover"` lets the page paint under the notch and the home
+// indicator, which is what makes env(safe-area-inset-*) report real values.
+// The [data-native] rules in globals.css then pad the content back out. We
+// leave pinch-zoom alone on purpose, capping it would hurt accessibility.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#1A1A1A",
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className="h-full">
       <body className="min-h-full antialiased">
+        <NativeShell />
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

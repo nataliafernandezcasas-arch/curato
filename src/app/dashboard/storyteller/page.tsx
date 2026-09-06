@@ -6,7 +6,7 @@ import { MapPin, SignOut } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
-import { isBeforeLaunch, LAUNCH_AT } from "@/lib/launch";
+import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import ConnectInstagram from "./connect-instagram";
 import SuggestVenue from "./suggest-venue";
 
@@ -93,12 +93,13 @@ export default function InfluencerDashboard() {
   const [preview, setPreview] = useState(false);
 
   // Before launch, accepted storytellers see a "coming soon" screen instead of
-  // the catalogue. ?preview=1 bypasses it for internal preview.
+  // the catalogue. ?preview=1 and the native app both bypass it, so the
+  // TestFlight cohort can browse while the website stays shut.
   useEffect(() => {
-    setPreview(new URLSearchParams(window.location.search).has("preview"));
+    setPreview(canBypassLaunchGate());
   }, []);
   const gated = isBeforeLaunch() && !preview;
-  const launchDateLabel = LAUNCH_AT.toLocaleDateString(lang, {
+  const launchDateLabel = LAUNCH_AT?.toLocaleDateString(lang, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -312,7 +313,9 @@ export default function InfluencerDashboard() {
               {t.comingSoonTitle}
             </h2>
             <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
-              {t.comingSoonBody.replace("{date}", launchDateLabel)}
+              {launchDateLabel
+                ? t.comingSoonBody.replace("{date}", launchDateLabel)
+                : t.comingSoonBodyNoDate}
             </p>
 
             <div className="mt-12 pt-12 border-t border-white/8 max-w-[460px] mx-auto">
