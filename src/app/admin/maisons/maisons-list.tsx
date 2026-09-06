@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ComingSoonToggle from "./coming-soon-toggle";
+import MaisonActions from "./maison-actions";
 
 export type MaisonItem = {
   id: string;
@@ -15,17 +16,36 @@ export type MaisonItem = {
   comingSoon: boolean;
   account: "connected" | "never" | "none";
   lastSignIn: string;
+  // Raw fields for the edit form.
+  arrondissement: string;
+  address: string;
+  description: string;
+  websiteUrl: string;
+  categoryId: string;
+  subscriptionPlan: string;
 };
 
-// Admin maisons list with search. By default only signed maisons are shown to
-// keep it focused; typing a query searches across ALL maisons by name.
+type Filter = "signed" | "unsigned" | "all";
+
+const TABS: { key: Filter; label: string }[] = [
+  { key: "signed", label: "Signées" },
+  { key: "unsigned", label: "Non signées" },
+  { key: "all", label: "Toutes" },
+];
+
+// Admin maisons list with a status filter (signed / not signed / all) and a
+// search box. Typing a query searches across ALL maisons by name, overriding
+// the filter.
 export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
   const [q, setQ] = useState("");
+  const [filter, setFilter] = useState<Filter>("signed");
   const query = q.trim().toLowerCase();
 
   const list = query
     ? maisons.filter((m) => m.name.toLowerCase().includes(query))
-    : maisons.filter((m) => m.isSigned);
+    : maisons.filter((m) =>
+        filter === "signed" ? m.isSigned : filter === "unsigned" ? !m.isSigned : true
+      );
 
   return (
     <div>
@@ -34,19 +54,37 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Rechercher une maison…"
-        className="w-full max-w-[420px] px-5 py-3 mb-8 border border-white/15 bg-black/40 text-white font-serif text-[14px] focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30"
+        className="w-full max-w-[420px] px-5 py-3 mb-6 border border-white/15 bg-black/40 text-white font-serif text-[14px] focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30"
       />
 
       {!query && (
-        <p className="font-serif text-[12px] font-light text-white/40 mb-6">
-          Seules les maisons signées sont affichées. Recherchez pour voir les autres.
-        </p>
+        <div className="flex gap-1 mb-8 flex-wrap">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
+                filter === tab.key
+                  ? "bg-champagne text-charcoal-deep"
+                  : "text-white/55 border border-white/10 hover:border-champagne/30 hover:text-champagne"
+              }`}
+            >
+              {tab.label} · {maisons.filter((m) => (tab.key === "signed" ? m.isSigned : tab.key === "unsigned" ? !m.isSigned : true)).length}
+            </button>
+          ))}
+        </div>
       )}
 
       {list.length === 0 ? (
         <div className="text-center py-16 border border-white/10">
           <p className="font-serif text-[14px] font-light text-white/55">
-            {query ? "Aucune maison trouvée." : "Aucune maison signée pour le moment."}
+            {query
+              ? "Aucune maison trouvée."
+              : filter === "unsigned"
+              ? "Aucune maison non signée."
+              : filter === "all"
+              ? "Aucune maison."
+              : "Aucune maison signée pour le moment."}
           </p>
         </div>
       ) : (
@@ -98,6 +136,8 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
                   </div>
                 </div>
               )}
+
+              <MaisonActions m={m} />
             </div>
           ))}
         </div>

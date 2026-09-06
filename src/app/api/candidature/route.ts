@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  PORTFOLIO_BUCKET,
+  PORTFOLIO_MIN,
+  PORTFOLIO_MAX,
+  PORTFOLIO_MAX_BYTES,
+  isAllowedImage,
+} from "@/lib/candidature-portfolio";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE = "https://curatocollective.com";
@@ -110,13 +118,24 @@ function confirmationEmail(name: string, typeLabel: string) {
 </html>`;
 }
 
-function notificationEmail(name: string, typeLabel: string, email: string, instagram?: string, website?: string, message?: string) {
+function notificationEmail(name: string, typeLabel: string, email: string, instagram?: string, website?: string, message?: string, photoStyle?: string, photoCount?: number, applicationId?: string) {
   const rows = [
     { label: "Type", value: typeLabel },
     { label: "Email", value: `<a href="mailto:${email}" style="color:#CBB78F;text-decoration:none;">${email}</a>` },
     ...(instagram ? [{ label: "Instagram", value: instagram }] : []),
     ...(website ? [{ label: "Site web", value: `<a href="${website}" style="color:#CBB78F;text-decoration:none;">${website}</a>` }] : []),
     ...(message ? [{ label: "Message", value: message }] : []),
+    ...(photoStyle ? [{ label: "Regard", value: photoStyle }] : []),
+    // The photographs live in a private bucket, so the email carries a count and
+    // a way in rather than links that would either leak or expire.
+    ...(photoCount
+      ? [{
+          label: "Portfolio",
+          value: applicationId
+            ? `${photoCount} photographie${photoCount > 1 ? "s" : ""} · <a href="${BASE}/admin/applications/${applicationId}" style="color:#CBB78F;text-decoration:none;">Voir la candidature</a>`
+            : `${photoCount} photographie${photoCount > 1 ? "s" : ""}`,
+        }]
+      : []),
   ];
 
   const rowsHtml = rows.map(r => `
@@ -175,7 +194,27 @@ function notificationEmail(name: string, typeLabel: string, email: string, insta
 }
 
 export async function POST(req: NextRequest) {
-  const { type, name, email, instagram, website, message, age_confirmed, terms_accepted } = await req.json();
+  // Multipart, not JSON: a creator application now carries photographs.
+  const formData = await req.formData();
+  const str = (k: string) => {
+    const v = formData.get(k);
+    return typeof v === "string" && v.trim() !== "" ? v.trim() : null;
+  };
+
+  const type = str("type");
+  const name = str("name");
+  const email = str("email");
+  const instagram = str("instagram");
+  const website = str("website");
+  const message = str("message");
+  const photoStyle = str("photo_style");
+  const age_confirmed = formData.get("age_confirmed") === "true";
+  const terms_accepted = formData.get("terms_accepted") === "true";
+  const photos = formData.getAll("photos").filter((f): f is File => f instanceof File && f.size > 0);
+
+  if (!type || !name || !email) {
+    return NextResponse.json({ error: "Champs obligatoires manquants." }, { status: 400 });
+  }
 
   // RGPD: 18+ attestation required (declared in /privacidad section 11).
   if (age_confirmed !== true) {
@@ -193,6 +232,37 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // A creator is judged on their eye, so the portfolio is not optional for them.
+  // A maison sends no photographs and is not asked for any.
+  if (type === "creator") {
+    if (!photoStyle) {
+      return NextResponse.json(
+        { error: "Décrivez votre regard en quelques mots." },
+        { status: 400 }
+      );
+    }
+    if (photos.length < PORTFOLIO_MIN || photos.length > PORTFOLIO_MAX) {
+      return NextResponse.json(
+        { error: `Joignez entre ${PORTFOLIO_MIN} et ${PORTFOLIO_MAX} photographies.` },
+        { status: 400 }
+      );
+    }
+    for (const photo of photos) {
+      if (!isAllowedImage(photo.type)) {
+        return NextResponse.json(
+          { error: "Format non accepté. JPEG, PNG ou WEBP." },
+          { status: 400 }
+        );
+      }
+      if (photo.size > PORTFOLIO_MAX_BYTES) {
+        return NextResponse.json(
+          { error: "Une des photographies est trop lourde." },
+          { status: 400 }
+        );
+      }
+    }
+  }
+
   const typeLabel = type === "creator" ? "Créateur · Créatrice" : "Maison · Commerce";
   const normalizedEmail = email.toLowerCase().trim();
 
@@ -201,18 +271,55 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const { error: dbError } = await supabase.from("applications").insert({
-    type,
-    name,
-    email: normalizedEmail,
-    instagram: instagram || null,
-    website: website || null,
-    message: message || null,
-  });
+  const { data: inserted, error: dbError } = await supabase
+    .from("applications")
+    .insert({
+      type,
+      name,
+      email: normalizedEmail,
+      instagram: instagram || null,
+      website: website || null,
+      message: message || null,
+      photo_style: photoStyle,
+    })
+    .select("id")
+    .single();
 
-  if (dbError) {
+  if (dbError || !inserted) {
     console.error("Supabase insert error:", dbError);
-    return NextResponse.json({ error: dbError.message }, { status: 500 });
+    return NextResponse.json({ error: dbError?.message ?? "Erreur" }, { status: 500 });
+  }
+
+  // The application is saved before the photographs are. If a file fails to
+  // upload we would rather hold an application with a thin portfolio than lose
+  // the candidature altogether, so a failure here is logged, not fatal.
+  const applicationId = inserted.id as string;
+  const uploadedPaths: string[] = [];
+
+  if (photos.length > 0) {
+    const admin = createAdminClient();
+    for (const [i, photo] of photos.entries()) {
+      const ext = photo.type === "image/png" ? "png" : photo.type === "image/webp" ? "webp" : "jpg";
+      const path = `${applicationId}/${String(i + 1).padStart(2, "0")}.${ext}`;
+      const { error: uploadError } = await admin.storage
+        .from(PORTFOLIO_BUCKET)
+        .upload(path, Buffer.from(await photo.arrayBuffer()), {
+          contentType: photo.type,
+          upsert: true,
+        });
+      if (uploadError) {
+        console.error("Portfolio upload error:", uploadError);
+        continue;
+      }
+      uploadedPaths.push(path);
+    }
+
+    if (uploadedPaths.length > 0) {
+      await admin
+        .from("applications")
+        .update({ portfolio_paths: uploadedPaths })
+        .eq("id", applicationId);
+    }
   }
 
   try {
@@ -227,7 +334,11 @@ export async function POST(req: NextRequest) {
         from: "Curato <hello@curatocollective.com>",
         to: "hello@curatocollective.com",
         subject: `Nouvelle candidature — ${typeLabel} — ${name}`,
-        html: notificationEmail(name, typeLabel, normalizedEmail, instagram, website, message),
+        html: notificationEmail(
+          name, typeLabel, normalizedEmail,
+          instagram ?? undefined, website ?? undefined, message ?? undefined,
+          photoStyle ?? undefined, uploadedPaths.length, applicationId
+        ),
       }),
     ]);
   } catch (emailErr) {
