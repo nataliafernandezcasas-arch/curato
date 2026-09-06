@@ -16,7 +16,15 @@ const config: CapacitorConfig = {
   webDir: "mobile/www",
   backgroundColor: "#1A1A1A",
   server: {
-    url: "https://www.curatocollective.com",
+    // The app opens on /dashboard, never on the marketing home. Curato is
+    // invitation-only, so someone holding the app is already a member and does
+    // not need the pages that explain what Curato is.
+    //
+    // /dashboard is a server route that decides: a live session goes straight
+    // to that member's own space by role (storyteller, maison, recruiter), and
+    // no session lands on /auth/sign-in. Pointing at the sign-in screen itself
+    // would show the login form to members who are already signed in.
+    url: "https://www.curatocollective.com/dashboard",
     cleartext: false,
     // Any top-level navigation to a host that isn't listed here gets handed to
     // Safari (Capacitor cancels it in the WebView), which would silently break
