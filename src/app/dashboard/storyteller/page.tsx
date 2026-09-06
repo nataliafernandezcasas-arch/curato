@@ -99,7 +99,7 @@ export default function InfluencerDashboard() {
     setPreview(canBypassLaunchGate());
   }, []);
   const gated = isBeforeLaunch() && !preview;
-  const launchDateLabel = LAUNCH_AT.toLocaleDateString(lang, {
+  const launchDateLabel = LAUNCH_AT?.toLocaleDateString(lang, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -313,7 +313,9 @@ export default function InfluencerDashboard() {
               {t.comingSoonTitle}
             </h2>
             <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
-              {t.comingSoonBody.replace("{date}", launchDateLabel)}
+              {launchDateLabel
+                ? t.comingSoonBody.replace("{date}", launchDateLabel)
+                : t.comingSoonBodyNoDate}
             </p>
 
             <div className="mt-12 pt-12 border-t border-white/8 max-w-[460px] mx-auto">

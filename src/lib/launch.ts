@@ -3,13 +3,17 @@
 // the selected addresses. See canBypassLaunchGate() for who gets in early.
 import { getNativePlatform } from "./native/bridge";
 
-// Monday 3 November, the public opening. Paris has left CEST by then, so +01:00.
-// The 15 September to 15 October pilot does NOT move this date: that cohort is
-// the TestFlight tester list, and it comes in through the app (see below).
-export const LAUNCH_AT = new Date("2026-11-03T00:00:00+01:00");
+// No public date yet. `null` keeps the gate shut for the website for as long as
+// it takes, and the "coming soon" screen drops the sentence that would have
+// named a day. Set a Date here to announce one (write the Paris offset: +02:00
+// during CEST, +01:00 once it ends in late October).
+//
+// The pilot does not need a date set: that cohort is the TestFlight tester list
+// and it comes in through the app, see canBypassLaunchGate() below.
+export const LAUNCH_AT: Date | null = null;
 
 export function isBeforeLaunch(): boolean {
-  return Date.now() < LAUNCH_AT.getTime();
+  return LAUNCH_AT === null || Date.now() < LAUNCH_AT.getTime();
 }
 
 /**

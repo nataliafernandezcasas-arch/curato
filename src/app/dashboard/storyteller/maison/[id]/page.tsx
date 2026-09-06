@@ -340,7 +340,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
     ? (lang === "en" ? maison.description_en : lang === "es" ? maison.description_es : null) || maison.description
     : null;
   const gated = isBeforeLaunch() && !preview;
-  const launchDateLabel = LAUNCH_AT.toLocaleDateString(lang, {
+  const launchDateLabel = LAUNCH_AT?.toLocaleDateString(lang, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -402,7 +402,9 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
               {td.comingSoonTitle}
             </h2>
             <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
-              {td.comingSoonBody.replace("{date}", launchDateLabel)}
+              {launchDateLabel
+                ? td.comingSoonBody.replace("{date}", launchDateLabel)
+                : td.comingSoonBodyNoDate}
             </p>
           </div>
         ) : loading ? (
