@@ -2,19 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MapPin, SignOut } from "@phosphor-icons/react";
+import { MapPin } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
+import DashboardNav from "../dashboard-nav";
+import { STORYTELLER_LINKS } from "./nav-links";
 import { useLang } from "@/lib/i18n/LanguageContext";
-import { translations, Lang } from "@/lib/i18n/translations";
+import { translations } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import ConnectInstagram from "./connect-instagram";
 import SuggestVenue from "./suggest-venue";
-
-const LANGS: { key: Lang; label: string }[] = [
-  { key: "fr", label: "FR" },
-  { key: "en", label: "EN" },
-  { key: "es", label: "ES" },
-];
 
 // A maison = a signed venue from `comercios` (is_reservable = true).
 type Maison = {
@@ -82,7 +78,7 @@ function formatFollowers(n: number): string {
 }
 
 export default function InfluencerDashboard() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const t = translations[lang].dashboard;
 
   const [maisons, setMaisons] = useState<Maison[]>([]);
@@ -164,12 +160,6 @@ export default function InfluencerDashboard() {
       ? maisons
       : maisons.filter((m) => slugOf(m) === catFilter);
 
-  async function signOut() {
-    const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  }
 
   const monthlyCredit = profile?.monthly_credit_cop ?? 0;
   const usedCredit = profile?.credit_used_cop ?? 0;
@@ -179,47 +169,12 @@ export default function InfluencerDashboard() {
   return (
     <div className="min-h-[100dvh]">
 
-      {/* Nav */}
-      <nav className="border-b border-white/10 px-5 h-14 flex items-center bg-black/30 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/">
-              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
-            </Link>
-            <div className="w-px h-3 bg-white/10" />
-            <Link href="/dashboard/storyteller" className="font-serif text-[12px] tracking-wider text-champagne">
-              {t.navAddresses}
-            </Link>
-            <Link href="/dashboard/storyteller/visits" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
-              {t.navVisits}
-            </Link>
-          </div>
-          <div className="flex items-center gap-5">
-            <RoleSwitch current="storyteller" />
-            <div className="flex items-center gap-2.5">
-              {LANGS.map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setLang(key)}
-                  className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
-                    lang === key ? "text-champagne" : "text-white/55 hover:text-white/60"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className="w-px h-3 bg-white/10" />
-            <button
-              onClick={signOut}
-              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/55 hover:text-champagne transition-colors"
-            >
-              <SignOut size={14} />
-              {t.signOut}
-            </button>
-          </div>
-        </div>
-      </nav>
+      <DashboardNav
+        links={STORYTELLER_LINKS(t, "addresses")}
+        roleSwitch={<RoleSwitch current="storyteller" />}
+        settingsHref="/dashboard/storyteller/reglages"
+        settingsLabel={t.navSettings}
+      />
 
       <div className="max-w-[1200px] mx-auto px-5 py-10">
 

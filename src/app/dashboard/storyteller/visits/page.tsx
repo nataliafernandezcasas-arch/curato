@@ -1,16 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { SignOut, Camera, CheckCircle } from "@phosphor-icons/react";
+import DashboardNav from "../../dashboard-nav";
+import { STORYTELLER_LINKS } from "../nav-links";
+import { Camera, CheckCircle } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
-
-const LANGS: { key: Lang; label: string }[] = [
-  { key: "fr", label: "FR" },
-  { key: "en", label: "EN" },
-  { key: "es", label: "ES" },
-];
 
 type Visit = {
   id: string;
@@ -174,7 +169,7 @@ function VisitCard({
 }
 
 export default function MesVisites() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const t = translations[lang].visits;
   const td = translations[lang].dashboard;
 
@@ -197,51 +192,15 @@ export default function MesVisites() {
     load();
   }, []);
 
-  async function signOut() {
-    const { createClient } = await import("@/lib/supabase/client");
-    await createClient().auth.signOut();
-    window.location.href = "/";
-  }
 
   return (
     <div className="min-h-[100dvh]">
       {/* Nav */}
-      <nav className="border-b border-white/10 px-5 h-14 flex items-center bg-black/30 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-[1200px] mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/">
-              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
-            </Link>
-            <div className="w-px h-3 bg-white/10" />
-            <Link href="/dashboard/storyteller" className="font-serif text-[12px] tracking-wider text-white/55 hover:text-champagne transition-colors">
-              {td.navAddresses}
-            </Link>
-            <Link href="/dashboard/storyteller/visits" className="font-serif text-[12px] tracking-wider text-champagne">
-              {td.navVisits}
-            </Link>
-          </div>
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2.5">
-              {LANGS.map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setLang(key)}
-                  className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
-                    lang === key ? "text-champagne" : "text-white/55 hover:text-white/80"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className="w-px h-3 bg-white/10" />
-            <button onClick={signOut} className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/55 hover:text-champagne transition-colors">
-              <SignOut size={14} />
-              {td.signOut}
-            </button>
-          </div>
-        </div>
-      </nav>
+      <DashboardNav
+        links={STORYTELLER_LINKS(td, "visits")}
+        settingsHref="/dashboard/storyteller/reglages"
+        settingsLabel={td.navSettings}
+      />
 
       <div className="max-w-[920px] mx-auto px-5 py-10">
         <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/60 mb-3">{t.kicker}</p>
