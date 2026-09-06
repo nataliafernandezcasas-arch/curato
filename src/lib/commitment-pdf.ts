@@ -1,13 +1,44 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { buildCommitmentPdfGenerated } from "./commitment-pdf-legacy";
 
-// Builds a one-page, branded PDF record of a maison's signed commitment.
-// Returns the PDF as a base64 string, ready to attach to a Resend email.
-// Pure pdf-lib (no headless browser), so it runs fine on Vercel serverless.
+// Builds the PDF record of a maison's signed commitment, ready to attach to a
+// Resend email as base64.
+//
+// French maisons get the designed template (Centaur, floral ground) shipped in
+// assets/engagement-template-fr.pdf. The template is a fixed document: the only
+// things that change per maison are the house name, who signed, and when, so we
+// load it and draw those three on top rather than regenerating the page.
+//
+// EN and ES have no export of that design yet, so they keep the fully generated
+// layout in commitment-pdf-legacy.ts. Sending a French document to a maison that
+// chose English would be worse than a plainer one in its own language.
 
 const CHARCOAL = rgb(0.11, 0.102, 0.094); // #1C1A18
-const CHAMPAGNE = rgb(0.796, 0.717, 0.561); // #CBB78F
-const MUTED = rgb(0.42, 0.4, 0.37);
-const CREAM = rgb(0.969, 0.957, 0.937); // #F7F4EF
+const COPPER = rgb(0.443, 0.267, 0.153); // matches the template's ink
+
+// Where the template leaves room. Origin is bottom-left, page is 595.5 x 842.25.
+// `track` is extra letter-spacing in points: the template letterspaces every
+// line, so untracked text reads as pasted on from another document.
+// Calibrated against the 6-term template: "Signé par :" and "Date:" now sit
+// side by side on one line, not stacked.
+const SLOT = {
+  maison: { y: 676, size: 13, track: 1.4 }, // centred, between the wordmark and the intro
+  signatory: { x: 150, y: 187, size: 12, track: 1.1 }, // right of "Signé par :"
+  date: { x: 400, y: 187, size: 12, track: 1.1 }, // right of "Date:"
+};
+
+let templateCache: Buffer | null = null;
+
+async function loadTemplate(): Promise<Buffer> {
+  if (templateCache) return templateCache;
+  // Literal path so Next's output file tracing bundles the asset into the lambda.
+  templateCache = await readFile(
+    path.join(process.cwd(), "src/lib/assets/engagement-template-fr.pdf")
+  );
+  return templateCache;
+}
 
 export async function buildCommitmentPdf(input: {
   maisonName: string;
@@ -20,88 +51,44 @@ export async function buildCommitmentPdf(input: {
   labels: { signedBy: string; date: string; footer: string };
   lang: string;
 }): Promise<string> {
-  const doc = await PDFDocument.create();
-  const page = doc.addPage([595, 842]); // A4
-  const serif = await doc.embedFont(StandardFonts.TimesRoman);
-  const serifBold = await doc.embedFont(StandardFonts.TimesRomanBold);
+  if (!input.lang.startsWith("fr")) return buildCommitmentPdfGenerated(input);
 
-  const W = 595;
-  const M = 64;
-  const maxW = W - M * 2;
-
-  // Cream background
-  page.drawRectangle({ x: 0, y: 0, width: W, height: 842, color: CREAM });
-
-  let y = 842 - 80;
-
-  const drawCentered = (text: string, font: typeof serif, size: number, color = CHARCOAL, spacing = 0) => {
-    const t = spacing ? text.split("").join(" ") : text;
-    const w = font.widthOfTextAtSize(t, size);
-    page.drawText(t, { x: (W - w) / 2, y, size, font, color });
-  };
-
-  // Wordmark
-  drawCentered("C U R A T O", serif, 24, CHARCOAL);
-  y -= 20;
-  drawCentered("PARIS  ·  INVITATION ONLY", serif, 8, MUTED);
-  y -= 44;
-
-  // Champagne rule
-  page.drawRectangle({ x: (W - 60) / 2, y, width: 60, height: 1, color: CHAMPAGNE });
-  y -= 40;
-
-  // Title
-  drawCentered(input.title.toUpperCase(), serifBold, 20, CHARCOAL);
-  y -= 30;
-  if (input.maisonName) {
-    drawCentered(input.maisonName, serif, 13, CHAMPAGNE);
-    y -= 34;
-  } else {
-    y -= 4;
+  let doc: PDFDocument;
+  try {
+    doc = await PDFDocument.load(await loadTemplate());
+  } catch {
+    // A missing or unreadable template must never cost the maison its record.
+    return buildCommitmentPdfGenerated(input);
   }
 
-  // Word-wrap helper for left-aligned paragraphs.
-  const drawWrapped = (text: string, font: typeof serif, size: number, x: number, color = CHARCOAL, lineH = size * 1.5, width = maxW - (x - M)) => {
-    const words = text.split(/\s+/);
-    let line = "";
-    for (const word of words) {
-      const test = line ? `${line} ${word}` : word;
-      if (font.widthOfTextAtSize(test, size) > width && line) {
-        page.drawText(line, { x, y, size, font, color });
-        y -= lineH;
-        line = word;
-      } else {
-        line = test;
-      }
-    }
-    if (line) {
-      page.drawText(line, { x, y, size, font, color });
-      y -= lineH;
+  const page = doc.getPage(0);
+  const { width } = page.getSize();
+
+  // Times is the closest standard serif to the template's Centaur. It is not a
+  // match. Swap it for the real face once the licence is confirmed to allow
+  // embedding in generated PDFs.
+  const serif = await doc.embedFont(StandardFonts.TimesRoman);
+
+  // pdf-lib has no letter-spacing, so advance glyph by glyph.
+  const trackedWidth = (t: string, size: number, track: number) =>
+    serif.widthOfTextAtSize(t, size) + track * Math.max(t.length - 1, 0);
+
+  const draw = (t: string, x: number, y: number, size: number, track: number, color = CHARCOAL) => {
+    let cx = x;
+    for (const ch of t) {
+      page.drawText(ch, { x: cx, y, size, font: serif, color });
+      cx += serif.widthOfTextAtSize(ch, size) + track;
     }
   };
 
-  // Intro
-  drawWrapped(input.intro, serif, 11, M, MUTED, 17);
-  y -= 20;
+  if (input.maisonName) {
+    const w = trackedWidth(input.maisonName, SLOT.maison.size, SLOT.maison.track);
+    draw(input.maisonName, (width - w) / 2, SLOT.maison.y, SLOT.maison.size, SLOT.maison.track, COPPER);
+  }
 
-  // Terms
-  input.terms.forEach((term, i) => {
-    const num = String(i + 1).padStart(2, "0");
-    page.drawText(num, { x: M, y, size: 11, font: serifBold, color: CHAMPAGNE });
-    drawWrapped(term, serif, 12, M + 30, CHARCOAL, 18);
-    y -= 12;
-  });
-
-  y -= 18;
-  // Divider
-  page.drawRectangle({ x: M, y, width: maxW, height: 0.75, color: rgb(0.85, 0.83, 0.8) });
-  y -= 34;
-
-  // Signature
-  page.drawText(input.labels.signedBy, { x: M, y, size: 9, font: serif, color: MUTED });
-  y -= 22;
-  page.drawText(input.signatory, { x: M, y, size: 20, font: serifBold, color: CHARCOAL });
-  y -= 34;
+  if (input.signatory) {
+    draw(input.signatory, SLOT.signatory.x, SLOT.signatory.y, SLOT.signatory.size, SLOT.signatory.track);
+  }
 
   const when = new Date(input.acceptedAtIso).toLocaleDateString(input.lang, {
     day: "numeric",
@@ -109,17 +96,7 @@ export async function buildCommitmentPdf(input: {
     year: "numeric",
     timeZone: "Europe/Paris",
   });
-  page.drawText(`${input.labels.date}: ${when}`, { x: M, y, size: 10, font: serif, color: MUTED });
-
-  // Acceptance note (terms of engagement + T&C + privacy)
-  y -= 30;
-  page.drawRectangle({ x: M, y: y + 14, width: maxW, height: 0.5, color: rgb(0.85, 0.83, 0.8) });
-  drawWrapped(input.acceptance, serif, 9, M, MUTED, 13, maxW);
-
-  // Footer
-  const footer = input.labels.footer;
-  const fw = serif.widthOfTextAtSize(footer, 8);
-  page.drawText(footer, { x: (W - fw) / 2, y: 48, size: 8, font: serif, color: MUTED });
+  draw(when, SLOT.date.x, SLOT.date.y, SLOT.date.size, SLOT.date.track);
 
   const bytes = await doc.save();
   return Buffer.from(bytes).toString("base64");

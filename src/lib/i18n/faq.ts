@@ -224,7 +224,7 @@ const fr: FaqContent = {
           },
           {
             q: "Combien de visites par mois sont garanties ?",
-            a: "Curato vous garantit un minimum de 5 visites de storytellers par mois. Si ce seuil n'est pas atteint sur un mois donné, le mois suivant vous est offert. Si trois mois consécutifs passent sans atteindre les 5 visites, cela signifie que votre maison ne suscite pas l'intérêt des storytellers et votre participation au programme prend fin.",
+            a: "Curato vous garantit un minimum de 5 visites de storytellers par mois. Ce minimum se mesure sur les visites que Curato vous propose : une demande que vous refusez compte comme une visite proposée. Si ce seuil n'est pas atteint sur un mois donné, le mois suivant vous est offert. Si trois mois consécutifs passent sans atteindre les 5 visites, cela signifie que votre maison ne suscite pas l'intérêt des storytellers et votre participation au programme prend fin.",
           },
           {
             q: "Puis-je refuser un storyteller en particulier ?",
@@ -460,7 +460,7 @@ const en: FaqContent = {
           },
           {
             q: "How many visits per month am I guaranteed?",
-            a: "Curato guarantees a minimum of 5 storyteller visits per month. If that threshold isn't met in a given month, the following month is offered to you free of charge. If three consecutive months go by without reaching 5 visits, it means your maison isn't generating interest from storytellers and your participation in the program ends.",
+            a: "Curato guarantees a minimum of 5 storyteller visits per month. That minimum is measured on the visits Curato offers you: a request you decline counts as a visit offered. If that threshold isn't met in a given month, the following month is offered to you free of charge. If three consecutive months go by without reaching 5 visits, it means your maison isn't generating interest from storytellers and your participation in the program ends.",
           },
           {
             q: "Can I refuse a specific storyteller?",
@@ -696,7 +696,7 @@ const es: FaqContent = {
           },
           {
             q: "¿Cuántas visitas al mes tengo garantizadas?",
-            a: "Curato te garantiza un mínimo de 5 visitas de storytellers al mes. Si ese umbral no se alcanza un mes dado, el mes siguiente te lo regalamos. Si pasan tres meses consecutivos sin alcanzar las 5 visitas, significa que tu casa no genera interés entre los storytellers y tu participación en el programa termina.",
+            a: "Curato te garantiza un mínimo de 5 visitas de storytellers al mes. Ese mínimo se mide sobre las visitas que Curato te propone: una solicitud que rechaces cuenta como visita propuesta. Si ese umbral no se alcanza un mes dado, el mes siguiente te lo regalamos. Si pasan tres meses consecutivos sin alcanzar las 5 visitas, significa que tu casa no genera interés entre los storytellers y tu participación en el programa termina.",
           },
           {
             q: "¿Puedo rechazar a un storyteller en particular?",
