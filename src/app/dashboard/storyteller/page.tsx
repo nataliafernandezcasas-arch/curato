@@ -6,7 +6,7 @@ import { MapPin, SignOut } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
-import { isBeforeLaunch, LAUNCH_AT } from "@/lib/launch";
+import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import ConnectInstagram from "./connect-instagram";
 import SuggestVenue from "./suggest-venue";
 
@@ -93,9 +93,10 @@ export default function InfluencerDashboard() {
   const [preview, setPreview] = useState(false);
 
   // Before launch, accepted storytellers see a "coming soon" screen instead of
-  // the catalogue. ?preview=1 bypasses it for internal preview.
+  // the catalogue. ?preview=1 and the native app both bypass it, so the
+  // TestFlight cohort can browse while the website stays shut.
   useEffect(() => {
-    setPreview(new URLSearchParams(window.location.search).has("preview"));
+    setPreview(canBypassLaunchGate());
   }, []);
   const gated = isBeforeLaunch() && !preview;
   const launchDateLabel = LAUNCH_AT.toLocaleDateString(lang, {
