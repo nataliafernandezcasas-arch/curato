@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
 import ApplicationActions from "./actions";
+import { PORTFOLIO_BUCKET, PORTFOLIO_SIGNED_URL_SECONDS } from "@/lib/candidature-portfolio";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,20 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
     followers: number | null;
     stage: string | null;
   } | null = null;
+
+  // The bucket is private, so the review page mints short-lived URLs each time
+  // it renders. Nothing linkable is written down, and a stale tab simply stops
+  // showing the images rather than leaving them reachable.
+  let portfolio: string[] = [];
+  const paths: string[] = app.portfolio_paths ?? [];
+  if (paths.length > 0) {
+    const { data: signed } = await supabase.storage
+      .from(PORTFOLIO_BUCKET)
+      .createSignedUrls(paths, PORTFOLIO_SIGNED_URL_SECONDS);
+    portfolio = (signed ?? [])
+      .map((entry) => entry.signedUrl)
+      .filter((url): url is string => Boolean(url));
+  }
 
   if (app.status === "approved" && app.type === "creator") {
     const { data } = await supabase
@@ -97,6 +112,46 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
             "{app.message}"
           </p>
         </div>
+      )}
+
+      {/* Le regard */}
+      {app.photo_style && (
+        <div className="border border-white/10 bg-white/5 p-8 mb-10">
+          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/40 mb-4">Su mirada</p>
+          <p className="font-serif text-[16px] font-light text-white/70 leading-relaxed">
+            {app.photo_style}
+          </p>
+        </div>
+      )}
+
+      {portfolio.length > 0 && (
+        <div className="mb-10">
+          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/40 mb-4">
+            Portfolio · {portfolio.length} {portfolio.length === 1 ? "foto" : "fotos"}
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {portfolio.map((url, i) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block aspect-square border border-white/10 hover:border-champagne/40 transition-colors"
+              >
+                {/* Signed, short-lived, one-off URLs: next/image would try to cache
+                    and optimise something that stops existing within the hour. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt={`Portfolio ${i + 1}`} className="w-full h-full object-cover" />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {app.type === "creator" && portfolio.length === 0 && (
+        <p className="font-serif text-[13px] font-light text-white/25 mb-10 border-l border-white/10 pl-4">
+          Sin portfolio. Candidatura enviada antes de que el formulario lo pidiera.
+        </p>
       )}
 
       {/* Actions */}
