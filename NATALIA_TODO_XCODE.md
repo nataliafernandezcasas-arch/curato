@@ -1,115 +1,92 @@
-# Lo que necesito de ti para seguir con la app
+# Lo que necesito de ti para la app
 
-Todo lo que se podía adelantar sin compilar ya está hecho y commiteado en
-`feature/capacitor-app`. Lo que queda son cosas que requieren tu contraseña de
-administrador o tu identidad como persona, así que no las puedo hacer yo.
-
-Están en orden. El paso 1 es el único urgente.
+Estado al 6 de septiembre de 2026. Lo que queda son cosas que piden tu
+contraseña o tu identidad como persona, así que no las puedo hacer yo.
 
 ---
 
-## 1. Desbloquear Xcode (5 minutos, gratis)
+## Resuelto
 
-Xcode 26.6 ya está instalado en tu Mac, pero está "dormido" por dos motivos: el
-sistema apunta a una versión reducida de las herramientas, y nunca se aceptó la
-licencia de Apple. Hasta resolver eso no se puede compilar ni abrir el
-simulador.
+- **Xcode.** Instalado, licencia aceptada, simuladores disponibles.
+- **Cuenta de Apple Developer.** Usamos la de Isabella Fernandez Abrahan, cuenta
+  individual, Team ID `P76GMA4YCZ`, vigente hasta el 10 de abril de 2027.
+- **App creada en App Store Connect** como *Curato Collective*, con Bundle ID
+  `com.curatocollective.app`.
+- **Primer build subido a TestFlight** el 6 de septiembre, versión 1.0 (1).
 
-Abrí la app **Terminal** (Cmd + Espacio, escribí "Terminal") y pegá estos tres
-comandos, uno por uno. Te va a pedir tu contraseña de Mac en el primero, y no
-se ve nada mientras la escribís, es normal.
-
-```bash
-sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-```
-
-Le dice al sistema que use el Xcode completo en vez de las herramientas
-reducidas.
-
-```bash
-sudo xcodebuild -license accept
-```
-
-Acepta la licencia de Apple. Sin esto todo comando de Xcode se niega a correr.
-
-```bash
-sudo xcodebuild -runFirstLaunch
-```
-
-Instala los componentes que Xcode deja pendientes tras instalarse. Puede tardar
-unos minutos.
-
-**Cómo saber si funcionó:** pegá `xcrun simctl list devices available` y tenés
-que ver una lista de iPhones. Si aparece, avisame y sigo con el build y la
-prueba de login.
+En el repo quedó configurado el equipo de firma, la declaración de criptografía
+(`ITSAppUsesNonExemptEncryption`) y el manifiesto de privacidad
+(`PrivacyInfo.xcprivacy`), que Apple exige desde 2024.
 
 ---
 
-## 2. Programa de Desarrollador de Apple (99 €/año)
+## 1. Antes de invitar a los testers
 
-Necesario para: publicar en la App Store, notificaciones push, y arreglar el
-link de recuperación de contraseña dentro de la app. **No** hace falta para
-probar en el simulador, así que el paso 1 no depende de esto.
+**Rellenar App Privacy** en App Store Connect, en la barra lateral izquierda de
+la app. Hace falta antes de poder distribuir a testers externos. El contenido
+sale de lo que ya está escrito en `/privacidad`.
 
-1. Entrá a https://developer.apple.com/programs/enroll/
-2. Iniciá sesión con tu Apple ID. Conviene que sea el que vas a usar siempre
-   para Curato, porque después es un dolor moverlo.
-3. Activá la verificación en dos pasos si te la pide, es obligatoria.
-4. Elegí el tipo de cuenta:
-   - **Individual**: más rápido, sale a tu nombre. La app aparece publicada por
-     "Natalia Fernández".
-   - **Organización**: la app aparece publicada por "Curato". Requiere número
-     de registro legal de la empresa (un D-U-N-S) y tarda más, a veces semanas.
-   - Si Curato ya es una sociedad y querés que la tienda diga Curato, elegí
-     organización y empezá ya, porque el D-U-N-S es lo más lento de todo.
-5. Pagá los 99 € y esperá el mail de confirmación (de horas a días).
+**Rellenar Test Information** en la pestaña TestFlight: un email de contacto y
+las credenciales de una cuenta de prueba. Sin la cuenta, el revisor de Apple se
+topa con el login y no puede entrar, y eso es rechazo seguro. Para eso sirve la
+cuenta `apercu` que ya existe.
 
-### Cuando esté aprobada, pasame estos datos
-
-- **Team ID**: son 10 caracteres tipo `A1B2C3D4E5`. Está en
-  https://developer.apple.com/account, sección "Membership details".
-
-Con eso puedo dejar configurado:
-
-- **Universal Links**, que es lo que hace que el link de recuperación de
-  contraseña abra dentro de la app en vez de mandar a Safari. Hoy ese flujo está
-  roto en la app y esta es la única solución real.
-- El archivo de capacidades para push.
-
-### Lo que vas a tener que hacer vos desde Xcode (te guío cuando llegue)
-
-- Iniciar sesión con tu Apple ID en Xcode (Settings, Accounts).
-- Activar la capacidad **Push Notifications** en el proyecto. Es un botón.
-- Activar **Associated Domains** para los Universal Links.
-- Crear una **APNs Key** en el portal de Apple, que es el permiso para
-  mandarnos notificaciones. Se descarga una sola vez, guardala bien.
-
-Los certificados de firma los genera Xcode solo si dejás activado "Automatically
-manage signing", así que no te preocupes por esa parte.
+**Los testers van en un grupo externo.** El primer build de un grupo externo
+pasa por Beta App Review, que tarda uno o dos días. Los testers internos no
+pasan revisión, pero un tester interno es un usuario de la cuenta de tu hermana,
+así que no sirve para gente de fuera.
 
 ---
 
-## 3. Android (opcional por ahora)
+## 2. El riesgo que hay que vigilar
 
-Ahora mismo no hay nada de Android instalado en tu Mac, así que el emulador no
-se puede ni abrir. El código de la app Android ya está listo y commiteado, solo
-falta el entorno.
+Curato es una web dentro de una cáscara nativa, y la **regla 4.2 de Apple**
+rechaza apps que no aportan nada sobre el sitio. Lo que normalmente salva a una
+app así son las notificaciones push, y hoy están a medias: el cliente escucha,
+pero no hay tabla donde guardar el token ni nada que envíe nada.
 
-1. **JDK 21**: https://adoptium.net/temurin/releases/?version=21
-   Elegí el instalador `.pkg` para macOS y tu chip (Apple Silicon = aarch64).
-2. **Android Studio**: https://developer.android.com/studio
-   Al abrirlo por primera vez elegí la instalación estándar, que baja el SDK y
-   crea un emulador solo.
-
-Para publicar en Google Play son 25 € por única vez, en
-https://play.google.com/console/signup. No corre apuro, se puede hacer después
-de iOS.
+Si Beta App Review lo rechaza, lo primero a construir es el backend de push.
 
 ---
 
-## 4. Lo único que no puedo probar yo
+## 3. Notificaciones push, cuando toque
 
-Cuando el simulador esté andando, la prueba crítica es iniciar sesión de verdad
-dentro de la app. Yo no escribo contraseñas en formularios, así que ese paso lo
-hacés vos: escribís las credenciales de la cuenta de prueba y yo verifico lo que
-importa, que la sesión sobreviva a recargar y a cerrar y reabrir la app.
+En el portal de Apple hay que crear una **APNs Key**. Se descarga una sola vez,
+guardala bien porque no se puede volver a bajar.
+
+Y en Xcode, activar la capacidad **Push Notifications** en el target. Es un
+botón en la pestaña Signing & Capabilities.
+
+Del lado del servidor falta una tabla `device_tokens` y un emisor que hable con
+APNs. Eso lo hago yo cuando exista la key.
+
+---
+
+## 4. Universal Links
+
+Recuperar la contraseña dentro de la app está roto y no tiene arreglo sin esto.
+Hace falta activar **Associated Domains** en Xcode y publicar un archivo en el
+dominio. Con el Team ID ya lo puedo dejar preparado.
+
+---
+
+## 5. Android, cuando quieras
+
+No hay nada de Android instalado en tu Mac. El código ya está listo y
+commiteado, falta el entorno.
+
+1. **JDK 21**: https://adoptium.net/temurin/releases/?version=21 (instalador
+   `.pkg`, chip Apple Silicon = aarch64).
+2. **Android Studio**: https://developer.android.com/studio, instalación
+   estándar.
+
+Publicar en Google Play son 25 € por única vez, en
+https://play.google.com/console/signup.
+
+---
+
+## 6. Lo único que no puedo probar yo
+
+Iniciar sesión de verdad dentro de la app. Yo no escribo contraseñas en
+formularios, así que ese paso lo hacés vos y yo verifico lo que importa: que la
+sesión sobreviva a recargar y a cerrar y reabrir la app.
