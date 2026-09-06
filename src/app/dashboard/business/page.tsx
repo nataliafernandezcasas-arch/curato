@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { SignOut, GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/react";
+import DashboardNav from "../dashboard-nav";
+import { GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import MaisonProfile from "./maison-profile";
@@ -32,12 +32,6 @@ type MaisonCard = {
   categoryId: string | null;
   comingSoon?: boolean;
 };
-
-const LANGS: { key: Lang; label: string }[] = [
-  { key: "fr", label: "FR" },
-  { key: "en", label: "EN" },
-  { key: "es", label: "ES" },
-];
 
 type RosterItem = {
   id: string;
@@ -95,7 +89,7 @@ function whyArguments(
 }
 
 export default function MaisonDashboard() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const t = translations[lang].business;
 
   const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory" | "billing">("profile");
@@ -189,46 +183,11 @@ export default function MaisonDashboard() {
     });
   }
 
-  async function signOut() {
-    const { createClient } = await import("@/lib/supabase/client");
-    await createClient().auth.signOut();
-    window.location.href = "/";
-  }
 
   return (
     <div className="min-h-[100dvh]">
       {/* Nav */}
-      <nav className="border-b border-white/10 px-5 h-14 flex items-center bg-black/30 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-[1100px] mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/">
-              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
-            </Link>
-            <div className="w-px h-3 bg-white/10" />
-            <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/45">Maison</span>
-          </div>
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-2.5">
-              {LANGS.map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setLang(key)}
-                  className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
-                    lang === key ? "text-champagne" : "text-white/55 hover:text-white/80"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <div className="w-px h-3 bg-white/10" />
-            <button onClick={signOut} className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/55 hover:text-champagne transition-colors">
-              <SignOut size={14} />
-              {t.signOut}
-            </button>
-          </div>
-        </div>
-      </nav>
+      <DashboardNav eyebrow="Maison" maxWidth="1100px" />
 
       <div className="max-w-[1280px] mx-auto px-8 py-12">
         <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">
