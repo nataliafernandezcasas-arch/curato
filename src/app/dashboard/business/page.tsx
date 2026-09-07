@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import DashboardNav from "../dashboard-nav";
+import { MAISON_LINKS, isMaisonSection, type MaisonSection } from "./nav-links";
 import { GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
@@ -88,11 +90,23 @@ function whyArguments(
   return out;
 }
 
-export default function MaisonDashboard() {
+export default function MaisonDashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[100dvh]" />}>
+      <MaisonDashboard />
+    </Suspense>
+  );
+}
+
+function MaisonDashboard() {
   const { lang } = useLang();
   const t = translations[lang].business;
 
-  const [tab, setTab] = useState<"roster" | "visitors" | "profile" | "directory" | "billing">("profile");
+  // Which section is open is part of the address, not local state: that is what
+  // lets the five of them be links in the menu instead of a row of buttons.
+  const searchParams = useSearchParams();
+  const section = searchParams.get("section");
+  const tab: MaisonSection = isMaisonSection(section) ? section : "profile";
   const [roster, setRoster] = useState<RosterItem[]>([]);
   const [maisonName, setMaisonName] = useState("");
   const [loading, setLoading] = useState(true);
@@ -187,9 +201,15 @@ export default function MaisonDashboard() {
   return (
     <div className="min-h-[100dvh]">
       {/* Nav */}
-      <DashboardNav eyebrow="Maison" maxWidth="1100px" />
+      <DashboardNav
+        eyebrow="Maison"
+        links={MAISON_LINKS(t, tab)}
+        settingsHref="/dashboard/business/reglages"
+        settingsLabel={translations[lang].dashboard.navSettings}
+        maxWidth="1100px"
+      />
 
-      <div className="max-w-[1280px] mx-auto px-8 py-12">
+      <div className="max-w-[1100px] mx-auto px-5 md:px-8 py-10 md:py-12">
         <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">
           {tab === "profile" ? t.tabProfile : t.kicker}
         </p>
@@ -205,23 +225,6 @@ export default function MaisonDashboard() {
             {tab === "directory" ? t.directorySubtitle : t.subtitle}
           </p>
         )}
-
-        {/* Tabs */}
-        <div className="flex gap-1 mb-8">
-          {([["profile", t.tabProfile], ["roster", t.tabRoster], ["visitors", t.tabVisitors], ["directory", t.tabDirectory], ["billing", "Facturation"]] as const).map(([key, label]) => (
-            <button
-              key={key}
-              onClick={() => setTab(key)}
-              className={`font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
-                tab === key
-                  ? "bg-champagne text-charcoal-deep"
-                  : "text-white/55 border border-white/12 hover:border-champagne/30 hover:text-champagne"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
 
         {tab === "roster" ? (
           loading ? (
@@ -240,9 +243,9 @@ export default function MaisonDashboard() {
                 <div
                   key={c.id}
                   onClick={() => openTeller(c)}
-                  className="bg-charcoal-deep p-6 cursor-pointer hover:bg-white/[0.03] transition-colors"
+                  className="bg-charcoal-deep p-5 sm:p-6 cursor-pointer hover:bg-white/[0.03] transition-colors"
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex items-center gap-3.5 min-w-0">
                       <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-charcoal-mid border border-white/10 flex items-center justify-center">
                         {c.avatar ? (
@@ -253,12 +256,12 @@ export default function MaisonDashboard() {
                         )}
                       </div>
                       <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-serif text-[18px] font-light text-white">{c.name}</h3>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="min-w-0 break-words font-serif text-[18px] font-light text-white">{c.name}</h3>
                         {c.igConnected && (
                           <span
                             title={t.igVerified}
-                            className="inline-flex items-center gap-1 border border-champagne/30 text-champagne/80 px-2 py-0.5 rounded-full"
+                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap border border-champagne/30 text-champagne/80 px-2 py-0.5 rounded-full"
                           >
                             <InstagramLogo size={11} weight="fill" />
                             <span className="font-serif text-[9px] tracking-[0.15em] uppercase">{t.igVerified}</span>
@@ -278,7 +281,7 @@ export default function MaisonDashboard() {
                       )}
                       </div>
                     </div>
-                    <div className="flex items-start gap-6 shrink-0 text-right">
+                    <div className="flex shrink-0 items-start gap-6 pl-[62px] sm:pl-0 sm:text-right">
                       <div>
                         <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.followers}</p>
                         <p className="font-serif text-[20px] font-light text-white/85">{formatFollowers(c.followers)}</p>

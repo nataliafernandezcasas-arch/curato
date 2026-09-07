@@ -120,7 +120,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   if (loading) return <div className="h-64 border border-white/8 bg-white/5 animate-pulse" />;
 
   const inputCls =
-    "px-4 py-2.5 border border-white/15 bg-charcoal-mid/50 text-white font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30";
+    "min-w-0 px-3 sm:px-4 py-2.5 border border-white/15 bg-charcoal-mid/50 text-white font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30";
   const labelCls = "font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70";
   const days = DAY_LABELS[lang];
   const fmtDate = (d: string) => new Date(d + "T00:00:00").toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric" });
@@ -135,19 +135,19 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           {DAY_ORDER.map((day, i) => {
             const w = winFor(day);
             return (
-              <div key={day} className="flex items-center gap-4 border-b border-white/8 py-2.5">
-                <label className="flex items-center gap-2.5 w-40 shrink-0 cursor-pointer">
+              <div key={day} className="flex flex-col gap-2 border-b border-white/8 py-2.5 sm:flex-row sm:items-center sm:gap-4">
+                <label className="flex items-center gap-2.5 cursor-pointer sm:w-40 sm:shrink-0">
                   <input type="checkbox" checked={!!w} onChange={(e) => toggleDay(day, e.target.checked)} className="accent-champagne" />
                   <span className="font-serif text-[14px] text-white/85">{days[i]}</span>
                 </label>
                 {w ? (
-                  <div className="flex items-center gap-2">
-                    <input type="time" value={w.start} onChange={(e) => setTime(day, "start", e.target.value)} className={inputCls} />
-                    <span className="text-white/30">→</span>
-                    <input type="time" value={w.end} onChange={(e) => setTime(day, "end", e.target.value)} className={inputCls} />
+                  <div className="flex items-center gap-2 pl-[26px] sm:pl-0">
+                    <input type="time" value={w.start} onChange={(e) => setTime(day, "start", e.target.value)} className={`${inputCls} flex-1 sm:flex-none`} />
+                    <span className="shrink-0 text-white/30">→</span>
+                    <input type="time" value={w.end} onChange={(e) => setTime(day, "end", e.target.value)} className={`${inputCls} flex-1 sm:flex-none`} />
                   </div>
                 ) : (
-                  <span className="font-serif text-[13px] font-light text-white/25">{t.offerClosed}</span>
+                  <span className="pl-[26px] font-serif text-[13px] font-light text-white/25 sm:pl-0">{t.offerClosed}</span>
                 )}
               </div>
             );
@@ -159,7 +159,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       <section>
         <p className={`${labelCls} mb-1`}>{t.offerBlocked}</p>
         <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerBlockedHint}</p>
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
           <input type="date" value={newBlock} onChange={(e) => setNewBlock(e.target.value)} className={inputCls} />
           <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 border border-white/15 text-white/70 hover:border-champagne/40 hover:text-champagne px-4 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-40">
             <Plus size={14} /> {t.offerAdd}
