@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
+<link rel="stylesheet" href="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/styles.css">
+<script src="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/_ds_bundle.js"></script>
+<style>
+  html { background: #1E1E1E; }
+  body { margin: 0; background: #1E1E1E; color: #F5EFE4;
+    font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300;
+    -webkit-font-smoothing: antialiased; }
+  a { color: #CBB78F; text-decoration: none; }
+  a:hover { color: #F5EFE4; }
+  ::selection { background: #763943; color: #F5EFE4; }
+  * { box-sizing: border-box; }
+  input[type="range"] { accent-color: #CBB78F; }
+  @keyframes cu-breathe { 0%,100% { opacity: .16 } 50% { opacity: .34 } }
+  @keyframes cu-plate { from { opacity: 0; transform: scale(1.04) } to { opacity: 1; transform: scale(1) } }
+  @keyframes cu-drift {
+    0% { transform: scale(1.06) translate3d(0, 0.8%, 0) }
+    50% { transform: scale(1.06) translate3d(0, -0.8%, 0) }
+    100% { transform: scale(1.06) translate3d(0, 0.8%, 0) }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-cu-drift] { animation: none !important }
+    [data-cu-plate] { animation-duration: 120ms !important; animation-name: none !important }
+  }
+</style>
+</helmet>
+
+<div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 120px">
+
+  <header style="display: flex; flex-direction: column; gap: 32px; padding-bottom: 48px; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 20px">
+      <img src="public/logo-curato-simple.png" alt="Curato" style="height: 15px; width: auto; display: block; opacity: .9">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Zone membre · sistema visual · v1</span>
+    </div>
+    <div style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 56px; align-items: end">
+      <h1 style="margin: 0; font-size: 46px; font-weight: 300; line-height: 1.06; letter-spacing: 0.11em; text-transform: uppercase">El sistema<br>de la zona<br>de miembro</h1>
+      <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); text-wrap: pretty">Cinco peldaños de texto, tres interletrados, una escala de espaciado, una regla para las líneas y una para las filas que no caben. Después, la misma pantalla de siempre, el carnet, construida solo con esas reglas y en sus cinco estados. Todo medido a 375 px.</p>
+    </div>
+  </header>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">00 · De dónde parto</p>
+    <div style="display: flex; flex-direction: column; gap: 26px">
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38); max-width: 62ch">Una nota sobre esta hoja: es una ficha, y va reglada como una página del dossier. La regla de las cajas gobierna la app, no este documento. En la pantalla de la sección 08 se cumple al pie de la letra.</p>
+      <p style="margin: 0; font-size: 17px; line-height: 1.55; color: rgba(245,239,228,0.88); max-width: 62ch; text-wrap: pretty">Leí el código, no el brandbook. Los tokens de <span style="color:#CBB78F">globals.css</span>, el nav del dashboard, el carnet del storyteller y el fondo floral. Dos cosas del brief no las encontré en <span style="color:#CBB78F">main</span>: no existe <span style="color:#CBB78F">design/decks/</span> ni <span style="color:#CBB78F">design/curato-app/</span>, así que no hay dossier contra el que medirme. Si están en otra rama, pásamela y contrasto.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Decisión</p>
+          <p style="margin: 0; font-size: 19px; line-height: 1.3; color: #F5EFE4">El negro es <span style="letter-spacing:0.04em">#1E1E1E</span></p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">La página se ve el cien por cien del tiempo, la cáscara solo en el rebote. Gana la página: <span style="color:#CBB78F">themeColor</span> y el fondo nativo bajan a <span style="letter-spacing:0.04em">#1E1E1E</span>, y <span style="letter-spacing:0.04em">#1A1A1A</span> desaparece del proyecto.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Decisión</p>
+          <p style="margin: 0; font-size: 19px; line-height: 1.3; color: #F5EFE4">Cormorant en peso 300</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Centaur es la fuente impresa. En pantalla el aire de la marca viene del peso Light, así que 300 es la voz por defecto y 400 solo aparece en texto por debajo de 13 px, donde 300 se rompe.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Decisión</p>
+          <p style="margin: 0; font-size: 19px; line-height: 1.3; color: #F5EFE4">Nada se desplaza en horizontal</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Ni pestañas, ni agenda, ni tabla. Cuando algo no cabe, envuelve o baja de línea. El scroll lateral no es una salida, es el síntoma.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">01 · La regla de las cajas</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">216 bordes hoy. El objetivo son ocho, y los ocho son botones.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 34px">
+      <p style="margin: 0; font-size: 19px; line-height: 1.45; color: #F5EFE4; max-width: 56ch; text-wrap: pretty">Ni una caja, salvo el botón. Es lo único que se dibuja cerrado, porque es lo único que se pulsa. Todo lo demás lo separa el aire.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px">
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">La única caja</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">El botón. Un filete de 1 px en champagne al 30 por ciento, 44 px de alto, esquinas rectas, la palabra en capital. Al ser la única forma cerrada del producto, se reconoce sin explicación: si está encerrado, se pulsa.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Sin caja y sin línea</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Listas, tarjetas, pestañas, campos, avisos y estados vacíos. Ni recuadro ni regla de separación: la jerarquía la hacen el tamaño, la foto y el aire de 32 px. La pestaña activa se marca en champagne, no con un subrayado.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Las tres líneas que quedan</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Y las tres son un dato, no un adorno: la barra del crédito, que mide cuánto queda; el filete de 2 px del error; y la línea del campo, que aparece solo al enfocarlo. Un único valor, <span style="color:#CBB78F">1 px, rgba(203,183,143,0.15)</span>.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 18px; flex-wrap: wrap">
+        <button onClick="{{ toggleBoxes }}" style="background: none; border: 1px solid rgba(203,183,143,0.3); padding: 12px 20px; margin: 0; min-height: 44px; cursor: pointer; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; transition: border-color 180ms ease-out, color 180ms ease-out" style-hover="color:#F5EFE4;border-color:#CBB78F">{{ boxesLabel }}</button>
+        <span style="font-size: 13px; color: rgba(245,239,228,0.38)">La misma fila de visita, encerrada y al aire.</span>
+      </div>
+
+      <div style="max-width: 375px; padding: 20px; background: #1E1E1E">
+        <sc-if value="{{ boxes }}" hint-placeholder-val="{{ true }}">
+          <div style="border: 1px solid rgba(203,183,143,0.15); padding: 14px; display: flex; flex-direction: column; gap: 10px">
+            <div style="border: 1px solid rgba(203,183,143,0.15); padding: 10px 12px; display: flex; justify-content: space-between; gap: 10px">
+              <span style="font-size: 13px; color: rgba(245,239,228,0.88)">Maison Marceau</span>
+              <span style="font-size: 13px; color: #CBB78F">19 h 30</span>
+            </div>
+            <div style="border: 1px solid rgba(203,183,143,0.15); padding: 10px 12px; display: flex; justify-content: space-between; gap: 10px">
+              <span style="font-size: 13px; color: rgba(245,239,228,0.88)">Tereza Bolkvadze</span>
+              <span style="font-size: 13px; color: rgba(245,239,228,0.65)">2 pers.</span>
+            </div>
+            <div style="border: 1px solid rgba(203,183,143,0.15); padding: 8px 10px; align-self: flex-start">
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: #B56E2E">À confirmer</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noBoxes }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Mardi 14 octobre</p>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 14px 0 4px">
+              <div style="min-width: 0; display: flex; flex-direction: column; gap: 3px">
+                <span style="font-size: 17px; color: #F5EFE4; line-height: 1.25">Maison Marceau</span>
+                <span style="font-size: 13px; color: rgba(245,239,228,0.65); overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Tereza Bolkvadze, 2 personnes</span>
+              </div>
+              <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19 h 30</span>
+            </div>
+            <p style="margin: 6px 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">À confirmer avant midi</p>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">02 · Escala tipográfica</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">De doce tamaños a cinco. De diez interletrados a tres.</p>
+    </div>
+    <div style="display: flex; flex-direction: column">
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 190px); gap: 24px; align-items: baseline; padding: 26px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Tereza Bolkvadze</p>
+        <div><p style="margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Titre · 28 / 32</p><p style="margin: 0; font-size: 13px; line-height: 1.5; color: rgba(245,239,228,0.65)">Uno por pantalla. Interletrado 0.12em, peso 300, 32 px desde 768.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 190px); gap: 24px; align-items: baseline; padding: 26px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 19px; font-weight: 300; line-height: 1.3">Réservé aux membres de Curato</p>
+        <div><p style="margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Sous-titre · 19</p><p style="margin: 0; font-size: 13px; line-height: 1.5; color: rgba(245,239,228,0.65)">Nombre de maison, cifra de crédito, pregunta de un formulario. Caja alta y baja, sin interletrado.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 190px); gap: 24px; align-items: baseline; padding: 26px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 15px; font-weight: 300; line-height: 1.6; max-width: 46ch">Une table de six dans une salle du seizième, à la lumière de fin de journée, pour deux stories publiées avant le lendemain midi.</p>
+        <div><p style="margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Corps · 15 / 1.6</p><p style="margin: 0; font-size: 13px; line-height: 1.5; color: rgba(245,239,228,0.65)">Toda la prosa. Medida máxima 46 caracteres a 375. Es el peldaño más usado.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 190px); gap: 24px; align-items: baseline; padding: 26px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 13px; font-weight: 400; line-height: 1.55; color: rgba(245,239,228,0.65)">Paris 6e · Gastronomie · 240 € de crédit restant</p>
+        <div><p style="margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Légende · 13</p><p style="margin: 0; font-size: 13px; line-height: 1.5; color: rgba(245,239,228,0.65)">Metadato y texto secundario. Peso 400, porque 300 a 13 px se deshace en pantalla.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 190px); gap: 24px; align-items: baseline; padding: 26px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Adresses sélectionnées</p>
+        <div><p style="margin: 0 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Capitale · 11</p><p style="margin: 0; font-size: 13px; line-height: 1.5; color: rgba(245,239,228,0.65)">El recurso de titulación de Curato. Solo mayúsculas, solo 0.28em, nunca frases de más de cuatro palabras.</p></div>
+      </div>
+      <div style="padding: 26px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px">
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">Desaparecen</span> 9, 10, 12, 14, 18, 20, 22, 26 y 32 px. Los 65 usos de 11 px que no eran capitales suben a 13. Los 31 de 10 px suben a 11 y se vuelven mayúsculas, o desaparecen.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">Interletrado</span>: 0 en corps y sous-titre, 0.12em en titre, 0.28em en capitale. Ningún otro valor. Los de 0.4em y 0.5em bajan a 0.28em, que a 11 px ya separa lo suficiente sin partir la palabra.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">Cifras</span> con <span style="color:#CBB78F">font-variant-numeric: tabular-nums</span> siempre que sean valor o columna. El crédito no puede cambiar de ancho cuando pasa de 240 a 40.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">03 · Espaciado</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">Base 4. Siete peldaños. Cada uno con un trabajo.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 30px">
+      <div style="display: flex; flex-direction: column">
+        <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">4</span><div style="height: 4px; background: rgba(203,183,143,0.3)"></div><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Entre una etiqueta y su valor</span></div>
+        <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">8</span><div style="height: 8px; background: rgba(203,183,143,0.3)"></div><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Entre líneas de un mismo bloque de texto</span></div>
+        <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">16</span><div style="height: 16px; background: rgba(203,183,143,0.3)"></div><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Aire dentro de una fila, arriba y abajo</span></div>
+        <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">20</span><div style="height: 20px; background: rgba(203,183,143,0.3)"></div><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Margen de página a 375, el único valor de borde</span></div>
+        <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">32</span><div style="height: 32px; background: rgba(203,183,143,0.3)"></div><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Entre dos elementos de distinto rango. Sustituye al recuadro</span></div>
+        <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">48</span><div style="height: 48px; background: rgba(203,183,143,0.3)"></div><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Entre secciones de una misma pantalla</span></div>
+        <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.2fr); gap: 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">72</span><div style="height: 72px; background: rgba(203,183,143,0.3)"></div><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Aire de respiración: cabecera de pantalla y estado vacío</span></div>
+      </div>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 60ch">Las áreas seguras no son espaciado, son terreno. El margen de página se suma a <span style="color:#CBB78F">env(safe-area-inset-*)</span> en Android, y en iOS lo resuelve el contenedor nativo. Ninguna pantalla añade su propio <span style="color:#CBB78F">padding-top</span> por si acaso.</p>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">04 · Roles de color</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">Seis roles, no una paleta. El color es información.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="height: 44px; background: #CBB78F"></div>
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Champagne · CBB78F</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.3; color: #F5EFE4">Lo que es del miembro, y dónde está</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Su crédito, su hora reservada, la pestaña de la sección en la que se encuentra, las capitales de titulación. <span style="color:#F5EFE4">No es</span> decoración, ni fondo grande, ni el color de todos los enlaces.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="height: 44px; background: #B56E2E"></div>
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Copper · B56E2E</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.3; color: #F5EFE4">Lo que tiene plazo</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Las dos stories antes de 24 h, la visita por confirmar, el crédito por debajo del 20 por ciento, la maison a la que le faltan visitas del mínimo de cinco. Nunca dos avisos en copper en la misma pantalla.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="height: 44px; background: #763943"></div>
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #9E5561">Burgundy · 763943</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.3; color: #F5EFE4">Lo que se ha caído</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Reserva rechazada, cobro fallido, selección de texto. Nunca en un texto pequeño sobre charcoal: no contrasta. El aviso se escribe en <span style="color:#F5EFE4">#F5EFE4</span> y el burgundy queda en el filete de 2 px que lo precede.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="height: 44px; background: linear-gradient(90deg, #F5EFE4 0 33%, rgba(245,239,228,0.65) 33% 66%, rgba(245,239,228,0.38) 66% 100%)"></div>
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Tinta · tres niveles</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.3; color: #F5EFE4">100, 65, 38</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Contenido, metadato, y lo que solo orienta. El 38 por ciento no lleva nunca texto que haya que leer para decidir algo: da 3.4:1 y sirve para una etiqueta, no para una condición.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="height: 44px; background: #4E5A4B"></div>
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86">Sauge · 4E5A4B</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.3; color: #F5EFE4">Lo que ya está cumplido</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Visita confirmada, dos stories publicadas, el mínimo de cinco visitas alcanzado, el mes cerrado. El verde de las fotografías de bien-être, tal como aparece en el brandbook. En texto sube a <span style="color:#8C9A86">#8C9A86</span> para contrastar sobre charcoal.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="height: 44px; background: #A3BAC0"></div>
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">Brume · A3BAC0</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.3; color: #F5EFE4">Lo que solo informa</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.65)">Categoría de una maison, arrondissement, idioma, número de factura. Es el azul frío del brandbook y hace un trabajo que el champagne hacía de más: así el champagne vuelve a significar solo lo que es del miembro.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">05 · Tacto y campos</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">Una mano, mala luz, entre dos servicios.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px">
+      <div style="display: flex; flex-direction: column; gap: 18px">
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">El objetivo táctil es <span style="color:#CBB78F">44 px de alto</span> y lo cubre la fila entera, no la palabra. Una fila de lista mide 16 px de aire arriba, 16 abajo y su contenido: nunca baja de 44. Dos objetivos táctiles no se tocan: 8 px mínimo entre ellos.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">El campo no lleva línea en reposo: lo definen su capital en champagne y el valor a <span style="color:#CBB78F">17 px</span>. La línea aparece al enfocarlo, y así la única línea de un formulario es la del campo en el que estás escribiendo. Los 17 px no son capricho: por debajo de 16 px el WebView de iOS hace zoom al enfocar, y ese zoom es lo que deja la pantalla desplazada en horizontal.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 26px; max-width: 335px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Nom de la maison</label>
+          <input value="Maison Marceau" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; transition: border-bottom-color 180ms ease-out" style-focus="border-bottom-color:#CBB78F">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Créneau</label>
+          <input value="19 h 30" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums; transition: border-bottom-color 180ms ease-out" style-focus="border-bottom-color:#CBB78F">
+          <span style="font-size: 13px; color: rgba(245,239,228,0.38)">El error se escribe aquí, en copper, sin recuadro y sin icono.</span>
+        </div>
+        <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; transition: border-color 180ms ease-out, color 180ms ease-out" style-hover="color:#F5EFE4;border-color:#CBB78F">Confirmer la visite</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">06 · La fila estrecha</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">Una sola regla, aplicada en todas partes.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 30px">
+      <p style="margin: 0; font-size: 19px; line-height: 1.45; color: #F5EFE4; max-width: 56ch; text-wrap: pretty">Toda fila es una rejilla de dos columnas: <span style="color:#CBB78F">minmax(0, 1fr)</span> para lo que se puede ceder, <span style="color:#CBB78F">auto</span> para el valor. El valor nunca se comprime ni se parte. Lo que cede es siempre la etiqueta.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px">
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">Uno.</span> El texto secundario trunca con puntos suspensivos a una línea.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">Dos.</span> El nombre propio no trunca: parte a dos líneas como máximo, porque un nombre cortado es una falta de respeto.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">Tres.</span> Si hay un tercer valor, baja a una segunda línea bajo la etiqueta. Nunca se aprieta en la misma.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">Cuatro.</span> Las pestañas envuelven a dos líneas, y la activa se distingue por el color. Cinco pestañas en francés no caben en 375, y el scroll lateral esconde la quinta.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ancho</span>
+        <input type="range" min="248" max="375" value="{{ rowW }}" onChange="{{ setRowW }}" style="width: 200px">
+        <span style="font-size: 13px; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">{{ rowW }} px</span>
+      </div>
+      <div style="{{ rowBoxStyle }}">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 16px 0">
+          <div style="min-width: 0; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 17px; line-height: 1.25; color: #F5EFE4; overflow-wrap: break-word">Tereza Bolkvadze</span>
+            <span style="font-size: 13px; color: rgba(245,239,228,0.65); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block">Réservé aux membres de Curato, Paris 16e</span>
+          </div>
+          <span style="font-size: 17px; color: #CBB78F; white-space: nowrap; font-variant-numeric: tabular-nums">19 h 30</span>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 16px 0">
+          <div style="min-width: 0; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 17px; line-height: 1.25; color: #F5EFE4; overflow-wrap: break-word">Jean-Baptiste de La Rochefoucauld</span>
+            <span style="font-size: 13px; color: rgba(245,239,228,0.65)">142 K · 2 personnes</span>
+          </div>
+          <span style="font-size: 17px; color: #CBB78F; white-space: nowrap; font-variant-numeric: tabular-nums">12 h 45</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0; border-bottom: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">07 · Movimiento</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">Tres duraciones, dos curvas. El movimiento vive en la fotografía.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 34px">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 28px">
+        <div><p style="margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Aparecer</p><p style="margin: 0; font-size: 15px; line-height: 1.55; color: rgba(245,239,228,0.88)">180 ms, solo opacidad. Curva <span style="color:#CBB78F">ease-out</span>. Sin desplazamiento.</p></div>
+        <div><p style="margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Entrar en escena</p><p style="margin: 0; font-size: 15px; line-height: 1.55; color: rgba(245,239,228,0.88)">260 ms, opacidad y <span style="color:#CBB78F">6 px</span> de recorrido. <span style="color:#CBB78F">cubic-bezier(.22, 1, .36, 1)</span>.</p></div>
+        <div><p style="margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Salir</p><p style="margin: 0; font-size: 15px; line-height: 1.55; color: rgba(245,239,228,0.88)">140 ms, solo opacidad. Se va más rápido de lo que llega, siempre.</p></div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; padding-top: 30px; border-top: 1px solid rgba(203,183,143,0.15)">
+        <div><p style="margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Se mueve la fotografía</p><p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Ahí está el movimiento de Curato, y solo ahí. La foto entra en <span style="color:#CBB78F">1200 ms</span> desde escala 1.04 hasta 1, con la opacidad de 0 a 1: se acerca al lector en lugar de encenderse. Una vez, al aparecer. La foto de un estado vacío o de una portada respira además en bucle, <span style="color:#CBB78F">18 s</span>, 0.8 por ciento de recorrido: no se ve mirando, se ve quedándose. Es el único bucle del producto.</p></div>
+        <div><p style="margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Sigue quieto el texto</p><p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Las cifras no cuentan hacia arriba. Las listas al filtrar solo cambian de opacidad, sin recolocarse una a una. Nada rebota, nada gira, y ninguna caja escala. Al confirmar una visita no hay confeti: hay una capital en sauge que dice que está hecho.</p></div>
+        <div><p style="margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">prefers-reduced-motion</p><p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">La respiración se detiene y la foto pasa a aparecer con 120 ms de opacidad, sin escala. Las alturas se aplican de golpe. El parallax del fondo floral queda quieto: es lo que ya hace <span style="color:#CBB78F">floral-backdrop.tsx</span>, y es la regla, no la excepción.</p></div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px; padding-top: 30px; border-top: 1px solid rgba(203,183,143,0.15)">
+        <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap">
+          <button onClick="{{ togglePanel }}" style="background: none; border: 1px solid rgba(203,183,143,0.3); padding: 12px 20px; min-height: 44px; cursor: pointer; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; transition: border-color 180ms ease-out, color 180ms ease-out" style-hover="color:#F5EFE4;border-color:#CBB78F">{{ panelLabel }}</button>
+          <button onClick="{{ toggleReduce }}" style="background: none; border: 1px solid rgba(203,183,143,0.15); padding: 12px 20px; min-height: 44px; cursor: pointer; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65); transition: border-color 180ms ease-out, color 180ms ease-out" style-hover="color:#F5EFE4;border-color:rgba(203,183,143,0.3)">{{ reduceLabel }}</button>
+        </div>
+        <div style="max-width: 375px; padding: 0 20px 20px; overflow: hidden; background: #1E1E1E">
+          <div style="{{ panelStyle }}">
+            <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Espaces</p>
+            <p style="margin: 0 0 14px; font-size: 17px; color: #F5EFE4">Maison</p>
+            <p style="margin: 0 0 14px; font-size: 17px; color: rgba(245,239,228,0.65)">Recruiter</p>
+            <p style="margin: 20px 0 0; font-size: 17px; color: rgba(245,239,228,0.65)">Réglages</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 56px 0 0">
+    <div style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; align-items: start">
+      <div>
+        <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">08 · Pantalla de referencia</p>
+        <p style="margin: 0 0 26px; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">Le carnet, a 375 px. Todo lo de arriba, y nada más.</p>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <sc-for list="{{ states }}" as="s" hint-placeholder-count="5">
+            <button onClick="{{ s.pick }}" style="{{ s.style }}">{{ s.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 44px; align-items: flex-start; flex-wrap: wrap">
+        <div style="width: 375px; flex: none; background: #1E1E1E; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between">
+            <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">18:42</span>
+            <span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span>
+          </div>
+          <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between">
+            <img src="public/logo-curato-simple.png" alt="Curato" style="height: 11px; width: auto; display: block; opacity: .9">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Réglages</span>
+          </div>
+
+          <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 32px 20px 72px; display: flex; flex-direction: column; gap: 32px">
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="height: 11px; width: 96px; background: rgba(203,183,143,0.15); animation: cu-breathe 1.6s ease-in-out infinite"></div>
+                <div style="height: 28px; width: 240px; background: rgba(203,183,143,0.15); animation: cu-breathe 1.6s ease-in-out infinite"></div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="aspect-ratio: 3 / 2; background: rgba(203,183,143,0.15); animation: cu-breathe 1.6s ease-in-out infinite"></div>
+                <div style="height: 17px; width: 180px; background: rgba(203,183,143,0.15); animation: cu-breathe 1.6s ease-in-out infinite"></div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 72px 20px 72px; display: flex; flex-direction: column; gap: 32px">
+              <div style="display: flex; flex-direction: column; gap: 16px">
+                <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Le carnet</p>
+                <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; color: #F5EFE4">Votre carnet<br>s'ouvre le<br>1er octobre</h2>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 30ch">Vingt-deux maisons vous attendent ce jour-là. Votre crédit de 400 € est déjà en place, il commence à courir à l'ouverture.</p>
+              </div>
+              <div style="overflow: hidden">
+                <img src="photos/p8.jpg" alt="" data-cu-drift="" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; opacity: .78; animation: cu-drift 18s ease-in-out infinite">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Une maison à nous suggérer</label>
+                <input placeholder="Nom et arrondissement" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; transition: border-bottom-color 180ms ease-out" style-focus="border-bottom-color:#CBB78F">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isError }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 72px 20px; display: flex; flex-direction: column; gap: 24px">
+              <div style="width: 24px; height: 2px; background: #763943"></div>
+              <h2 style="margin: 0; font-size: 19px; font-weight: 300; line-height: 1.35; color: #F5EFE4; max-width: 28ch">Le carnet ne s'est pas chargé. Votre connexion s'est interrompue.</h2>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 30ch">Rien n'est perdu, vos deux visites de la semaine sont enregistrées.</p>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; transition: border-color 180ms ease-out, color 180ms ease-out" style-hover="color:#F5EFE4;border-color:#CBB78F">Réessayer</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasData }}" hint-placeholder-val="{{ true }}">
+            <div style="padding: 32px 20px 48px">
+              <p style="margin: 0 0 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Bonsoir</p>
+              <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; color: #F5EFE4; overflow-wrap: break-word">Tereza Bolkvadze</h2>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding-bottom: 12px">
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Crédit du mois</span>
+                <span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">240 € <span style="font-size: 13px; color: rgba(245,239,228,0.38)">de 400 €</span></span>
+              </div>
+              <div style="height: 1px; background: rgba(203,183,143,0.15); position: relative">
+                <div style="position: absolute; inset: 0 60% 0 0; background: #CBB78F"></div>
+              </div>
+            </div>
+            <div style="padding: 0 20px 32px; display: flex; flex-wrap: wrap; gap: 8px 20px">
+              <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+                <button onClick="{{ t.pick }}" style="{{ t.style }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+            <div style="padding: 0 20px 20px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Adresses sélectionnées</p>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38); font-variant-numeric: tabular-nums">{{ visibleCount }}</span>
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 48px">
+              <sc-for list="{{ maisons }}" as="m" hint-placeholder-count="3">
+                <div style="display: flex; flex-direction: column; gap: 12px">
+                  <div style="overflow: hidden">
+                    <img src="{{ m.photo }}" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+                  </div>
+                  <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                    <span style="font-size: 19px; line-height: 1.25; color: #F5EFE4; overflow-wrap: break-word">{{ m.name }}</span>
+                    <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38); white-space: nowrap">{{ m.arr }}</span>
+                  </div>
+                  <p style="margin: 0; font-size: 13px; font-weight: 400; color: #A3BAC0">{{ m.cat }}</p>
+                  <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 42ch">{{ m.line }}</p>
+                  <sc-if value="{{ m.urgent }}" hint-placeholder-val="{{ false }}">
+                    <p style="margin: 4px 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">{{ m.urgent }}</p>
+                  </sc-if>
+                  <sc-if value="{{ m.done }}" hint-placeholder-val="{{ false }}">
+                    <p style="margin: 4px 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86">{{ m.done }}</p>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div style="height: 22px; display: flex; align-items: center; justify-content: center">
+            <div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div>
+          </div>
+        </div>
+
+        <div style="flex: 1 1 260px; min-width: 240px; display: flex; flex-direction: column; gap: 22px; padding-top: 8px">
+          <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Lo que hay que mirar</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Cero cajas y una sola línea, la del crédito, que es una medida. Lo que antes era una tarjeta ahora es una foto con aire de 48 px debajo, y la barra de arriba se separa por el aire, no por una regla.</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Las cinco pestañas en francés envuelven a dos líneas. La activa va en champagne, sin subrayado y sin fondo: cambiar de sección no debería parecer pulsar un botón.</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Cada foto entra acercándose, 1200 ms desde escala 1.04. Cambia de pestaña y vuelve a verlo: es lo único que se mueve, y es la marca la que se mueve.</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Nombre y arrondissement viven en la misma rejilla de dos columnas: el nombre parte a dos líneas, el arrondissement no se mueve.</p>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">El estado vacío da la fecha, la cifra y una cosa que hacer. El de error dice qué no se ha perdido, que es lo único que importa a esa hora.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px; padding: 56px 0 0; margin-top: 56px; border-top: 1px solid rgba(203,183,143,0.15)">
+    <div>
+      <p style="margin: 0 0 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">09 · Orden de construcción</p>
+      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38)">Cimiento primero. Un solo PR.</p>
+    </div>
+    <div style="display: flex; flex-direction: column">
+      <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">1</span><span style="font-size: 17px; color: #F5EFE4">Tokens en @theme inline</span><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Cinco tamaños, tres interletrados, siete espacios, una línea. Nada más entra.</span></div>
+      <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">2</span><span style="font-size: 17px; color: #F5EFE4">Cuatro primitivas</span><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Row, Field, Tabs, Section. Son las que borran los 216 bordes de una vez.</span></div>
+      <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">3</span><span style="font-size: 17px; color: #F5EFE4">El negro y las áreas seguras</span><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Un cambio de tres líneas, y el rebote del scroll deja de delatar la cáscara.</span></div>
+      <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">4</span><span style="font-size: 17px; color: #F5EFE4">Movimiento, una sola vez</span><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Dos variantes de framer-motion compartidas, con useReducedMotion dentro.</span></div>
+      <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid rgba(203,183,143,0.15)"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">5</span><span style="font-size: 17px; color: #F5EFE4">Pantallas, en este orden</span><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Carnet, ficha de maison, visites, agenda de maison, réglages. La agenda al final: es la que más depende de la fila estrecha.</span></div>
+      <div style="display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: baseline; padding: 18px 0"><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums">6</span><span style="font-size: 17px; color: #F5EFE4">Estados vacíos</span><span style="font-size: 13px; color: rgba(245,239,228,0.65)">Acabado, no cimiento, pero son la primera pantalla de todo miembro nuevo.</span></div>
+    </div>
+  </section>
+
+  <footer style="padding: 56px 0 0; margin-top: 56px; border-top: 1px solid rgba(203,183,143,0.15); display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 48px">
+    <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Siguiente</p>
+    <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 60ch">Con el sistema cerrado, lo siguiente son los wireframes de storyteller a 375 con sus cinco estados, y el tablero de maison a 375 y 1440. Dime si la regla de las cajas te vale tal como está escrita, porque todo lo demás se apoya en ella. Y si existe <span style="color:#CBB78F">design/decks/</span> en otra rama, pásamela: quiero poner el carnet al lado de una página del dossier antes de dibujar nada más.</p>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180}}">
+const STATES = [
+  { id: "data", label: "Con datos" },
+  { id: "few", label: "Con pocos datos" },
+  { id: "loading", label: "Cargando" },
+  { id: "empty", label: "Vacío" },
+  { id: "error", label: "Error" },
+];
+
+const TABS = ["Tout", "Gastronomie", "Hôtels", "Bien-être", "Beauté"];
+
+const MAISONS = [
+  { name: "Réservé aux membres de Curato", arr: "Paris 16e", cat: "Gastronomie", photo: "photos/p1.jpg",
+    line: "Une table de six en fin de service, la cuisine ouverte, deux couverts par visite.", urgent: "2 stories sous 24 h", tab: "Gastronomie" },
+  { name: "Maison Marceau", arr: "Paris 8e", cat: "Hôtellerie", photo: "photos/p2.jpg",
+    line: "Une nuit en chambre haute, petit déjeuner servi jusqu'à onze heures.", urgent: "", done: "Visite confirmée", tab: "Hôtels" },
+  { name: "Atelier Sainte-Anne", arr: "Paris 2e", cat: "Bien-être", photo: "photos/p6.jpg",
+    line: "Soixante minutes, en fin de journée, dans la salle du fond qui donne sur la cour.", urgent: "", done: "2 stories publiées", tab: "Bien-être" },
+  { name: "Jean-Baptiste de La Rochefoucauld", arr: "Paris 6e", cat: "Beauté", photo: "photos/p5.jpg",
+    line: "Un soin du visage de quarante minutes, réservable du mardi au samedi.", urgent: "", tab: "Beauté" },
+];
+
+class Component extends DCLogic {
+  state = { boxes: true, rowW: 375, screen: "data", tab: "Tout", panel: false, reduce: false };
+
+  renderVals() {
+    const s = this.state;
+    const tabStyle = (active) =>
+      "background:none;border:none;padding:8px 0;margin:0;cursor:pointer;font-family:inherit;font-size:11px;text-transform:uppercase;letter-spacing:0.28em;min-height:44px;" +
+      (active ? "color:#CBB78F;font-weight:400" : "color:rgba(245,239,228,0.55)");
+
+    const stateBtn = (active) =>
+      "background:none;border:none;text-align:left;padding:11px 0;cursor:pointer;font-family:inherit;font-size:13px;font-weight:400;min-height:44px;" +
+      (active ? "color:#CBB78F" : "color:rgba(245,239,228,0.38)");
+
+    const filtered = s.tab === "Tout" ? MAISONS : MAISONS.filter((m) => m.tab === s.tab);
+    const shown = s.screen === "few" ? filtered.slice(0, 1) : filtered;
+
+    return {
+      boxes: s.boxes,
+      noBoxes: !s.boxes,
+      boxesLabel: s.boxes ? "Ver sin recuadros" : "Ver como está hoy",
+      toggleBoxes: () => this.setState((p) => ({ boxes: !p.boxes })),
+
+      rowW: s.rowW,
+      setRowW: (e) => this.setState({ rowW: Number(e.target.value) }),
+      rowBoxStyle: { width: s.rowW + "px", maxWidth: "100%", padding: "0 20px", background: "#1E1E1E", transition: "width 180ms ease-out" },
+
+      panelLabel: s.panel ? "Fermer le menu" : "Ouvrir le menu",
+      togglePanel: () => this.setState((p) => ({ panel: !p.panel })),
+      reduceLabel: s.reduce ? "reduced-motion activado" : "reduced-motion desactivado",
+      toggleReduce: () => this.setState((p) => ({ reduce: !p.reduce })),
+      panelStyle: {
+        overflow: "hidden",
+        paddingTop: s.panel ? "20px" : "0px",
+        maxHeight: s.panel ? "220px" : "0px",
+        opacity: s.panel ? 1 : 0,
+        transform: "none",
+        transition: s.reduce
+          ? "opacity 120ms linear"
+          : "max-height 260ms cubic-bezier(.22,1,.36,1), opacity 260ms cubic-bezier(.22,1,.36,1), padding-top 260ms cubic-bezier(.22,1,.36,1)",
+      },
+
+      states: STATES.map((st) => ({
+        label: st.label,
+        style: stateBtn(s.screen === st.id),
+        pick: () => this.setState({ screen: st.id }),
+      })),
+      tabs: TABS.map((t) => ({
+        label: t,
+        style: tabStyle(s.tab === t),
+        pick: () => this.setState({ tab: t }),
+      })),
+
+      isLoading: s.screen === "loading",
+      isEmpty: s.screen === "empty",
+      isError: s.screen === "error",
+      hasData: s.screen === "data" || s.screen === "few",
+      maisons: shown,
+      visibleCount: String(shown.length),
+    };
+  }
+}
+</script>
+</body>
+</html>
