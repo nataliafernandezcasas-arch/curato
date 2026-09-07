@@ -19,8 +19,12 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "fr
  * The travel is deliberately small. This is a backdrop behind text, not a
  * parallax showpiece: past roughly 8% the flower starts pulling the eye away
  * from what the person came to read.
+ *
+ * The veil is heavy for the same reason. The flower has a pale, busy centre,
+ * and text sitting over it was unreadable at 0.65. Legibility wins over seeing
+ * more of the photograph.
  */
-export default function FloralBackdrop({ opacity = 0.65 }: { opacity?: number }) {
+export default function FloralBackdrop({ opacity = 0.8 }: { opacity?: number }) {
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
 
