@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useNativePlatform } from "@/lib/native/use-native";
 import { useState } from "react";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -19,6 +20,9 @@ export default function SignInPage() {
   const [mode, setMode] = useState<"signin" | "reset">("signin");
   const [handle, setHandle] = useState("");
   const [password, setPassword] = useState("");
+  // Inside the app the marketing site is not a place to go: the member is
+  // already a member, and that page is the shop window.
+  const native = useNativePlatform();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -125,9 +129,14 @@ export default function SignInPage() {
 
       <div className="relative z-10 w-full max-w-[340px]">
         <div className="text-center mb-12">
-          <Link href="/" className="inline-block mb-8">
-            <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
-          </Link>
+          {native ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src="/logo-curato-simple.png" alt="curato" className="inline-block mb-8" style={{ height: "14px", width: "auto" }} />
+          ) : (
+            <Link href="/" className="inline-block mb-8">
+              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
+            </Link>
+          )}
           <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
             {mode === "reset" ? t.resetTitle : t.title}
           </h1>
@@ -156,6 +165,11 @@ export default function SignInPage() {
               </label>
               <input
                 type="text"
+                inputMode="email"
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
                 required
@@ -181,6 +195,7 @@ export default function SignInPage() {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -231,7 +246,7 @@ export default function SignInPage() {
           </form>
         )}
 
-        {mode === "signin" && (
+        {mode === "signin" && !native && (
           <p className="text-center mt-9 font-serif text-[11px] font-light text-text-muted tracking-wide">
             {t.notMember}{" "}
             <Link href="/storytellers" className="text-champagne hover:text-copper transition-colors">

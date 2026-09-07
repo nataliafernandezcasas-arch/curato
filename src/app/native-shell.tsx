@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { getCapacitor, getNativePlatform } from "@/lib/native/bridge";
 import { attachPushListeners, syncPushRegistration } from "@/lib/native/push";
 
@@ -12,6 +13,19 @@ import { attachPushListeners, syncPushRegistration } from "@/lib/native/push";
  * a no-op in a normal browser. Renders nothing.
  */
 export default function NativeShell() {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // The marketing home explains what Curato is to someone who has never heard
+  // of it. Whoever is holding the app was invited, so that page has nothing to
+  // say to them and should never be a place the app can end up. Every link that
+  // used to lead here now points at /dashboard; this is the net underneath, so
+  // a link added later cannot quietly reopen the door.
+  useEffect(() => {
+    if (!getNativePlatform()) return;
+    if (pathname === "/") router.replace("/dashboard");
+  }, [pathname, router]);
+
   useEffect(() => {
     const platform = getNativePlatform();
     if (!platform) return;
