@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.curatocollective.com";
+
 export async function POST(request: NextRequest) {
   try {
     const { email, code } = await request.json();
@@ -35,12 +37,15 @@ export async function POST(request: NextRequest) {
     const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
       type: "magiclink",
       email: email.toLowerCase().trim(),
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://curatocollective.com"}/auth/callback`,
-      },
     });
 
-    if (linkError || !linkData?.properties?.action_link) {
+    // Same reason as the password-reset route: Supabase's own action_link bounces
+    // through /auth/v1/verify, which returns the session in the URL fragment
+    // (#access_token=...). A fragment never reaches a server route, so
+    // /auth/callback would see nothing and bounce the user to /auth/sign-in.
+    // Send them straight to our callback with the hashed token instead.
+    const hashedToken = linkData?.properties?.hashed_token;
+    if (linkError || !hashedToken) {
       console.error("generateLink error:", linkError);
       return NextResponse.json({ error: "Erreur lors de la génération du lien. Réessayez." }, { status: 500 });
     }
@@ -51,7 +56,9 @@ export async function POST(request: NextRequest) {
       .update({ access_code: null, access_code_expires_at: null })
       .eq("id", app.id);
 
-    return NextResponse.json({ redirectTo: linkData.properties.action_link });
+    return NextResponse.json({
+      redirectTo: `${SITE_URL}/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`,
+    });
   } catch (err) {
     console.error("verify-access-code error:", err);
     return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });
