@@ -9,8 +9,15 @@ import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import { parisParts, AvailWindow } from "@/lib/availability";
+import { Row } from "@/components/member/row";
 
-type MaisonAvail = { availability: AvailWindow[]; blocked: { date: string }[]; taken: string[] };
+type MaisonService = { name: string; description: string; price: string };
+type MaisonAvail = {
+  availability: AvailWindow[];
+  blocked: { date: string }[];
+  taken: string[];
+  services: MaisonService[];
+};
 
 type Maison = {
   id: string;
@@ -35,11 +42,13 @@ const SLUG_LABEL_KEY = {
 
 // Canonical category UUIDs (migration 009) → slug + credit cost. The label is
 // resolved per-language from the slug.
-const CATEGORY: Record<string, { slug: keyof typeof SLUG_LABEL_KEY; credits: number; unit: string }> = {
-  "00000000-0000-0000-0000-0000000ca701": { slug: "hoteles", credits: 8, unit: "night" },
-  "00000000-0000-0000-0000-0000000ca702": { slug: "gastronomia", credits: 2, unit: "booking" },
-  "00000000-0000-0000-0000-0000000ca703": { slug: "wellness", credits: 3, unit: "booking" },
-  "00000000-0000-0000-0000-0000000ca704": { slug: "belleza", credits: 3, unit: "booking" },
+// Solo la categoría y si se cuenta por noches. El coste ya no vive aquí: lo
+// pone cada maison en sus servicios, en euros, que es lo que el creador recibe.
+const CATEGORY: Record<string, { slug: keyof typeof SLUG_LABEL_KEY; unit: string }> = {
+  "00000000-0000-0000-0000-0000000ca701": { slug: "hoteles", unit: "night" },
+  "00000000-0000-0000-0000-0000000ca702": { slug: "gastronomia", unit: "booking" },
+  "00000000-0000-0000-0000-0000000ca703": { slug: "wellness", unit: "booking" },
+  "00000000-0000-0000-0000-0000000ca704": { slug: "belleza", unit: "booking" },
 };
 
 function ReserveModal({ maison, onClose, initialSlot }: { maison: Maison; onClose: () => void; initialSlot?: string }) {
@@ -258,10 +267,25 @@ function ReserveModal({ maison, onClose, initialSlot }: { maison: Maison; onClos
               />
             </div>
 
-            {cat && (
-              <p className="font-serif text-[12px] text-white/55">
-                {t.indicativeCost.replace("{n}", String(isHotel ? cat.credits * nights : cat.credits))}
-              </p>
+            {avail?.services?.some((s) => s.name?.trim()) && (
+              <div>
+                <p className="mb-bloque text-capitale uppercase tracking-capitale text-text-secondary">
+                  {t.maisonRates}
+                </p>
+                {avail.services
+                  .filter((s) => s.name?.trim())
+                  .map((s, i) => (
+                    <Row
+                      key={i}
+                      label={<span className="text-legende text-text-primary">{s.name}</span>}
+                      value={
+                        s.price?.trim() ? (
+                          <span className="text-legende text-text-primary">{s.price}</span>
+                        ) : undefined
+                      }
+                    />
+                  ))}
+              </div>
             )}
 
             {error && (

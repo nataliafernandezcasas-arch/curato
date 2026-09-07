@@ -8,7 +8,8 @@
 // reasons, but the value is euros.
 export function suggestedBudgetEUR(followers: number): number {
   if (followers >= 500000) return 3000; // Macro
-  if (followers >= 50000) return 1000;  // Mid (adjust 1000 to 1500 by hand)
+  if (followers >= 100000) return 1500; // Mid alto
+  if (followers >= 50000) return 1000;  // Mid
   if (followers >= 10000) return 750;   // Nano (1500 for the first 7)
   if (followers >= 5000) return 500;    // Micro
   return 0;                             // below threshold
