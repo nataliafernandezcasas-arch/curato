@@ -70,7 +70,7 @@ export default function ProfilPage() {
           {profile?.full_name ?? ""}
         </h1>
         {profile?.handle && (
-          <p className="mb-10 font-serif text-[14px] font-light tracking-wider text-champagne/50">
+          <p className="mb-10 font-serif text-[14px] font-light tracking-wider text-champagne/70">
             @{profile.handle}
           </p>
         )}
@@ -83,9 +83,9 @@ export default function ProfilPage() {
             { k: t.profileStories, v: String(stories) },
           ].map(({ k, v, s }) => (
             <div key={k}>
-              <p className="mb-2 font-serif text-[10px] uppercase tracking-[0.25em] text-white/40">{k}</p>
+              <p className="mb-2 font-serif text-[10px] uppercase tracking-[0.25em] text-white/60">{k}</p>
               <p className="font-serif text-[26px] font-light text-champagne">{v}</p>
-              {s && <p className="mt-1 font-serif text-[12px] font-light text-white/40">{s}</p>}
+              {s && <p className="mt-1 font-serif text-[12px] font-light text-white/55">{s}</p>}
             </div>
           ))}
         </div>
@@ -94,9 +94,9 @@ export default function ProfilPage() {
           {t.profileHousesVisited}
         </p>
         {loading ? (
-          <p className="font-serif text-[14px] font-light text-white/40">…</p>
+          <p className="font-serif text-[14px] font-light text-white/55">…</p>
         ) : houses.length === 0 ? (
-          <p className="font-serif text-[14px] font-light italic text-white/40">
+          <p className="font-serif text-[14px] font-light italic text-white/55">
             {t.profileNoVisitsYet}
           </p>
         ) : (
@@ -107,7 +107,7 @@ export default function ProfilPage() {
                 className="flex items-baseline justify-between border-b border-white/10 py-4"
               >
                 <span className="font-serif text-[15px] font-light text-white/85">{v.venueName}</span>
-                <span className="font-serif text-[12px] tracking-wider text-white/40">
+                <span className="font-serif text-[12px] tracking-wider text-white/55">
                   {new Date(v.slotStart).toLocaleDateString(lang, {
                     day: "numeric",
                     month: "long",
