@@ -102,7 +102,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] relative flex items-center justify-center px-5">
+    <div className="min-h-[100dvh] relative flex items-center justify-center px-7">
       <div className="absolute inset-0">
         <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-charcoal-deep/70" />
@@ -123,7 +123,7 @@ export default function SignInPage() {
         ))}
       </div>
 
-      <div className="relative z-10 w-full max-w-[400px]">
+      <div className="relative z-10 w-full max-w-[340px]">
         <div className="text-center mb-12">
           <Link href="/" className="inline-block mb-8">
             <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
@@ -131,7 +131,7 @@ export default function SignInPage() {
           <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
             {mode === "reset" ? t.resetTitle : t.title}
           </h1>
-          <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">
+          <p className="font-serif text-[12px] font-light text-text-muted mt-3 tracking-wide">
             {mode === "reset" ? t.resetSubtitle : t.subtitle}
           </p>
         </div>
@@ -151,7 +151,7 @@ export default function SignInPage() {
         ) : (
           <form onSubmit={mode === "reset" ? handleReset : handleSubmit} className="space-y-5">
             <div>
-              <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+              <label className="block font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60 mb-2.5">
                 {t.handleLabel}
               </label>
               <input
@@ -159,7 +159,7 @@ export default function SignInPage() {
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
                 required
-                className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
+                className="w-full px-4 py-3.5 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
                 placeholder={t.handlePlaceholder}
               />
             </div>
@@ -167,13 +167,13 @@ export default function SignInPage() {
             {mode === "signin" && (
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60">
+                  <label className="block font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60">
                     {t.passwordLabel}
                   </label>
                   <button
                     type="button"
                     onClick={() => switchMode("reset")}
-                    className="font-serif text-[11px] font-light text-text-muted hover:text-champagne transition-colors tracking-wide"
+                    className="font-serif text-[10px] font-light text-text-muted hover:text-champagne transition-colors tracking-wide"
                   >
                     {t.forgotPassword}
                   </button>
@@ -184,7 +184,7 @@ export default function SignInPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-5 py-4 pr-12 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
+                    className="w-full px-4 py-3.5 pr-11 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
                     placeholder="••••••••"
                   />
                   <button
@@ -208,7 +208,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
+              className="w-full font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne py-3.5 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
             >
               {mode === "reset"
                 ? loading
@@ -232,7 +232,7 @@ export default function SignInPage() {
         )}
 
         {mode === "signin" && (
-          <p className="text-center mt-10 font-serif text-[12px] font-light text-text-muted tracking-wide">
+          <p className="text-center mt-9 font-serif text-[11px] font-light text-text-muted tracking-wide">
             {t.notMember}{" "}
             <Link href="/storytellers" className="text-champagne hover:text-copper transition-colors">
               {t.requestInvite}
