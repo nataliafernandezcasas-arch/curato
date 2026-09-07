@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { List, X, Gear } from "@phosphor-icons/react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 export type NavLink = { href: string; label: string; active?: boolean };
 
@@ -36,6 +37,7 @@ export default function DashboardNav({
   maxWidth?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const reduce = useReducedMotion();
 
   // A stale open panel over a new page is worse than no panel, and Escape is
   // what anyone reaches for first.
@@ -115,41 +117,56 @@ export default function DashboardNav({
         </button>
       </div>
 
-      {open && (
-        <div className="border-t border-white/10 bg-charcoal-deep/95 px-5 py-5 backdrop-blur-sm sm:hidden">
-          <div className="flex flex-col gap-5">
-            {links.length > 0 && (
-              <div className="flex flex-col gap-4">
-                {links.map((l) => (
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="panel"
+            // Height animates on a wrapper that owns no padding of its own. Put
+            // padding here and the first frame jumps by that amount, which is
+            // what makes a slide read as a snap.
+            className="overflow-hidden sm:hidden"
+            initial={reduce ? false : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="border-t border-white/10 bg-charcoal-deep/95 px-5 py-5 backdrop-blur-sm">
+              <div className="flex flex-col gap-5">
+                {links.length > 0 && (
+                  <div className="flex flex-col gap-4">
+                    {links.map((l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        onClick={() => setOpen(false)}
+                        className={`font-serif text-[13px] tracking-wider transition-colors ${
+                          l.active ? "text-champagne" : "text-white/65 hover:text-champagne"
+                        }`}
+                      >
+                        {l.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+
+                {roleSwitch && <div className="flex flex-wrap items-center gap-3">{roleSwitch}</div>}
+
+                {settingsHref && (
                   <Link
-                    key={l.href}
-                    href={l.href}
+                    href={settingsHref}
                     onClick={() => setOpen(false)}
-                    className={`font-serif text-[13px] tracking-wider transition-colors ${
-                      l.active ? "text-champagne" : "text-white/65 hover:text-champagne"
-                    }`}
+                    className="flex items-center gap-2 border-t border-white/10 pt-5 font-serif text-[13px] tracking-wider text-white/65 transition-colors hover:text-champagne"
                   >
-                    {l.label}
+                    <Gear size={15} />
+                    {settingsLabel}
                   </Link>
-                ))}
+                )}
               </div>
-            )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            {roleSwitch && <div className="flex flex-wrap items-center gap-3">{roleSwitch}</div>}
-
-            {settingsHref && (
-              <Link
-                href={settingsHref}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2 border-t border-white/10 pt-5 font-serif text-[13px] tracking-wider text-white/65 transition-colors hover:text-champagne"
-              >
-                <Gear size={15} />
-                {settingsLabel}
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
     </nav>
   );
 }
