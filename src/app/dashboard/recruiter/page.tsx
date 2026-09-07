@@ -221,7 +221,7 @@ export default function RecruiterDashboard() {
     <main className="min-h-[100dvh] max-w-[1120px] mx-auto px-6 md:px-8 py-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
-        <Link href="/">
+        <Link href="/dashboard">
           <img src="/logo-curato-simple.png" alt="curato" style={{ height: "13px", width: "auto", display: "block" }} />
         </Link>
         <div className="flex items-center gap-6">

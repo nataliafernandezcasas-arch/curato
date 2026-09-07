@@ -56,7 +56,9 @@ export default function DashboardNav({
         style={{ maxWidth }}
       >
         <div className="flex min-w-0 items-center gap-4 sm:gap-6">
-          <Link href="/" className="shrink-0">
+          {/* Home for a member is their own space, not the page that explains
+              what Curato is. In the app that page should never appear at all. */}
+          <Link href="/dashboard" className="shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo-curato-simple.png"
