@@ -29,11 +29,18 @@ export async function POST(request: NextRequest) {
     const { data, error } = await admin.auth.admin.generateLink({
       type: "recovery",
       email,
-      options: { redirectTo: `${SITE_URL}/auth/callback?next=/auth/change-password` },
     });
     // No auth user for this email (or other error) — stay silent.
-    const link = data?.properties?.action_link;
-    if (error || !link) return NextResponse.json({ ok: true });
+    // Don't send Supabase's own action_link: it bounces through /auth/v1/verify,
+    // which hands the session back in the URL *fragment* (#access_token=...).
+    // A fragment never reaches the server, so /auth/callback saw no code and no
+    // token_hash and fell through to /auth/sign-in. Build the link ourselves from
+    // the hashed token instead, so the callback verifies it server-side.
+    const hashedToken = data?.properties?.hashed_token;
+    if (error || !hashedToken) return NextResponse.json({ ok: true });
+    const link =
+      `${SITE_URL}/auth/callback?token_hash=${encodeURIComponent(hashedToken)}` +
+      `&type=recovery&next=${encodeURIComponent("/auth/change-password")}`;
 
     try {
       await sendPasswordReset(email, link);
