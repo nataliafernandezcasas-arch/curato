@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { persistentCookie } from "@/lib/supabase/cookies";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Next.js 16: middleware fue renombrado a `proxy` (misma funcionalidad).
@@ -18,7 +19,7 @@ export async function proxy(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, persistentCookie(options, value))
           );
         },
       },
