@@ -1,20 +1,17 @@
 "use client";
 
-import Link from "next/link";
 import { useNativePlatform } from "@/lib/native/use-native";
 import { useState } from "react";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
-import { translations, Lang } from "@/lib/i18n/translations";
-
-const LANGS: { key: Lang; label: string }[] = [
-  { key: "fr", label: "FR" },
-  { key: "en", label: "EN" },
-  { key: "es", label: "ES" },
-];
+import { translations } from "@/lib/i18n/translations";
+import Link from "next/link";
+import { AuthShell } from "@/components/member/auth-shell";
+import { Button } from "@/components/member/button";
+import { Field } from "@/components/member/field";
 
 export default function SignInPage() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const t = translations[lang].signIn;
 
   const [mode, setMode] = useState<"signin" | "reset">("signin");
@@ -106,155 +103,105 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-[100dvh] relative flex items-center justify-center px-7">
-      <div className="absolute inset-0">
-        <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-charcoal-deep/70" />
-      </div>
-
-      {/* Language switcher */}
-      <div className="absolute top-5 right-5 flex items-center gap-3 z-20">
-        {LANGS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setLang(key)}
-            className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
-              lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <div className="relative z-10 w-full max-w-[340px]">
-        <div className="text-center mb-12">
-          {native ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src="/logo-curato-simple.png" alt="curato" className="inline-block mb-8" style={{ height: "14px", width: "auto" }} />
-          ) : (
-            <Link href="/" className="inline-block mb-8">
-              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
+    <AuthShell
+      title={mode === "reset" ? t.resetTitle : t.title}
+      subtitle={mode === "reset" ? t.resetSubtitle : t.subtitle}
+      footer={
+        mode === "signin" && !native ? (
+          <>
+            {t.notMember}{" "}
+            <Link href="/storytellers" className="text-accent transition-colors hover:text-text-primary">
+              {t.requestInvite}
             </Link>
-          )}
-          <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
-            {mode === "reset" ? t.resetTitle : t.title}
-          </h1>
-          <p className="font-serif text-[12px] font-light text-text-muted mt-3 tracking-wide">
-            {mode === "reset" ? t.resetSubtitle : t.subtitle}
-          </p>
+          </>
+        ) : undefined
+      }
+    >
+      {mode === "reset" && resetSent ? (
+        <div className="space-y-rango">
+          {/* La misma frase exista la cuenta o no: decir "no existe" sería
+              contar quién es miembro a quien pregunte. */}
+          <p className="border-l border-accent/40 pl-fila text-corps text-text-primary">{t.resetSent}</p>
+          <button
+            onClick={() => switchMode("signin")}
+            className="min-h-11 text-capitale uppercase tracking-capitale text-accent transition-colors hover:text-text-primary"
+          >
+            {t.backToSignIn}
+          </button>
         </div>
+      ) : (
+        <form onSubmit={mode === "reset" ? handleReset : handleSubmit} className="space-y-rango">
+          <Field
+            label={t.handleLabel}
+            type="text"
+            inputMode="email"
+            autoComplete="username"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            value={handle}
+            onChange={(e) => setHandle(e.target.value)}
+            required
+            placeholder={t.handlePlaceholder}
+          />
 
-        {mode === "reset" && resetSent ? (
-          <div className="text-center space-y-8">
-            <p className="font-serif text-[14px] font-light text-text-primary/80 leading-relaxed border-l border-champagne/40 pl-4 text-left">
-              {t.resetSent}
-            </p>
+          {mode === "signin" && (
+            <div>
+              <div className="relative">
+                <Field
+                  label={t.passwordLabel}
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Masquer" : "Afficher"}
+                  className="absolute bottom-2 right-0 text-text-muted transition-colors hover:text-accent"
+                >
+                  {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={() => switchMode("reset")}
+                className="mt-bloque min-h-11 text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-accent"
+              >
+                {t.forgotPassword}
+              </button>
+            </div>
+          )}
+
+          {error && (
+            <p className="border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
+          )}
+
+          <Button type="submit" full disabled={loading}>
+            {mode === "reset"
+              ? loading
+                ? t.resetSending
+                : t.resetSubmit
+              : loading
+              ? t.submitting
+              : t.submitBtn}
+          </Button>
+
+          {mode === "reset" && (
             <button
+              type="button"
               onClick={() => switchMode("signin")}
-              className="font-serif text-[12px] tracking-wide text-champagne hover:text-copper transition-colors"
+              className="min-h-11 w-full text-center text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-accent"
             >
               {t.backToSignIn}
             </button>
-          </div>
-        ) : (
-          <form onSubmit={mode === "reset" ? handleReset : handleSubmit} className="space-y-5">
-            <div>
-              <label className="block font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60 mb-2.5">
-                {t.handleLabel}
-              </label>
-              <input
-                type="text"
-                inputMode="email"
-                autoComplete="username"
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                value={handle}
-                onChange={(e) => setHandle(e.target.value)}
-                required
-                className="w-full px-4 py-3.5 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
-                placeholder={t.handlePlaceholder}
-              />
-            </div>
-
-            {mode === "signin" && (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="block font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60">
-                    {t.passwordLabel}
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => switchMode("reset")}
-                    className="font-serif text-[10px] font-light text-text-muted hover:text-champagne transition-colors tracking-wide"
-                  >
-                    {t.forgotPassword}
-                  </button>
-                </div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="w-full px-4 py-3.5 pr-11 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Masquer" : "Afficher"}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-champagne transition-colors"
-                  >
-                    {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne py-3.5 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
-            >
-              {mode === "reset"
-                ? loading
-                  ? t.resetSending
-                  : t.resetSubmit
-                : loading
-                ? t.submitting
-                : t.submitBtn}
-            </button>
-
-            {mode === "reset" && (
-              <button
-                type="button"
-                onClick={() => switchMode("signin")}
-                className="w-full text-center font-serif text-[12px] font-light text-text-muted hover:text-champagne transition-colors tracking-wide"
-              >
-                {t.backToSignIn}
-              </button>
-            )}
-          </form>
-        )}
-
-        {mode === "signin" && !native && (
-          <p className="text-center mt-9 font-serif text-[11px] font-light text-text-muted tracking-wide">
-            {t.notMember}{" "}
-            <Link href="/storytellers" className="text-champagne hover:text-copper transition-colors">
-              {t.requestInvite}
-            </Link>
-          </p>
-        )}
-      </div>
-    </div>
+          )}
+        </form>
+      )}
+    </AuthShell>
   );
 }

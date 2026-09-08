@@ -211,6 +211,9 @@ export const translations = {
       errorMatch: "Les mots de passe ne correspondent pas.",
       errorUpdate: "Erreur lors du changement. Veuillez réessayer.",
       errorConnection: "Erreur de connexion. Veuillez réessayer.",
+      strengthWeak: "Faible",
+      strengthFair: "Correct",
+      strengthStrong: "Solide",
     },
     dashboard: {
       navAddresses: "Adresses",
@@ -675,6 +678,9 @@ export const translations = {
       errorMatch: "The passwords don't match.",
       errorUpdate: "Something went wrong. Please try again.",
       errorConnection: "Connection error. Please try again.",
+      strengthWeak: "Weak",
+      strengthFair: "Fair",
+      strengthStrong: "Strong",
     },
     dashboard: {
       navAddresses: "Addresses",
@@ -1173,6 +1179,9 @@ export const translations = {
       errorMatch: "Las contraseñas no coinciden.",
       errorUpdate: "Ocurrió un error. Inténtalo de nuevo.",
       errorConnection: "Error de conexión. Inténtalo de nuevo.",
+      strengthWeak: "Débil",
+      strengthFair: "Correcta",
+      strengthStrong: "Sólida",
     },
     dashboard: {
       navAddresses: "Direcciones",

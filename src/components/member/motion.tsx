@@ -51,35 +51,72 @@ export const panelTransition = { duration: 0.26, ease: EASE };
 export const panelExitTransition = { duration: 0.14, ease: EASE };
 
 const VIEWPORT = { once: true, margin: "-10%" } as const;
+const IMMEDIATE_VIEWPORT = { once: true, amount: 0 } as const;
+
+// Los tipos se crean una vez. Creándolos dentro del render, `motion[as]`
+// devuelve un componente nuevo en cada pasada, React lo trata como otro tipo y
+// remonta el subárbol entero: la animación vuelve a empezar y nunca termina.
+const TAGS = {
+  div: motion.div,
+  section: motion.section,
+  li: motion.li,
+  h1: motion.h1,
+  h2: motion.h2,
+  p: motion.p,
+} as const;
 
 /**
  * Un elemento que se asienta al entrar en pantalla.
  *
  * `index` escalona hermanos. `as` deja usar el elemento correcto: un título
  * sigue siendo un h1 aunque se anime.
+ *
+ * `immediate` es para pantallas que no hacen scroll, como las de entrada. El
+ * revelado normal espera a que el elemento entre un 10 % dentro de la ventana,
+ * y en una pantalla sin scroll lo que nace por debajo de esa línea no entra
+ * jamás: se queda invisible para siempre. Ahí se anima al montar y punto.
  */
 export function Rise({
   children,
   index = 0,
   className,
   as = "div",
+  immediate = false,
 }: {
   children: React.ReactNode;
   index?: number;
   className?: string;
-  as?: "div" | "section" | "li" | "h1" | "h2" | "p";
+  as?: keyof typeof TAGS;
+  immediate?: boolean;
 }) {
   const reduce = useReducedMotion() ?? false;
-  const Component = motion[as];
+  const Component = TAGS[as];
 
+  const hidden = { opacity: 0, y: reduce ? 0 : -8 };
+  const shown = {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: reduce ? 0.12 : 0.42,
+      // Escalonado de 70 ms, cortado al cuarto: una lista de veinte no puede
+      // tardar segundo y medio en aparecer entera.
+      delay: reduce ? 0 : Math.min(index, 3) * 0.07,
+      ease: EASE,
+    },
+  };
+
+  // Los dos caminos revelan al entrar en pantalla, y a propósito. Lo que
+  // cambia es el umbral: el normal espera a que el elemento entre un 10 %
+  // dentro de la ventana, que es lo correcto para una lista larga; `immediate`
+  // se contenta con que asome un píxel, que es lo que necesita una pantalla sin
+  // scroll, donde lo que nace por debajo de esa línea del 10 % no entraría
+  // jamás y se quedaría invisible para siempre.
   return (
     <Component
       className={className}
-      custom={index}
-      variants={riseVariants(reduce)}
-      initial="hidden"
-      whileInView="shown"
-      viewport={VIEWPORT}
+      initial={hidden}
+      whileInView={shown}
+      viewport={immediate ? IMMEDIATE_VIEWPORT : VIEWPORT}
     >
       {children}
     </Component>
