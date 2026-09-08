@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardNav from "../dashboard-nav";
+import { Row } from "@/components/member/row";
 import { MAISON_LINKS, isMaisonSection, type MaisonSection } from "./nav-links";
 import { GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -238,33 +239,35 @@ function MaisonDashboard() {
               <p className="font-serif text-[15px] font-light text-white/55">{t.empty}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5">
+            <div className="grid grid-cols-1 gap-rango md:grid-cols-2">
               {roster.map((c) => (
                 <div
                   key={c.id}
                   onClick={() => openTeller(c)}
-                  className="bg-charcoal-deep p-5 sm:p-6 cursor-pointer hover:bg-white/[0.03] transition-colors"
+                  className="cursor-pointer"
                 >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 bg-charcoal-mid border border-white/10 flex items-center justify-center">
+                  <div className="flex flex-col gap-fila sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex min-w-0 items-start gap-fila">
+                      {/* Retrato en 4:5, no un círculo. Un creador es una
+                          persona a la que se mira, no un avatar de sistema. */}
+                      <div className="aspect-[4/5] w-16 shrink-0 overflow-hidden bg-surface-raised">
                         {c.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={c.avatar} alt="" className="w-full h-full object-cover" />
+                          <img src={c.avatar} alt="" className="h-full w-full object-cover" />
                         ) : (
-                          <span className="font-serif text-[14px] tracking-wide text-champagne/70">{initials(c.name)}</span>
+                          <span className="flex h-full w-full items-center justify-center text-legende text-accent">{initials(c.name)}</span>
                         )}
                       </div>
                       <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="min-w-0 break-words font-serif text-[18px] font-light text-white">{c.name}</h3>
+                        <h3 className="min-w-0 break-words text-sous-titre text-text-primary">{c.name}</h3>
                         {c.igConnected && (
                           <span
                             title={t.igVerified}
-                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap border border-champagne/30 text-champagne/80 px-2 py-0.5 rounded-full"
+                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-capitale uppercase tracking-capitale text-sauge-text"
                           >
                             <InstagramLogo size={11} weight="fill" />
-                            <span className="font-serif text-[9px] tracking-[0.15em] uppercase">{t.igVerified}</span>
+                            {t.igVerified}
                           </span>
                         )}
                       </div>
@@ -274,35 +277,29 @@ function MaisonDashboard() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="font-serif text-[13px] text-champagne/70 hover:text-champagne transition-colors"
+                          className="text-legende text-accent transition-colors hover:text-text-primary"
                         >
                           @{c.handle}
                         </a>
                       )}
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-start gap-6 pl-[62px] sm:pl-0 sm:text-right">
-                      <div>
-                        <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.followers}</p>
-                        <p className="font-serif text-[20px] font-light text-white/85">{formatFollowers(c.followers)}</p>
-                      </div>
+                    <div className="shrink-0 sm:w-40">
+                      <Row
+                        label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.followers}</span>}
+                        value={<span className="text-sous-titre text-text-primary">{formatFollowers(c.followers)}</span>}
+                      />
                       {c.engagement != null && (
-                        <div>
-                          <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.engagement}</p>
-                          <p className="font-serif text-[20px] font-light text-white/85">{c.engagement}%</p>
-                        </div>
+                        <Row
+                          label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.engagement}</span>}
+                          value={<span className="text-sous-titre text-text-primary">{c.engagement}%</span>}
+                        />
                       )}
                     </div>
                   </div>
 
                   {c.content.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {c.content.map((tag) => (
-                        <span key={tag} className="font-serif text-[11px] tracking-wide text-white/70 border border-white/12 px-3 py-1">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    <p className="mt-fila text-legende text-brume">{c.content.join(" · ")}</p>
                   )}
 
                   {/* 3 latest publications */}

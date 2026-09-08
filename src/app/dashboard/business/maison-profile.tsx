@@ -144,11 +144,11 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   }
 
   if (loading) {
-    return <div className="h-64 border border-white/8 bg-white/5 animate-pulse" />;
+    return <div className="h-64 bg-border animate-pulse [animation-duration:1.6s]" />;
   }
 
   const inputCls =
-    "w-full px-5 py-3.5 border border-white/15 bg-charcoal-mid/50 text-white font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30";
+    "w-full min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ font-light text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted focus:border-accent";
   const igHandle = instagram.replace(/^@/, "").trim();
   const descLen = description.trim().length;
   const photosOk = photos.length >= MIN_PHOTOS;
@@ -166,7 +166,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   // ── STORYTELLER PREVIEW (how the venue appears to creators) ─────────────────
   function StorytellerPreview() {
     return (
-      <div className="border border-white/10 bg-charcoal-deep/70 overflow-hidden">
+      <div className="overflow-hidden">
         <div className="relative aspect-[16/9] bg-charcoal-mid">
           {photos[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -176,8 +176,8 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-charcoal-deep/10 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6">
-            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/70 mb-1">{place}</p>
-            <h3 className="font-serif text-[26px] font-light tracking-[0.12em] uppercase text-white leading-none">{name}</h3>
+            <p className="mb-bloque text-capitale uppercase tracking-capitale text-brume">{place}</p>
+            <h3 className="text-titre uppercase tracking-titre text-text-primary">{name}</h3>
           </div>
         </div>
         {previewDesc && (
@@ -264,20 +264,21 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
     <div className="max-w-[1100px] mx-auto">
       {/* Let's get started — guided checklist while the profile is incomplete */}
       {(!photosOk || !descOk) && (
-        <div className="border border-champagne/25 bg-champagne/[0.04] p-6 md:p-8 mb-10">
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-2">{t.gsEyebrow}</p>
-          <h2 className="font-serif text-[22px] md:text-[26px] font-light tracking-[0.06em] text-white mb-2">{t.gsTitle}</h2>
-          <p className="font-serif text-[14px] font-light text-white/60 leading-relaxed mb-6 max-w-[640px]">{t.gsSubtitle}</p>
-          <div className="space-y-3">
+        <div className="mb-seccion">
+          <p className="text-capitale uppercase tracking-capitale text-accent">{t.gsEyebrow}</p>
+          <h2 className="mt-bloque text-titre tracking-titre text-text-primary">{t.gsTitle}</h2>
+          <p className="mt-fila mb-rango max-w-[46ch] text-corps text-text-secondary">{t.gsSubtitle}</p>
+          <div>
             {[
               { done: photosOk, label: t.gsStepPhotos.replace("{n}", String(photos.length)) },
               { done: descOk, label: t.gsStepDesc.replace("{n}", String(descLen)) },
             ].map((s, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${s.done ? "bg-champagne border-champagne text-charcoal-deep" : "border-white/25 text-transparent"}`}>
-                  <Check size={12} weight="bold" />
-                </span>
-                <span className={`font-serif text-[14px] ${s.done ? "text-white/45 line-through" : "text-white/85"}`}>{s.label}</span>
+              <div key={i} className="flex min-h-11 items-center gap-fila">
+                <span
+                  aria-hidden
+                  className={`block h-2.5 w-2.5 shrink-0 rounded-full ${s.done ? "bg-sauge-text" : "bg-copper"}`}
+                />
+                <span className={`text-corps ${s.done ? "text-text-muted" : "text-text-primary"}`}>{s.label}</span>
               </div>
             ))}
           </div>
@@ -359,10 +360,12 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                 <button
                   key={lg}
                   onClick={() => setDescLang(lg)}
-                  className={`font-serif text-[11px] tracking-[0.15em] uppercase px-3 py-1.5 border transition-all ${
+                  className={`min-h-11 px-2 text-capitale uppercase tracking-capitale transition-colors duration-200 ease-curato ${
                     descLang === lg
-                      ? "bg-champagne text-charcoal-deep border-champagne"
-                      : `border-white/12 hover:border-champagne/30 ${filled ? "text-champagne/70" : "text-white/45"}`
+                      ? "text-accent"
+                      : filled
+                      ? "text-brume hover:text-accent"
+                      : "text-text-muted hover:text-accent"
                   }`}
                 >
                   {lg}{filled && descLang !== lg ? " ·" : ""}
