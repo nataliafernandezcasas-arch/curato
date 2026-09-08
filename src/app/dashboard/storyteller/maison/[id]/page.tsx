@@ -378,7 +378,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
         </Link>
 
         {gated ? (
-          <div className="text-center py-24 md:py-32 border border-white/8">
+          <div className="py-respiro text-center">
             <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/70 mb-6">
               {td.comingSoonKicker}
             </p>
@@ -393,25 +393,25 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
           </div>
         ) : loading ? (
           <div className="space-y-6">
-            <div className="aspect-[16/9] bg-white/5 animate-pulse" />
+            <div className="aspect-[4/5] bg-border animate-pulse [animation-duration:1.6s] sm:aspect-[16/9]" />
             <div className="h-6 bg-white/5 animate-pulse w-1/3" />
           </div>
         ) : !maison ? (
-          <div className="text-center py-24 border border-white/5">
+          <div className="py-respiro text-center">
             <p className="font-serif text-[15px] font-light text-white/55">{t.notFound}</p>
           </div>
         ) : (
           <>
             {/* Hero */}
-            <div className="aspect-[16/9] bg-charcoal-mid overflow-hidden relative mb-8">
+            <div className="relative mb-rango aspect-[4/5] overflow-hidden bg-surface-raised sm:aspect-[16/9]">
               {maison.photos?.[0] ? (
-                <img src={maison.photos[0]} alt={maison.name} className="w-full h-full object-cover" />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={maison.photos[0]} alt={maison.name} className="h-full w-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <p className="font-serif text-[12px] tracking-[0.3em] uppercase text-white/35">{catLabelText}</p>
+                <div className="flex h-full w-full items-center justify-center">
+                  <p className="text-capitale uppercase tracking-capitale text-text-muted">{catLabelText}</p>
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
             </div>
 
             <div className="grid md:grid-cols-3 gap-10">
@@ -439,7 +439,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                 {maison.address && (
                   <div className="mb-8">
                     <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/65 mb-3">{t.location}</p>
-                    <div className="aspect-[16/9] border border-white/10 overflow-hidden">
+                    <div className="h-[180px] overflow-hidden">
                       <iframe
                         title="map"
                         src={`https://maps.google.com/maps?q=${encodeURIComponent(maison.address)}&z=15&output=embed`}
@@ -455,28 +455,31 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
               {/* Right: actions */}
               <div className="md:col-span-1">
-                <div className="border border-white/10 p-6 sticky top-20 space-y-5">
+                <div className="sticky top-20 space-y-fila">
                   {maison.address && (
-                    <div className="flex items-start gap-2 text-white/60">
-                      <MapPin size={14} className="mt-0.5 shrink-0" />
-                      <span className="font-serif text-[13px] font-light leading-snug">{maison.address}</span>
-                    </div>
+                    <Row
+                      label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.location}</span>}
+                      aside={<span className="text-legende text-text-primary">{maison.address}</span>}
+                    />
                   )}
                   {maison.website_url && (
-                    <a
-                      href={maison.website_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-white/60 hover:text-champagne transition-colors"
-                    >
-                      <GlobeSimple size={14} className="shrink-0" />
-                      <span className="font-serif text-[13px] font-light truncate">{maison.website_url.replace(/^https?:\/\//, "")}</span>
-                    </a>
+                    <Row
+                      label={
+                        <a
+                          href={maison.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-legende text-accent transition-colors hover:text-text-primary"
+                        >
+                          {maison.website_url.replace(/^https?:\/\//, "")}
+                        </a>
+                      }
+                    />
                   )}
 
                   <button
                     onClick={() => setReserveOpen(true)}
-                    className="w-full font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300"
+                    className="inline-flex min-h-11 w-full items-center justify-center border border-[rgba(203,183,143,0.3)] px-fila text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:border-accent hover:text-text-primary"
                   >
                     {t.requestReservation}
                   </button>
