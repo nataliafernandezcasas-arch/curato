@@ -10,85 +10,22 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Handle content events
-    if (event === "CONTENTS.ADDED" || event === "CONTENTS.UPDATED") {
-      const accountId = data?.account?.id;
-      const content = data?.content;
-
-      if (!accountId || !content) return NextResponse.json({ ok: true });
-
-      // Find the creator by their Phyllo account ID
-      const { data: creator } = await supabase
-        .from("creators")
-        .select("id, email")
-        .eq("phyllo_account_id", accountId)
-        .single();
-
-      if (!creator) {
-        console.log("No creator found for Phyllo account:", accountId);
-        return NextResponse.json({ ok: true });
-      }
-
-      // Find pending visits for this creator
-      const { data: pendingVisits } = await supabase
-        .from("visits")
-        .select("id, comercio_id, offers(title, comercios(name))")
-        .eq("creator_id", creator.id)
-        .eq("status", "content_pending")
-        .order("created_at", { ascending: false });
-
-      if (!pendingVisits || pendingVisits.length === 0) {
-        console.log("No pending visits for creator:", creator.email);
-        return NextResponse.json({ ok: true });
-      }
-
-      // Check if content mentions the business or @midi
-      const caption = (content.title || "") + " " + (content.description || "");
-      const captionLower = caption.toLowerCase();
-      const contentUrl = content.url || content.media_url || "";
-      const contentType = content.type || "post"; // post, story, reel
-
-      // Try to match with a pending visit
-      for (const visit of pendingVisits) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const visitAny = visit as any;
-        const bizName = visitAny.offers?.comercios?.name || "";
-        const offerTitle = visitAny.offers?.title || "";
-
-        const mentionsMidi = captionLower.includes("midi") || captionLower.includes("@midi");
-        const mentionsBusiness = bizName && captionLower.includes(bizName.toLowerCase());
-
-        if (mentionsMidi || mentionsBusiness) {
-          // Match found -- update visit
-          const proofUrls = [contentUrl].filter(Boolean);
-
-          await supabase
-            .from("visits")
-            .update({
-              status: "content_submitted",
-              content_submitted_at: new Date().toISOString(),
-              content_proof_urls: proofUrls,
-              content_notes: `Auto-verificado via Phyllo. Tipo: ${contentType}. Caption match: ${mentionsMidi ? "@midi" : bizName}`,
-              content_verified: true,
-            })
-            .eq("id", visit.id);
-
-          console.log(`Visit ${visit.id} auto-verified for creator ${creator.email}`);
-          break; // Only match one visit per content
-        }
-      }
-    }
-
     // Handle account connection events
     if (event === "ACCOUNTS.CONNECTED") {
-      const accountId = data?.account?.id;
       const userId = data?.user?.id;
 
       if (userId) {
-        // Update creator's instagram_connected flag
+        // OJO con el nombre de la columna: `phyllo_account_id` guarda el **user
+        // id** de Phyllo, no el id de la cuenta. Lo usa así todo el código
+        // (getPhylloAccounts lo manda como user_id, createSDKToken igual).
+        //
+        // Este webhook lo sobrescribía con el accountId, así que la primera vez
+        // que Phyllo avisaba de una conexión, el creador perdía su user id y
+        // sus métricas dejaban de cargar en silencio: las llamadas seguían
+        // saliendo bien, solo que preguntando por un id que no era el suyo.
         await supabase
           .from("creators")
-          .update({ instagram_connected: true, phyllo_account_id: accountId })
+          .update({ instagram_connected: true, phyllo_connected_at: new Date().toISOString() })
           .eq("phyllo_account_id", userId);
       }
     }
