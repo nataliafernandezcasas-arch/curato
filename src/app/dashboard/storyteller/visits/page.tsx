@@ -7,6 +7,8 @@ import { Rise } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Button } from "@/components/member/button";
+import { PullToRefresh } from "@/components/member/pull-to-refresh";
+import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 
@@ -49,6 +51,25 @@ function groupOf(v: Visit): "todo" | "upcoming" | "past" {
   const yaPasó = new Date(v.slotStart).getTime() < Date.now();
   if (!yaPasó) return "upcoming";
   return v.status === "confirmed" || v.status === "completed" ? "todo" : "upcoming";
+}
+
+function Envoltura({
+  deslizable,
+  action,
+  onAction,
+  children,
+}: {
+  deslizable: boolean;
+  action: string;
+  onAction: () => void;
+  children: React.ReactNode;
+}) {
+  if (!deslizable) return <>{children}</>;
+  return (
+    <SwipeAction action={action} onAction={onAction}>
+      {children}
+    </SwipeAction>
+  );
 }
 
 function VisitCard({
@@ -164,16 +185,24 @@ function VisitCard({
   // ── Not yet uploaded: prompt to mark visited + upload ─────────────────────
   return (
     <div>
-      <Row
-        name
-        label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
-        aside={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
-        value={
-          <span className={`text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
-            {t[statusKey]}
-          </span>
-        }
-      />
+      {/* Solo se desliza lo que tiene algo que hacer. Un gesto que revela un
+          botón vacío enseña a desconfiar del gesto. */}
+      <Envoltura
+        deslizable={canUpload}
+        action={t.swipeDeclare}
+        onAction={() => fileRef.current?.click()}
+      >
+        <Row
+          name
+          label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
+          aside={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
+          value={
+            <span className={`text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
+              {t[statusKey]}
+            </span>
+          }
+        />
+      </Envoltura>
 
       {canUpload && (
         <div className="mt-fila">
@@ -223,6 +252,7 @@ export default function MesVisites() {
         settingsLabel={td.navSettings}
       />
 
+      <PullToRefresh onRefresh={load}>
       <div className="mx-auto max-w-[920px] px-pagina py-seccion">
         <Rise>
           <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
@@ -265,6 +295,7 @@ export default function MesVisites() {
           </>
         )}
       </div>
+      </PullToRefresh>
     </div>
   );
 }
