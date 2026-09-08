@@ -11,6 +11,7 @@ import { translations, Lang } from "@/lib/i18n/translations";
 import MaisonProfile from "./maison-profile";
 import MaisonOffer from "./maison-offer";
 import MaisonBilling from "./maison-billing";
+import MaisonReport from "./maison-report";
 import type { StorytellerMetrics } from "@/lib/phyllo/client";
 
 // Category UUID (migration 009) → translation key in the `dashboard` section.
@@ -334,6 +335,10 @@ function MaisonDashboard() {
               <MaisonOffer t={t} lang={lang} />
             </div>
           </div>
+        ) : tab === "visitors" ? (
+          // El informe encabeza la sección: primero cuánto sirvió el mes, y
+          // debajo quién vino exactamente.
+          <MaisonReport />
         ) : tab === "billing" ? (
           <MaisonBilling />
         ) : tab === "directory" ? (

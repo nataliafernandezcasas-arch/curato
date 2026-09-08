@@ -23,7 +23,7 @@ export async function GET() {
 
     const { data: reservations } = await admin
       .from("reservations")
-      .select("id, venue_id, slot_start, status, content_photo_paths, content_rights_expires_at")
+      .select("id, venue_id, slot_start, status, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at")
       .eq("creator_id", creator.id)
       .order("slot_start", { ascending: false });
 
@@ -47,6 +47,13 @@ export async function GET() {
           status: r.status as string,
           photos,
           rightsExpiresAt: (r.content_rights_expires_at as string | null) ?? null,
+          reach: r.reach_declared_at
+            ? {
+                views: r.reach_views as number | null,
+                accounts: r.reach_accounts as number | null,
+                interactions: r.reach_interactions as number | null,
+              }
+            : null,
         };
       })
     );
@@ -69,6 +76,17 @@ export async function POST(request: NextRequest) {
     const form = await request.formData();
     const reservationId = form.get("reservationId") as string | null;
     const files = form.getAll("files") as File[];
+    // La portée: se archivaban capturas y no se guardaba ni una cifra, así que
+    // no había forma de decirle a una maison a cuánta gente llegó.
+    const cifra = (campo: string) => {
+      const raw = form.get(campo);
+      if (raw === null || raw === "") return null;
+      const n = Number(String(raw).replace(/\s/g, ""));
+      return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+    };
+    const vues = cifra("reachViews");
+    const comptes = cifra("reachAccounts");
+    const interactions = cifra("reachInteractions");
     if (!reservationId) {
       return NextResponse.json({ error: "Réservation manquante." }, { status: 400 });
     }
@@ -126,6 +144,15 @@ export async function POST(request: NextRequest) {
       update.content_photo_paths = allPaths;
       update.content_uploaded_at = now.toISOString();
       update.content_rights_expires_at = new Date(now.getTime() + NINETY_DAYS_MS).toISOString();
+    }
+    if (vues !== null || comptes !== null || interactions !== null) {
+      if (vues !== null) update.reach_views = vues;
+      if (comptes !== null) update.reach_accounts = comptes;
+      if (interactions !== null) update.reach_interactions = interactions;
+      // De momento siempre a mano. Cuando Phyllo devuelva la portée por story,
+      // ese camino escribirá 'phyllo' y estas cifras dejarán de teclearse.
+      update.reach_source = "manual";
+      update.reach_declared_at = now.toISOString();
     }
 
     const { error: updErr } = await admin.from("reservations").update(update).eq("id", reservationId);
