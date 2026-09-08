@@ -3,7 +3,7 @@ branch: main
 path: src/app
 
 ## Last sync
-date: 2026-09-08T00:08:00Z
+date: 2026-09-08T02:40:00Z
 
 ### Updated in this project
 - Wireframes de entrada, primera vez, storyteller y maison (15 de 35) a 375 px, con el fondo floral en todas.
@@ -38,6 +38,7 @@ date: 2026-09-08T00:08:00Z
 | Wireframes 2 · 13 mes visites | src/app/dashboard/storyteller/visits/page.tsx, src/app/api/reservations/visit/route.ts |
 | Wireframes 2 · 18 réglages | src/app/dashboard/storyteller/reglages/page.tsx, src/app/dashboard/business/reglages/page.tsx |
 | Wireframes 2 · 31 barra y menú | src/app/dashboard/dashboard-nav.tsx, src/app/dashboard/role-switch.tsx |
+| Interacciones · nueve gestos (barra inferior, galerías, visor, deslizar fila) | src/app/dashboard/dashboard-nav.tsx, src/app/dashboard/role-switch.tsx |
 
 ## Sync history
 - 2026-09-07T20:20:00Z · primera lectura: globals.css, dashboard del storyteller, nav, fondo floral.

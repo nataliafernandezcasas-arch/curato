@@ -272,9 +272,41 @@ Once pantallas y la vista de ordenador: 10 (ya construida, queda revisarla contr
 
 **Pendiente de decidir antes de dibujar:** la 27, el código QR. Es el único caso de uso físico del producto y pide romper dos reglas, brillo alto y una forma grande y cerrada. Propuesta en una línea: QR a ancho completo sobre **fondo crema**, no charcoal, porque un código oscuro se lee peor y la cámara del cliente no perdona. Sería la única pantalla en modo claro de la app, y el modo crema ya está en los tokens.
 
+## 10 ter. Interacciones: que se sienta app y no página
+
+Documento vivo y tocable: `Curato Interacciones.dc.html`. Ábrelo antes de implementar nada de esta sección — describir un gesto con palabras no sirve.
+
+Dos causas hacían que la zona de miembro pareciese una web: todo se recorre hacia abajo, y la navegación vive arriba detrás de un menú. Nueve piezas lo corrigen.
+
+**Esto reemplaza la pantalla 31 tal como estaba diseñada, y convierte la 32 en un estado en vez de una pantalla.**
+
+| # | Pieza | Qué implica en el código |
+|---|---|---|
+| 1 | **Barra de pestañas abajo** — tres destinos en capital de 11 px, la activa en champagne, sobre `rgba(30,30,30,0.72)` con desenfoque, sin iconos ni caja ni subrayado | Sustituye al menú desplegable como navegación principal en `dashboard-nav.tsx`. El menú se queda solo para réglages, cambiar de espacio y cerrar sesión, colgados del nombre. Inactivas al 65 % de tinta, no a un valor nuevo |
+| 2 | **Galerías que se arrastran** — una por maison, páginas del ancho completo con `scroll-snap-type: x mandatory` | Arrastre con dedo y con ratón vía pointer events; al soltar cae en la foto más cercana. Un arrastre de más de 8 px **no** cuenta como toque, o deslizar abre la ficha por error. Indicador: una línea de 1 px que se llena, nunca una hilera de puntos (serían formas cerradas) |
+| 3 | **La ficha entra desde la derecha** — 320 ms, curva de la marca, sombra en el canto | View Transition API o framer-motion sobre el router. El gesto de arrastrar desde el borde lo da el WebView de iOS solo si la ruta es real: otra razón para que la reserva sea la 12 y no un diálogo |
+| 4 | **Acción pegada abajo** en la ficha, y la barra de pestañas se apaga mientras está abierta | En una pantalla de detalle hay una sola cosa que hacer |
+| 5 | **Hoja inferior para elecciones cortas** — filtros del carnet, 260 ms, se aplica al tocar, sin botón de aceptar | Mismo patrón para el idioma en réglages y las noches de un hotel. Sustituye a los diálogos centrados |
+| 6 | **Tirar para actualizar** — `Tirer` → `Relâcher pour actualiser` → `À jour` en sauge | Sin botón de recargar y sin rueda giratoria. La cabecera aparece con el gesto y se va sola |
+| 7 | **Visor a pantalla completa** — se abre en la foto que se estaba viendo, las cuatro se recorren dentro, contador `2 / 4`, pie de foto y `Fermer` | Sin marco, sin negro puro y sin pellizcar para ampliar: son fotografías de casas, no mapas. La misma pieza sirve para las stories del perfil y la galería del informe mensual |
+| 8 | **Deslizar una visita para actuar** — la fila se arrastra a la izquierda y revela una sola acción, la que toca según el estado | Declarar si la visita se hizo, anular si no ha llegado. Nunca dos, nunca destructiva sin decir la consecuencia. El botón sigue dentro de la visita: el gesto es un atajo, no la única vía |
+| 9 | **La cabecera se encoge** — el nombre de la maison aparece en la barra pegada cuando el titular grande sale de pantalla | Solo opacidad, nada se mueve. Única excepción a la regla de no truncar nombres, porque en la barra es metadato y el nombre completo sigue dos dedos más abajo |
+
+### Cuatro más, decididas y sin prototipo
+
+- **Vibración al confirmar**: `Haptics.impact` de Capacitor al enviar una demanda o declarar la portée. Dos líneas, y es lo que el cuerpo reconoce como app. Nunca en errores.
+- **La foto que revela**: cada fotografía entra desde una miniatura desenfocada del propio archivo, no desde un bloque gris. Es un atributo de `next/image`.
+- **Sin conexión, dicho en la barra**: `Hors ligne` en copper en la barra inferior y las acciones de red al 45 %. **Esto es la pantalla 32, y deja de ser pantalla.**
+- **Cambiar de espacio en dos toques**: el nombre de arriba abre una hoja con los espacios y se vuelve al mismo sitio de la otra cara. `role-switch` ya existe.
+
+### Lo que no se añade
+
+Carruseles automáticos, rebotes, muelles exagerados, mensajes flotantes, celebraciones al confirmar, transiciones distintas por pantalla, cifras que cuentan hacia arriba. Lo que hace que una app se sienta app no es la cantidad de movimiento: es que el pulgar alcance las cosas, que se pueda volver, y que cada gesto tenga consecuencia inmediata.
+
 ## 11. Archivos de este paquete
 
 - `Curato Sistema.dc.html` — el sistema: escala tipográfica, espaciado, la regla de las cajas con un antes y después interactivo, roles de color, tacto, la fila estrecha con un deslizador que la estrecha de verdad, y el movimiento. Incluye la pantalla del carnet en sus cinco estados.
+- `Curato Interacciones.dc.html` — **el prototipo tocable de las nueve interacciones**: galerías que se arrastran, barra inferior, empuje de pantalla, hoja de filtros, tirar para actualizar, visor a pantalla completa y deslizar una visita. Ábrelo primero.
 - `Curato Wireframes 2.dc.html` — la segunda entrega: 11, 12, 13, 18, 31, 33 y 34, más la lista de lo que sigue sin diseñar.
 - `Curato Wireframes.dc.html` — las 17 pantallas de la primera entrega a 375 px, agrupadas por rol, cada una con ruta, estados y decisiones. Al final, el índice de las 35 con el orden de trabajo.
 - `Curato Movimiento.dc.html` — el movimiento **vivo**: una pantalla desplazable donde el fondo camina, el texto se asienta y las fotos se acercan, con un interruptor de `reduced-motion` para comparar. Abre este primero para entender el movimiento; describirlo con palabras no sirve.

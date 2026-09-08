@@ -117,11 +117,11 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
     if (res.ok) setMenuUrls(d.menuUrls ?? []);
   }
 
-  if (loading) return <div className="h-64 border border-white/8 bg-white/5 animate-pulse" />;
+  if (loading) return <div className="h-64 bg-border animate-pulse [animation-duration:1.6s]" />;
 
   const inputCls =
-    "min-w-0 px-3 sm:px-4 py-2.5 border border-white/15 bg-charcoal-mid/50 text-white font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30";
-  const labelCls = "font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70";
+    "min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ font-light text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted focus:border-accent";
+  const labelCls = "text-capitale uppercase tracking-capitale text-accent";
   const days = DAY_LABELS[lang];
   const fmtDate = (d: string) => new Date(d + "T00:00:00").toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric" });
 
@@ -135,19 +135,31 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           {DAY_ORDER.map((day, i) => {
             const w = winFor(day);
             return (
-              <div key={day} className="flex flex-col gap-2 border-b border-white/8 py-2.5 sm:flex-row sm:items-center sm:gap-4">
-                <label className="flex items-center gap-2.5 cursor-pointer sm:w-40 sm:shrink-0">
-                  <input type="checkbox" checked={!!w} onChange={(e) => toggleDay(day, e.target.checked)} className="accent-champagne" />
-                  <span className="font-serif text-[14px] text-white/85">{days[i]}</span>
-                </label>
+              <div key={day} className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-fila py-bloque">
+                <button
+                  type="button"
+                  onClick={() => toggleDay(day, !w)}
+                  aria-pressed={!!w}
+                  className="group flex min-w-0 items-center gap-fila text-left"
+                >
+                  <span
+                    aria-hidden
+                    className={`block h-2.5 w-2.5 shrink-0 rounded-full border transition-colors duration-200 ease-curato ${
+                      w ? "border-accent bg-accent" : "border-text-muted group-hover:border-accent"
+                    }`}
+                  />
+                  <span className={`truncate text-corps ${w ? "text-text-primary" : "text-text-muted"}`}>
+                    {days[i]}
+                  </span>
+                </button>
                 {w ? (
-                  <div className="flex items-center gap-2 pl-[26px] sm:pl-0">
-                    <input type="time" value={w.start} onChange={(e) => setTime(day, "start", e.target.value)} className={`${inputCls} flex-1 sm:flex-none`} />
-                    <span className="shrink-0 text-white/30">→</span>
-                    <input type="time" value={w.end} onChange={(e) => setTime(day, "end", e.target.value)} className={`${inputCls} flex-1 sm:flex-none`} />
+                  <div className="flex shrink-0 items-center gap-bloque">
+                    <input type="time" value={w.start} onChange={(e) => setTime(day, "start", e.target.value)} className={`${inputCls} w-[99px] text-center`} />
+                    <span className="shrink-0 text-text-muted">→</span>
+                    <input type="time" value={w.end} onChange={(e) => setTime(day, "end", e.target.value)} className={`${inputCls} w-[99px] text-center`} />
                   </div>
                 ) : (
-                  <span className="pl-[26px] font-serif text-[13px] font-light text-white/25 sm:pl-0">{t.offerClosed}</span>
+                  <span className="shrink-0 text-legende text-text-muted">{t.offerClosed}</span>
                 )}
               </div>
             );
@@ -166,12 +178,17 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           </button>
         </div>
         {blocked.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div>
             {blocked.map((b) => (
-              <span key={b.date} className="inline-flex items-center gap-2 border border-white/12 px-3 py-1.5 font-serif text-[12px] text-white/70">
-                {fmtDate(b.date)}
-                <button onClick={() => removeBlock(b.date)} className="text-white/40 hover:text-copper" aria-label="X"><X size={12} /></button>
-              </span>
+              <div key={b.date} className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-fila">
+                <span className="truncate text-corps text-text-primary">{fmtDate(b.date)}</span>
+                <button
+                  onClick={() => removeBlock(b.date)}
+                  className="shrink-0 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-copper"
+                >
+                  {t.offerRemove}
+                </button>
+              </div>
             ))}
           </div>
         )}
@@ -188,7 +205,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerServicesHint}</p>
         <div className="space-y-3">
           {services.map((s, i) => (
-            <div key={i} className="relative border border-white/10 bg-charcoal-deep/40 p-4 pr-10">
+            <div key={i} className="relative pr-10">
               <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-white/40 hover:text-copper" aria-label="X"><X size={15} /></button>
               <div className="grid sm:grid-cols-[1fr_140px] gap-3 mb-3">
                 <input value={s.name} onChange={(e) => updateService(i, "name", e.target.value)} placeholder={t.offerServiceName} className={`${inputCls} w-full`} />

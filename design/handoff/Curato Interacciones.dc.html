@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&display=swap">
+<link rel="stylesheet" href="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/styles.css">
+<script src="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/_ds_bundle.js"></script>
+<style>
+  html { background: #1E1E1E; }
+  body { margin: 0; background: #1E1E1E; color: #F5EFE4;
+    font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300;
+    -webkit-font-smoothing: antialiased; }
+  a { color: #CBB78F; text-decoration: none; }
+  a:hover { color: #F5EFE4; }
+  ::selection { background: #763943; color: #F5EFE4; }
+  * { box-sizing: border-box; }
+  [data-scroll]::-webkit-scrollbar { display: none; }
+  [data-scroll] { scrollbar-width: none; }
+  @keyframes cu-plate { from { opacity: 0; transform: scale(1.04) } to { opacity: 1; transform: scale(1) } }
+</style>
+</helmet>
+
+<div style="padding: 72px 48px 120px; display: flex; flex-direction: column; gap: 72px">
+
+  <header style="display: flex; flex-direction: column; gap: 24px; max-width: 1180px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 20px">
+      <img src="public/logo-curato-simple.png" alt="Curato" style="height: 15px; width: auto; display: block; opacity: .9">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Interacciones · prototipo tocable</span>
+    </div>
+    <h1 style="margin: 0; font-size: 46px; font-weight: 300; line-height: 1.06; letter-spacing: 0.11em; text-transform: uppercase">Que se toque,<br>no que se lea</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); max-width: 62ch; text-wrap: pretty">Lo que hacía que pareciese una página tiene dos causas concretas: todo se recorre hacia abajo, y la navegación vive arriba, escondida detrás de un menú. Nueve piezas lo cambian, y aquí están funcionando: arrastra las fotos de lado, cambia de pestaña abajo, abre una maison y baja, toca su fotografía para verla entera, vuelve, abre los filtros, desliza una visita hacia la izquierda, y tira de la lista hacia abajo estando arriba del todo.</p>
+  </header>
+
+  <section style="display: flex; gap: 64px; flex-wrap: wrap; align-items: flex-start">
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Tócalo</span>
+      <div style="width: 375px; height: 812px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+
+        <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 5">
+          <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">9:41</span>
+          <span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span>
+        </div>
+
+        <div data-scroll="" onWheel="{{ onPull }}" onScroll="{{ onRootScroll }}" style="position: absolute; top: 44px; left: 0; right: 0; bottom: 0; overflow-y: auto; overscroll-behavior: contain">
+          <div style="height: 44px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: {{ pullColor }}; opacity: {{ pullOpacity }}">{{ pullLabel }}</span>
+          </div>
+
+          <sc-if value="{{ isCarnet }}" hint-placeholder-val="{{ true }}">
+            <div style="padding: 12px 20px 0; display: flex; flex-direction: column; gap: 12px">
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Le carnet</h2>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">{{ filterLabel }}</span>
+                <button onClick="{{ openSheet }}" style="min-height: 44px; padding: 10px 16px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; white-space: nowrap" style-hover="color:#F5EFE4;border-color:#CBB78F">Filtrer</button>
+              </div>
+            </div>
+            <div style="padding: 32px 0 0; display: flex; flex-direction: column; gap: 40px">
+              <div onClick="{{ openFiche }}" style="cursor: pointer; display: flex; flex-direction: column; gap: 12px">
+                <div data-scroll="" onScroll="{{ onGallery }}" onPointerDown="{{ onSwipeDown }}" onPointerMove="{{ onSwipeMove }}" onPointerUp="{{ onSwipeUp }}" onPointerCancel="{{ onSwipeUp }}" style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; gap: 0; touch-action: pan-y; cursor: grab" style-active="cursor:grabbing">
+                  <img src="photos/p1.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none; animation: cu-plate 900ms cubic-bezier(.22,1,.36,1) both">
+                  <img src="photos/p6.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none">
+                  <img src="photos/p2.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none">
+                  <img src="photos/p8.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none">
+                </div>
+                <div style="margin: 0 20px; height: 1px; background: rgba(203,183,143,0.15)">
+                  <div style="height: 1px; background: #CBB78F; width: {{ galWidth }}; transition: width 180ms cubic-bezier(.22,1,.36,1)"></div>
+                </div>
+                <div style="padding: 8px 20px 0; display: flex; flex-direction: column; gap: 6px">
+                  <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">Gastronomie · Paris 16e</p>
+                  <span style="font-size: 19px; line-height: 1.25; overflow-wrap: break-word">Réservé aux membres de Curato</span>
+                  <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">{{ galCaption }}</span>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <img src="photos/p3.jpg" alt="" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block">
+                <div style="padding: 0 20px; display: flex; flex-direction: column; gap: 6px">
+                  <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">Bien-être · Paris 7e</p>
+                  <span style="font-size: 19px; line-height: 1.25">Atelier Sainte-Anne</span>
+                </div>
+              </div>
+              <div style="height: 96px"></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isVisites }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 12px 20px 0; display: flex; flex-direction: column; gap: 12px">
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Mes visites</h2>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Une seule chose vous attend: déclarer la portée de mercredi.</p>
+            </div>
+            <div style="padding: 40px 0 0; display: flex; flex-direction: column; gap: 12px">
+              <p style="margin: 0; padding: 0 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">À faire</p>
+              <div style="position: relative; overflow: hidden">
+                <div style="position: absolute; top: 0; right: 0; bottom: 0; width: 112px; display: flex; align-items: center; justify-content: center">
+                  <button onClick="{{ declare }}" style="min-height: 44px; padding: 10px 12px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; line-height: 1.4" style-hover="color:#F5EFE4;border-color:#CBB78F">Déclarer</button>
+                </div>
+                <div onPointerDown="{{ onRowDown }}" onPointerMove="{{ onRowMove }}" onPointerUp="{{ onRowUp }}" onPointerCancel="{{ onRowUp }}" style="padding: 0 20px 4px; display: flex; flex-direction: column; gap: 8px; background: #1E1E1E; transform: {{ rowTransform }}; transition: {{ rowTransition }}; touch-action: pan-y; cursor: grab">
+                  <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                    <span style="font-size: 19px; line-height: 1.25; overflow-wrap: break-word">Réservé aux membres de Curato</span>
+                    <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:30</span>
+                  </div>
+                  <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: {{ todoColor }}">{{ todoLabel }}</span>
+                  <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Glisser la ligne vers la gauche</span>
+                </div>
+              </div>
+              <div style="height: 96px"></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isProfil }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 12px 20px 0; display: flex; flex-direction: column; gap: 32px">
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Tereza<br>Bolkvadze</h2>
+              <div style="display: flex; flex-direction: column; gap: 20px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Abonnés</span><span style="font-size: 19px; font-variant-numeric: tabular-nums; white-space: nowrap">142 K</span></div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Engagement</span><span style="font-size: 19px; font-variant-numeric: tabular-nums; white-space: nowrap">4,2 %</span></div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Votre crédit du mois</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">900 € <span style="font-size: 13px; color: rgba(245,239,228,0.65)">de 1 500 €</span></span></div>
+                <div style="height: 1px; background: rgba(203,183,143,0.15)"><div style="height: 1px; background: #CBB78F; width: 40%"></div></div>
+              </div>
+              <div style="height: 96px"></div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 0; transform: {{ ficheX }}; transition: transform 320ms cubic-bezier(.22,1,.36,1); z-index: 6; background: linear-gradient(rgba(30,30,30,0.9), rgba(30,30,30,0.9)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E; box-shadow: -12px 0 32px rgba(0,0,0,0.35)">
+          <div data-scroll="" onScroll="{{ onFicheScroll }}" style="position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain">
+            <div style="height: 52px; padding: 0 20px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; position: sticky; top: 0; background: rgba(30,30,30,0.72); backdrop-filter: blur(12px); z-index: 2">
+              <button onClick="{{ closeFiche }}" style="min-height: 44px; padding: 0; background: none; border: none; color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; white-space: nowrap" style-hover="color:#F5EFE4">Retour</button>
+              <span style="font-size: 13px; font-weight: 400; color: #F5EFE4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; opacity: {{ shrunkOpacity }}; transition: opacity 160ms ease-out">Réservé aux membres de Curato</span>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">120 €</span>
+            </div>
+            <div data-scroll="" onScroll="{{ onFicheGallery }}" onClick="{{ openPhotoIfNotSwiped }}" onPointerDown="{{ onSwipeDown }}" onPointerMove="{{ onSwipeMove }}" onPointerUp="{{ onSwipeUp }}" onPointerCancel="{{ onSwipeUp }}" style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; touch-action: pan-y; cursor: grab" style-active="cursor:grabbing">
+              <img src="photos/p1.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none">
+              <img src="photos/p6.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none">
+              <img src="photos/p2.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none">
+              <img src="photos/p8.jpg" alt="" style="width: 375px; flex: 0 0 375px; aspect-ratio: 4 / 5; object-fit: cover; display: block; scroll-snap-align: start; user-select: none; -webkit-user-drag: none">
+            </div>
+            <div style="margin: 0 20px; height: 1px; background: rgba(203,183,143,0.15)">
+              <div style="height: 1px; background: #CBB78F; width: {{ ficheGalWidth }}; transition: width 180ms cubic-bezier(.22,1,.36,1)"></div>
+            </div>
+            <div style="padding: 32px 20px 0; display: flex; flex-direction: column; gap: 12px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">Gastronomie · Paris 16e</p>
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; overflow-wrap: break-word">Réservé aux membres de Curato</h2>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88); max-width: 42ch">Une table de six en fin de service, la cuisine ouverte sur la salle. La salle donne sur une cour que personne ne connaît.</p>
+            </div>
+            <div style="padding: 48px 20px 0; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ce que la visite prend</p>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Tarif de la maison</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">120 €</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Votre crédit du mois</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">900 € <span style="font-size: 13px; color: rgba(245,239,228,0.65)">de 1 500 €</span></span></div>
+            </div>
+            <div style="padding: 48px 20px 0; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Les prochains créneaux</p>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: #F5EFE4">Jeudi 16 octobre</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:00 → 22:00</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: #F5EFE4">Vendredi 17 octobre</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:00 → 23:00</span></div>
+            </div>
+            <div style="height: 160px"></div>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 20px 20px; background: rgba(30,30,30,0.82); backdrop-filter: blur(12px)">
+            <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Demander une visite</button>
+          </div>
+        </div>
+
+        <div style="position: absolute; inset: 0; z-index: 10; background: #1E1E1E; display: flex; flex-direction: column; opacity: {{ photoOpacity }}; pointer-events: {{ photoEvents }}; transition: opacity 240ms ease-out">
+          <div style="height: 52px; padding: 0 20px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums; white-space: nowrap">{{ photoCounter }}</span>
+            <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Réservé aux membres de Curato</span>
+            <button onClick="{{ closePhoto }}" style="min-height: 44px; padding: 0; background: none; border: none; color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; white-space: nowrap" style-hover="color:#F5EFE4">Fermer</button>
+          </div>
+          <div data-scroll="" onScroll="{{ onViewer }}" onClick="{{ closePhotoIfNotSwiped }}" onPointerDown="{{ onSwipeDown }}" onPointerMove="{{ onSwipeMove }}" onPointerUp="{{ onSwipeUp }}" onPointerCancel="{{ onSwipeUp }}" style="flex: 1; min-height: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; touch-action: pan-y; cursor: grab; transform: {{ photoScale }}; transition: transform 320ms cubic-bezier(.22,1,.36,1)">
+            <div style="width: 375px; flex: 0 0 375px; scroll-snap-align: start; display: flex; align-items: center; justify-content: center"><img src="photos/p1.jpg" alt="" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none"></div>
+            <div style="width: 375px; flex: 0 0 375px; scroll-snap-align: start; display: flex; align-items: center; justify-content: center"><img src="photos/p6.jpg" alt="" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none"></div>
+            <div style="width: 375px; flex: 0 0 375px; scroll-snap-align: start; display: flex; align-items: center; justify-content: center"><img src="photos/p2.jpg" alt="" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none"></div>
+            <div style="width: 375px; flex: 0 0 375px; scroll-snap-align: start; display: flex; align-items: center; justify-content: center"><img src="photos/p8.jpg" alt="" style="max-width: 100%; max-height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none"></div>
+          </div>
+          <div style="padding: 20px 20px 28px; display: flex; flex-direction: column; gap: 12px">
+            <div style="height: 1px; background: rgba(203,183,143,0.15)">
+              <div style="height: 1px; background: #CBB78F; width: {{ viewerWidth }}; transition: width 180ms cubic-bezier(.22,1,.36,1)"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <span style="font-size: 15px; line-height: 1.5; color: rgba(245,239,228,0.65)">{{ photoLegend }}</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65); white-space: nowrap">Glisser</span>
+            </div>
+          </div>
+        </div>
+
+        <div onClick="{{ closeSheet }}" style="position: absolute; inset: 0; z-index: 7; background: rgba(30,30,30,0.4); backdrop-filter: blur(2px); opacity: {{ sheetVeil }}; pointer-events: {{ sheetEvents }}; transition: opacity 200ms ease-out"></div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 8; transform: {{ sheetY }}; transition: transform 260ms cubic-bezier(.22,1,.36,1); background: #1E1E1E; box-shadow: 0 -1px 0 rgba(203,183,143,0.15)">
+          <div style="padding: 12px 0 0; display: flex; justify-content: center"><div style="width: 44px; height: 3px; background: rgba(203,183,143,0.3); border-radius: 2px"></div></div>
+          <div style="padding: 24px 20px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Filtrer le carnet</p>
+            <button onClick="{{ closeSheet }}" style="min-height: 44px; padding: 0; background: none; border: none; color: rgba(245,239,228,0.65); font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4">Fermer</button>
+          </div>
+          <div style="padding: 20px 20px 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+              <div onClick="{{ f.pick }}" style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0; cursor: pointer">
+                <span style="font-size: 15px; color: #CBB78F; text-align: center">{{ f.dot }}</span>
+                <span style="font-size: 17px; color: {{ f.color }}">{{ f.label }}</span>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap; font-variant-numeric: tabular-nums">{{ f.count }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding: 32px 20px 32px">
+            <button onClick="{{ closeSheet }}" style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Voir les adresses</button>
+          </div>
+        </div>
+
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 9; height: 76px; padding: 0 20px 18px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 8px; background: rgba(30,30,30,0.72); backdrop-filter: blur(16px); opacity: {{ barOpacity }}; pointer-events: {{ barEvents }}; transition: opacity 200ms ease-out">
+          <button onClick="{{ goCarnet }}" style="min-height: 44px; background: none; border: none; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; padding: 0; color: {{ carnetColor }}">Carnet</button>
+          <button onClick="{{ goVisites }}" style="min-height: 44px; background: none; border: none; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; padding: 0; color: {{ visitesColor }}">Visites</button>
+          <button onClick="{{ goProfil }}" style="min-height: 44px; background: none; border: none; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer; padding: 0; color: {{ profilColor }}">Profil</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 40px; max-width: 520px; min-width: 320px; flex: 1">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">1 · La barra abajo, y fuera el menú</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Es el cambio que más se nota, y el más barato. Tres destinos en capital, la activa en champagne, sobre charcoal translúcido con desenfoque. Sin iconos, sin caja y sin subrayado: la marca ya escribe en capitales. Nada de esto se alcanza con el pulgar cuando vive arriba a la derecha, y un menú desplegable obliga a dos toques para cada salto.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">Sustituye a la 31 tal como la dibujé. El menú desplegable se queda solo para lo que no es un destino frecuente: réglages, cambiar de espacio y cerrar sesión, colgados del nombre en la cabecera.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">2 · Las fotos se arrastran de lado</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Cada maison es una galería con <span style="color:#CBB78F">scroll-snap</span> y páginas del ancho completo. Es lo único que convierte una lista en algo que se manosea, y encaja con la marca porque lo que se mira aquí son fotografías, no filas. El indicador es una línea de 1 px que se llena, no una hilera de puntos: los puntos son formas cerradas y el sistema solo se las permite a los botones.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">El pie cambia con la foto, <span style="color:#CBB78F">Photographie 2 sur 4</span>, para que se sepa que hay más. Se arrastra con el dedo en el móvil y con el ratón en escritorio: al soltar, la galería cae sola en la foto más cercana. Un arrastre no cuenta como toque, así que deslizar las fotos de una tarjeta nunca abre la maison por error.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">3 · La ficha entra desde la derecha</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Toca una maison. La ficha empuja desde la derecha en 320 ms con la curva de la marca y una sombra en su canto; <span style="color:#CBB78F">Retour</span> la devuelve. Una página que se recarga y salta arriba es lo que delata a una web; una pantalla que entra de lado dice que hay una jerarquía y que se puede volver.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">En Capacitor esto es la View Transition API o un envoltorio de framer-motion sobre el router de Next; el gesto de arrastrar desde el borde lo da el WebView en iOS si la ruta es real, que es otra razón para que la reserva sea la 12 y no un diálogo.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">4 · La acción se queda pegada abajo</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">En la ficha, <span style="color:#CBB78F">Demander une visite</span> flota sobre charcoal translúcido al alcance del pulgar, y la barra de pestañas se apaga mientras la ficha está abierta: en una pantalla de detalle solo hay una cosa que hacer. Antes había que llegar al final del texto para encontrar el botón.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">5 · Los filtros suben en una hoja</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Toca <span style="color:#CBB78F">Filtrer</span>. La hoja sube desde abajo en 260 ms, el fondo se atenúa y se cierra tocando fuera, con la palabra o arrastrando el asa. Es el patrón nativo para una elección corta, y evita perder la lista para elegir una categoría. Se aplica al cambiar, sin botón de aceptar.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">Mismo patrón para el idioma en réglages y para las noches de un hotel. Nada de diálogos centrados con seis campos: eso es lo que estamos sacando de la ficha.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">6 · Tirar para actualizar</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Estando arriba del todo, tira de la lista hacia abajo con el trackpad. Aparece <span style="color:#CBB78F">Relâcher pour actualiser</span> y al soltar se lee <span style="color:#8C9A86">À jour</span> en sauge. Ningún botón de recargar: en un móvil ese gesto ya se sabe, y es lo que hace que un carnet parezca vivo en vez de impreso.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">La cabecera aparece con el gesto y desaparece sola. Sin rueda giratoria, como el resto del sistema.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">7 · La foto a pantalla completa</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Abre una maison y toca la fotografía. Se abre a pantalla completa sobre charcoal, entrando desde 1.04, y se cierra tocando en cualquier sitio. En una app cuyo contenido es fotografía de casas, no poder verla grande es el desperdicio más caro que teníamos. En el móvil real se cierra también arrastrando hacia abajo, que es el gesto que ya se conoce.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Dentro se sigue arrastrando de lado, así que las cuatro fotografías se recorren sin salir. Arriba, el contador <span style="color:#CBB78F">2 / 4</span> y el nombre de la maison truncado; abajo, la misma línea de 1 px que se llena y el pie de la fotografía, que es lo que convierte un visor en una lámina de revista. Se abre en la foto que se estaba viendo, no en la primera.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">Sin marco, sin fondo negro puro y sin pellizcar para ampliar: son fotografías de casas, no mapas. En el móvil se cierra también arrastrando hacia abajo, y <span style="color:#CBB78F">Fermer</span> queda arriba a la derecha para quien no conozca el gesto. La misma pieza sirve para las stories del perfil y para la galería del informe mensual.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">8 · Deslizar una visita para actuar</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Ve a <span style="color:#CBB78F">Visites</span> y arrastra la fila hacia la izquierda: aparece <span style="color:#CBB78F">Déclarer</span>. Al soltarla vuelve o se queda abierta, y al pulsar la acción el estado de la fila cambia en el sitio, a <span style="color:#8C9A86">Portée déclarée</span> en sauge. Ahorra el botón permanente en cada fila, que es lo que hoy convierte la lista en un formulario.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">Una sola acción por fila y siempre la que toca según el estado: declarar si la visita se hizo, anular si aún no ha llegado. Nunca dos, y nunca destructiva sin decir la consecuencia. El botón sigue existiendo dentro de la visita: el gesto es el atajo, no la única vía.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">9 · La cabecera se encoge</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Dentro de una ficha, baja: el nombre de la maison aparece en la barra pegada arriba cuando el titular grande sale de pantalla. Es lo que hace que no se pierda el sitio en una pantalla larga, y es la razón por la que una app se puede recorrer sin volver arriba a comprobar dónde estás.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0">Solo opacidad, sin que nada se mueva ni cambie de tamaño, y el nombre trunca a una línea porque en la barra es metadato, no nombre propio. Es la única excepción a la regla de no truncar nombres, y está justificada: el nombre completo sigue en la pantalla, dos dedos más abajo.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Cuatro más, que no hacen falta ver para decidir</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty"><span style="color:#CBB78F">Vibración al confirmar.</span> Un toque seco de <span style="color:#CBB78F">Haptics.impact</span> de Capacitor al enviar una demanda o declarar la portée. Dos líneas de código, y es literalmente lo que el cuerpo reconoce como app y no como web. Nada de vibrar en errores: solo cuando algo sale bien.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty"><span style="color:#CBB78F">La foto que revela.</span> Cada fotografía entra desde una versión diminuta y desenfocada del propio archivo, no desde un bloque gris. Es un atributo de <span style="color:#CBB78F">next/image</span> y hace que un carnet con veintidós casas nunca parezca vacío mientras carga.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty"><span style="color:#CBB78F">Sin conexión, dicho en la barra.</span> Una capital en copper en la barra inferior, <span style="color:#B56E2E">Hors ligne</span>, y las acciones que necesitan red quedan al 45 %. Es un WebView: se va la conexión en el metro y hoy la app se queda en blanco sin explicar nada. Esto es la 32 y cambia de ser una pantalla a ser un estado de la barra.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty"><span style="color:#CBB78F">Cambiar de espacio en dos toques.</span> Quien es storyteller y maison a la vez lo hace hoy desde el menú. Con la barra abajo, el nombre de arriba abre una hoja con los espacios, y se vuelve al mismo sitio de la otra cara. El componente <span style="color:#CBB78F">role-switch</span> ya existe.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Lo que no voy a añadir</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.88); text-wrap: pretty">Carruseles automáticos, rebotes, muelles exagerados, mensajes flotantes, celebraciones al confirmar ni transiciones distintas por pantalla. Lo que hace que una app se sienta app no es la cantidad de movimiento: es que el pulgar alcance las cosas, que se pueda volver, y que cada gesto tenga una consecuencia inmediata. Seis piezas bastan, y las seis son las que ya usa cualquiera sin que se le explique.</p>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1100}}">
+class Component extends DCLogic {
+  state = { tab: "carnet", fiche: false, sheet: false, gal: 0, ficheGal: 0, filter: "Toutes", pull: 0, refreshed: false,
+            photo: null, viewer: 0, ficheTop: 0, rowX: 0, dragging: false, declared: false };
+
+  // Arrastrar las galerías con el dedo o con el ratón, y soltar en la foto más cercana.
+  onSwipeDown = (e) => {
+    const el = e.currentTarget;
+    this.sw = { el, x: e.clientX, left: el.scrollLeft, moved: 0 };
+    el.style.scrollSnapType = "none";
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+  };
+
+  onSwipeMove = (e) => {
+    if (!this.sw) return;
+    const dx = e.clientX - this.sw.x;
+    this.sw.moved = Math.max(this.sw.moved, Math.abs(dx));
+    this.sw.el.scrollLeft = this.sw.left - dx;
+  };
+
+  onSwipeUp = () => {
+    if (!this.sw) return;
+    const { el, moved } = this.sw;
+    const w = Math.max(1, el.clientWidth);
+    const target = Math.round(el.scrollLeft / w) * w;
+    el.style.scrollSnapType = "x mandatory";
+    el.scrollTo({ left: target, behavior: "smooth" });
+    this.swiped = moved > 8;
+    this.sw = null;
+    if (this.swiped) setTimeout(() => { this.swiped = false; }, 60);
+  };
+
+  onRowDown = (e) => {
+    this.startX = e.clientX;
+    this.baseX = this.state.rowX;
+    this.setState({ dragging: true });
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+  };
+
+  onRowMove = (e) => {
+    if (!this.state.dragging) return;
+    const dx = Math.min(0, Math.max(-112, this.baseX + (e.clientX - this.startX)));
+    this.setState({ rowX: dx });
+  };
+
+  onRowUp = () => {
+    if (!this.state.dragging) return;
+    this.setState({ dragging: false, rowX: this.state.rowX < -56 ? -112 : 0 });
+  };
+
+  pickFilter = (label) => this.setState({ filter: label, sheet: false });
+
+  onPull = (e) => {
+    const el = e.currentTarget;
+    if (el.scrollTop > 0) return;
+    if (e.deltaY < 0) {
+      const next = Math.min(72, this.state.pull - e.deltaY * 1.6);
+      this.setState({ pull: next, refreshed: false });
+      clearTimeout(this.releaseT);
+      this.releaseT = setTimeout(() => this.release(), 260);
+    }
+  };
+
+  release() {
+    if (this.state.pull >= 48) {
+      this.setState({ pull: 0, refreshed: true });
+      clearTimeout(this.doneT);
+      this.doneT = setTimeout(() => this.setState({ refreshed: false }), 1800);
+    } else {
+      this.setState({ pull: 0 });
+    }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.releaseT);
+    clearTimeout(this.doneT);
+  }
+
+  page(e) {
+    const el = e.currentTarget;
+    return Math.round(el.scrollLeft / Math.max(1, el.clientWidth));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const counts = { "Toutes": 22, "Gastronomie": 9, "Hôtels": 4, "Bien-être": 5, "Beauté": 4 };
+    const pulling = s.pull > 0;
+    const ready = s.pull >= 48;
+    return {
+      isCarnet: s.tab === "carnet" && true,
+      isVisites: s.tab === "visites",
+      isProfil: s.tab === "profil",
+      carnetColor: s.tab === "carnet" ? "#CBB78F" : "rgba(245,239,228,0.65)",
+      visitesColor: s.tab === "visites" ? "#CBB78F" : "rgba(245,239,228,0.65)",
+      profilColor: s.tab === "profil" ? "#CBB78F" : "rgba(245,239,228,0.65)",
+      goCarnet: () => this.setState({ tab: "carnet", fiche: false }),
+      goVisites: () => this.setState({ tab: "visites", fiche: false }),
+      goProfil: () => this.setState({ tab: "profil", fiche: false }),
+
+      onSwipeDown: this.onSwipeDown,
+      onSwipeMove: this.onSwipeMove,
+      onSwipeUp: this.onSwipeUp,
+      openFiche: () => { if (!this.swiped) this.setState({ fiche: true }); },
+      openPhotoIfNotSwiped: () => { if (!this.swiped) this.setState({ photo: true, viewer: this.state.ficheGal }); },
+      closePhotoIfNotSwiped: () => { if (!this.swiped) this.setState({ photo: null }); },
+      closeFiche: () => this.setState({ fiche: false }),
+      ficheX: s.fiche ? "translateX(0)" : "translateX(100%)",
+      barOpacity: s.fiche ? 0 : 1,
+      barEvents: s.fiche ? "none" : "auto",
+
+      openSheet: () => this.setState({ sheet: true }),
+      closeSheet: () => this.setState({ sheet: false }),
+      sheetY: s.sheet ? "translateY(0)" : "translateY(110%)",
+      sheetVeil: s.sheet ? 1 : 0,
+      sheetEvents: s.sheet ? "auto" : "none",
+      filterLabel: s.filter === "Toutes" ? "22 adresses à Paris" : counts[s.filter] + " adresses · " + s.filter,
+      filters: Object.keys(counts).map((label) => ({
+        label,
+        count: counts[label],
+        dot: s.filter === label ? "\u2022" : "\u00A0",
+        color: s.filter === label ? "#F5EFE4" : "rgba(245,239,228,0.65)",
+        pick: () => this.pickFilter(label)
+      })),
+
+      onGallery: (e) => { const p = this.page(e); if (p !== s.gal) this.setState({ gal: p }); },
+      galWidth: ((s.gal + 1) / 4 * 100) + "%",
+      galCaption: "Photographie " + (s.gal + 1) + " sur 4",
+      onFicheGallery: (e) => { const p = this.page(e); if (p !== s.ficheGal) this.setState({ ficheGal: p }); },
+      ficheGalWidth: ((s.ficheGal + 1) / 4 * 100) + "%",
+
+      openPhoto: () => this.setState({ photo: true, viewer: s.ficheGal }),
+      closePhoto: () => this.setState({ photo: null }),
+      onViewer: (e) => { const p = this.page(e); if (p !== s.viewer) this.setState({ viewer: p }); },
+      viewerWidth: ((s.viewer + 1) / 4 * 100) + "%",
+      photoCounter: (s.viewer + 1) + " / 4",
+      photoLegend: ["La salle sur la cour, fin de service", "La cuisine ouverte", "La table de six", "La cour, vingt heures"][s.viewer],
+      photoOpacity: s.photo ? 1 : 0,
+      photoEvents: s.photo ? "auto" : "none",
+      photoScale: s.photo ? "scale(1)" : "scale(1.04)",
+      
+      onFicheScroll: (e) => {
+        const top = e.currentTarget.scrollTop;
+        if (Math.abs(top - this.state.ficheTop) > 6) this.setState({ ficheTop: top });
+      },
+      shrunkOpacity: Math.max(0, Math.min(1, (s.ficheTop - 300) / 80)),
+
+      onRowDown: this.onRowDown,
+      onRowMove: this.onRowMove,
+      onRowUp: this.onRowUp,
+      rowTransform: "translateX(" + s.rowX + "px)",
+      rowTransition: s.dragging ? "none" : "transform 220ms cubic-bezier(.22,1,.36,1)",
+      declare: () => this.setState({ declared: true, rowX: 0 }),
+      declaredOpacity: s.declared ? 1 : 0,
+      todoLabel: s.declared ? "Portée déclarée" : "Il reste 9 h 20 pour publier",
+      todoColor: s.declared ? "#8C9A86" : "#B56E2E",
+
+      onPull: this.onPull,
+      onRootScroll: () => { if (this.state.pull) this.setState({ pull: 0 }); },
+      pullOpacity: pulling || s.refreshed ? 1 : 0,
+      pullColor: s.refreshed ? "#8C9A86" : ready ? "#CBB78F" : "rgba(245,239,228,0.65)",
+      pullLabel: s.refreshed ? "\u00C0 jour" : ready ? "Rel\u00E2cher pour actualiser" : "Tirer pour actualiser"
+    };
+  }
+}
+</script>
+</body>
+</html>
