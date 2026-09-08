@@ -7,6 +7,7 @@ import { Rise } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Button } from "@/components/member/button";
+import { PullToRefresh } from "@/components/member/pull-to-refresh";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 
@@ -223,6 +224,7 @@ export default function MesVisites() {
         settingsLabel={td.navSettings}
       />
 
+      <PullToRefresh onRefresh={load}>
       <div className="mx-auto max-w-[920px] px-pagina py-seccion">
         <Rise>
           <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
@@ -265,6 +267,7 @@ export default function MesVisites() {
           </>
         )}
       </div>
+      </PullToRefresh>
     </div>
   );
 }

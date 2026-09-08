@@ -10,6 +10,8 @@ import { translations } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import { parisParts, AvailWindow } from "@/lib/availability";
 import { Row } from "@/components/member/row";
+import { Gallery } from "@/components/member/gallery";
+import { Viewer } from "@/components/member/viewer";
 
 type MaisonService = { name: string; description: string; price: string };
 type MaisonAvail = {
@@ -315,6 +317,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const [reserveOpen, setReserveOpen] = useState(false);
   const [initialSlot, setInitialSlot] = useState("");
   const [preview, setPreview] = useState(false);
+  const [visor, setVisor] = useState<number | null>(null);
 
   // A "?slot=" param (from a proposed-créneaux email) pre-fills + opens the form.
   // "?preview=1" and the native app both bypass the pre-launch gate.
@@ -403,16 +406,29 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
         ) : (
           <>
             {/* Hero */}
-            <div className="relative mb-rango aspect-[4/5] overflow-hidden bg-surface-raised sm:aspect-[16/9]">
-              {maison.photos?.[0] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={maison.photos[0]} alt={maison.name} className="h-full w-full object-cover" />
+            {/* Todas las fotografías, no solo la primera. Las demás estaban
+                cargadas y no se veían nunca. */}
+            <div className="mb-rango">
+              {maison.photos && maison.photos.length > 0 ? (
+                <Gallery
+                  photos={maison.photos}
+                  alt={maison.name}
+                  aspect="aspect-[4/5] sm:aspect-[16/9]"
+                  onOpen={setVisor}
+                />
               ) : (
-                <div className="flex h-full w-full items-center justify-center">
+                <div className="flex aspect-[4/5] items-center justify-center bg-surface-raised sm:aspect-[16/9]">
                   <p className="text-capitale uppercase tracking-capitale text-text-muted">{catLabelText}</p>
                 </div>
               )}
             </div>
+
+            <Viewer
+              photos={maison.photos ?? []}
+              index={visor}
+              onClose={() => setVisor(null)}
+              caption={maison.name}
+            />
 
             <div className="grid md:grid-cols-3 gap-10">
               {/* Left: info */}
