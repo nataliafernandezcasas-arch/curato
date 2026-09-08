@@ -230,10 +230,53 @@ Lo único del diseño que necesita esquema nuevo:
 - **Portrait y bio propios del storyteller**, separados de los que trae Phyllo.
 - **Agregados mensuales por maison** para el informe: visitas del mes, portée acumulada, stories publicadas, audiencia acumulada. Se pueden derivar de las visitas, no hace falta tabla nueva.
 
+## 10 bis. Segunda entrega: los huecos del orden
+
+Al construir por el orden de la sección 9 aparecieron tres huecos: la ficha de maison, Mes visites y Réglages no estaban diseñadas, y la 14 vivía dentro de la 13. `Curato Wireframes 2.dc.html` los cierra. Con eso, las seis pantallas del orden de construcción están diseñadas.
+
+**Regla de negocio, y el código la contradice: todo va en euros, nunca en créditos.**
+
+El crédito mensual del creador se calibra sobre su audiencia:
+
+| Abonnés | Crédito mensual |
+|---|---|
+| 5 000 a 10 000 | 500 € |
+| 10 000 a 50 000 | 750 € |
+| 50 000 a 100 000 | 1 000 € |
+| 100 000 a 500 000 | 1 500 € |
+| Más de 500 000 | 3 000 € |
+
+Es mensual y se consume. Se muestra siempre con su denominador (900 € de 1 500 €, el tramo de Tereza Bolkvadze con 142 K abonnés, que es el ejemplo de todos los documentos), con espacio fino de millar a la francesa y `font-variant-numeric: tabular-nums`, para que no cambie de ancho al gastarse.
+
+Antes de reservar, lo que se ve son **las tarifas reales de la maison**, escritas por ella en sus servicios, y la pantalla dice de dónde sale la cifra (*le tarif du dîner pour deux, tel que la maison l'affiche*). Nunca una valoración de Curato ni una unidad abstracta.
+
+La tabla `CATEGORY` de `maison/[id]/page.tsx` guarda hoy 8, 2 y 3 "crédits" y los pinta como coste indicativo: **es un resto y hay que sustituirlo** por esa tarifa. La palabra crédit no vuelve a aparecer en el producto.
+
+**Primitivas que ya existen y hay que reutilizar, no rehacer:** `Button` y `ButtonLink`, `AuthShell` (flor, velo ajustable, idioma, logotipo), `CodeField` y `StrengthMeter`, además de `Row`, `Field`, `Tabs`, `Section`, `Rise` y `Photo`. Construidas ya: el carnet (10) y las cinco de entrada (01 a 05).
+
+**Encadenado en un PR aparte** porque necesitan columnas nuevas: la 14, la 25 y la 16b. Los diseños son válidos tal cual y no hay que rehacerlos.
+
+| # | Pantalla | Ruta | Archivo | Qué cambia |
+|---|---|---|---|---|
+| 11 | Fiche maison | `/dashboard/storyteller/maison/[id]` | `maison/[id]/page.tsx` | Portada 4:5 en vez de 16:9: en vertical una banda ancha desperdicia media pantalla. Fuera la tarjeta lateral con borde, en 375 px dirección, web y botón son filas. Orden de revista: foto, categoría, nombre, texto, coste en créditos, créneaux, acción, más fotografías, plano al final. El plano sigue siendo el iframe de Google en gris, sin borde, 180 px de alto. |
+| 12 | **Demander une visite**, pantalla propia | `/maison/[id]/reserver`, ruta nueva | idem, extraído de `ReserveModal` | **Decisión: deja de ser diálogo.** Seis campos y una rejilla de horas con el teclado abierto no caben en un modal de 375 px, y una ruta propia devuelve el botón atrás y hace que el enlace `?slot=` del correo abra algo compartible. El día es una lista de filas con su recuento de créneaux, no un `select` nativo. Horas en rejilla de cuatro, 44 px, las ocupadas al 38 % sin poder pulsarse. Lo elegido se repite sobre el botón con su coste. Éxito sin diálogo: vuelta a la ficha con una capital en sauge. |
+| 13 | Mes visites | `/dashboard/storyteller/visits` | `storyteller/visits/page.tsx` | Se ordena por **lo que toca hacer**: À faire, con la cuenta atrás y el botón a la 14; À venir; Passées. Los seis estados con color y acción propios. **Hoy `no_show` se pinta igual que `declined`**, el mapa de estados los une; son cosas distintas y la primera lleva strike. La subida sigue pidiendo dos fotos como mínimo en el primer envío, y solo en `confirmed` o `completed`. |
+| 18 | Réglages | `/dashboard/storyteller/reglages` y `/dashboard/business/reglages` | ambos `reglages/page.tsx` | Idioma en tres filas con punto en champagne, sin línea inferior. **Añadido**: bloque de cuenta con correo, antigüedad y cambio de contraseña, que no existe. Cerrar sesión es un botón con su caja, no un enlace gris con icono, y sin diálogo de confirmación. |
+| 31 | La barra y su menú | `dashboard-nav.tsx` | | Fuera la hamburguesa y la equis: la palabra Menu se convierte en Fermer, capital de 11 px. Destinos a 19 px, no a 13. El contenido de detrás se atenúa al 38 %, no se cubre con velo negro. La barra se queda pegada con `rgba(30,30,30,0.72)` y desenfoque, sin la línea inferior de hoy. |
+| 33 | Estados vacíos, como sistema | todas | | Una plantilla, cuatro huecos: 72 px de aire, capital en champagne, titular de 28 px, una frase con **un dato real** (cifra o fecha), una fotografía que respira 18 s al 0.8 %, y **un solo** botón. Si no hay nada que hacer, el botón desaparece en vez de inventarse una acción. Los cuatro vacíos que ve un miembro nuevo, con el dato que le toca a cada uno, están en el documento. |
+| 34 | Errores, confirmaciones y esperas | todas | | La regla que las ordena: **el aviso vive donde ocurrió la cosa**, nada flota. Guardado: en la fila que cambió, en sauge, se va en 2,5 s. Error de campo: bajo el campo, en copper, y la línea del campo se tiñe. Error grande: filete burgundy, qué pasó, **qué no se ha perdido**, botón. Espera: bloques con la forma de lo que va a llegar y la respiración de 1,6 s; pasados 8 s se convierte en el error grande. Botón trabajando: texto a Envoi y 45 % de opacidad. |
+
+### Sigue sin diseñar (24 de 35 entregadas, más la 16b)
+
+Once pantallas y la vista de ordenador: 10 (ya construida, queda revisarla contra la referencia), 15 conectar Instagram, 17 sugerir una dirección, 23 vos visiteurs, 24 le carnet de la maison, 27 code QR, 28 réglages de maison, 29 tableau apporteur, 30 présenter une maison, 32 sans connexion, 35 notificaciones, y el tablero de maison a 1440.
+
+**Pendiente de decidir antes de dibujar:** la 27, el código QR. Es el único caso de uso físico del producto y pide romper dos reglas, brillo alto y una forma grande y cerrada. Propuesta en una línea: QR a ancho completo sobre **fondo crema**, no charcoal, porque un código oscuro se lee peor y la cámara del cliente no perdona. Sería la única pantalla en modo claro de la app, y el modo crema ya está en los tokens.
+
 ## 11. Archivos de este paquete
 
 - `Curato Sistema.dc.html` — el sistema: escala tipográfica, espaciado, la regla de las cajas con un antes y después interactivo, roles de color, tacto, la fila estrecha con un deslizador que la estrecha de verdad, y el movimiento. Incluye la pantalla del carnet en sus cinco estados.
-- `Curato Wireframes.dc.html` — las 17 pantallas a 375 px, agrupadas por rol, cada una con ruta, estados y decisiones. Al final, el índice de las 35 con el orden de trabajo.
+- `Curato Wireframes 2.dc.html` — la segunda entrega: 11, 12, 13, 18, 31, 33 y 34, más la lista de lo que sigue sin diseñar.
+- `Curato Wireframes.dc.html` — las 17 pantallas de la primera entrega a 375 px, agrupadas por rol, cada una con ruta, estados y decisiones. Al final, el índice de las 35 con el orden de trabajo.
 - `Curato Movimiento.dc.html` — el movimiento **vivo**: una pantalla desplazable donde el fondo camina, el texto se asienta y las fotos se acercan, con un interruptor de `reduced-motion` para comparar. Abre este primero para entender el movimiento; describirlo con palabras no sirve.
 - `github.md` — la asociación con el repositorio y el mapa de pantalla a archivos, que es el que se diffea en el siguiente sync.
 

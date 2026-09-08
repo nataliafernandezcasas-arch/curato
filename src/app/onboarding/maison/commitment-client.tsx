@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/member/button";
 import { useRouter } from "next/navigation";
-import { Check, DownloadSimple } from "@phosphor-icons/react";
+import { DownloadSimple } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { getCommitmentLabels, getMaisonDossierSlides, getMaisonDossierPdf, getMaisonDossierFilename } from "@/lib/i18n/commitment";
 import { signCommitment } from "./actions";
@@ -59,8 +60,8 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
             key={key}
             type="button"
             onClick={() => setLang(key)}
-            className={`font-serif text-[11px] tracking-[0.25em] px-2.5 py-1.5 rounded-sm backdrop-blur-md transition-colors ${
-              lang === key ? "bg-champagne/90 text-charcoal-deep" : "bg-black/40 text-white/70 hover:text-white"
+            className={`px-2.5 py-1.5 text-capitale tracking-capitale backdrop-blur-md transition-colors duration-200 ease-curato ${
+              lang === key ? "bg-black/40 text-accent" : "bg-black/40 text-text-secondary hover:text-text-primary"
             }`}
             aria-pressed={lang === key}
           >
@@ -78,11 +79,11 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
       </section>
 
       {/* Download the dossier */}
-      <div className="text-center py-10 border-t border-white/10">
+      <div className="py-seccion text-center">
         <a
           href={dossierPdf}
           download={dossierFilename}
-          className="inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.2em] uppercase text-champagne/80 hover:text-champagne border border-champagne/30 hover:border-champagne/60 px-6 py-3 transition-colors"
+          className="inline-flex min-h-11 items-center gap-2 border border-[rgba(203,183,143,0.3)] px-fila text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:border-accent hover:text-text-primary"
         >
           <DownloadSimple size={15} />
           {l.downloadLabel}
@@ -90,38 +91,38 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
       </div>
 
       {/* Commitment + signature band, over the floral backdrop */}
-      <section className="relative border-t border-white/10 overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-charcoal-deep/85" />
         </div>
         <div className="max-w-[640px] mx-auto px-5 py-24 md:py-28">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">{l.eyebrow}</p>
-        <h1 className="font-serif text-[clamp(1.9rem,5vw,2.8rem)] font-light tracking-[0.14em] uppercase leading-tight mb-6">
+        <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{l.eyebrow}</p>
+        <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
           {l.title}
         </h1>
         {maisonName && (
-          <p className="font-serif text-[13px] tracking-[0.25em] uppercase text-champagne/70 mb-6">{maisonName}</p>
+          <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{maisonName}</p>
         )}
-        <p className="font-serif text-[15px] md:text-[16px] font-light text-white/70 leading-[1.8] tracking-wide mb-10">
+        <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">
           {l.intro}
         </p>
 
         {/* Commitment terms */}
-        <ul className="space-y-4 border-t border-white/10 pt-8 mb-10">
+        <ul className="mb-seccion space-y-fila">
           {l.terms.map((term, i) => (
             <li key={i} className="flex gap-4">
-              <span className="font-serif text-[13px] text-champagne/70 mt-0.5">{String(i + 1).padStart(2, "0")}</span>
-              <span className="font-serif text-[15px] md:text-[16px] font-light text-white/85 leading-relaxed">{term}</span>
+              <span className="mt-0.5 text-capitale tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</span>
+              <span className="text-corps text-text-primary">{term}</span>
             </li>
           ))}
         </ul>
 
         {/* Signature */}
-        <div className="border-t border-white/10 pt-8 space-y-6">
+        <div className="space-y-rango">
           <div>
-            <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+            <label className="mb-bloque block text-capitale uppercase tracking-capitale text-accent">
               {l.signatureLabel} <span className="text-copper/70">{l.required}</span>
             </label>
             <input
@@ -129,7 +130,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
               value={signatory}
               onChange={(e) => setSignatory(e.target.value)}
               placeholder={l.signaturePlaceholder}
-              className="w-full px-5 py-4 border border-white/15 bg-charcoal-deep/50 text-text-primary font-serif text-[18px] italic tracking-wide focus:outline-none focus:border-champagne/50 transition-colors"
+              className="w-full min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ italic text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted focus:border-accent"
             />
           </div>
 
@@ -155,23 +156,15 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
         </div>
 
         {error && (
-          <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4 mt-8">
+          <p className="mt-rango border-l-2 border-burgundy pl-fila text-legende text-text-primary">
             {error}
           </p>
         )}
 
-        <div className="mt-12">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!canSubmit}
-            className={`inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.25em] uppercase px-8 py-4 transition-all duration-300 ${
-              canSubmit ? "bg-champagne text-charcoal-deep hover:bg-copper hover:text-white" : "bg-white/5 text-white/20 cursor-not-allowed"
-            }`}
-          >
+        <div className="mt-seccion">
+          <Button type="button" onClick={handleSubmit} disabled={!canSubmit}>
             {submitting ? l.submitting : l.submit}
-            {!submitting && <Check size={14} weight="bold" />}
-          </button>
+          </Button>
         </div>
         </div>
       </section>

@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/client";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 import DashboardNav from "../../dashboard-nav";
+import { Rise } from "@/components/member/motion";
+import { Row } from "@/components/member/row";
+import { Section } from "@/components/member/section";
 import { STORYTELLER_LINKS } from "../nav-links";
 
 type Reservation = {
@@ -62,62 +65,81 @@ export default function ProfilPage() {
         settingsLabel={t.navSettings}
       />
 
-      <div className="mx-auto max-w-[900px] px-5 py-10">
-        <p className="mb-3 font-serif text-[11px] uppercase tracking-[0.35em] text-champagne/60">
-          {t.navProfile}
-        </p>
-        <h1 className="mb-2 font-serif text-[32px] font-light uppercase leading-none tracking-[0.12em] text-white">
-          {profile?.full_name ?? ""}
-        </h1>
-        {profile?.handle && (
-          <p className="mb-10 font-serif text-[14px] font-light tracking-wider text-champagne/70">
-            @{profile.handle}
-          </p>
-        )}
+      <div className="mx-auto max-w-[900px] px-pagina py-seccion">
+        <Rise>
+          <p className="text-capitale uppercase tracking-capitale text-accent">{t.navProfile}</p>
+          <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+            {profile?.full_name ?? ""}
+          </h1>
+          {profile?.handle && (
+            <p className="mt-etiqueta text-legende text-accent">@{profile.handle}</p>
+          )}
+        </Rise>
 
-        <div className="mb-12 grid grid-cols-2 gap-y-8 border-y border-white/10 py-8 sm:grid-cols-4">
-          {[
-            { k: t.profileCredit, v: `€${credit - used}`, s: `${t.profileOf} €${credit}` },
-            { k: t.profileVisits, v: String(done.length) },
-            { k: t.profileHouses, v: String(houses.length) },
-            { k: t.profileStories, v: String(stories) },
-          ].map(({ k, v, s }) => (
-            <div key={k}>
-              <p className="mb-2 font-serif text-[10px] uppercase tracking-[0.25em] text-white/60">{k}</p>
-              <p className="font-serif text-[26px] font-light text-champagne">{v}</p>
-              {s && <p className="mt-1 font-serif text-[12px] font-light text-white/55">{s}</p>}
-            </div>
-          ))}
-        </div>
-
-        <p className="mb-5 font-serif text-[11px] uppercase tracking-[0.3em] text-champagne/60">
-          {t.profileHousesVisited}
-        </p>
-        {loading ? (
-          <p className="font-serif text-[14px] font-light text-white/55">…</p>
-        ) : houses.length === 0 ? (
-          <p className="font-serif text-[14px] font-light italic text-white/55">
-            {t.profileNoVisitsYet}
-          </p>
-        ) : (
-          <div className="flex flex-col">
-            {done.map((v) => (
+        {/* Las cifras dejan de ir encerradas entre dos filetes. Son filas, y
+            cada una es la suya: el crédito en champagne porque es lo que la
+            persona tiene, el resto en tinta porque solo cuentan lo hecho. */}
+        <Rise index={1} className="mt-rango mb-seccion">
+          <Row
+            label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.profileCredit}</span>}
+            aside={<span className="text-legende text-text-muted">{t.profileOf} {credit} €</span>}
+            value={<span className="text-sous-titre text-accent">{credit - used} €</span>}
+          />
+          {credit > 0 && (
+            <div className="my-fila h-px bg-border">
               <div
-                key={v.id}
-                className="flex items-baseline justify-between border-b border-white/10 py-4"
-              >
-                <span className="font-serif text-[15px] font-light text-white/85">{v.venueName}</span>
-                <span className="font-serif text-[12px] tracking-wider text-white/55">
-                  {new Date(v.slotStart).toLocaleDateString(lang, {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+                className="h-full bg-accent transition-[width] duration-700 ease-curato"
+                style={{ width: `${Math.min((used / credit) * 100, 100)}%` }}
+              />
+            </div>
+          )}
+          <Row
+            label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.profileVisits}</span>}
+            value={<span className="text-sous-titre text-text-primary">{done.length}</span>}
+          />
+          <Row
+            label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.profileHouses}</span>}
+            value={<span className="text-sous-titre text-text-primary">{houses.length}</span>}
+          />
+          <Row
+            label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.profileStories}</span>}
+            value={<span className="text-sous-titre text-text-primary">{stories}</span>}
+          />
+        </Rise>
+
+        <Section title={t.profileHousesVisited}>
+          {loading ? (
+            <div className="space-y-bloque">
+              {[1, 2].map((i) => (
+                <div key={i} className="h-3 w-2/3 bg-border animate-pulse [animation-duration:1.6s]" />
+              ))}
+            </div>
+          ) : houses.length === 0 ? (
+            <div className="py-respiro text-center">
+              <p className="text-corps text-text-secondary">{t.profileNoVisitsYet}</p>
+            </div>
+          ) : (
+            <div>
+              {done.map((v, i) => (
+                <Rise key={v.id} index={i}>
+                  <Row
+                    name
+                    label={<span className="text-corps text-text-primary">{v.venueName}</span>}
+                    value={
+                      <span className="text-legende tabular-nums text-brume">
+                        {new Date(v.slotStart).toLocaleDateString(lang, {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </span>
+                    }
+                  />
+                </Rise>
+              ))}
+            </div>
+          )}
+        </Section>
       </div>
     </div>
   );
