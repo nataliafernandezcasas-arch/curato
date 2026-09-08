@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Gear } from "@phosphor-icons/react";
-import { TabBar, TabBarSpacer } from "@/components/member/tab-bar";
+import { TabBar, TabBarSpacer, MAX_DESTINOS } from "@/components/member/tab-bar";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 export type NavLink = { href: string; label: string; active?: boolean };
@@ -138,6 +138,21 @@ export default function DashboardNav({
           >
             <div className="bg-surface/95 px-pagina py-rango backdrop-blur-sm">
               <div className="flex flex-col gap-fila">
+                {/* Los destinos que no caben abajo viven aquí. Sin esto, la
+                    quinta sección de una maison no se podía alcanzar. */}
+                {links.slice(MAX_DESTINOS).map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className={`flex min-h-11 items-center text-sous-titre transition-colors duration-200 ease-curato ${
+                      l.active ? "text-accent" : "text-text-secondary hover:text-accent"
+                    }`}
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+
                 {roleSwitch && <div className="flex flex-wrap items-center gap-fila">{roleSwitch}</div>}
 
                 {settingsHref && (
