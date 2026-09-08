@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { List, X, Gear } from "@phosphor-icons/react";
+import { Gear } from "@phosphor-icons/react";
+import { TabBar, TabBarSpacer } from "@/components/member/tab-bar";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 export type NavLink = { href: string; label: string; active?: boolean };
@@ -50,7 +51,11 @@ export default function DashboardNav({
 
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-white/10 bg-black/30 backdrop-blur-sm">
+    <>
+    <nav
+      className="sticky top-0 z-40 backdrop-blur-sm"
+      style={{ backgroundColor: "rgba(30,30,30,0.72)" }}
+    >
       <div
         className="mx-auto flex h-14 w-full items-center justify-between px-5"
         style={{ maxWidth }}
@@ -112,10 +117,9 @@ export default function DashboardNav({
         <button
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          aria-label="Menu"
-          className="-mr-2 p-2 text-white/70 transition-colors hover:text-champagne sm:hidden"
+          className="-mr-2 min-h-11 px-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent sm:hidden"
         >
-          {open ? <X size={18} /> : <List size={18} />}
+          {open ? "Fermer" : "Menu"}
         </button>
       </div>
 
@@ -132,32 +136,15 @@ export default function DashboardNav({
             exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
             transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="border-t border-white/10 bg-charcoal-deep/95 px-5 py-5 backdrop-blur-sm">
-              <div className="flex flex-col gap-5">
-                {links.length > 0 && (
-                  <div className="flex flex-col gap-4">
-                    {links.map((l) => (
-                      <Link
-                        key={l.href}
-                        href={l.href}
-                        onClick={() => setOpen(false)}
-                        className={`font-serif text-[13px] tracking-wider transition-colors ${
-                          l.active ? "text-champagne" : "text-white/65 hover:text-champagne"
-                        }`}
-                      >
-                        {l.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-
-                {roleSwitch && <div className="flex flex-wrap items-center gap-3">{roleSwitch}</div>}
+            <div className="bg-surface/95 px-pagina py-rango backdrop-blur-sm">
+              <div className="flex flex-col gap-fila">
+                {roleSwitch && <div className="flex flex-wrap items-center gap-fila">{roleSwitch}</div>}
 
                 {settingsHref && (
                   <Link
                     href={settingsHref}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 border-t border-white/10 pt-5 font-serif text-[13px] tracking-wider text-white/65 transition-colors hover:text-champagne"
+                    className="flex min-h-11 items-center gap-2 text-sous-titre text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
                   >
                     <Gear size={15} />
                     {settingsLabel}
@@ -170,5 +157,9 @@ export default function DashboardNav({
       </AnimatePresence>
 
     </nav>
+
+    {/* Los destinos viven abajo, donde llega el pulgar. */}
+    <TabBar links={links} />
+    </>
   );
 }
