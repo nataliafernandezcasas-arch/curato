@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { FilePicker } from "@/components/member/file-picker";
 import { Plus, X, FilePdf, FloppyDisk, Check } from "@phosphor-icons/react";
 import { Lang } from "@/lib/i18n/translations";
 
@@ -17,7 +18,6 @@ const DAY_LABELS: Record<Lang, string[]> = {
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // JS getDay(): Mon..Sun
 
 export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
-  const fileRef = useRef<HTMLInputElement>(null);
   const [availability, setAvailability] = useState<Window[]>([]);
   const [blocked, setBlocked] = useState<Block[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -104,7 +104,6 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       if (res.ok) setMenuUrls(d.menuUrls ?? []);
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
     }
   }
   async function removeMenu(url: string) {
@@ -231,11 +230,16 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
               <button onClick={() => removeMenu(url)} className="absolute top-1.5 right-1.5 text-white/40 hover:text-copper" aria-label="X"><X size={13} /></button>
             </div>
           ))}
-          <button onClick={() => fileRef.current?.click()} disabled={uploading} className="inline-flex items-center gap-2 border border-dashed border-white/20 text-white/40 hover:border-champagne/40 hover:text-champagne px-5 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-50">
+          <FilePicker
+            onFiles={uploadMenu}
+            accept="application/pdf,image/*"
+            multiple
+            disabled={uploading}
+            className="inline-flex min-h-11 items-center gap-2 border border-dashed border-white/20 px-fila text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:border-champagne/40 hover:text-accent"
+          >
             <Plus size={14} /> {t.offerAdd}
-          </button>
+          </FilePicker>
         </div>
-        <input ref={fileRef} type="file" accept="application/pdf,image/*" multiple className="hidden" onChange={(e) => uploadMenu(e.target.files)} />
       </section>
 
       {/* Save */}

@@ -126,14 +126,18 @@ function VisitCard({
     }
   }
 
-  // Hidden file input shared by both states.
+  // El input vive en el documento y se esconde con tamaño y opacidad, nunca con
+  // `display:none`: dentro del WebView de iOS, lo que no se pinta tampoco abre
+  // el selector, y el botón parece muerto sin dar ningún error.
   const fileInput = (
     <input
       ref={fileRef}
+      id={`fotos-${visit.id}`}
       type="file"
       accept="image/*"
       multiple
-      className="hidden"
+      className="absolute h-px w-px overflow-hidden opacity-0"
+      style={{ clip: "rect(0 0 0 0)" }}
       onChange={(e) => upload(e.target.files)}
     />
   );
@@ -167,13 +171,12 @@ function VisitCard({
           {canUpload && (
             <div className="mt-fila">
               {fileInput}
-              <button
-                onClick={() => fileRef.current?.click()}
-                disabled={busy}
-                className="min-h-11 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-accent disabled:opacity-45"
+              <label
+                htmlFor={`fotos-${visit.id}`}
+                className={`inline-flex min-h-11 items-center text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-accent ${busy ? "pointer-events-none opacity-45" : "cursor-pointer"}`}
               >
                 {busy ? t.sending : t.addMore}
-              </button>
+              </label>
               {error && <p className="text-legende text-copper">{error}</p>}
             </div>
           )}
@@ -207,9 +210,12 @@ function VisitCard({
       {canUpload && (
         <div className="mt-fila">
           {fileInput}
-          <Button onClick={() => fileRef.current?.click()} disabled={busy}>
+          <label
+            htmlFor={`fotos-${visit.id}`}
+            className={`inline-flex min-h-11 items-center justify-center border border-[rgba(203,183,143,0.3)] px-fila text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:border-accent hover:text-text-primary ${busy ? "pointer-events-none opacity-45" : "cursor-pointer"}`}
+          >
             {busy ? t.sending : t.markVisited}
-          </Button>
+          </label>
           <p className="mt-bloque text-legende text-text-secondary">{t.minPhotos}</p>
           {error && <p className="mt-bloque text-legende text-copper">{error}</p>}
         </div>
