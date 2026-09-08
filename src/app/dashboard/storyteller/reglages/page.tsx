@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SignOut } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/client";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
+import { Button, ButtonLink } from "@/components/member/button";
+import { Row } from "@/components/member/row";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -20,6 +21,14 @@ export default function ReglagesPage() {
   const t = translations[lang].dashboard;
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    createClient()
+      .auth.getUser()
+      .then(({ data }) => setEmail(data.user?.email ?? ""))
+      .catch(() => {});
+  }, []);
 
   async function signOut() {
     setBusy(true);
@@ -36,40 +45,57 @@ export default function ReglagesPage() {
         settingsLabel={t.navSettings}
       />
 
-      <div className="mx-auto max-w-[720px] px-5 py-10">
-        <h1 className="mb-10 font-serif text-[28px] font-light uppercase leading-none tracking-[0.12em] text-white">
+      <div className="mx-auto max-w-[720px] px-pagina py-seccion">
+        <h1 className="mb-seccion text-titre uppercase tracking-titre text-text-primary">
           {t.navSettings}
         </h1>
 
         <section className="mb-12">
-          <p className="mb-5 font-serif text-[11px] uppercase tracking-[0.3em] text-champagne/60">
+          <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">
             {t.settingsLanguage}
           </p>
-          <div className="flex flex-col">
+          <div>
             {LANGS.map(({ key, label, name }) => (
               <button
                 key={key}
                 onClick={() => setLang(key)}
-                className={`flex items-center justify-between border-b border-white/10 py-4 text-left font-serif text-[15px] font-light transition-colors ${
-                  lang === key ? "text-champagne" : "text-white/60 hover:text-white/85"
-                }`}
+                className="group grid min-h-11 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-fila text-left"
               >
-                <span>{name}</span>
-                <span className="font-serif text-[11px] tracking-[0.2em]">{label}</span>
+                <span
+                  aria-hidden
+                  className={`block h-2.5 w-2.5 shrink-0 rounded-full border transition-colors duration-200 ease-curato ${
+                    lang === key ? "border-accent bg-accent" : "border-text-muted group-hover:border-accent"
+                  }`}
+                />
+                <span className={`truncate text-corps ${lang === key ? "text-text-primary" : "text-text-secondary"}`}>
+                  {name}
+                </span>
+                <span className="shrink-0 text-capitale tracking-capitale text-text-muted">{label}</span>
               </button>
             ))}
           </div>
         </section>
 
+        {/* La cuenta, que no se decía en ninguna parte. */}
+        {email && (
+          <section className="mb-seccion">
+            <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{t.settingsAccount}</p>
+            <Row
+              label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.settingsEmail}</span>}
+              value={<span className="break-all text-legende text-text-primary">{email}</span>}
+            />
+            <div className="mt-fila">
+              <ButtonLink href="/auth/change-password">{t.settingsChangePassword}</ButtonLink>
+            </div>
+          </section>
+        )}
+
         <section>
-          <button
-            onClick={signOut}
-            disabled={busy}
-            className="flex items-center gap-2 font-serif text-[13px] tracking-wider text-white/55 transition-colors hover:text-champagne disabled:opacity-40"
-          >
-            <SignOut size={15} />
+          {/* Salir es un botón con su caja, no un enlace gris con un icono.
+              Y sin diálogo de confirmación: quien lo pulsa sabe lo que hace. */}
+          <Button onClick={signOut} disabled={busy}>
             {t.signOut}
-          </button>
+          </Button>
         </section>
       </div>
     </div>
