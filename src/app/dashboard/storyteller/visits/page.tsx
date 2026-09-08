@@ -3,7 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
-import { Camera, CheckCircle } from "@phosphor-icons/react";
+import { Rise } from "@/components/member/motion";
+import { Row } from "@/components/member/row";
+import { Section } from "@/components/member/section";
+import { Button } from "@/components/member/button";
+import { PullToRefresh } from "@/components/member/pull-to-refresh";
+import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 
@@ -16,14 +21,56 @@ type Visit = {
   rightsExpiresAt: string | null;
 };
 
-const STATUS_KEY: Record<string, "confirmed" | "pending" | "visited" | "declined" | "cancelled"> = {
+type StatusKey = "confirmed" | "pending" | "visited" | "declined" | "cancelled" | "noShow";
+
+const STATUS_KEY: Record<string, StatusKey> = {
   confirmed: "confirmed",
   pending_review: "pending",
   completed: "visited",
   declined: "declined",
   cancelled: "cancelled",
-  no_show: "declined",
+  // Un plantón no es un rechazo. Se pintaban igual, y son cosas distintas:
+  // esta lleva strike y la casa la sufrió.
+  no_show: "noShow",
 };
+
+// Sauge lo cumplido, copper lo que tiene plazo, burgundy lo que se cayó.
+const STATUS_TONE: Record<StatusKey, string> = {
+  confirmed: "text-sauge-text",
+  visited: "text-sauge-text",
+  pending: "text-copper",
+  declined: "text-burgundy",
+  noShow: "text-burgundy",
+  cancelled: "text-text-muted",
+};
+
+/** Se ordena por lo que toca hacer, no por fecha. */
+function groupOf(v: Visit): "todo" | "upcoming" | "past" {
+  if (v.photos.length > 0) return "past";
+  if (v.status === "declined" || v.status === "cancelled" || v.status === "no_show") return "past";
+  const yaPasó = new Date(v.slotStart).getTime() < Date.now();
+  if (!yaPasó) return "upcoming";
+  return v.status === "confirmed" || v.status === "completed" ? "todo" : "upcoming";
+}
+
+function Envoltura({
+  deslizable,
+  action,
+  onAction,
+  children,
+}: {
+  deslizable: boolean;
+  action: string;
+  onAction: () => void;
+  children: React.ReactNode;
+}) {
+  if (!deslizable) return <>{children}</>;
+  return (
+    <SwipeAction action={action} onAction={onAction}>
+      {children}
+    </SwipeAction>
+  );
+}
 
 function VisitCard({
   visit,
@@ -106,27 +153,28 @@ function VisitCard({
         </div>
 
         {/* Caption: place + date */}
-        <div className="mt-4 flex items-start justify-between gap-4">
-          <div>
-            <h3 className="font-serif text-[20px] font-light text-white">{visit.maison}</h3>
-            <p className="font-serif text-[13px] text-white/60 mt-1">{dateLabel}</p>
-            {rightsLabel && (
-              <p className="font-serif text-[12px] font-light text-white/45 mt-2 italic">
-                {t.rightsUntil.replace("{date}", rightsLabel)}
-              </p>
-            )}
-          </div>
+        <div className="mt-fila">
+          <Row
+            name
+            label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
+            value={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
+          />
+          {rightsLabel && (
+            <p className="mt-etiqueta text-legende text-text-muted">
+              {t.rightsUntil.replace("{date}", rightsLabel)}
+            </p>
+          )}
           {canUpload && (
-            <div className="shrink-0 text-right">
+            <div className="mt-fila">
               {fileInput}
               <button
                 onClick={() => fileRef.current?.click()}
                 disabled={busy}
-                className="font-serif text-[11px] tracking-wide text-white/55 hover:text-champagne transition-colors disabled:opacity-50"
+                className="min-h-11 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-accent disabled:opacity-45"
               >
-                {busy ? t.sending : `+ ${t.addMore}`}
+                {busy ? t.sending : t.addMore}
               </button>
-              {error && <p className="font-serif text-[12px] text-copper/80 mt-1">{error}</p>}
+              {error && <p className="text-legende text-copper">{error}</p>}
             </div>
           )}
         </div>
@@ -136,32 +184,34 @@ function VisitCard({
 
   // ── Not yet uploaded: prompt to mark visited + upload ─────────────────────
   return (
-    <div className="border border-white/10 bg-black/20 p-6">
-      <div className="flex items-start justify-between flex-wrap gap-3">
-        <div>
-          <h3 className="font-serif text-[18px] font-light text-white">{visit.maison}</h3>
-          <p className="font-serif text-[13px] text-white/55 mt-1">{dateLabel}</p>
-        </div>
-        <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70 border border-champagne/25 px-3 py-1">
-          {t[statusKey]}
-        </span>
-      </div>
+    <div>
+      {/* Solo se desliza lo que tiene algo que hacer. Un gesto que revela un
+          botón vacío enseña a desconfiar del gesto. */}
+      <Envoltura
+        deslizable={canUpload}
+        action={t.swipeDeclare}
+        onAction={() => fileRef.current?.click()}
+      >
+        <Row
+          name
+          label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
+          aside={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
+          value={
+            <span className={`text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
+              {t[statusKey]}
+            </span>
+          }
+        />
+      </Envoltura>
 
       {canUpload && (
-        <div className="mt-5">
+        <div className="mt-fila">
           {fileInput}
-          <button
-            onClick={() => fileRef.current?.click()}
-            disabled={busy}
-            className="inline-flex items-center gap-2 font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-5 py-3 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
-          >
-            <Camera size={14} />
+          <Button onClick={() => fileRef.current?.click()} disabled={busy}>
             {busy ? t.sending : t.markVisited}
-          </button>
-          <p className="font-serif text-[11px] font-light text-white/45 mt-2">{t.minPhotos}</p>
-          {error && (
-            <p className="font-serif text-[12px] text-copper/80 mt-2 border-l border-copper/40 pl-3">{error}</p>
-          )}
+          </Button>
+          <p className="mt-bloque text-legende text-text-secondary">{t.minPhotos}</p>
+          {error && <p className="mt-bloque text-legende text-copper">{error}</p>}
         </div>
       )}
     </div>
@@ -202,31 +252,50 @@ export default function MesVisites() {
         settingsLabel={td.navSettings}
       />
 
-      <div className="max-w-[920px] mx-auto px-5 py-10">
-        <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/60 mb-3">{t.kicker}</p>
-        <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.15em] uppercase text-white leading-none mb-10">
-          {t.title}
-        </h1>
+      <PullToRefresh onRefresh={load}>
+      <div className="mx-auto max-w-[920px] px-pagina py-seccion">
+        <Rise>
+          <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
+          <h1 className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+            {t.title}
+          </h1>
+        </Rise>
 
         {loading ? (
-          <div className="space-y-4">
+          <div className="space-y-fila">
             {[1, 2].map((i) => (
-              <div key={i} className="h-28 border border-white/8 bg-white/5 animate-pulse" />
+              <div key={i} className="h-20 bg-border animate-pulse [animation-duration:1.6s]" />
             ))}
           </div>
         ) : visits.length === 0 ? (
-          <div className="text-center py-24 border border-white/8">
-            <CheckCircle size={28} weight="thin" className="text-white/30 mx-auto mb-4" />
-            <p className="font-serif text-[14px] font-light text-white/55">{t.empty}</p>
+          <div className="py-respiro text-center">
+            <p className="text-corps text-text-secondary">{t.empty}</p>
           </div>
         ) : (
-          <div className="space-y-12">
-            {visits.map((v) => (
-              <VisitCard key={v.id} visit={v} t={t} lang={lang} onChanged={load} />
-            ))}
-          </div>
+          <>
+            {([
+              ["todo", t.groupTodo],
+              ["upcoming", t.groupUpcoming],
+              ["past", t.groupPast],
+            ] as const).map(([grupo, titulo]) => {
+              const delGrupo = visits.filter((v) => groupOf(v) === grupo);
+              if (delGrupo.length === 0) return null;
+              return (
+                <Section key={grupo} title={titulo}>
+                  <div className="space-y-seccion">
+                    {delGrupo.map((v, i) => (
+                      <Rise key={v.id} index={i}>
+                        <VisitCard visit={v} t={t} lang={lang} onChanged={load} />
+                      </Rise>
+                    ))}
+                  </div>
+                </Section>
+              );
+            })}
+          </>
         )}
       </div>
+      </PullToRefresh>
     </div>
   );
 }
