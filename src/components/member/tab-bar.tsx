@@ -12,10 +12,17 @@ import type { NavLink } from "@/app/dashboard/dashboard-nav";
  * menú. El pulgar no llega arriba del todo en un teléfono, y abrir un menú para
  * cambiar de sitio son dos gestos donde debería haber uno.
  *
- * Abajo, siempre visible, sin iconos: tres palabras en capital y la activa en
- * champagne. Sin caja, sin subrayado y sin píldora. Solo en el teléfono: en un
- * portátil los destinos siguen en la barra de arriba, que ahí sí se alcanzan.
+ * Abajo, siempre visible, sin iconos: la palabra del destino en capital y la
+ * activa en champagne. Sin caja, sin subrayado y sin píldora. Solo en el
+ * teléfono: en un portátil los destinos siguen arriba, que ahí sí se alcanzan.
+ *
+ * **Tres como máximo.** La maison tiene cinco secciones y en 375 px no caben:
+ * la quinta se sale por la derecha y deja de poder tocarse. Las que no entran
+ * no desaparecen, bajan al menú, que para eso sigue estando. Aquí quedan las
+ * que se usan a diario y allí las de vez en cuando.
  */
+export const MAX_DESTINOS = 3;
+
 export function TabBar({ links }: { links: NavLink[] }) {
   const [offline, setOffline] = useState(false);
 
@@ -32,7 +39,8 @@ export function TabBar({ links }: { links: NavLink[] }) {
     };
   }, []);
 
-  if (links.length === 0) return null;
+  const destinos = links.slice(0, MAX_DESTINOS);
+  if (destinos.length === 0) return null;
 
   return (
     <nav
@@ -48,12 +56,12 @@ export function TabBar({ links }: { links: NavLink[] }) {
         </p>
       )}
       <div className="flex items-stretch justify-around">
-        {links.map((l) => (
+        {destinos.map((l) => (
           <Link
             key={l.href}
             href={l.href}
             aria-current={l.active ? "page" : undefined}
-            className={`flex min-h-14 flex-1 items-center justify-center px-2 text-center text-capitale uppercase tracking-capitale transition-colors duration-200 ease-curato ${
+            className={`flex min-h-14 flex-1 items-center justify-center text-balance px-1 py-2 text-center text-capitale uppercase tracking-capitale transition-colors duration-200 ease-curato ${
               l.active ? "text-accent" : "text-text-secondary"
             }`}
           >
