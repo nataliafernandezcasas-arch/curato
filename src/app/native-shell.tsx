@@ -44,7 +44,7 @@ export default function NativeShell() {
 
     const cap = getCapacitor();
 
-    // "DARK" means light text, which is what reads over the #1A1A1A shell.
+    // "DARK" means light text, which is what reads over the #1E1E1E shell.
     cap?.Plugins?.StatusBar?.setStyle({ style: "DARK" }).catch(() => {});
 
     if (platform === "android") {

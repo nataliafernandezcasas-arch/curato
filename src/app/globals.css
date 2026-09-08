@@ -19,12 +19,59 @@
   --color-text-muted: rgba(245,239,228,0.38);
   --color-accent: #CBB78F;
 
+  /* Sauge y brume liberan al champagne, que hoy señala cinco cosas distintas.
+     Sauge es lo cumplido, brume es lo que solo informa. En texto el sauge sube
+     a #8C9A86: el #4E5A4B es para marcas y filetes, no para leerlo. */
+  --color-sauge: #4E5A4B;
+  --color-sauge-text: #8C9A86;
+  --color-brume: #A3BAC0;
+
   --color-cream: #F2EDE4;
   --color-cream-text: #2A201C;
   --color-cream-muted: rgba(42, 32, 28, 0.42);
   --color-cream-border: rgba(42, 32, 28, 0.12);
 
   --font-serif: 'Cormorant Garamond', Georgia, serif;
+
+  /* ── Cinco peldaños tipográficos, de los doce tamaños que había ────────────
+     Titre uno por pantalla. Sous-titre para un nombre o una cifra. Corps para
+     toda la prosa. Légende sube a peso 400: el 300 a 13px se deshace en
+     pantalla. Capitale es el recurso de titulación de Curato. */
+  --text-titre: 28px;
+  --text-titre--line-height: 1.15;
+  --text-sous-titre: 19px;
+  --text-sous-titre--line-height: 1.3;
+  --text-corps: 15px;
+  --text-corps--line-height: 1.6;
+  --text-legende: 13px;
+  --text-legende--line-height: 1.55;
+  --text-capitale: 11px;
+  --text-capitale--line-height: 1.2;
+
+  /* El valor de un campo. Por debajo de 16px el WebView de iOS hace zoom al
+     enfocar, y ese zoom es el origen del desplazamiento horizontal. */
+  --text-champ: 17px;
+  --text-champ--line-height: 1.4;
+
+  /* Tres interletrados y no diez. Los de 0.4em y 0.5em bajan a capitale. */
+  --tracking-titre: 0.12em;
+  --tracking-capitale: 0.28em;
+
+  /* ── Siete espacios, cada uno con un trabajo ───────────────────────────────
+     4 etiqueta y valor · 8 líneas de un bloque · 16 aire dentro de una fila ·
+     20 margen de página, el único valor de borde · 32 entre rangos distintos,
+     que es lo que sustituye al recuadro · 48 entre secciones · 72 cabecera y
+     estado vacío. */
+  --spacing-etiqueta: 4px;
+  --spacing-bloque: 8px;
+  --spacing-fila: 16px;
+  --spacing-pagina: 20px;
+  --spacing-rango: 32px;
+  --spacing-seccion: 48px;
+  --spacing-respiro: 72px;
+
+  /* Una sola curva. Sale rápido y se asienta, nunca rebota. */
+  --ease-curato: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html { scroll-behavior: smooth; }

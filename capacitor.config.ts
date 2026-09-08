@@ -14,7 +14,7 @@ const config: CapacitorConfig = {
   appId: "com.curatocollective.app",
   appName: "Curato",
   webDir: "mobile/www",
-  backgroundColor: "#1A1A1A",
+  backgroundColor: "#1E1E1E",
   server: {
     // The app opens on /dashboard, never on the marketing home. Curato is
     // invitation-only, so someone holding the app is already a member and does
@@ -53,7 +53,7 @@ const config: CapacitorConfig = {
     },
     StatusBar: {
       // Counter-intuitive name: "DARK" means light text, which is what we need
-      // over the #1A1A1A background. Android 15+ forces edge-to-edge, so the
+      // over the #1E1E1E background. Android 15+ forces edge-to-edge, so the
       // bar always overlays the WebView and the safe-area CSS does the spacing.
       style: "DARK",
     },

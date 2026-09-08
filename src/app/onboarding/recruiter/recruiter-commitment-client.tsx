@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/member/button";
 import { useRouter } from "next/navigation";
-import { Check, DownloadSimple } from "@phosphor-icons/react";
+import { DownloadSimple } from "@phosphor-icons/react";
 import { signRecruiterCommitment } from "./actions";
 
 const SLIDES = [1, 2, 3, 4, 5, 6].map((n) => `/onboarding/recruiter/slide-${n}.jpg`);
@@ -68,11 +69,11 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
       </section>
 
       {/* Download */}
-      <div className="text-center py-10 border-t border-white/10">
+      <div className="py-seccion text-center">
         <a
           href="/onboarding/recruiter/dossier-curato-recruiter.pdf"
           download="Curato - Programme Recruiters.pdf"
-          className="inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.2em] uppercase text-champagne/80 hover:text-champagne border border-champagne/30 hover:border-champagne/60 px-6 py-3 transition-colors"
+          className="inline-flex min-h-11 items-center gap-2 border border-[rgba(203,183,143,0.3)] px-fila text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:border-accent hover:text-text-primary"
         >
           <DownloadSimple size={15} />
           Télécharger le dossier
@@ -80,32 +81,32 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
       </div>
 
       {/* Commitment + signature */}
-      <section className="relative border-t border-white/10 overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-charcoal-deep/85" />
         </div>
         <div className="max-w-[640px] mx-auto px-5 py-24 md:py-28">
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">Programme Recruiters</p>
-          <h1 className="font-serif text-[clamp(1.9rem,5vw,2.8rem)] font-light tracking-[0.14em] uppercase leading-tight mb-6">
+          <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">Programme Recruiters</p>
+          <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
             Votre engagement
           </h1>
-          <p className="font-serif text-[15px] md:text-[16px] font-light text-white/70 leading-[1.8] tracking-wide mb-10">
+          <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">
             En rejoignant le programme Recruiters de Curato, vous acceptez les conditions ci-dessous. Signez pour accéder à votre espace.
           </p>
 
-          <ul className="space-y-4 border-t border-white/10 pt-8 mb-10">
+          <ul className="mb-seccion space-y-fila">
             {TERMS.map((term, i) => (
               <li key={i} className="flex gap-4">
-                <span className="font-serif text-[13px] text-champagne/70 mt-0.5">{String(i + 1).padStart(2, "0")}</span>
-                <span className="font-serif text-[15px] md:text-[16px] font-light text-white/85 leading-relaxed">{term}</span>
+                <span className="mt-0.5 text-capitale tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</span>
+                <span className="text-corps text-text-primary">{term}</span>
               </li>
             ))}
           </ul>
 
           {/* Signature */}
-          <div className="border-t border-white/10 pt-8 space-y-6">
+          <div className="space-y-rango">
             <div>
               <label className={labelClass}>Nom et prénom <span className="text-copper/70">*</span></label>
               <input type="text" value={signatory} onChange={(e) => setSignatory(e.target.value)} placeholder="Votre nom" className={`${inputClass} italic`} />
@@ -138,21 +139,13 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
           </div>
 
           {error && (
-            <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4 mt-8">{error}</p>
+            <p className="mt-rango border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
           )}
 
-          <div className="mt-12">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className={`inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.25em] uppercase px-8 py-4 transition-all duration-300 ${
-                canSubmit ? "bg-champagne text-charcoal-deep hover:bg-copper hover:text-white" : "bg-white/5 text-white/20 cursor-not-allowed"
-              }`}
-            >
+          <div className="mt-seccion">
+            <Button type="button" onClick={handleSubmit} disabled={!canSubmit}>
               {submitting ? "Signature…" : "Signer et accéder à mon espace"}
-              {!submitting && <Check size={14} weight="bold" />}
-            </button>
+            </Button>
           </div>
         </div>
       </section>

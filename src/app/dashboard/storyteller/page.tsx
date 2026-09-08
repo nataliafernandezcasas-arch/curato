@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MapPin } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
 import DashboardNav from "../dashboard-nav";
 import { STORYTELLER_LINKS } from "./nav-links";
@@ -11,6 +10,10 @@ import { translations } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import ConnectInstagram from "./connect-instagram";
 import SuggestVenue from "./suggest-venue";
+import { Rise, Photo } from "@/components/member/motion";
+import { Row } from "@/components/member/row";
+import { Section } from "@/components/member/section";
+import { Tabs } from "@/components/member/tabs";
 
 // A maison = a signed venue from `comercios` (is_reservable = true).
 type Maison = {
@@ -69,12 +72,6 @@ function isNew(signedAt: string | null): boolean {
   if (!signedAt) return false;
   const signed = new Date(signedAt).getTime();
   return Date.now() - signed < 45 * 24 * 60 * 60 * 1000;
-}
-
-function formatFollowers(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
-  return String(n);
 }
 
 export default function InfluencerDashboard() {
@@ -166,6 +163,8 @@ export default function InfluencerDashboard() {
   const remaining = monthlyCredit - usedCredit;
   const usedPercent = monthlyCredit > 0 ? Math.min((usedCredit / monthlyCredit) * 100, 100) : 0;
 
+  const skeleton = "bg-border animate-pulse [animation-duration:1.6s]";
+
   return (
     <div className="min-h-[100dvh]">
 
@@ -176,219 +175,182 @@ export default function InfluencerDashboard() {
         settingsLabel={t.navSettings}
       />
 
-      <div className="max-w-[1200px] mx-auto px-5 py-10">
+      <div className="mx-auto max-w-[1200px] px-pagina py-seccion">
 
-        {/* ── Profile header ── */}
-        <div className="border-b border-white/8 mb-10 pb-10">
-          {profileLoading ? (
-            <div className="h-20 flex items-center">
-              <div className="w-48 h-4 bg-white/5 animate-pulse" />
-            </div>
-          ) : (
-            <div className="flex items-end justify-between flex-wrap gap-6">
+        {/* ── Quién eres y cuánto te queda ─────────────────────────────────
+            Sin línea debajo: lo que separa esta cabecera de las direcciones
+            son 48 px de aire. Los abonnés se han ido al perfil; el carnet
+            trata de las direcciones y del crédito que las paga. */}
+        {profileLoading ? (
+          <div className="mb-seccion space-y-bloque">
+            <div className={`h-3 w-24 ${skeleton}`} />
+            <div className={`h-8 w-64 ${skeleton}`} />
+          </div>
+        ) : (
+          <div className="mb-seccion">
+            <Rise>
+              <p className="text-capitale uppercase tracking-capitale text-accent">{t.greeting}</p>
+            </Rise>
 
-              {/* Left: name + handle */}
-              <div>
-                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/65 mb-3">
-                  {t.greeting}
-                </p>
-                <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.15em] uppercase text-white leading-none mb-3">
-                  {profile?.full_name || profile?.handle || t.defaultName}
-                </h1>
-                {profile?.handle && (
-                  <a
-                    href={`https://instagram.com/${profile.handle}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-serif text-[13px] text-champagne/65 hover:text-champagne transition-colors tracking-widest"
-                  >
-                    @{profile.handle}
-                  </a>
-                )}
-              </div>
+            <Rise index={1}>
+              <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+                {profile?.full_name || profile?.handle || t.defaultName}
+              </h1>
+            </Rise>
 
-              {/* Right: stats */}
-              <div className="flex items-end gap-8 flex-wrap">
+            {profile?.handle && (
+              <Rise index={2}>
+                <a
+                  href={`https://instagram.com/${profile.handle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-etiqueta inline-block text-legende text-accent transition-colors hover:text-text-primary"
+                >
+                  @{profile.handle}
+                </a>
+              </Rise>
+            )}
 
-                {/* Followers */}
-                {profile?.followers != null && profile.followers > 0 && (
-                  <div className="text-right">
-                    <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/45 mb-1">
-                      {t.followers}
-                    </p>
-                    <p className="font-serif text-[32px] font-light text-white/70 leading-none">
-                      {formatFollowers(profile.followers)}
-                    </p>
-                  </div>
-                )}
-
-                {/* Divider */}
-                {profile?.followers != null && profile.followers > 0 && (
-                  <div className="w-px h-10 bg-white/10 self-center" />
-                )}
-
-                {/* Credit */}
-                <div className="text-right">
-                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/45 mb-1">
+            {/* El crédito. Su barra es una de las tres líneas que quedan en
+                todo el producto, y está porque es un dato, no un adorno. */}
+            <Rise index={3} className="mt-rango">
+              <Row
+                label={
+                  <span className="text-capitale uppercase tracking-capitale text-text-secondary">
                     {t.creditAvailable}
-                  </p>
-                  <p className="font-serif text-[32px] font-light text-champagne leading-none">
-                    €{remaining}
-                  </p>
-                  {monthlyCredit > 0 && (
-                    <p className="font-serif text-[11px] text-white/45 mt-1">
+                  </span>
+                }
+                aside={
+                  monthlyCredit > 0 ? (
+                    <span className="text-legende text-text-muted">
                       {t.creditOf.replace("{total}", String(monthlyCredit))}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Credit bar */}
-          {!profileLoading && monthlyCredit > 0 && (
-            <div className="mt-6 h-px bg-white/8 relative">
-              <div
-                className="absolute top-0 left-0 h-full bg-champagne/50 transition-all duration-700"
-                style={{ width: `${usedPercent}%` }}
+                    </span>
+                  ) : undefined
+                }
+                value={<span className="text-sous-titre text-accent">{remaining} €</span>}
               />
-            </div>
-          )}
-        </div>
+              {monthlyCredit > 0 && (
+                <div className="mt-bloque h-px bg-border">
+                  <div
+                    className="h-full bg-accent transition-[width] duration-700 ease-curato"
+                    style={{ width: `${usedPercent}%` }}
+                  />
+                </div>
+              )}
+            </Rise>
+          </div>
+        )}
 
-        {/* Connect Instagram (Phyllo) */}
         {!profileLoading && profile && <ConnectInstagram connected={!!profile.instagram_connected} />}
 
         {gated ? (
-          <div className="text-center py-24 md:py-32 border border-white/8">
-            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/70 mb-6">
-              {t.comingSoonKicker}
-            </p>
-            <h2 className="font-serif text-[26px] md:text-[34px] font-light tracking-[0.1em] text-white mb-6">
-              {t.comingSoonTitle}
-            </h2>
-            <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
+          <div className="py-respiro text-center">
+            <p className="text-capitale uppercase tracking-capitale text-accent">{t.comingSoonKicker}</p>
+            <h2 className="mt-fila text-titre tracking-titre text-text-primary">{t.comingSoonTitle}</h2>
+            <p className="mx-auto mt-fila max-w-[46ch] text-corps text-text-secondary">
               {launchDateLabel
                 ? t.comingSoonBody.replace("{date}", launchDateLabel)
                 : t.comingSoonBodyNoDate}
             </p>
-
-            <div className="mt-12 pt-12 border-t border-white/8 max-w-[460px] mx-auto">
+            <div className="mx-auto mt-seccion max-w-[460px]">
               <SuggestVenue />
             </div>
           </div>
         ) : (
-        <>
-        {/* ── Category filters ── */}
-        <div className="flex gap-1 mb-8 flex-wrap">
-          {FILTERS.map((f) => (
-            <button
-              key={f.slug}
-              onClick={() => setCatFilter(f.slug)}
-              className={`font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
-                catFilter === f.slug
-                  ? "bg-champagne text-charcoal-deep"
-                  : "text-white/55 border border-white/10 hover:border-champagne/30 hover:text-champagne"
-              }`}
-            >
-              {t[f.key]}
-            </button>
-          ))}
-        </div>
+          <>
+            {/* Las categorías envuelven a dos líneas. La activa se marca en
+                champagne: sin fondo, sin subrayado y sin recuadro. */}
+            <Tabs
+              className="mb-rango"
+              tabs={FILTERS.map((f) => ({
+                label: t[f.key],
+                active: catFilter === f.slug,
+                onClick: () => setCatFilter(f.slug),
+              }))}
+            />
 
-        {/* Label */}
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/55 mb-8">
-          {t.selectedAddresses}
-        </p>
-
-        {/* ── Maisons grid ── */}
-        {maisonsLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-charcoal-deep">
-                <div className="aspect-[4/3] bg-white/5 animate-pulse" />
-                <div className="p-6 space-y-3">
-                  <div className="h-3 bg-white/5 animate-pulse w-3/4" />
-                  <div className="h-3 bg-white/5 animate-pulse w-1/2" />
+            <Section title={t.selectedAddresses}>
+              {maisonsLoading ? (
+                <div className="grid grid-cols-1 gap-rango md:grid-cols-2 lg:grid-cols-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <div className={`aspect-[4/3] ${skeleton}`} />
+                      <div className={`mt-fila h-3 w-3/4 ${skeleton}`} />
+                      <div className={`mt-bloque h-3 w-1/2 ${skeleton}`} />
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : filteredMaisons.length === 0 ? (
-          <div className="text-center py-24 border border-white/5">
-            <p className="font-serif text-[15px] font-light text-white/55 mb-2">
-              {t.emptyTitle}
-            </p>
-            <p className="font-serif text-[13px] font-light text-white/35 italic">
-              {t.emptySubtitle}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
-            {filteredMaisons.map((maison) => {
-              const label = catLabel(slugOf(maison));
-              return (
-                <Link
-                  key={maison.id}
-                  href={`/dashboard/storyteller/maison/${maison.id}`}
-                  className="bg-charcoal-deep group relative overflow-hidden block"
-                >
-                  {/* Photo */}
-                  <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden relative">
-                    {maison.photos?.[0] ? (
-                      <img
-                        src={maison.photos[0]}
-                        alt={maison.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-white/35">
-                          {label}
-                        </p>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <span className="absolute bottom-3 left-4 font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70">
-                      {label}
-                    </span>
-                    {isNew(maison.signed_at) && (
-                      <span className="absolute top-3 right-3 font-serif text-[9px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-2.5 py-1">
-                        {t.badgeNew}
-                      </span>
-                    )}
+              ) : filteredMaisons.length === 0 ? (
+                <div className="py-respiro text-center">
+                  <p className="text-corps text-text-secondary">{t.emptyTitle}</p>
+                  <p className="mt-bloque text-legende text-text-muted">{t.emptySubtitle}</p>
+                  <div className="mx-auto mt-seccion max-w-[460px]">
+                    <SuggestVenue />
                   </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-rango md:grid-cols-2 lg:grid-cols-3">
+                  {filteredMaisons.map((maison, i) => {
+                    const label = catLabel(slugOf(maison));
+                    return (
+                      <Rise key={maison.id} index={i}>
+                        <Link href={`/dashboard/storyteller/maison/${maison.id}`} className="group block">
+                          {maison.photos?.[0] ? (
+                            <Photo
+                              src={maison.photos[0]}
+                              alt={maison.name}
+                              className="aspect-[4/3] bg-surface-raised"
+                            />
+                          ) : (
+                            <div className="flex aspect-[4/3] items-center justify-center bg-surface-raised">
+                              <p className="text-capitale uppercase tracking-capitale text-text-muted">{label}</p>
+                            </div>
+                          )}
 
-                  {/* Info */}
-                  <div className="p-6">
-                    <h3 className="font-serif text-[17px] font-light text-white mb-1 group-hover:text-champagne transition-colors">
-                      {maison.name}
-                    </h3>
-                    {maison.arrondissement && (
-                      <p className="font-serif text-[12px] text-white/55 mb-3 tracking-wide">
-                        Paris {maison.arrondissement}
-                      </p>
-                    )}
-                    {maison.description && (
-                      <p className="font-serif text-[13px] font-light text-white/60 leading-relaxed mb-4 line-clamp-3">
-                        {maison.description}
-                      </p>
-                    )}
-                    {maison.address && (
-                      <div className="flex items-start gap-1.5 text-white/45 pt-4 border-t border-white/8">
-                        <MapPin size={12} className="mt-0.5 shrink-0" />
-                        <span className="font-serif text-[12px] font-light leading-snug">
-                          {maison.address}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-        </>
+                          <div className="mt-fila">
+                            <Row
+                              name
+                              label={
+                                <h3 className="text-sous-titre text-text-primary transition-colors group-hover:text-accent">
+                                  {maison.name}
+                                </h3>
+                              }
+                              value={
+                                maison.arrondissement ? (
+                                  <span className="text-capitale uppercase tracking-capitale text-brume">
+                                    Paris {maison.arrondissement}
+                                  </span>
+                                ) : undefined
+                              }
+                            />
+
+                            <p className="mt-etiqueta text-legende text-text-secondary">
+                              {label}
+                              {isNew(maison.signed_at) && (
+                                <span className="ml-fila text-capitale uppercase tracking-capitale text-accent">
+                                  {t.badgeNew}
+                                </span>
+                              )}
+                            </p>
+
+                            {maison.description && (
+                              <p className="mt-bloque line-clamp-3 text-corps text-text-secondary">
+                                {maison.description}
+                              </p>
+                            )}
+
+                            {maison.address && (
+                              <p className="mt-bloque text-legende text-text-muted">{maison.address}</p>
+                            )}
+                          </div>
+                        </Link>
+                      </Rise>
+                    );
+                  })}
+                </div>
+              )}
+            </Section>
+          </>
         )}
       </div>
     </div>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
+<link rel="stylesheet" href="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/styles.css">
+<script src="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/_ds_bundle.js"></script>
+<style>
+  html { background: #1E1E1E; }
+  body { margin: 0; background: #1E1E1E; color: #F5EFE4;
+    font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300;
+    -webkit-font-smoothing: antialiased; }
+  a { color: #CBB78F; text-decoration: none; }
+  a:hover { color: #F5EFE4; }
+  ::selection { background: #763943; color: #F5EFE4; }
+  * { box-sizing: border-box; }
+  [data-rise] { opacity: 0; transform: translateY(8px); transition: opacity 420ms cubic-bezier(.22,1,.36,1), transform 420ms cubic-bezier(.22,1,.36,1) }
+  [data-rise][data-in] { opacity: 1; transform: none }
+  [data-reduce] [data-rise] { transform: none !important; transition: opacity 120ms linear !important }
+  @media (prefers-reduced-motion: reduce) {
+    [data-rise] { opacity: 1 !important; transform: none !important; transition: none !important }
+  }
+  .cu-scroll::-webkit-scrollbar { width: 0; height: 0 }
+</style>
+</helmet>
+
+<div style="padding: 72px 48px 120px; display: flex; flex-direction: column; gap: 72px">
+
+  <header style="display: flex; flex-direction: column; gap: 26px; max-width: 1180px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 20px">
+      <img src="public/logo-curato-simple.png" alt="Curato" style="height: 15px; width: auto; display: block; opacity: .9">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Zone membre · movimiento · vivo</span>
+    </div>
+    <h1 style="margin: 0; font-size: 46px; font-weight: 300; line-height: 1.06; letter-spacing: 0.11em; text-transform: uppercase">Cómo se<br>mueve Curato</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); max-width: 62ch; text-wrap: pretty">Desplaza la pantalla de la derecha, con el dedo o con la rueda. El fondo floral se retrasa, el texto entra bajando ocho píxeles y las fotos se acercan desde 1.04. Nada rebota, nada tarda más de medio segundo, y todo se puede apagar desde el sistema operativo.</p>
+    <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); max-width: 62ch; text-wrap: pretty">La regla de la marca no es moverse poco por miedo, es que el movimiento venga de la fotografía y del papel. El texto no viaja: <span style="color:#CBB78F">aparece asentándose</span>. Es la diferencia entre una revista que se hojea y una app que se anuncia.</p>
+  </header>
+
+  <div style="display: flex; gap: 64px; flex-wrap: wrap; align-items: flex-start">
+
+    <div style="width: 375px; flex: none; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+        <button onClick="{{ replay }}" style="min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Volver arriba</button>
+        <button onClick="{{ toggleReduce }}" style="min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.65); font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:rgba(203,183,143,0.3)">{{ reduceLabel }}</button>
+      </div>
+      <div style="{{ frameStyle }}">
+        <div style="{{ floralWrapStyle }}">
+          <img src="public/flor-bg.jpg" alt="" style="{{ floralStyle }}">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .87"></div>
+        </div>
+        <div ref="{{ scrollRef }}" onScroll="{{ onScroll }}" class="cu-scroll" style="position: relative; height: 100%; overflow-y: auto; overflow-x: hidden; scrollbar-width: none">
+          <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 2; background: rgba(30,30,30,0.72); backdrop-filter: blur(6px)">
+            <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">18:42</span>
+            <span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span>
+          </div>
+          <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between">
+            <img src="public/logo-curato-simple.png" alt="Curato" style="height: 11px; width: auto; display: block; opacity: .9">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Réglages</span>
+          </div>
+          <div style="padding: 32px 20px 40px; display: flex; flex-direction: column; gap: 12px">
+            <p data-rise="" style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Bonsoir</p>
+            <h2 data-rise="" style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; overflow-wrap: break-word">Tereza Bolkvadze</h2>
+            <div data-rise="" style="display: flex; flex-direction: column; gap: 12px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Crédit du mois</span>
+                <span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">900 € <span style="font-size: 13px; color: rgba(245,239,228,0.65)">de 1 500 €</span></span>
+              </div>
+              <div style="height: 1px; background: rgba(203,183,143,0.15); position: relative; overflow: hidden">
+                <div data-bar="" style="position: absolute; inset: 0 auto 0 0; width: 0; background: #CBB78F; transition: width 900ms cubic-bezier(.22,1,.36,1) 200ms"></div>
+              </div>
+            </div>
+          </div>
+          <div style="padding: 0 20px 24px; display: flex; flex-wrap: wrap; gap: 8px 20px">
+            <span data-rise="" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; font-weight: 400">Tout</span>
+            <span data-rise="" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Gastronomie</span>
+            <span data-rise="" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Hôtels</span>
+            <span data-rise="" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Bien-être</span>
+            <span data-rise="" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Beauté</span>
+          </div>
+          <div style="padding: 0 20px 20px"><p data-rise="" style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Adresses sélectionnées</p></div>
+          <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 48px">
+            <sc-for list="{{ maisons }}" as="m" hint-placeholder-count="4">
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="overflow: hidden"><img src="{{ m.photo }}" alt="" data-plate="" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; opacity: 0; transform: scale(1.04); transition: opacity 900ms cubic-bezier(.22,1,.36,1), transform 900ms cubic-bezier(.22,1,.36,1)"></div>
+                <div data-rise="" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                  <span style="font-size: 19px; line-height: 1.25; overflow-wrap: break-word">{{ m.name }}</span>
+                  <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65); white-space: nowrap">{{ m.arr }}</span>
+                </div>
+                <p data-rise="" style="margin: 0; font-size: 13px; font-weight: 400; color: #A3BAC0">{{ m.cat }}</p>
+                <p data-rise="" style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 42ch">{{ m.line }}</p>
+              </div>
+            </sc-for>
+          </div>
+          <div style="height: 22px; display: flex; align-items: center; justify-content: center; padding-bottom: 12px"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)">Desplaza dentro de la pantalla. El fondo se mueve un 7 por ciento de lo que se mueve el contenido, así que camina detrás en vez de pegarse al dedo.</p>
+    </div>
+
+    <div style="flex: 1 1 420px; min-width: 320px; display: flex; flex-direction: column; gap: 40px">
+
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Cuatro movimientos, y ninguno más</p>
+        <div style="display: flex; flex-direction: column; gap: 26px">
+          <div style="display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 24px; align-items: baseline">
+            <span style="font-size: 17px; color: #F5EFE4">El texto se asienta</span>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">420 ms, opacidad de 0 a 1 y <span style="color:#CBB78F">8 px</span> de bajada. Curva <span style="color:#CBB78F">cubic-bezier(.22, 1, .36, 1)</span>. Baja, no sube: el texto cae en su renglón como una línea de plomo, y eso es lo que lo hace editorial en vez de web.</p>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 24px; align-items: baseline">
+            <span style="font-size: 17px; color: #F5EFE4">Escalonado</span>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)"><span style="color:#CBB78F">70 ms</span> entre hermanos, y el escalonado se corta al cuarto elemento. Más allá se nota la cola y parece que la pantalla tarda en cargar.</p>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 24px; align-items: baseline">
+            <span style="font-size: 17px; color: #F5EFE4">La foto se acerca</span>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">900 ms desde escala <span style="color:#CBB78F">1.04</span> hasta 1, con la opacidad. Una vez, al entrar en pantalla. Nunca al pasar el dedo: en un móvil no hay hover.</p>
+          </div>
+          <div style="display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 24px; align-items: baseline">
+            <span style="font-size: 17px; color: #F5EFE4">El fondo camina</span>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">La flor se desplaza el <span style="color:#CBB78F">7 por ciento</span> del scroll, con un muelle de baja rigidez, y va escalada a 1.06 para no descubrir el borde. El retraso es el efecto: si se pega al dedo, vuelve el temblor que ya se arregló en <span style="color:#CBB78F">floral-backdrop.tsx</span>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 32px; border-top: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Lo que sigue quieto</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88); max-width: 60ch">Las cifras no cuentan hacia arriba, ni el crédito ni la portée. Las listas al filtrar solo cambian de opacidad, sin recolocarse una a una. Nada rebota, nada gira, ninguna caja escala, y la cuenta atrás de las 24 horas se lee, no corre. Al confirmar una visita no hay confeti: hay una capital en sauge que dice que está hecho.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88); max-width: 60ch">Y una prohibición de la que no me muevo: el texto no se anima letra a letra ni palabra por palabra. La tipografía es la marca, y hacerla parpadear es exactamente lo contrario de una revista impresa.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 32px; border-top: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">prefers-reduced-motion</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88); max-width: 60ch">Todo cae a una opacidad de 120 ms, sin desplazamiento ni escala, y la flor queda quieta. Pruébalo con el botón de arriba: la pantalla sigue siendo la misma, solo deja de moverse. Esa es la prueba de que el movimiento acompaña y no sostiene.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 32px; border-top: 1px solid rgba(203,183,143,0.15)">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Cómo se construye, con lo que ya hay</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 60ch">Dos variantes compartidas de framer-motion y un componente de revelado. Nada por pantalla, nada a medida, y <span style="color:#CBB78F">useReducedMotion</span> dentro de la variante, no en cada uso.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 24px 0; border-top: 1px solid rgba(203,183,143,0.15); border-bottom: 1px solid rgba(203,183,143,0.15)">
+          <p style="margin: 0; font-size: 13px; line-height: 1.7; color: rgba(245,239,228,0.88); font-family: ui-monospace, Menlo, monospace">export const rise = (reduce) =&gt; ({</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.7; color: rgba(245,239,228,0.65); font-family: ui-monospace, Menlo, monospace">&nbsp;&nbsp;hidden: { opacity: 0, y: reduce ? 0 : -8 },</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.7; color: rgba(245,239,228,0.65); font-family: ui-monospace, Menlo, monospace">&nbsp;&nbsp;shown: (i = 0) =&gt; ({ opacity: 1, y: 0, transition: {</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.7; color: rgba(245,239,228,0.65); font-family: ui-monospace, Menlo, monospace">&nbsp;&nbsp;&nbsp;&nbsp;duration: reduce ? 0.12 : 0.42,</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.7; color: rgba(245,239,228,0.65); font-family: ui-monospace, Menlo, monospace">&nbsp;&nbsp;&nbsp;&nbsp;delay: reduce ? 0 : Math.min(i, 3) * 0.07,</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.7; color: rgba(245,239,228,0.65); font-family: ui-monospace, Menlo, monospace">&nbsp;&nbsp;&nbsp;&nbsp;ease: [0.22, 1, 0.36, 1] } }),</p>
+          <p style="margin: 0; font-size: 13px; line-height: 1.7; color: rgba(245,239,228,0.88); font-family: ui-monospace, Menlo, monospace">});</p>
+        </div>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 60ch">El revelado usa <span style="color:#CBB78F">whileInView</span> con <span style="color:#CBB78F">viewport = &#123; once: true, margin: "-10%" &#125;</span>, para que la foto ya esté entrando cuando el ojo llega. El fondo es el <span style="color:#CBB78F">FloralBackdrop</span> que ya existe: solo hay que bajar el recorrido de 8 a 7 por ciento y montarlo en las pantallas de entrada, que hoy llevan la imagen fija.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 60ch">Coste real: un archivo de variantes, un componente <span style="color:#CBB78F">Rise</span> de doce líneas y el backdrop ya escrito. Todo dentro del WebView, sin nada nativo, y llega al móvil sin recompilar.</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180}}">
+const MAISONS = [
+  { name: "Réservé aux membres de Curato", arr: "Paris 16e", cat: "Gastronomie", photo: "photos/p1.jpg",
+    line: "Une table de six en fin de service, la cuisine ouverte, deux couverts par visite." },
+  { name: "Maison Marceau", arr: "Paris 8e", cat: "Hôtellerie", photo: "photos/p2.jpg",
+    line: "Une nuit en chambre haute, petit déjeuner servi jusqu'à onze heures." },
+  { name: "Atelier Sainte-Anne", arr: "Paris 2e", cat: "Bien-être", photo: "photos/p6.jpg",
+    line: "Soixante minutes en fin de journée, dans la salle du fond qui donne sur la cour." },
+  { name: "Jean-Baptiste de La Rochefoucauld", arr: "Paris 6e", cat: "Beauté", photo: "photos/p5.jpg",
+    line: "Un soin du visage de quarante minutes, réservable du mardi au samedi." },
+];
+
+class Component extends DCLogic {
+  state = { y: 0, reduce: false };
+  scroller = null;
+  io = null;
+
+  componentDidMount() {
+    this.observe();
+    // Red de seguridad solo si el navegador no tiene observador: con él, revelar
+    // todo mataría justo la animación que hay que ver al desplazarse.
+    if (typeof IntersectionObserver !== "function") {
+      this.safety = setTimeout(() => this.revealAll(), 800);
+    }
+  }
+
+  componentDidUpdate() { this.observe(); }
+
+  componentWillUnmount() {
+    clearTimeout(this.safety);
+    if (this.io) this.io.disconnect();
+  }
+
+  revealAll() {
+    const root = this.scroller;
+    if (!root) return;
+    root.querySelectorAll("[data-rise]").forEach((n) => n.setAttribute("data-in", ""));
+    root.querySelectorAll("[data-plate]").forEach((n) => { n.style.opacity = "1"; n.style.transform = "none"; });
+    root.querySelectorAll("[data-bar]").forEach((n) => { n.style.width = "40%"; });
+  }
+
+  observe() {
+    const root = this.scroller;
+    if (!root || this.io) return;
+    let stagger = 0;
+    let lastAt = 0;
+    this.io = new IntersectionObserver((entries) => {
+      const now = performance.now();
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const n = e.target;
+        // El escalonado se reinicia cuando pasan más de 400 ms entre grupos, y
+        // se corta al cuarto: más allá se nota la cola.
+        if (now - lastAt > 400) stagger = 0;
+        lastAt = now;
+        const delay = this.state.reduce ? 0 : Math.min(stagger, 3) * 70;
+        stagger += 1;
+        setTimeout(() => {
+          if (n.hasAttribute("data-rise")) n.setAttribute("data-in", "");
+          if (n.hasAttribute("data-plate")) { n.style.opacity = "1"; n.style.transform = "none"; }
+          if (n.hasAttribute("data-bar")) n.style.width = "40%";
+        }, delay);
+        this.io.unobserve(n);
+      });
+    }, { root, rootMargin: "0px 0px -10% 0px", threshold: 0.01 });
+
+    root.querySelectorAll("[data-rise], [data-plate], [data-bar]").forEach((n) => this.io.observe(n));
+  }
+
+  renderVals() {
+    const s = this.state;
+    return {
+      maisons: MAISONS,
+      reduceLabel: s.reduce ? "reduced-motion activado" : "reduced-motion desactivado",
+      toggleReduce: () => this.setState((p) => {
+        const next = !p.reduce;
+        if (this.scroller) {
+          if (next) this.scroller.setAttribute("data-reduce", "");
+          else this.scroller.removeAttribute("data-reduce");
+        }
+        return { reduce: next };
+      }),
+      replay: () => {
+        if (!this.scroller) return;
+        this.scroller.scrollTo({ top: 0, behavior: s.reduce ? "auto" : "smooth" });
+      },
+      scrollRef: (n) => {
+        if (n && n !== this.scroller) { this.scroller = n; this.observe(); }
+      },
+      onScroll: (e) => {
+        const y = e.currentTarget.scrollTop;
+        if (Math.abs(y - this.state.y) > 2) this.setState({ y });
+      },
+      frameStyle: {
+        width: "375px",
+        height: "720px",
+        position: "relative",
+        overflow: "hidden",
+        background: "#1E1E1E",
+        boxShadow: "0 0 0 1px rgba(203,183,143,0.15)",
+      },
+      floralWrapStyle: { position: "absolute", inset: 0, overflow: "hidden" },
+      floralStyle: {
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        // El fondo camina un 7 % de lo que camina el contenido, y va escalado
+        // para que el recorrido nunca descubra el borde de la imagen.
+        transform: s.reduce
+          ? "scale(1.06)"
+          : "scale(1.06) translate3d(0, " + (-y0(s.y) * 0.07) + "px, 0)",
+        transition: s.reduce ? "none" : "transform 620ms cubic-bezier(.22,1,.36,1)",
+        willChange: "transform",
+      },
+    };
+  }
+}
+
+function y0(v) { return typeof v === "number" ? v : 0; }
+</script>
+</body>
+</html>

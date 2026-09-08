@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Sparkle } from "@phosphor-icons/react";
+import { ArrowLeft, Sparkle } from "@phosphor-icons/react";
+import { Button } from "@/components/member/button";
+import { Choice } from "@/components/member/choice";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import { submitSurvey, type SurveyAnswers } from "./actions";
@@ -160,7 +162,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
   return (
     <div className="min-h-[100dvh] bg-charcoal-deep flex flex-col">
       {/* ── Top bar: logo + language switcher ── */}
-      <header className="px-5 h-16 flex items-center justify-between border-b border-white/8 bg-black/20 backdrop-blur-sm">
+      <header className="flex h-16 items-center justify-between bg-surface/70 px-pagina backdrop-blur-sm">
         <Link href="/" tabIndex={-1}>
           <img
             src="/logo-curato-simple.png"
@@ -174,8 +176,8 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
               key={key}
               type="button"
               onClick={() => setLang(key)}
-              className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
-                lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
+              className={`min-h-11 text-capitale tracking-capitale transition-colors duration-200 ease-curato ${
+                lang === key ? "text-accent" : "text-text-muted hover:text-text-secondary"
               }`}
             >
               {label}
@@ -187,16 +189,14 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
       {/* ── Progress bar ── */}
       <div className="px-5 pt-8 max-w-[760px] mx-auto w-full">
         <div className="flex items-center justify-between mb-3">
-          <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-champagne/50">
-            {t.eyebrow}
-          </p>
-          <p className="font-serif text-[11px] tracking-[0.2em] uppercase text-white/30">
+          <p className="text-capitale uppercase tracking-capitale text-accent">{t.eyebrow}</p>
+          <p className="text-capitale uppercase tracking-capitale tabular-nums text-text-muted">
             {t.progress(step + 1, total)}
           </p>
         </div>
-        <div className="h-px bg-white/8 relative overflow-hidden">
+        <div className="relative h-px overflow-hidden bg-border">
           <motion.div
-            className="absolute inset-y-0 left-0 bg-champagne"
+            className="absolute inset-y-0 left-0 bg-accent"
             initial={false}
             animate={{ width: `${progressPct}%` }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -299,33 +299,23 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
       {/* ── Footer: nav buttons + error ── */}
       <footer className="px-5 pb-8 md:pb-10 max-w-[760px] mx-auto w-full">
         {submitError && (
-          <p className="font-serif text-[13px] font-light text-copper/80 border-l border-copper/40 pl-4 mb-5">
+          <p className="mb-fila border-l-2 border-burgundy pl-fila text-legende text-text-primary">
             {submitError}
           </p>
         )}
-        <div className="flex items-center justify-between gap-4 pt-6 border-t border-white/8">
+        <div className="flex items-center justify-between gap-fila pt-fila">
           <button
             type="button"
             onClick={goBack}
             disabled={isFirst || submitting}
-            className="flex items-center gap-2 font-serif text-[11px] tracking-[0.25em] uppercase text-white/40 hover:text-champagne transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+            className="flex min-h-11 items-center gap-2 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-accent disabled:pointer-events-none disabled:opacity-45"
           >
             <ArrowLeft size={14} />
             {t.back}
           </button>
-          <button
-            type="button"
-            onClick={goNext}
-            disabled={!canProceed || submitting}
-            className={`flex items-center gap-2 font-serif text-[12px] tracking-[0.25em] uppercase px-7 py-3.5 transition-all duration-300 ${
-              canProceed && !submitting
-                ? "bg-champagne text-charcoal-deep hover:bg-copper hover:text-white"
-                : "bg-white/5 text-white/20 cursor-not-allowed"
-            }`}
-          >
+          <Button type="button" onClick={goNext} disabled={!canProceed || submitting}>
             {submitting ? t.submitting : isLast ? t.finish : t.next}
-            {!submitting && (isLast ? <Check size={14} weight="bold" /> : <ArrowRight size={14} />)}
-          </button>
+          </Button>
         </div>
       </footer>
     </div>
@@ -347,27 +337,12 @@ function ChipsGrid({
   onToggle: (value: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2.5">
-      {options.map((opt) => {
-        const isOn = selected.includes(opt.value);
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => onToggle(opt.value)}
-            className={`group relative font-serif text-[13px] tracking-wide px-5 py-3 transition-all duration-200 border ${
-              isOn
-                ? "bg-champagne text-charcoal-deep border-champagne"
-                : "bg-transparent text-white/70 border-white/15 hover:border-champagne/50 hover:text-champagne"
-            }`}
-          >
-            {isOn && (
-              <Check size={11} weight="bold" className="inline-block mr-1.5 -mt-0.5" />
-            )}
-            {pickOptionLabel(opt, lang)}
-          </button>
-        );
-      })}
+    <div>
+      {options.map((opt) => (
+        <Choice key={opt.value} checked={selected.includes(opt.value)} onChange={() => onToggle(opt.value)}>
+          {pickOptionLabel(opt, lang)}
+        </Choice>
+      ))}
     </div>
   );
 }
@@ -387,35 +362,12 @@ function CardsGrid({
   onToggle: (value: string) => void;
 }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {options.map((opt) => {
-        const isOn = selected.includes(opt.value);
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => onToggle(opt.value)}
-            className={`group relative text-left p-7 min-h-[120px] flex items-end transition-all duration-300 border ${
-              isOn
-                ? "border-champagne bg-champagne/10"
-                : "border-white/10 bg-charcoal-mid/30 hover:border-champagne/40 hover:bg-charcoal-mid/50"
-            }`}
-          >
-            {isOn && (
-              <span className="absolute top-4 right-4 inline-flex items-center justify-center w-6 h-6 bg-champagne text-charcoal-deep">
-                <Check size={12} weight="bold" />
-              </span>
-            )}
-            <span
-              className={`font-serif text-[18px] md:text-[20px] font-light tracking-wide leading-tight transition-colors ${
-                isOn ? "text-champagne" : "text-white/80 group-hover:text-white"
-              }`}
-            >
-              {pickOptionLabel(opt, lang)}
-            </span>
-          </button>
-        );
-      })}
+    <div>
+      {options.map((opt) => (
+        <Choice key={opt.value} checked={selected.includes(opt.value)} onChange={() => onToggle(opt.value)}>
+          <span className="text-sous-titre">{pickOptionLabel(opt, lang)}</span>
+        </Choice>
+      ))}
     </div>
   );
 }

@@ -24,7 +24,15 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "fr
  * and text sitting over it was unreadable at 0.65. Legibility wins over seeing
  * more of the photograph.
  */
-export default function FloralBackdrop({ opacity = 0.8 }: { opacity?: number }) {
+export default function FloralBackdrop({
+  opacity = 0.8,
+  breathe = false,
+}: {
+  opacity?: number;
+  /** Para las pantallas sin scroll: la flor deriva muy despacio, en bucle.
+      Es el único bucle del producto. */
+  breathe?: boolean;
+}) {
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
 
@@ -38,7 +46,9 @@ export default function FloralBackdrop({ opacity = 0.8 }: { opacity?: number }) 
       <motion.div
         // Oversized so the drift never exposes an edge.
         className="absolute inset-0 h-[112%] w-full will-change-transform"
-        style={reduce ? undefined : { y }}
+        style={reduce || breathe ? undefined : { y }}
+        animate={reduce || !breathe ? undefined : { scale: [1, 1.008, 1] }}
+        transition={reduce || !breathe ? undefined : { duration: 18, repeat: Infinity, ease: "easeInOut" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

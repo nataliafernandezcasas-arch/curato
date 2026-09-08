@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
+<link rel="stylesheet" href="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/styles.css">
+<script src="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/_ds_bundle.js"></script>
+<style>
+  html { background: #1E1E1E; }
+  body { margin: 0; background: #1E1E1E; color: #F5EFE4;
+    font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300;
+    -webkit-font-smoothing: antialiased; }
+  a { color: #CBB78F; text-decoration: none; }
+  a:hover { color: #F5EFE4; }
+  ::selection { background: #763943; color: #F5EFE4; }
+  * { box-sizing: border-box; }
+  @keyframes cu-plate { from { opacity: 0; transform: scale(1.04) } to { opacity: 1; transform: scale(1) } }
+  @keyframes cu-drift {
+    0% { transform: scale(1.06) translate3d(0, 0.8%, 0) }
+    50% { transform: scale(1.06) translate3d(0, -0.8%, 0) }
+    100% { transform: scale(1.06) translate3d(0, 0.8%, 0) }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-cu-drift] { animation: none !important }
+    [data-cu-plate] { animation: none !important }
+  }
+</style>
+</helmet>
+
+<div style="padding: 72px 48px 120px; display: flex; flex-direction: column; gap: 96px">
+
+  <header style="display: flex; flex-direction: column; gap: 26px; max-width: 1180px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 20px">
+      <img src="public/logo-curato-simple.png" alt="Curato" style="height: 15px; width: auto; display: block; opacity: .9">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Zone membre · wireframes · segunda entrega</span>
+    </div>
+    <h1 style="margin: 0; font-size: 46px; font-weight: 300; line-height: 1.06; letter-spacing: 0.11em; text-transform: uppercase">Los huecos<br>del orden</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); max-width: 62ch; text-wrap: pretty">Las seis que faltaban para poder construir: la ficha de maison, la reserva, mes visites con sus seis estados, réglages, la barra con su menú, y los estados vacíos y los avisos como sistema. A 375 px, sobre las primitivas ya implementadas, y con las cinco reglas sin reabrir.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; padding-top: 8px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Sobre el fondo de la app hoy</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">En la captura de <span style="color:#CBB78F">/auth/sign-in</span> la flor está, pero no se reconoce: el velo al 70 por ciento sobre un recorte del centro pálido de la imagen la deja en un gris de ruido. Dos ajustes de una línea: velo a <span style="color:#CBB78F">0.80</span> y <span style="color:#CBB78F">object-position</span> hacia los pétalos, no al centro. Una foto que no se lee como foto sale más cara que ninguna, porque paga el peso y no da la marca. Aquí los marcos ya llevan el fondo al 0.88, que es el valor de las pantallas con mucho texto.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Todo en euros, y el código miente</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Un creador recibe <span style="color:#CBB78F">euros</span>, nunca créditos. La tabla <span style="color:#CBB78F">CATEGORY</span> de <span style="color:#CBB78F">maison/[id]/page.tsx</span> guarda 8, 2 y 3 "crédits" y los pinta como coste indicativo: es un resto, y hay que sustituirlo por el valor en euros de la prestación, que la maison ya escribe en sus servicios. Nada del producto vuelve a decir crédit.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">La cifra que se ve antes de reservar es <span style="color:#CBB78F">la tarifa real de la maison</span>, la que ella misma escribe en sus servicios, y se dice de dónde sale: el tarif du dîner pour deux, tel que la maison l'affiche. No es una valoración de Curato ni una unidad abstracta.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">El barème del crédito mensual</p>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: baseline">
+          <span style="font-size: 15px; color: rgba(245,239,228,0.65)">5 000 à 10 000 abonnés</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">500 €</span>
+          <span style="font-size: 15px; color: rgba(245,239,228,0.65)">10 000 à 50 000</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">750 €</span>
+          <span style="font-size: 15px; color: rgba(245,239,228,0.65)">50 000 à 100 000</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">1 000 €</span>
+          <span style="font-size: 15px; color: rgba(245,239,228,0.65)">100 000 à 500 000</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">1 500 €</span>
+          <span style="font-size: 15px; color: rgba(245,239,228,0.65)">Au-delà de 500 000</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">3 000 €</span>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65)">Mensual, calibrado sobre la audiencia y se consume. Va siempre con su denominador, <span style="color:#CBB78F">900 € de 1 500 €</span>, con espacio fino de millar a la francesa y tabular-nums, para que no cambie de ancho al gastarse.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">La decisión que pediste</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">La reserva pasa a ser <span style="color:#CBB78F">pantalla propia</span>, la 12, en <span style="color:#CBB78F">/maison/[id]/reserver</span>. Motivo en una línea: seis campos y una rejilla de horas con el teclado abierto no caben en un diálogo de 375 px, y una ruta propia devuelve el botón atrás y hace que el enlace <span style="color:#CBB78F">?slot=</span> del correo abra algo compartible en vez de un modal huérfano.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Un hallazgo del código</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Hoy <span style="color:#CBB78F">no_show</span> se pinta igual que <span style="color:#CBB78F">declined</span>: el mapa de estados los une. Son cosas distintas, una es un plantón del storyteller y la otra un no de la casa, y con la primera hay consecuencia contractual. En la 13 tienen tratamiento propio.</p>
+      </div>
+    </div>
+  </header>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">E · La ficha y la reserva</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.65)">La pantalla más editorial de la app, y la que decide si Curato parece una revista o un directorio.</span>
+    </div>
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; align-items: flex-start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Fiche maison</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">11</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/storyteller/maison/[id]</span>
+        <div style="width: 375px; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+          <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">19:04</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+          <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Le carnet</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Réglages</span></div>
+          <div style="overflow: hidden">
+            <img src="photos/p1.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+          </div>
+          <div style="padding: 32px 20px 0; display: flex; flex-direction: column; gap: 12px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">Gastronomie · Paris 16e</p>
+            <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; overflow-wrap: break-word">Réservé aux membres de Curato</h2>
+          </div>
+          <div style="padding: 32px 20px 0">
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88); max-width: 42ch">Une table de six en fin de service, la cuisine ouverte sur la salle, deux couverts par visite. La salle donne sur une cour que personne ne connaît, et la lumière y tombe jusqu'à vingt heures.</p>
+          </div>
+          <div style="padding: 48px 20px 0; display: flex; flex-direction: column; gap: 20px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ce que la visite prend</p>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Tarif de la maison</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">120 €</span></div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Votre crédit du mois</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">900 € <span style="font-size: 13px; color: rgba(245,239,228,0.65)">de 1 500 €</span></span></div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Le tarif du dîner pour deux, tel que la maison l'affiche. Il sera pris sur votre crédit du mois.</p>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Deux stories dans les 24 heures qui suivent la visite. C'est le seul engagement.</p>
+          </div>
+          <div style="padding: 48px 20px 0; display: flex; flex-direction: column; gap: 20px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Les prochains créneaux</p>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: #F5EFE4">Jeudi 16 octobre</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:00 → 22:00</span></div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: #F5EFE4">Vendredi 17 octobre</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:00 → 23:00</span></div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: #F5EFE4">Samedi 18 octobre</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:00 → 23:00</span></div>
+          </div>
+          <div style="padding: 32px 20px 0">
+            <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Demander une visite</button>
+          </div>
+          <div style="padding: 48px 20px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <img src="photos/p6.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+            <img src="photos/p2.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+            <img src="photos/p8.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+            <img src="photos/p1.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+          </div>
+          <div style="padding: 48px 20px 0; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Où c'est</p>
+            <p style="margin: 0; font-size: 17px; line-height: 1.4; color: #F5EFE4">14 rue de la Tour, Paris 16e</p>
+            <div style="height: 180px; background: #2A2A2A; display: flex; align-items: flex-end; padding: 12px">
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Plan, en gris et sans étiquettes</span>
+            </div>
+            <p style="margin: 0; font-size: 15px; color: rgba(245,239,228,0.65)">maison-marceau.fr</p>
+          </div>
+          <div style="padding: 48px 20px 72px">
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">La maison confirme sous 48 heures. Vous recevrez une notification.</p>
+          </div>
+          <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: cargando, no encontrada, sin franjas libres (los créneaux se sustituyen por la fecha en que se abren de nuevo), crédito insuficiente (el coste en copper y el botón al 45 %), antes del lanzamiento, error.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Cero cajas, y aquí se nota: la foto de portada a 4:5 en vez de 16:9, porque en un móvil vertical una banda ancha desperdicia la mitad de la pantalla. Fuera la tarjeta lateral con borde que hoy sostiene dirección, web y botón: en 375 px eso es una columna, no una tarjeta, y sus tres datos son filas.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">El orden es de revista: foto, categoría, nombre, texto, tarifa de la casa en euros, créneaux, acción, más fotografías, y el plano al final. La reserva se pide donde se acaba de leer para qué, no en una barra fija que tape el texto.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">El plano sigue siendo el iframe de Google en gris (<span style="color:#CBB78F">grayscale(0.4) contrast(0.9)</span>, ya está así), sin borde y a 180 px de alto: es una referencia, no la pantalla.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Demander une visite</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">12 · pantalla</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/storyteller/maison/[id]/reserver</span>
+        <div style="width: 375px; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+          <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">19:06</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+          <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Retour</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">120 €</span></div>
+          <div style="padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 12px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Demander une visite</p>
+            <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; overflow-wrap: break-word">Réservé aux membres de Curato</h2>
+          </div>
+          <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Le jour</p>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; color: rgba(245,239,228,0.65)">Jeudi 16 octobre</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">6 créneaux</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; color: #F5EFE4">Vendredi 17 octobre</span><span style="font-size: 13px; font-weight: 400; color: #CBB78F; white-space: nowrap">8 créneaux</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; color: rgba(245,239,228,0.65)">Samedi 18 octobre</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">8 créneaux</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; color: rgba(245,239,228,0.65)">Lundi 20 octobre</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">4 créneaux</span></div>
+            </div>
+            <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Les quatre prochaines semaines. Les jours fermés n'apparaissent pas.</span>
+          </div>
+          <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">L'heure</p>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+              <button style="min-height: 44px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.65); font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; cursor: pointer" style-hover="border-color:rgba(203,183,143,0.3);color:#F5EFE4">19:00</button>
+              <button style="min-height: 44px; background: none; border: 1px solid #CBB78F; color: #CBB78F; font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; cursor: pointer">19:30</button>
+              <button style="min-height: 44px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.65); font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; cursor: pointer" style-hover="border-color:rgba(203,183,143,0.3);color:#F5EFE4">20:00</button>
+              <button style="min-height: 44px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.65); font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; cursor: pointer" style-hover="border-color:rgba(203,183,143,0.3);color:#F5EFE4">20:30</button>
+              <button style="min-height: 44px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.65); font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; cursor: pointer" style-hover="border-color:rgba(203,183,143,0.3);color:#F5EFE4">21:00</button>
+              <button style="min-height: 44px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.65); font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums; cursor: pointer" style-hover="border-color:rgba(203,183,143,0.3);color:#F5EFE4">21:30</button>
+              <button style="min-height: 44px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.38); font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums">22:00</button>
+              <button style="min-height: 44px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(245,239,228,0.38); font-family: inherit; font-size: 15px; font-variant-numeric: tabular-nums">22:30</button>
+            </div>
+            <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Les heures pâles sont déjà prises.</span>
+          </div>
+          <div style="padding: 0 20px 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px">
+            <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Personnes</label>
+              <input value="2" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums" style-focus="border-bottom-color:#CBB78F">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Nuits</label>
+              <span style="font-size: 15px; line-height: 1.5; color: rgba(245,239,228,0.65); padding: 12px 0">Hôtels seulement</span>
+            </div>
+          </div>
+          <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Un mot pour la maison</label>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Optionnel</span>
+            </div>
+            <textarea placeholder="Ce que vous aimeriez photographier" style="width: 100%; min-height: 88px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; line-height: 1.6; padding: 8px 0; outline: none; resize: none" style-focus="border-bottom-color:#CBB78F"></textarea>
+          </div>
+          <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 16px">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Vendredi 17 octobre, 19:30</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">120 €</span></div>
+            <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Envoyer la demande</button>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Rien n'est débité avant que la maison confirme.</p>
+          </div>
+          <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: sin día elegido, día elegido sin hora, sin franjas libres, enviando, enviada, error, crédito insuficiente, y llegada desde el correo con <span style="color:#CBB78F">?slot=</span> ya elegido.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">El día es una lista de filas con su recuento de créneaux, no un <span style="color:#CBB78F">select</span> nativo: un desplegable del sistema tapa media pantalla y no dice cuántas horas hay detrás de cada fecha. Las horas se quedan en rejilla de cuatro, que es lo que ya hace el código, con 44 px de alto y las ocupadas al 38 % sin poder pulsarse.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código, <span style="color:#CBB78F">availability.ts</span>: todo se interpreta en hora de Paris, y una maison sin disponibilidad configurada no tiene restricción, así que ahí la pantalla cae al campo de fecha y hora libre en vez de mostrar la lista de días. Es un estado más, y hay que dibujarlo cuando aparezca la primera casa así.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Lo elegido se repite arriba del botón con su valor en euros, para que nadie envíe una fecha que no quería. Y la frase que importa va al final: nada se descuenta del crédito del mes hasta que la casa confirma.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La pantalla de éxito no es un diálogo con un tic: vuelve a la ficha con una capital en sauge, <span style="color:#8C9A86">Demande envoyée</span>, y la fila de la visita ya aparece en Mes visites. Confirmar sin celebrar.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">F · Mes visites</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.65)">El contenedor de la 14, con los seis estados reales diciendo qué toca hacer ahora.</span>
+    </div>
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; align-items: flex-start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Mes visites</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">13</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/storyteller/visits</span>
+        <div style="width: 375px; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+          <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">19:12</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+          <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><img src="public/logo-curato-simple.png" alt="Curato" style="height: 11px; width: auto; display: block; opacity: .9"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Réglages</span></div>
+          <div style="padding: 24px 20px 32px; display: flex; flex-wrap: wrap; gap: 8px 20px">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Le carnet</span>
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; font-weight: 400">Mes visites</span>
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Profil</span>
+          </div>
+          <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px">
+            <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Mes visites</h2>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Une seule chose vous attend aujourd'hui: déclarer la portée de mercredi.</p>
+          </div>
+
+          <div style="padding: 0 20px 20px"><p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">À faire</p></div>
+          <div style="padding: 0 20px 48px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <span style="font-size: 19px; line-height: 1.25; overflow-wrap: break-word">Réservé aux membres de Curato</span>
+              <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:30</span>
+            </div>
+            <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Mercredi 14 octobre · visite faite</span>
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Il reste 9 h 20 pour publier</p>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 4px">
+              <img src="photos/p1.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+              <img src="photos/p6.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+            </div>
+            <button style="width: 100%; min-height: 44px; padding: 12px 20px; margin-top: 8px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Déclarer la portée</button>
+          </div>
+
+          <div style="padding: 0 20px 20px"><p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">À venir</p></div>
+          <div style="padding: 0 20px 48px; display: flex; flex-direction: column; gap: 32px">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 19px; line-height: 1.25">Maison Marceau</span>
+                <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">12:45</span>
+              </div>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Jeudi 16 octobre · 2 personnes</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86">Confirmée</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 19px; line-height: 1.25">Atelier Sainte-Anne</span>
+                <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">18:00</span>
+              </div>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Samedi 18 octobre · 1 personne</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">En attente de la maison</span>
+            </div>
+          </div>
+
+          <div style="padding: 0 20px 20px"><p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Passées</p></div>
+          <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 40px">
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                <img src="photos/p2.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+                <img src="photos/p8.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+              </div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 19px; line-height: 1.25">Atelier Sainte-Anne</span>
+                <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">29 K</span>
+              </div>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">2 octobre · 2 stories · portée déclarée</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86">Terminée · usage jusqu'au 31 décembre</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 19px; line-height: 1.25; color: rgba(245,239,228,0.65)">Maison Ravel</span>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">20 sept.</span>
+              </div>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Annulée par vous</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 19px; line-height: 1.25; color: rgba(245,239,228,0.65)">Maison Bellechasse</span>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">12 sept.</span>
+              </div>
+              <div style="width: 24px; height: 2px; background: #763943"></div>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #F5EFE4">Refusée par la maison</span>
+              <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Votre crédit n'a pas été débité.</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 19px; line-height: 1.25; color: rgba(245,239,228,0.65)">Maison Lauriston</span>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">4 sept.</span>
+              </div>
+              <div style="width: 24px; height: 2px; background: #763943"></div>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #F5EFE4">Absence signalée</span>
+              <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">La maison vous attendait. Un strike a été inscrit sur votre compte.</span>
+            </div>
+          </div>
+          <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: cargando, ninguna visita todavía, solo futuras, con algo que hacer (el dibujado), todo en orden, error de carga. Los seis estados de una visita están todos en pantalla, a propósito, para poder compararlos.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La pantalla se ordena por <span style="color:#CBB78F">lo que toca hacer</span>, no por fecha: À faire primero, con la cuenta atrás en copper y el botón que lleva a la 14; luego À venir; luego Passées. La frase del titular dice cuántas cosas esperan, y cuando no hay ninguna dice justamente eso.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Los seis estados, cada uno con su color y su acción: <span style="color:#B56E2E">En attente de la maison</span> (copper, esperar), <span style="color:#8C9A86">Confirmée</span> (sauge, ir), <span style="color:#B56E2E">visite faite sin declarar</span> (copper con plazo, declarar), <span style="color:#8C9A86">Terminée</span> (sauge con la fecha de fin de usos), <span style="color:#F5EFE4">Annulée</span> (tinta apagada, nada que hacer) y las dos que hoy se confunden: <span style="color:#F5EFE4">Refusée</span> y <span style="color:#F5EFE4">Absence signalée</span>, ambas con filete burgundy y con la consecuencia escrita, que en el segundo caso es un strike.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: la subida ya pide <span style="color:#CBB78F">dos fotos como mínimo</span> en el primer envío y solo se permite en <span style="color:#CBB78F">confirmed</span> o <span style="color:#CBB78F">completed</span>; los derechos de uso muestran su fecha de caducidad. Las fotos de una visita terminada van grandes y cuadradas, como hoy, porque es lo más parecido a una revista que hay en la app.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Réglages</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">18</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/storyteller/reglages · /dashboard/business/reglages</span>
+        <div style="width: 375px; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+          <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">19:20</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+          <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><img src="public/logo-curato-simple.png" alt="Curato" style="height: 11px; width: auto; display: block; opacity: .9"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; font-weight: 400">Réglages</span></div>
+          <div style="padding: 24px 20px 48px"><h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Réglages</h2></div>
+          <div style="padding: 0 20px 48px; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">La langue</p>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; color: #F5EFE4">Français</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">FR</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; color: rgba(245,239,228,0.65)">English</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">EN</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; color: rgba(245,239,228,0.65)">Español</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">ES</span></div>
+            </div>
+            <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Le changement est immédiat, ici et dans les e-mails.</span>
+          </div>
+          <div style="padding: 0 20px 48px; display: flex; flex-direction: column; gap: 20px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Votre compte</p>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Adresse</span><span style="font-size: 17px; color: #F5EFE4; overflow-wrap: break-word; text-align: right">tereza.bolkvadze@gmail.com</span></div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Membre depuis</span><span style="font-size: 17px; color: #F5EFE4; white-space: nowrap">Mars 2026</span></div>
+            <span style="font-size: 15px; color: #CBB78F">Changer de mot de passe</span>
+          </div>
+          <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 20px">
+            <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Se déconnecter</button>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Une question, écrivez à <span style="color:#CBB78F">hello@curatocollective.com</span></p>
+          </div>
+          <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: idioma activo, cambiando, cerrando sesión, sin conexión al cerrar sesión. La versión de maison es idéntica: mismo idioma en tres filas y mismo cerrar sesión, con el eyebrow Maison y sus cinco secciones en el menú.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: el idioma ya son tres filas con el nombre y su sigla, y el cambio es inmediato. Cambia que la fila deja de tener línea inferior y que la sigla pasa a capital de 11 px: la lista se sostiene con el punto en champagne del elegido.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Añado el bloque de cuenta, que no existe: correo, antigüedad y cambio de contraseña. Son cortas pero no menores, y una pantalla de ajustes sin decir de quién es la cuenta deja a la persona sin saber con qué sesión está dentro.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Cerrar sesión es un botón con su caja, no un enlace gris con un icono: es la acción de la pantalla, aunque sea la que menos se usa. Sin diálogo de confirmación, porque volver a entrar cuesta un toque.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">G · Transversales</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.65)">No son pantallas de una ruta: se ven en todas, y hoy no las ha diseñado nadie.</span>
+    </div>
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; align-items: flex-start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">La barra y su menú</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">31</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">dashboard-nav.tsx</span>
+        <div style="width: 375px; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+          <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">19:30</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+          <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(30,30,30,0.72)">
+            <div style="display: flex; align-items: center; gap: 16px; min-width: 0">
+              <img src="public/logo-curato-simple.png" alt="Curato" style="height: 11px; width: auto; display: block; opacity: .9">
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Storyteller</span>
+            </div>
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Fermer</span>
+          </div>
+          <div style="padding: 32px 20px 40px; display: flex; flex-direction: column; gap: 28px; background: rgba(30,30,30,0.92)">
+            <div style="display: flex; flex-direction: column; gap: 20px">
+              <span style="font-size: 19px; color: #CBB78F">Le carnet</span>
+              <span style="font-size: 19px; color: rgba(245,239,228,0.65)">Mes visites</span>
+              <span style="font-size: 19px; color: rgba(245,239,228,0.65)">Profil</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 12px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Vos autres espaces</p>
+              <span style="font-size: 17px; color: #CBB78F">Maison</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px; padding-top: 12px">
+              <span style="font-size: 17px; color: rgba(245,239,228,0.65)">Réglages</span>
+              <span style="font-size: 17px; color: rgba(245,239,228,0.65)">Se déconnecter</span>
+            </div>
+          </div>
+          <div style="padding: 0 20px 32px">
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">El panel baja sobre el contenido, con 260 ms de altura y opacidad y la curva de la marca. El fondo de la página se queda quieto y no se oscurece.</p>
+          </div>
+          <div style="padding: 0 20px 20px; opacity: .38">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Adresses sélectionnées</p>
+          </div>
+          <div style="padding: 0 20px 72px; opacity: .38">
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <img src="photos/p1.jpg" alt="" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block">
+              <span style="font-size: 19px; line-height: 1.25">Réservé aux membres de Curato</span>
+            </div>
+          </div>
+          <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: cerrado, abierto (el dibujado), con dos espacios, con uno solo (la sección de espacios desaparece), en una ruta sin pestañas.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Cambia respecto a hoy: fuera el icono de hamburguesa y fuera la equis. La palabra <span style="color:#CBB78F">Menu</span> se convierte en <span style="color:#CBB78F">Fermer</span>, en capital de 11 px, que es más fácil de acertar con el pulgar y no necesita explicación. Fuera también las líneas que hoy separan la barra, el panel y el pie del panel: la separación la hace el aire de 32 px.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Los destinos van a 19 px, no a 13: es el menú de un móvil y se toca con una mano. Se abre desde la barra y se cierra con Escape, con un toque fuera o volviendo a la misma palabra, lo que ya hace el componente. El contenido de detrás se atenúa al 38 %, no se cubre con un velo negro: sigue siendo la misma página.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La barra se mantiene pegada arriba con <span style="color:#CBB78F">rgba(30,30,30,0.72)</span> y desenfoque, sin la línea inferior de hoy: el charcoal translúcido ya separa lo suficiente.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Los estados vacíos</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">33 · sistema</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Una plantilla, cuatro huecos</span>
+        <div style="width: 375px; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+          <div style="padding: 72px 20px 48px; display: flex; flex-direction: column; gap: 32px">
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">1 · Dónde estás</p>
+              <h3 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Aucune visite<br>pour l'instant</h3>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">2 · Qué pasa después, con una cifra o una fecha si existe: vingt-deux maisons vous attendent, et votre crédit de 400 € court déjà.</p>
+            </div>
+            <div style="overflow: hidden">
+              <img src="photos/p8.jpg" alt="" data-cu-drift="" style="width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; opacity: .78; animation: cu-drift 18s ease-in-out infinite">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">3 · Una sola cosa que hacer, nunca dos.</p>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Ouvrir le carnet</button>
+            </div>
+          </div>
+          <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 28px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Los cuatro vacíos que ve un miembro nuevo</p>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Le carnet, avant l'ouverture</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Fecha</span></div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Mes visites, aucune encore</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Crédito</span></div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Profil, sans Instagram</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Privilegio</span></div>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Vos visiteurs, mois sans visites</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Mínimo</span></div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">La segunda columna es el dato que hay que dar en cada uno. Un vacío sin cifra ni fecha es una frase centrada, que es lo que hay hoy.</p>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">La plantilla: 72 px de aire, capital en champagne, titular de 28 px, una frase de corps con un dato real, una fotografía que respira, y un solo botón. Sin recuadro, sin icono grande y sin frase centrada.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La regla de fondo: un vacío no dice que no hay nada, dice <span style="color:#CBB78F">dónde estás, qué pasa después y qué puedes hacer ahora</span>. Si no hay nada que hacer, la fotografía y la fecha bastan, y el botón desaparece en vez de inventarse una acción.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La fotografía es la única de la app que respira en bucle, 18 s y 0.8 %. Es el momento en que menos hay que leer y más se mira, y es lo que hace que un tablero vacío parezca una portada y no un error.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Errores, confirmaciones y esperas</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">34 · sistema</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Cuatro piezas, y ninguna flota</span>
+        <div style="width: 375px; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15); background: linear-gradient(rgba(30,30,30,0.88), rgba(30,30,30,0.88)), url(public/flor-bg.jpg) center / cover no-repeat #1E1E1E">
+          <div style="padding: 48px 20px 40px; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">1 · Se ha guardado</p>
+            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <span style="font-size: 17px; color: #F5EFE4">Vos disponibilités</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Enregistré</span>
+            </div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">La confirmación aparece en la fila que cambió, en sauge, y se va sola en 2,5 s. No hay mensaje flotante, ni tic verde, ni celebración.</p>
+          </div>
+          <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">2 · Ha fallado algo pequeño</p>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Créneau</label>
+              <input value="19:30" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid #B56E2E; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums">
+              <span style="font-size: 13px; font-weight: 400; color: #B56E2E">Ce créneau vient d'être pris. Choisissez-en un autre.</span>
+            </div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">El error vive bajo el campo que lo causó, en copper, y la línea del campo se tiñe. Sin icono y sin recuadro.</p>
+          </div>
+          <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">3 · Ha fallado algo grande</p>
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div style="width: 24px; height: 2px; background: #763943"></div>
+              <p style="margin: 0; font-size: 19px; font-weight: 300; line-height: 1.35; max-width: 30ch">Le carnet ne s'est pas chargé. Votre connexion s'est interrompue.</p>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Rien n'est perdu, vos deux visites de la semaine sont enregistrées.</p>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Réessayer</button>
+            </div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Filete de 2 px en burgundy, qué ha pasado, qué no se ha perdido, y un botón. En ese orden.</p>
+          </div>
+          <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 16px">
+            <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">4 · Está tardando</p>
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div style="height: 11px; width: 96px; background: rgba(203,183,143,0.15)"></div>
+              <div style="height: 28px; width: 220px; background: rgba(203,183,143,0.15)"></div>
+              <div style="aspect-ratio: 3 / 2; background: rgba(203,183,143,0.15)"></div>
+            </div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Bloques con la forma de lo que va a llegar, con la respiración de opacidad de 1,6 s. Sin ruedas giratorias. Si tarda más de 8 s, el bloque se sustituye por el error grande.</p>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Y un botón mientras trabaja: el texto cambia a <span style="color:#CBB78F">Envoi…</span>, el botón queda al 45 % y no se puede volver a pulsar. Nada gira.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La regla que ordena las cuatro: <span style="color:#CBB78F">el aviso vive donde ocurrió la cosa</span>. Nada flota sobre la pantalla, porque un mensaje flotante en un móvil tapa justo el campo que hay que corregir y desaparece antes de que se lea.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Sin emoji, sin globos rojos, sin celebraciones. Una casa que acaba de guardar sus horarios necesita saber que están guardados, no una fiesta.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Lo que sigue sin diseñar</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.65)">Para que el orden de construcción y la lista de pendientes no vuelvan a contradecirse.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; max-width: 1180px">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86">Entregado · 24 de 35</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Primera entrega: 1 a 9, 14, 16, 19, 20, 21, 22, 25 y 26, diecisiete, más la 16b, que es un extra fuera de las 35. Esta: 11, 12, 13, 18, 31, 33 y 34, siete.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Con esto, las seis del orden de construcción están todas diseñadas: carnet, ficha, visits con la 14, agenda, informe y réglages. Ya se puede construir de arriba abajo sin pararse.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Falta · 11 pantallas, más el 1440</p>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">10</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Le carnet, ya construido; queda revisarlo contra la referencia</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">15</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Connecter Instagram, que hoy parece un paso técnico</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">17</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Suggérer une adresse, el bucle de crecimiento escondido</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">23</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Vos visiteurs, la lista viva bajo el informe</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">24</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Le carnet de la maison, el directorio del club</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">27</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Code QR, un caso físico: sala, prisa y mala luz</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">28</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Réglages de maison, gemela de la 18, cambia el menú</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">29</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Tableau apporteur</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">30</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Présenter une maison</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">32</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Sans connexion, la única pieza que obliga a recompilar</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; font-variant-numeric: tabular-nums">35</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Notificaciones: cómo se ven al llegar y si se acumulan</span></div>
+          <div style="display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #B56E2E; white-space: nowrap">1440</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">El tablero de maison en un ordenador, con el informe como vista principal</span></div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Y una cosa que hay que decidir</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">La 27, el código QR, es el único caso de uso físico del producto: alguien lo enseña en la sala, de pie, con prisa y a veces con mala luz. Eso pide una pantalla que rompa dos reglas, brillo alto y una forma grande y cerrada, y prefiero decidirlo contigo antes de dibujarla.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Mi propuesta en una línea: el QR ocupa el ancho completo sobre fondo crema, no charcoal, porque un código oscuro se lee peor y la cámara del cliente no perdona. Sería la única pantalla en modo claro de toda la app, y el modo crema ya está en los tokens.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400}}"></script>
+</body>
+</html>

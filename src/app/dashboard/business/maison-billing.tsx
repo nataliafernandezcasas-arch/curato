@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Row } from "@/components/member/row";
 
 type Billing = { name: string; signedAt: string | null; plan: string; monthly: number; trialDays: number };
 
@@ -40,9 +41,15 @@ export default function MaisonBilling() {
     while (nextPayment <= now) nextPayment.setMonth(nextPayment.getMonth() + 1);
   }
 
+  // El estado sube al titular, así que sale de la lista.
+  const status = signed
+    ? inTrial
+      ? `Essai gratuit · ${daysLeft} jour${daysLeft > 1 ? "s" : ""} restant${daysLeft > 1 ? "s" : ""}`
+      : "Abonnement actif"
+    : "En attente de signature";
+
   const rows: { label: string; value: string }[] = [
     { label: "Formule", value: `Abonnement mensuel · ${eur(b.monthly)}/mois` },
-    { label: "Statut", value: signed ? (inTrial ? `Essai gratuit · ${daysLeft} jour${daysLeft > 1 ? "s" : ""} restant${daysLeft > 1 ? "s" : ""}` : "Abonnement actif") : "En attente de signature" },
     ...(signed ? [{ label: "Début", value: fmtDate(signed) }] : []),
     ...(inTrial && trialEnd ? [{ label: "Fin de l'essai", value: fmtDate(trialEnd) }] : []),
     ...(nextPayment ? [{ label: inTrial ? "Premier paiement" : "Prochain paiement", value: fmtDate(nextPayment) }] : []),
@@ -51,20 +58,32 @@ export default function MaisonBilling() {
 
   return (
     <div>
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-8">Facturation & abonnement</p>
+      <p className="text-capitale uppercase tracking-capitale text-accent">Facturation &amp; abonnement</p>
 
-      <div className="border border-white/12 bg-black/20">
-        {rows.map((r, i) => (
-          <div key={r.label} className={`flex items-center justify-between gap-4 px-6 py-4 ${i > 0 ? "border-t border-white/8" : ""}`}>
-            <span className="font-serif text-[11px] tracking-[0.2em] uppercase text-white/40">{r.label}</span>
-            <span className={`font-serif text-[15px] font-light text-right ${r.label === "Statut" ? "text-champagne" : "text-white/85"}`}>
-              {r.value}
-            </span>
-          </div>
+      {/* El estado estaba escondido en una fila dentro de un recuadro. Es lo
+          primero que una casa quiere saber, así que es el titular. */}
+      <p className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-accent md:text-[32px]">
+        {status}
+      </p>
+
+      <div>
+        {rows.map((r) => (
+          <Row
+            key={r.label}
+            label={
+              <span className="text-capitale uppercase tracking-capitale text-text-secondary">{r.label}</span>
+            }
+            value={
+              // Una fecha no se trunca jamás: envuelve si hace falta.
+              <span className="block max-w-[62vw] text-right text-corps text-text-primary sm:max-w-none">
+                {r.value}
+              </span>
+            }
+          />
         ))}
       </div>
 
-      <p className="font-serif text-[12px] font-light text-white/40 leading-relaxed mt-5">
+      <p className="mt-seccion max-w-[46ch] text-legende text-text-secondary">
         Les 15 premiers jours vous sont offerts. La facturation est gérée par Curato : vous serez contacté·e pour la mise en place du paiement. Pour toute question, écrivez à hello@curatocollective.com.
       </p>
     </div>

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Button } from "@/components/member/button";
+import { Choice } from "@/components/member/choice";
 import { useRouter } from "next/navigation";
-import { Check } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { getWelcomeSlides, getWelcomeLabels } from "@/lib/i18n/welcome";
 import { completeWelcome } from "./actions";
@@ -68,10 +69,8 @@ export default function WelcomeClient() {
             key={key}
             type="button"
             onClick={() => setLang(key)}
-            className={`pointer-events-auto font-serif text-[11px] tracking-[0.25em] px-2.5 py-1.5 rounded-sm backdrop-blur-md transition-colors ${
-              lang === key
-                ? "bg-champagne/90 text-charcoal-deep"
-                : "bg-black/40 text-white/70 hover:text-white"
+            className={`pointer-events-auto bg-black/40 px-2.5 py-1.5 text-capitale tracking-capitale backdrop-blur-md transition-colors duration-200 ease-curato ${
+              lang === key ? "text-accent" : "text-text-secondary hover:text-text-primary"
             }`}
             aria-label={`Switch to ${label}`}
             aria-pressed={lang === key}
@@ -100,29 +99,23 @@ export default function WelcomeClient() {
           dark band so the storyteller knows they've reached the action. */}
       <section
         aria-label="Acceptation des conditions"
-        className="px-5 py-20 md:py-28 bg-charcoal-deep border-t border-white/10"
+        className="bg-surface px-pagina py-respiro"
       >
         <div className="max-w-[680px] mx-auto">
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">
+          <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">
             {welcomeLabels.acceptEyebrow}
           </p>
-          <h1 className="font-serif text-[clamp(1.8rem,4.5vw,2.6rem)] font-light tracking-[0.15em] uppercase text-text-primary leading-tight mb-6">
+          <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
             {welcomeLabels.acceptTitle}
           </h1>
-          <p className="font-serif text-[15px] md:text-[16px] font-light text-text-secondary leading-[1.85] tracking-wide mb-12">
+          <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">
             {welcomeLabels.acceptIntro}
           </p>
 
-          <div className="space-y-6 border-t border-white/8 pt-10">
+          <div>
             {/* Terms checkbox */}
-            <label className="flex items-start gap-4 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
-                className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
-              />
-              <span className="font-serif text-[14px] md:text-[15px] font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
+            <Choice checked={termsAccepted} onChange={setTermsAccepted}>
+              <>
                 {welcomeLabels.termsLabel}{" "}
                 <Link
                   href="/condiciones"
@@ -133,19 +126,12 @@ export default function WelcomeClient() {
                 >
                   {welcomeLabels.termsLink}
                 </Link>
-                <span className="text-copper/70"> {welcomeLabels.required}</span>
-              </span>
-            </label>
+                <span className="text-copper"> {welcomeLabels.required}</span>
+              </>
+            </Choice>
 
-            {/* Privacy checkbox */}
-            <label className="flex items-start gap-4 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={privacyAccepted}
-                onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
-              />
-              <span className="font-serif text-[14px] md:text-[15px] font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
+            <Choice checked={privacyAccepted} onChange={setPrivacyAccepted}>
+              <>
                 {welcomeLabels.privacyLabel}{" "}
                 <Link
                   href="/privacidad"
@@ -156,31 +142,21 @@ export default function WelcomeClient() {
                 >
                   {welcomeLabels.privacyLink}
                 </Link>
-                <span className="text-copper/70"> {welcomeLabels.required}</span>
-              </span>
-            </label>
+                <span className="text-copper"> {welcomeLabels.required}</span>
+              </>
+            </Choice>
           </div>
 
           {error && (
-            <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4 mt-8">
+            <p className="mt-rango border-l-2 border-burgundy pl-fila text-legende text-text-primary">
               {error}
             </p>
           )}
 
-          <div className="mt-12">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className={`inline-flex items-center gap-2 font-serif text-[12px] tracking-[0.25em] uppercase px-8 py-4 transition-all duration-300 ${
-                canSubmit
-                  ? "bg-champagne text-charcoal-deep hover:bg-copper hover:text-white"
-                  : "bg-white/5 text-white/20 cursor-not-allowed"
-              }`}
-            >
+          <div className="mt-seccion">
+            <Button type="button" onClick={handleSubmit} disabled={!canSubmit}>
               {submitting ? welcomeLabels.submitting : welcomeLabels.enterCurato}
-              {!submitting && <Check size={14} weight="bold" />}
-            </button>
+            </Button>
           </div>
         </div>
       </section>

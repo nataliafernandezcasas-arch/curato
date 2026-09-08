@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { AuthShell } from "@/components/member/auth-shell";
+import { Button } from "@/components/member/button";
+import { CodeField } from "@/components/member/code-field";
+import { Field } from "@/components/member/field";
 
 function AccessForm() {
   const searchParams = useSearchParams();
@@ -36,92 +40,60 @@ function AccessForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div>
-        <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-          Adresse e-mail
-        </label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/50"
-          placeholder="votre@email.com"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-rango">
+      <Field
+        label="Adresse e-mail"
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        placeholder="votre@email.com"
+      />
 
-      <div>
-        <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
-          Code d'accès
-        </label>
-        <input
-          type="text"
-          value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-          required
-          maxLength={6}
-          className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-2xl text-center tracking-[0.5em] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/30"
-          placeholder="000000"
-        />
-        <p className="font-serif text-[11px] text-text-muted/50 mt-2">
-          Le code à 6 chiffres reçu dans votre e-mail de bienvenue
-        </p>
-      </div>
+      <CodeField
+        label="Code d'accès"
+        value={code}
+        onChange={setCode}
+        hint="Le code à 6 chiffres reçu dans votre e-mail de bienvenue"
+      />
 
       {error && (
-        <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">
-          {error}
-        </p>
+        <p className="border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={loading || code.length !== 6 || !email}
-        className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
-      >
+      {/* Inactivo hasta tener las seis cifras: pulsarlo antes solo devuelve un
+          error que ya sabíamos. */}
+      <Button type="submit" full disabled={loading || code.length !== 6 || !email}>
         {loading ? "Vérification…" : "Accéder"}
-      </button>
+      </Button>
     </form>
   );
 }
 
 export default function AccessPage() {
   return (
-    <div className="min-h-[100dvh] relative flex items-center justify-center px-5">
-      <div className="absolute inset-0">
-        <img
-          src="/hero-floral.jpeg"
-          alt=""
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-charcoal-deep/80 backdrop-blur-sm" />
-      </div>
-
-      <div className="relative z-10 w-full max-w-[400px]">
-        <div className="text-center mb-12">
-          <Link href="/" className="inline-block mb-8">
-            <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
-          </Link>
-          <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">
-            Accéder
-          </h1>
-          <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">
-            Utilisez le code reçu dans votre e-mail
-          </p>
-        </div>
-
-        <Suspense fallback={<div className="text-center font-serif text-[13px] text-text-muted">Chargement…</div>}>
-          <AccessForm />
-        </Suspense>
-
-        <p className="text-center mt-10 font-serif text-[12px] font-light text-text-muted tracking-wide">
+    // Poco texto que proteger, así que aquí la flor se ve más que en el resto.
+    <AuthShell
+      title="Accéder"
+      subtitle="Utilisez le code reçu dans votre e-mail"
+      veil={0.8}
+      footer={
+        <>
           Déjà membre ?{" "}
-          <Link href="/auth/sign-in" className="text-champagne hover:text-copper transition-colors">
+          <Link href="/auth/sign-in" className="text-accent transition-colors hover:text-text-primary">
             Se connecter
           </Link>
-        </p>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <Suspense fallback={<p className="text-center text-legende text-text-muted">Chargement…</p>}>
+        <AccessForm />
+      </Suspense>
+    </AuthShell>
   );
 }

@@ -38,7 +38,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#1A1A1A",
+  // Un solo negro. La cáscara nativa pintaba #1A1A1A detrás de una página
+  // #1E1E1E, y el segundo negro asomaba en los rebotes del scroll.
+  themeColor: "#1E1E1E",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

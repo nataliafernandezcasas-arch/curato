@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap">
+<link rel="stylesheet" href="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/styles.css">
+<script src="_ds/classical-30e8e11d-db2a-4419-a608-001be628f7f8/_ds_bundle.js"></script>
+<style>
+  html { background: #1E1E1E; }
+  body { margin: 0; background: #1E1E1E; color: #F5EFE4;
+    font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300;
+    -webkit-font-smoothing: antialiased; }
+  a { color: #CBB78F; text-decoration: none; }
+  a:hover { color: #F5EFE4; }
+  ::selection { background: #763943; color: #F5EFE4; }
+  * { box-sizing: border-box; }
+  @keyframes cu-plate { from { opacity: 0; transform: scale(1.04) } to { opacity: 1; transform: scale(1) } }
+  @keyframes cu-drift {
+    0% { transform: scale(1.06) translate3d(0, 0.8%, 0) }
+    50% { transform: scale(1.06) translate3d(0, -0.8%, 0) }
+    100% { transform: scale(1.06) translate3d(0, 0.8%, 0) }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-cu-drift] { animation: none !important }
+    [data-cu-plate] { animation: none !important }
+  }
+</style>
+</helmet>
+
+<div style="padding: 72px 48px 120px; display: flex; flex-direction: column; gap: 96px">
+
+  <header style="display: flex; flex-direction: column; gap: 28px; max-width: 1180px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 20px">
+      <img src="public/logo-curato-simple.png" alt="Curato" style="height: 15px; width: auto; display: block; opacity: .9">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Zone membre · wireframes · 375 px</span>
+    </div>
+    <h1 style="margin: 0; font-size: 46px; font-weight: 300; line-height: 1.06; letter-spacing: 0.11em; text-transform: uppercase">Entrada, primera vez,<br>storyteller y maison</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); max-width: 62ch; text-wrap: pretty">Diecisiete de las treinta y cinco, a 375 px y sobre las rutas reales: la entrada y la primera vez completas, del 1 al 9; del storyteller la 14, la 16 y su portrait y bio (16b); y de las casas la 19, la 20 con la agenda semanal, la 21, la 22 y la 25, el informe mensual, más la 26. Contenido en francés y con los nombres largos que rompen las cajas. Cada pantalla lleva debajo sus estados y la decisión que resuelve. Ninguna caja salvo los botones.</p>
+    <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); max-width: 62ch; text-wrap: pretty"><span style="color:#CBB78F">El fondo floral va en todas</span>, no solo en el tablero, y eso es lo que separa a Curato de una app oscura cualquiera. Sale gratis: la imagen que ya existe, un velo de charcoal, y el mismo <span style="color:#CBB78F">floral-backdrop.tsx</span>. El velo se mueve entre el 80 y el 90 por ciento según cuánto texto haya que proteger, nunca menos: la flor tiene un centro pálido y esto se lee con mala luz.</p>
+    <p style="margin: 0; font-size: 15px; line-height: 1.62; color: rgba(245,239,228,0.65); max-width: 62ch">Una regla que se aplica aquí y no estaba escrita: <span style="color:#CBB78F">toda instrucción va al 65 por ciento de tinta</span>, que da 6.9:1. El 38 por ciento, 3.2:1, se queda para etiquetas de ruta y metadatos. Con mala luz y una mano, la frase que dice qué hacer no puede ser la más pálida de la pantalla.</p>
+    <p style="margin: 0; font-size: 13px; line-height: 1.55; color: rgba(245,239,228,0.38); max-width: 62ch">El índice de las 35 está al final, con el orden en que las voy dibujando y por qué.</p>
+  </header>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">A · Entrada</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.38)">Cinco pantallas sin sesión. Es donde más se ve la marca y donde menos se ha cuidado.</span>
+    </div>
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; align-items: flex-start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Accéder</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">01</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/auth/sign-in</span>
+        <div data-shot="01" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" data-cu-drift="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: cu-drift 26s ease-in-out infinite">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .86"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:40</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: flex-end; gap: 20px">
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; font-weight: 400">FR</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">EN</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">ES</span>
+            </div>
+            <div style="padding: 72px 20px 48px; display: flex; flex-direction: column; gap: 48px">
+              <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center">
+                <img src="public/logo-curato-simple.png" alt="Curato" style="height: 14px; width: auto; display: block">
+                <h2 style="margin: 8px 0 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Accéder</h2>
+                <p style="margin: 0; font-size: 15px; color: rgba(245,239,228,0.65)">Réservé aux membres de Curato</p>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 32px">
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Handle · email</label>
+                  <input value="@tereza.blk" placeholder="@handle ou email@maison.com" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid #CBB78F; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none">
+                  <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Enfocado: la línea solo existe aquí</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                    <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Mot de passe</label>
+                    <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Oublié ?</span>
+                  </div>
+                  <input type="password" value="curatoparis" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none" style-focus="border-bottom-color:#CBB78F">
+                </div>
+              </div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Se connecter</button>
+            </div>
+            <div style="padding: 0 20px 72px">
+              <p style="margin: 0; font-size: 13px; font-weight: 400; line-height: 1.6; color: rgba(245,239,228,0.65)">En la app no hay pie: la invitación solo se pide desde el sitio. El código lo comprueba <span style="color:#CBB78F">useNativePlatform</span>, y ya funciona así.</p>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Del código: un solo campo que acepta handle o correo, y se resuelve por <span style="color:#CBB78F">/api/auth/lookup-handle</span>. Estados: vacío, escribiendo, handle no encontrado, contraseña incorrecta, error de conexión, cargando. En la app el pie de la invitación no se pinta.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Cambia respecto a hoy: los campos pierden el recuadro gris y el botón deja de ser un bloque champagne relleno. En esta marca el champagne es tinta, no fondo.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Mot de passe oublié</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">02</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/auth/sign-in, otro modo</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .86"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:41</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Retour</span></div>
+            <div style="padding: 96px 20px 48px; display: flex; flex-direction: column; gap: 40px">
+              <div style="display: flex; flex-direction: column; gap: 16px">
+                <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Mot de<br>passe</h2>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Votre handle ou l'adresse du compte. Nous envoyons un lien pour en choisir un nouveau.</p>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Handle · email</label>
+                <input value="@tereza.blk" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none" style-focus="border-bottom-color:#CBB78F">
+              </div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Envoyer le lien</button>
+              <span style="align-self: center; font-size: 15px; color: rgba(245,239,228,0.65)">Retour</span>
+              <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px">
+                <div style="width: 24px; height: 2px; background: #CBB78F"></div>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88); max-width: 32ch">Si un compte existe à cette adresse, le lien est parti.</p>
+                <p style="margin: 0; font-size: 13px; font-weight: 400; line-height: 1.6; color: rgba(245,239,228,0.38); max-width: 34ch">La misma frase para una cuenta que existe y para una que no. Nunca se confirma si alguien es miembro.</p>
+              </div>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Del código: no es otra ruta, es <span style="color:#CBB78F">/auth/sign-in</span> en modo reset, con el mismo campo de handle y un Retour. Estados: vacío, enviando, enviado, error de conexión. No hay error por cuenta inexistente, y eso ya está así a propósito: el endpoint devuelve siempre la misma confirmación.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Nouveau mot de passe</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">03</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/auth/change-password</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .88"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:43</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="padding: 96px 20px 48px; display: flex; flex-direction: column; gap: 40px">
+              <div style="display: flex; flex-direction: column; gap: 16px">
+                <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Depuis votre e-mail</p>
+                <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Choisir un<br>mot de passe</h2>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 32px">
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Nouveau mot de passe</label>
+                  <input type="password" value="lumieredeparis" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid #CBB78F; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none">
+                  <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding-top: 4px">
+                    <div style="height: 1px; background: rgba(203,183,143,0.15); position: relative; align-self: center"><div style="position: absolute; inset: 0 25% 0 0; background: #CBB78F"></div></div>
+                    <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; white-space: nowrap">Solide</span>
+                  </div>
+                  <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Huit caractères au moins</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Répéter</label>
+                  <input type="password" value="lumieredepari" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none" style-focus="border-bottom-color:#CBB78F">
+                  <span style="font-size: 13px; font-weight: 400; color: #B56E2E">Les deux ne correspondent pas</span>
+                </div>
+              </div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(203,183,143,0.45); font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em">Enregistrer</button>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: vacío, débil, sólido, sin coincidencia (el dibujado), guardando, enlace caducado. Con el formulario inválido el botón queda al 45 por ciento y no se pulsa.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: el mínimo real son ocho caracteres, y hoy hay dos campos con el ojo para mostrar la contraseña. El medidor de solidez lo pides en tu lista y hoy no existe: aquí es una barra de 1 px con su palabra al lado, la misma pieza que la barra del crédito. Nada de tres bloques de colores.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Code de bienvenue</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">04</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/auth/access</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" data-cu-drift="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: cu-drift 26s ease-in-out infinite">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .8"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:40</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="padding: 96px 20px 48px; display: flex; flex-direction: column; gap: 40px">
+              <div style="display: flex; flex-direction: column; gap: 16px">
+                <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Bienvenue</p>
+                <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Votre code<br>d'accès</h2>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Six chiffres, dans l'e-mail de bienvenue. Il n'y a pas d'autre façon d'entrer.</p>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Adresse e-mail</label>
+                <input value="marceau@maison-marceau.fr" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none" style-focus="border-bottom-color:#CBB78F">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Code d'accès</label>
+                <input value="482117" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid #CBB78F; color: #F5EFE4; font-family: inherit; font-size: 28px; font-weight: 300; letter-spacing: 0.28em; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums">
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Le code à 6 chiffres reçu dans votre e-mail de bienvenue</span>
+                <span style="font-size: 13px; font-weight: 400; color: #B56E2E">Code invalide ou expiré</span>
+              </div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Accéder</button>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Déjà membre ? <span style="color:#CBB78F">Se connecter</span></p>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Del código: correo más código de seis cifras, solo dígitos, y el botón inactivo hasta tener los seis. Estados: vacío, escribiendo, inválido o caducado (el dibujado), correcto, error de conexión.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Aquí el velo baja al 80 y la flor se ve más: es la pantalla de la invitación y hay poco texto que proteger. La flor deriva en 26 s.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Vérification</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">05</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/auth/verify</span>
+        <div data-shot="05" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" data-cu-drift="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; animation: cu-drift 26s ease-in-out infinite">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .84"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:41</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="padding: 96px 20px 72px; display: flex; flex-direction: column; gap: 40px">
+              <div style="display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center">
+                <img src="public/logo-curato-simple.png" alt="Curato" style="height: 14px; width: auto; display: block; opacity: .9">
+                <h2 style="margin: 8px 0 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Vérification</h2>
+                <p style="margin: 0; font-size: 15px; color: rgba(245,239,228,0.65)">Saisissez le code reçu par e-mail</p>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px; align-items: center; text-align: center">
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Code envoyé à</span>
+                <span style="font-size: 17px; color: #F5EFE4; overflow-wrap: break-word; max-width: 100%">tereza.bolkvadze@gmail.com</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Code de vérification</label>
+                <input value="482117" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid #CBB78F; color: #F5EFE4; font-family: inherit; font-size: 28px; font-weight: 300; letter-spacing: 0.28em; text-align: center; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums">
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); text-align: center">Six chiffres</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 20px; align-items: center">
+                <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Accéder</button>
+                <span style="font-size: 15px; color: #CBB78F">Changer d'adresse e-mail</span>
+              </div>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Del código: no es una sala de espera, es un código de seis cifras que llega por correo, con el botón inactivo hasta tener los seis y un enlace para cambiar de dirección. Estados: vacío, escribiendo, inválido o caducado, verificando, error de conexión.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Es la pantalla que más se ve y la que menos se cuidó. El correo entero y sin truncar, porque es el único dato que permite ver el fallo, y el código a 28 px centrado, que es la cifra que la persona está copiando de su bandeja.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">B · La primera vez</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.38)">Cuatro pantallas que se ven una vez en la vida. Aquí se dicen las reglas del club sin dar una clase.</span>
+    </div>
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; align-items: flex-start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Bienvenue</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">06</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/onboarding/welcome</span>
+        <div data-shot="06" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .86"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:44</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="overflow: hidden">
+              <img src="public/onboarding/fr/slide-01.jpg" alt="" data-cu-plate="" style="width: 100%; height: auto; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+            </div>
+            <div style="padding: 20px 20px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Les pages du dossier, à la suite</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0; white-space: nowrap">10 pages</span>
+            </div>
+            <div style="padding: 48px 20px 72px; display: flex; flex-direction: column; gap: 32px">
+              <div style="display: flex; flex-direction: column; gap: 16px">
+                <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Pour finir</p>
+                <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Entrer dans<br>Curato</h2>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Deux accords et votre espace s'ouvre. Le texte vient de lib/i18n/welcome, dans les trois langues.</p>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 20px">
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 15px; line-height: 1.6; color: #F5EFE4">J'accepte les <span style="color:#CBB78F">conditions générales</span></span></div>
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">J'accepte la <span style="color:#CBB78F">politique de confidentialité</span></span></div>
+              </div>
+              <p style="margin: 0; font-size: 13px; font-weight: 400; color: #B56E2E">Les deux accords sont nécessaires pour continuer</p>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(203,183,143,0.45); font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em">Entrer dans Curato</button>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Del código: son diez páginas del dossier a sangre en un solo scroll, y al final dos casillas, condiciones y privacidad, con el botón inactivo hasta tener las dos. Estados: sin aceptar (el dibujado), una de dos, las dos, guardando, error.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Arriba está la página real, <span style="color:#CBB78F">public/onboarding/fr/slide-01.jpg</span>: son diez en francés y diez en inglés. Lo que cambia es que entra acercándose y que el bloque de aceptación deja de ser un pie oscuro con casillas de sistema. Misma estructura, con aire y sin recuadros.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Questionnaire</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">07</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/onboarding/survey</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .88"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:45</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="padding: 32px 20px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Question 2 sur 5</p>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Passer</span>
+            </div>
+            <div style="padding: 0 20px"><div style="height: 1px; background: rgba(203,183,143,0.15); position: relative"><div style="position: absolute; inset: 0 60% 0 0; background: #CBB78F"></div></div></div>
+            <div style="padding: 48px 20px 32px; display: flex; flex-direction: column; gap: 32px">
+              <h2 style="margin: 0; font-size: 19px; font-weight: 300; line-height: 1.35; max-width: 30ch">Quelles maisons vous font sortir de chez vous</h2>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; line-height: 1.35; color: #F5EFE4">Gastronomie</span></div>
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; line-height: 1.35; color: rgba(245,239,228,0.65)">Hôtellerie</span></div>
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; line-height: 1.35; color: #F5EFE4">Bien-être</span></div>
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; line-height: 1.35; color: rgba(245,239,228,0.65)">Beauté</span></div>
+              </div>
+              <p style="margin: 0; font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Plusieurs réponses possibles</p>
+            </div>
+            <div style="padding: 0 20px 20px"><button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Continuer</button></div>
+            <div style="padding: 0 20px 20px"><p style="margin: 0; font-size: 13px; font-weight: 400; line-height: 1.6; color: #A3BAC0">Con el teclado abierto el botón se queda anclado aquí, sobre el teclado, y la pregunta no se desplaza. El campo enfocado nunca queda tapado.</p></div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: sin responder, con respuestas, saltada, última pregunta, guardando, error al guardar. La barra de progreso es la única línea y mide algo real. Las cuatro categorías son las del código, gastronomia, hoteles, wellness y belleza. El enunciado, el Passer y el número de pasos son supuestos míos: no he leído survey-client todavía, y lo digo antes de que alguien lo dé por cierto.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Teclado: el botón se ancla al fondo del área visible, con <span style="color:#CBB78F">100dvh</span> y no <span style="color:#CBB78F">100vh</span>, que es lo que hoy lo deja debajo del teclado en iOS. La opción elegida se marca con un signo en champagne, sin casillas, y la fila entera es el objetivo táctil.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Engagement maison</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">08</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/onboarding/maison</span>
+        <div data-shot="08" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:47</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="padding: 64px 20px 40px; display: flex; flex-direction: column; gap: 16px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Maison Marceau · Paris 8e</p>
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Notre<br>engagement</h2>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Le dossier au complet, puis les conditions et votre signature. Rien d'autre sur cet écran.</p>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Le dossier</p>
+              <div style="overflow: hidden">
+                <img src="public/onboarding/maison/slide-1.jpg" alt="" data-cu-plate="" style="width: 100%; height: auto; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+              </div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Les pages du dossier, à la suite</span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0; white-space: nowrap">8 pages</span>
+              </div>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Télécharger le dossier</button>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 24px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Les conditions</p>
+              <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 16px; align-items: baseline"><span style="font-size: 13px; color: #CBB78F; font-variant-numeric: tabular-nums">01</span><span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Cinq visites garanties chaque mois, choisies parmi les storytellers du cercle.</span></div>
+              <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 16px; align-items: baseline"><span style="font-size: 13px; color: #CBB78F; font-variant-numeric: tabular-nums">02</span><span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Un abonnement de 299 € par mois, prélevé à l'ouverture de votre fiche.</span></div>
+              <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 16px; align-items: baseline"><span style="font-size: 13px; color: #CBB78F; font-variant-numeric: tabular-nums">03</span><span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.88)">Le texte exact des termes vient de lib/i18n/commitment, dans les trois langues.</span></div>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 8px">
+              <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Nom du signataire</label>
+              <input value="Camille Marceau" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-style: italic; font-weight: 300; padding: 8px 0; outline: none" style-focus="border-bottom-color:#CBB78F">
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 24px">
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 15px; line-height: 1.6; color: #F5EFE4">J'ai lu et j'accepte les conditions générales et la politique de confidentialité</span></div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Signer et accéder à mon espace</button>
+              <p style="margin: 0; font-size: 13px; font-weight: 400; line-height: 1.6; color: rgba(245,239,228,0.65)">La signature ouvre votre espace. Le prélèvement de 299 € vient ensuite, avec la facture par e-mail.</p>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: sin firmar, nombre sin escribir, condiciones sin aceptar, firmando, error al firmar. Con el formulario incompleto el botón queda al 45 por ciento, como hoy.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: el dossier son páginas a sangre una tras otra, luego la descarga en PDF, los términos numerados de lib/i18n/commitment, el nombre del firmante en cursiva y la casilla con los dos enlaces. Lo que cambia es el orden y el aire: dossier, condiciones, firma, sin recuadros y con el nombre a 17 px.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Engagement apporteur</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">09</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.38)">/onboarding/recruiter</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">22:48</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="padding: 64px 20px 40px; display: flex; flex-direction: column; gap: 16px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Apporteur</p>
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Présenter<br>des maisons</h2>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Vous présentez des maisons parisiennes, en toute indépendance. Si l'une signe, la commission suit.</p>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 16px">
+              <div style="overflow: hidden">
+                <img src="public/onboarding/recruiter/slide-1.jpg" alt="" data-cu-plate="" style="width: 100%; height: auto; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+              </div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Les pages du dossier, à la suite</span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0; white-space: nowrap">6 pages</span>
+              </div>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Télécharger le dossier</button>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 28px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Part de l'abonnement</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">50 %</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Par mois et par maison</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">149,50 €</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Pendant les 3 premiers mois payés</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">448,50 €</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Virement après paiement</span><span style="font-size: 19px; color: #CBB78F; white-space: nowrap">15 jours</span></div>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Une maison vous est attribuée au premier enregistrement. En cas de doublon, le premier prime.</p>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 24px">
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Nom et prénom</label>
+                <input value="Jean-Baptiste de La Rochefoucauld" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-style: italic; font-weight: 300; padding: 8px 0; outline: none" style-focus="border-bottom-color:#CBB78F">
+              </div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px">
+                <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Fait à</label>
+                  <input value="Paris" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none" style-focus="border-bottom-color:#CBB78F">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Le</label>
+                  <input value="07.09.2026" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums" style-focus="border-bottom-color:#CBB78F">
+                </div>
+              </div>
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 24px">
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 15px; line-height: 1.6; color: #F5EFE4">J'ai lu et j'accepte les conditions du programme Recruiters</span></div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Signer et accéder à mon espace</button>
+              <p style="margin: 0; font-size: 13px; font-weight: 400; line-height: 1.6; color: rgba(245,239,228,0.65)">Vous restez responsable de vos obligations fiscales et sociales. Rien à payer aujourd'hui.</p>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: sin firmar, nombre o lugar sin escribir, condiciones sin aceptar, firmando, error al firmar. No hay pago, así que no hay estado de cobro.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Cifras del código, no inventadas: 50 por ciento del abonnement, 149,50 € al mes, tres primeros meses pagados, hasta 448,50 € por maison, y transferencia a 15 días. Misma plantilla que la 08 y los tres campos de firma que ya existen. Fait à y Le comparten fila con <span style="color:#CBB78F">minmax(0, 1fr)</span>, y en 375 caben.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">C · Storyteller</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.65)">Su cuenta y su rendimiento. Las dos que pediste: el tablero de perfil y la declaración de portée.</span>
+    </div>
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; align-items: flex-start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Mon profil</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">16</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/storyteller/profil</span>
+        <div data-shot="16" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">18:42</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><img src="public/logo-curato-simple.png" alt="Curato" style="height: 11px; width: auto; display: block; opacity: .9"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Réglages</span></div>
+            <div style="padding: 24px 20px 40px; display: flex; flex-wrap: wrap; gap: 8px 20px">
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Le carnet</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">Mes visites</span>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; font-weight: 400">Profil</span>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Storyteller depuis mars 2026</p>
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; overflow-wrap: break-word">Tereza Bolkvadze</h2>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 15px; color: #CBB78F">@tereza.blk</span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Instagram connecté</span>
+              </div>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 28px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Mes chiffres</p>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Abonnés</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">142 K</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Engagement</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">4,8 %</span></div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Portée moyenne</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">38 K</span></div>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">≈ 38 K comptes touchés par publication</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Crédit du mois</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">900 € <span style="font-size: 13px; color: rgba(245,239,228,0.65)">de 1 500 €</span></span></div>
+                <div style="height: 1px; background: rgba(203,183,143,0.15); position: relative"><div style="position: absolute; inset: 0 60% 0 0; background: #CBB78F"></div></div>
+              </div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Vos catégories</span><span style="font-size: 13px; font-weight: 400; color: #A3BAC0; text-align: right">Gastronomie, bien-être</span></div>
+            </div>
+            <div style="padding: 0 20px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Mes dernières publications</p>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Instagram</span>
+            </div>
+            <div style="padding: 0 20px 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+              <div style="display: flex; flex-direction: column; gap: 6px"><div style="overflow: hidden"><img src="photos/p1.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both"></div><span style="font-size: 13px; font-weight: 400; color: #CBB78F; font-variant-numeric: tabular-nums">41 K</span></div>
+              <div style="display: flex; flex-direction: column; gap: 6px"><div style="overflow: hidden"><img src="photos/p6.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both"></div><span style="font-size: 13px; font-weight: 400; color: #CBB78F; font-variant-numeric: tabular-nums">36 K</span></div>
+              <div style="display: flex; flex-direction: column; gap: 6px"><div style="overflow: hidden"><img src="photos/p2.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both"></div><span style="font-size: 13px; font-weight: 400; color: #CBB78F; font-variant-numeric: tabular-nums">33 K</span></div>
+            </div>
+            <div style="padding: 0 20px 16px"><p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Publiées chez les maisons</p></div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 32px">
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                  <span style="font-size: 17px; line-height: 1.25; overflow-wrap: break-word">Réservé aux membres de Curato</span>
+                  <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">52 K</span>
+                </div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                  <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">2 stories · 14 octobre</span>
+                  <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Vérifié · 62 j</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                  <img src="photos/p1.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+                  <img src="photos/p6.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                  <span style="font-size: 17px; line-height: 1.25; overflow-wrap: break-word">Atelier Sainte-Anne</span>
+                  <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">29 K</span>
+                </div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                  <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">2 stories · 2 octobre</span>
+                  <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E; white-space: nowrap">Expire dans 8 j</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                  <img src="photos/p6.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+                  <img src="photos/p8.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+                </div>
+              </div>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: Instagram sin conectar (sin engagement ni portée, con la invitación a conectar), conectado sin publicaciones todavía, con publicaciones, cifras sin verificar, contenido caducado a los 90 días.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: <span style="color:#CBB78F">abonnés</span>, <span style="color:#CBB78F">engagement_rate</span> (se guarda en fracción, se muestra en tanto por ciento con un decimal) y <span style="color:#CBB78F">avgReach</span> vienen de Phyllo, y las últimas publicaciones con su portée también. La palabra de la marca es Portée, no alcance ni reach, y la frase larga ya existe en las traducciones.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Las cifras propias van en tinta al 100, no en champagne: el champagne se reserva para el crédito y la portée conseguida en una maison del club, que es lo que la marca le devuelve. Las miniaturas son cuadradas para Instagram y 9:16 para las stories de una visita, así se distinguen sin etiqueta.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Déclarer la portée</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">14 · nueva</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/storyteller/visits, dentro de una visita</span>
+        <div data-shot="14" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">18:42</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Mes visites</span></div>
+            <div style="padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 12px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Visite du 14 octobre</p>
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; overflow-wrap: break-word">Réservé aux membres de Curato</h2>
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Il reste 9 h 20 pour publier</p>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 20px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Vos chiffres, par Instagram</p>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Connecté</span>
+              </div>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Vos deux stories sont arrivées. Les chiffres viennent de votre compte, vous n'avez qu'à les confirmer.</p>
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                <img src="photos/p1.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+                <img src="photos/p6.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 20px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Vues</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">61 400</span></div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Portée</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">52 100</span></div>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Interactions</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">2 480</span></div>
+              </div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Confirmer ces chiffres</button>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ou à la main</p>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Deux captures, une par story, et les trois chiffres tels qu'ils apparaissent chez vous.</p>
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+                <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+                  <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Story 1</span>
+                  <div style="overflow: hidden"><img src="photos/p1.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both"></div>
+                  <button style="width: 100%; min-height: 44px; padding: 12px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Remplacer</button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+                  <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Story 2</span>
+                  <button style="width: 100%; aspect-ratio: 9 / 16; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; line-height: 1.6; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 12px" style-hover="color:#F5EFE4;border-color:#CBB78F"><span style="font-size: 19px; letter-spacing: 0; text-transform: none">+</span>Ajouter la capture</button>
+                  <span style="font-size: 13px; font-weight: 400; color: #B56E2E; line-height: 1.5">La seconde manque encore</span>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 24px">
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Vues</label>
+                  <input value="61 400" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid #CBB78F; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Portée</label>
+                  <input placeholder="Comptes touchés" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums" style-focus="border-bottom-color:#CBB78F">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Interactions</label>
+                  <input placeholder="Réponses, partages, clics" style="width: 100%; min-height: 44px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; padding: 8px 0; outline: none; font-variant-numeric: tabular-nums" style-focus="border-bottom-color:#CBB78F">
+                </div>
+              </div>
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.15); color: rgba(203,183,143,0.45); font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em">Envoyer</button>
+            </div>
+            <div style="padding: 0 20px 72px">
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">La maison garde l'usage du contenu pendant 90 jours. Vos captures ne sont vues que par elle et par Curato.</p>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: dentro de las 24 h con cuenta atrás (el dibujado), fuera de plazo, una story de dos, cifras pendientes de verificar, verificado, contenido caducado a los 90 días.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: la subida ya existe, <span style="color:#CBB78F">/api/visits/upload-proof</span> guarda en el bucket privado <span style="color:#CBB78F">content-proofs</span> y escribe <span style="color:#CBB78F">content_proof_urls</span> en la visita. Lo que no existe es guardar una sola cifra: vues, portée e interactions son campos nuevos, y de ahí sale el dato que necesita el informe mensual de la maison, la 25.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Las dos vías conviven en la misma pantalla, la automática arriba porque es un clic, y no se esconde la manual detrás de un enlace: quien no tiene Phyllo conectado no puede quedarse sin declarar. El hueco de captura dice lo que hace, <span style="color:#CBB78F">Ajouter la capture</span>, y cuando ya hay una se ve la miniatura con un Remplacer debajo. Un rectángulo con la palabra Story no se entiende sin que alguien lo explique.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La cuenta atrás va en copper y en capital, sin dígitos que corran: el reloj no se anima, se lee. Con el plazo vencido la misma línea pasa a burgundy y dice qué ocurre, no cuánto se pasó.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Mon portrait et ma voix</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">16 b · nueva</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/storyteller/profil, en edición</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">18:42</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Profil</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Aperçu</span></div>
+            <div style="padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 12px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ce que voient les maisons</p>
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Votre<br>portrait</h2>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 32ch">Une photographie et quelques lignes. C'est sur ça qu'une maison décide de vous ouvrir sa porte.</p>
+            </div>
+            <div style="padding: 0 20px 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start">
+              <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Portrait</span>
+                <div style="overflow: hidden"><img src="photos/p2.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both"></div>
+                <button style="width: 100%; min-height: 44px; padding: 12px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Remplacer</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Une seconde</span>
+                <button style="width: 100%; aspect-ratio: 4 / 5; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; line-height: 1.6; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 12px" style-hover="color:#F5EFE4;border-color:#CBB78F"><span style="font-size: 19px; letter-spacing: 0; text-transform: none">+</span>Ajouter une photo</button>
+                <span style="font-size: 13px; font-weight: 400; line-height: 1.5; color: rgba(245,239,228,0.65)">Deux au plus. JPEG, PNG, WEBP ou HEIC, 3 Mo.</span>
+              </div>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Quelques lignes sur vous</label>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums; white-space: nowrap">184 / 240</span>
+              </div>
+              <textarea style="width: 100%; min-height: 132px; background: none; border: none; border-bottom: 1px solid #CBB78F; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; line-height: 1.6; padding: 8px 0; outline: none; resize: none">Je photographie les salles vides avant le service, la lumière de fin de journée et les mains qui travaillent. Le grain plutôt que le net, le silence plutôt que la pose.</textarea>
+              <span style="font-size: 13px; font-weight: 400; line-height: 1.5; color: rgba(245,239,228,0.65)">Ce que vous aimez photographier, la lumière que vous cherchez, le genre de lieux où vous êtes chez vous.</span>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 16px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ce que je photographie</p>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; line-height: 1.35; color: #F5EFE4">Tables et cuisines</span></div>
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; line-height: 1.35; color: #F5EFE4">Intérieurs et matières</span></div>
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; line-height: 1.35; color: rgba(245,239,228,0.65)">Portraits et gestes</span></div>
+                <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 16px; align-items: baseline; min-height: 44px; padding: 8px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; line-height: 1.35; color: rgba(245,239,228,0.65)">Soins et bien-être</span></div>
+              </div>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Deux au plus. C'est ce qui vous place dans les carnets des maisons.</span>
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 20px">
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Enregistrer</button>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Votre portrait remplace la photo d'Instagram. Vos chiffres, eux, restent ceux de votre compte.</p>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: sin portrait ni bio (el que ve un miembro nuevo), con la foto de Instagram heredada, en edición con cambios sin guardar, guardando, error de subida, archivo demasiado grande.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: hoy el avatar y la bio los trae Phyllo desde Instagram, <span style="color:#CBB78F">/api/maison/roster</span> los pide junto a las últimas publicaciones. Esta pantalla los deja sobrescribir con lo suyo, y las cifras siguen viniendo de la cuenta: eso no se escribe a mano.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">El portrait es un rectángulo 4:5, no un círculo. En esta dirección de arte una foto se enmarca como una lámina, y un avatar redondo la convierte en una red social. Dos fotos como máximo, y la bio con 240 caracteres: quien lee esto es una maison entre dos servicios, no un jurado.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">El campo largo se escribe en 17 px con línea inferior, sin recuadro, y el contador va arriba a la derecha en la misma fila que la etiqueta: es un dato, no un aviso, así que no cambia de color hasta pasarse.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Los formatos y el peso son los que ya usa la candidatura, <span style="color:#CBB78F">candidature-portfolio.ts</span>: JPEG, PNG, WEBP y HEIC hasta 3 MB. Reutilizo ese límite en vez de inventar otro, porque tener dos reglas de subida en el mismo producto es cómo se acumulan los doce tamaños de texto. Los formularios del tablero hoy aceptan <span style="color:#CBB78F">image/*</span> sin tope, y eso es lo que hay que unificar.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La foto es un marcador: en tu banco no hay retratos con cara, así que aquí va una imagen de ambiente hasta que me pases un portrait real. Es la pieza que más pide material tuyo de todo el encargo.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">D · Maison</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.65)">Las cinco secciones reales, la agenda semanal que hoy es lo más roto, y el informe mensual que justifica los 299 €.</span>
+    </div>
+    <div style="display: flex; gap: 56px; flex-wrap: wrap; align-items: flex-start">
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Ma maison</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">19</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/business</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">15:12</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between">
+              <div style="display: flex; align-items: center; gap: 16px; min-width: 0">
+                <img src="public/logo-curato-simple.png" alt="Curato" style="height: 11px; width: auto; display: block; opacity: .9">
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Maison</span>
+              </div>
+              <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Menu</span>
+            </div>
+            <div style="padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 12px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ma maison</p>
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15; overflow-wrap: break-word">Maison Marceau</h2>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <span style="font-size: 13px; font-weight: 400; color: #A3BAC0">Hôtellerie · Paris 8e</span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E; white-space: nowrap">Fiche en préparation</span>
+              </div>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Deux choses avant l'ouverture</p>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; color: #F5EFE4">Cinq photographies</span><span style="font-size: 17px; color: #B56E2E; font-variant-numeric: tabular-nums; white-space: nowrap">3 / 5</span></div>
+                <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">En haute définition, 1280 px au moins sur le grand côté.</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; color: #F5EFE4">La description en français</span><span style="font-size: 17px; color: #B56E2E; font-variant-numeric: tabular-nums; white-space: nowrap">118 / 200</span></div>
+                <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">L'anglais et l'espagnol restent optionnels.</span>
+              </div>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Aperçu storyteller</button>
+            </div>
+            <div style="padding: 0 20px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Photographies</p>
+              <span style="font-size: 13px; font-weight: 400; color: #B56E2E; font-variant-numeric: tabular-nums; white-space: nowrap">3 / 5</span>
+            </div>
+            <div style="padding: 0 20px 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+              <div style="position: relative; overflow: hidden">
+                <img src="photos/p2.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+                <span style="position: absolute; bottom: 6px; left: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Couv.</span>
+              </div>
+              <img src="photos/p1.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+              <img src="photos/p6.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+              <button style="width: 100%; aspect-ratio: 1 / 1; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; line-height: 1.6; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 12px" style-hover="color:#F5EFE4;border-color:#CBB78F"><span style="font-size: 19px; letter-spacing: 0; text-transform: none">+</span>Ajouter</button>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">La première est la couverture. Faites glisser pour changer l'ordre.</span>
+              <span style="font-size: 13px; font-weight: 400; line-height: 1.5; color: #B56E2E">Une photographie a été refusée, définition trop faible.</span>
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 12px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Description</label>
+                <span style="font-size: 13px; font-weight: 400; color: #B56E2E; font-variant-numeric: tabular-nums; white-space: nowrap">118 / 200</span>
+              </div>
+              <div style="display: flex; gap: 20px">
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F; font-weight: 400">FR</span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">EN</span>
+                <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.55)">ES</span>
+              </div>
+              <textarea style="width: 100%; min-height: 108px; background: none; border: none; border-bottom: 1px solid transparent; color: #F5EFE4; font-family: inherit; font-size: 17px; font-weight: 300; line-height: 1.6; padding: 8px 0; outline: none; resize: none" style-focus="border-bottom-color:#CBB78F">Douze chambres dans un hôtel particulier du 8e, une cour intérieure et un petit déjeuner servi jusqu'à onze heures.</textarea>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: recién firmada y vacía, a medias (el dibujado), completa y publicada, guardando, error de subida.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código, <span style="color:#CBB78F">maison-profile.tsx</span>: los requisitos para abrir la ficha son exactamente dos, cinco fotografías y doscientos caracteres de descripción en francés. Nada más. Las fotos se rechazan por debajo de 1280 px en el lado largo, la primera es la portada y el orden se cambia arrastrando. Inglés y español son opcionales.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Lo que falta va primero, contado y en copper, y el aviso de la foto rechazada se escribe donde ocurre, no en un aviso flotante. Hoy hay que adivinar por qué la ficha no se ve. Las cinco secciones del código, profile, roster, visitors, directory y billing, viven en el menú, no en una fila de pestañas que no cabe.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">El <span style="color:#CBB78F">Aperçu storyteller</span> ya existe y se queda: es lo único que le dice a una casa cómo la va a ver un creador. Sube a botón al principio de la pantalla en vez de vivir en un icono de ojo arriba a la derecha.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Mon offre</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">20</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/business/offer/edit</span>
+        <div data-shot="20" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .92"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">15:14</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ma maison</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Enregistrer</span></div>
+            <div style="padding: 24px 20px 32px; display: flex; flex-direction: column; gap: 12px">
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Mon offre</h2>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Les créneaux où vous recevez un storyteller. Vous pouvez changer d'avis à tout moment.</p>
+            </div>
+            <div style="padding: 0 20px 16px"><p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">La semaine</p></div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 4px">
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; color: #F5EFE4">Lundi</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">18:00 → 22:00</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; color: #F5EFE4">Mardi</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">12:00 → 14:30</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; color: rgba(245,239,228,0.65)">Mercredi</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Fermé</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; color: #F5EFE4">Jeudi</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">18:00 → 22:00</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; color: #F5EFE4">Vendredi</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:00 → 23:00</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center">•</span><span style="font-size: 17px; color: #F5EFE4">Samedi</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19:00 → 23:00</span></div>
+              <div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; min-height: 44px; padding: 10px 0"><span style="font-size: 15px; color: #CBB78F; text-align: center"> </span><span style="font-size: 17px; color: rgba(245,239,228,0.65)">Dimanche</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Fermé</span></div>
+              <p style="margin: 8px 0 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Touchez une heure pour la changer. Touchez le jour pour l'ouvrir ou le fermer.</p>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Dates fermées</p>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; color: #F5EFE4">24 décembre 2026</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Retirer</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; color: #F5EFE4">25 décembre 2026</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Retirer</span></div>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">+ Ajouter une date</button>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 24px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ce que vous offrez</p>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 19px; line-height: 1.25">Nuit en chambre haute</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">240 €</span></div>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Petit déjeuner compris, arrivée après 15 h.</p>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 19px; line-height: 1.25">Table pour deux</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">120 €</span></div>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Menu du soir, hors boissons.</p>
+              </div>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">+ Ajouter un service</button>
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">La carte</p>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; color: #F5EFE4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">carte-hiver-2026.pdf</span><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Retirer</span></div>
+              <button style="align-self: flex-start; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">+ Ajouter un PDF</button>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: cargando, semana vacía, semana completa (el dibujado), con fechas cerradas, guardando, guardado, error.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: una ventana por día con <span style="color:#CBB78F">start</span> y <span style="color:#CBB78F">end</span>, orden lunes a domingo, 18:00 a 22:00 por defecto, Fermé cuando está apagado, más las fechas cerradas, los servicios con nombre, precio y descripción, y la carta en PDF.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Aquí está el arreglo de la fila que no cabe: el día y sus dos horas son <span style="color:#CBB78F">[punto][día flexible][horas fijas]</span> en una sola rejilla. Las horas no se comprimen y viajan juntas con la flecha, que en 375 mide 108 px. Hoy son dos campos de tipo time con borde, y con dos horas el día se sale de la pantalla.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Y las fechas cerradas dejan de ser etiquetas con una equis dentro de un recuadro: son filas con su Retirer al final, tocables en 44 px y legibles con la fecha entera en francés, que es lo que se lee de un vistazo entre dos servicios.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Storytellers et demandes</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">21 · 22</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/business?section=roster</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">15:20</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Storytellers</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Menu</span></div>
+            <div style="padding: 24px 20px 32px; display: flex; flex-direction: column; gap: 20px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #B56E2E">Demandes de visite</p>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums; white-space: nowrap">2 en attente</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 14px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                  <span style="font-size: 19px; line-height: 1.25; overflow-wrap: break-word">Tereza Bolkvadze</span>
+                  <span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">19 h 30</span>
+                </div>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Jeudi 16 octobre · 142 K abonnés · 4,8 %</span>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Un refus compte comme une visite offerte dans votre minimum du mois.</p>
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px">
+                  <button style="min-height: 44px; padding: 12px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Accepter</button>
+                  <button style="min-height: 44px; padding: 12px; background: none; border: 1px solid rgba(118,57,67,0.5); color: rgba(245,239,228,0.65); font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#763943">Refuser</button>
+                </div>
+              </div>
+            </div>
+            <div style="padding: 0 20px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Le cercle</p>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums; white-space: nowrap">38 storytellers</span>
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 40px">
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: start">
+                  <img src="photos/p2.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+                  <div style="min-width: 0; display: flex; flex-direction: column; gap: 8px">
+                    <span style="font-size: 19px; line-height: 1.25; overflow-wrap: break-word">Tereza Bolkvadze</span>
+                    <span style="font-size: 13px; font-weight: 400; color: #A3BAC0">Gastronomie, bien-être</span>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Abonnés</span><span style="font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap">142 K</span></div>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Engagement</span><span style="font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap">4,8 %</span></div>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Portée</span><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">38 K</span></div>
+                  </div>
+                </div>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Je photographie les salles vides avant le service et la lumière de fin de journée.</p>
+                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+                  <img src="photos/p1.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+                  <img src="photos/p6.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+                  <img src="photos/p8.jpg" alt="" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block">
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: start">
+                  <img src="photos/p6.jpg" alt="" data-cu-plate="" style="width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; animation: cu-plate 1200ms cubic-bezier(.22,1,.36,1) both">
+                  <div style="min-width: 0; display: flex; flex-direction: column; gap: 8px">
+                    <span style="font-size: 19px; line-height: 1.25; overflow-wrap: break-word">Jean-Baptiste de La Rochefoucauld</span>
+                    <span style="font-size: 13px; font-weight: 400; color: #A3BAC0">Beauté</span>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Abonnés</span><span style="font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap">61 K</span></div>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Engagement</span><span style="font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap">6,2 %</span></div>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">Portée</span><span style="font-size: 15px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">22 K</span></div>
+                  </div>
+                </div>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Les gestes, les mains, les matières. Toujours en lumière naturelle.</p>
+              </div>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: sin solicitudes, con solicitudes (el dibujado), aceptando, rechazando, cercle vacío, storyteller sin Instagram conectado (sin engagement ni portée, sin hueco vacío).</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La consecuencia de rechazar se lee <span style="color:#CBB78F">antes</span> de pulsar, encima de los dos botones, y sale de la letra pequeña real: un rechazo cuenta como visita ofrecida en el mínimo del mes. No hay diálogo de confirmación después: eso solo sirve para culpar.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">El nombre más largo del catálogo parte a dos líneas junto a las cifras, que es lo que hoy se solapa. La ficha es retrato 4:5, tres cifras en filas, la bio y las últimas publicaciones: lo mismo que devuelve <span style="color:#CBB78F">/api/maison/roster</span>, sin recuadro alrededor.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Le rapport mensuel</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">25 · nueva</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/business?section=visitors</span>
+        <div data-shot="25" style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .9"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">15:26</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Vos visiteurs</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Menu</span></div>
+            <div style="padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 24px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+                <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Octobre<br>2026</h2>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">Septembre</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Visites du mois</p>
+                <div style="display: flex; align-items: baseline; gap: 12px">
+                  <span style="font-size: 46px; font-weight: 300; color: #CBB78F; line-height: 1; font-variant-numeric: tabular-nums">6</span>
+                  <span style="font-size: 19px; color: rgba(245,239,228,0.65)">sur 5 garanties</span>
+                </div>
+                <div style="height: 1px; background: rgba(203,183,143,0.15); position: relative"><div style="position: absolute; inset: 0 0 0 0; background: #CBB78F"></div></div>
+                <span style="font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Le minimum est atteint. Une visite refusée compte comme offerte.</span>
+              </div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Portée cumulée</span><span style="font-size: 19px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">184 K</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Stories publiées</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">12</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Audience cumulée</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; white-space: nowrap">612 K</span></div>
+            </div>
+            <div style="padding: 0 20px 16px"><p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Qui est venu</p></div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 24px">
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; line-height: 1.25; overflow-wrap: break-word">Tereza Bolkvadze</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">52 K</span></div>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">14 octobre · 142 K abonnés · 2 stories</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; line-height: 1.25; overflow-wrap: break-word">Jean-Baptiste de La Rochefoucauld</span><span style="font-size: 17px; color: #CBB78F; font-variant-numeric: tabular-nums; white-space: nowrap">29 K</span></div>
+                <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">9 octobre · 61 K abonnés · 2 stories</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px">
+                <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 17px; line-height: 1.25; overflow-wrap: break-word">Camille Ferrand</span><span style="font-size: 17px; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums; white-space: nowrap">En attente</span></div>
+                <span style="font-size: 13px; font-weight: 400; color: #B56E2E">2 octobre · chiffres non déclarés</span>
+              </div>
+            </div>
+            <div style="padding: 0 20px 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Ce qui a été publié</p>
+              <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); white-space: nowrap">90 jours d'usage</span>
+            </div>
+            <div style="padding: 0 20px 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+              <img src="photos/p1.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+              <img src="photos/p2.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+              <img src="photos/p6.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+              <img src="photos/p8.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+              <img src="photos/p1.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+              <img src="photos/p2.jpg" alt="" style="width: 100%; aspect-ratio: 9 / 16; object-fit: cover; display: block">
+            </div>
+            <div style="padding: 0 20px 72px">
+              <button style="width: 100%; min-height: 44px; padding: 12px 20px; background: none; border: 1px solid rgba(203,183,143,0.3); color: #CBB78F; font-family: inherit; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; cursor: pointer" style-hover="color:#F5EFE4;border-color:#CBB78F">Télécharger le rapport</button>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: mes sin visitas todavía, por debajo del mínimo, mínimo alcanzado (el dibujado), cifras sin declarar por algún storyteller, mes cerrado, contenido caducado a los 90 días.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La cifra que justifica la suscripción es la más grande de la pantalla, 46 px, y va con su denominador: <span style="color:#CBB78F">6 sur 5 garanties</span>. Por debajo del mínimo la misma cifra pasa a copper y la frase dice lo que dice el contrato, que el mes siguiente se ofrece gratis, sin reproche y sin signos de admiración.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La portée acumulada sale de la pantalla 14: sin ese dato este informe no existe, y hoy no se guarda ni una cifra. Quien no ha declarado aparece en copper como En attente, no se esconde: es lo que la maison necesita para reclamar.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">La descarga sale con la misma dirección de arte que los dossiers, en tamaño A4, y por eso las cifras y la galería se maquetan ya en una rejilla que aguanta el papel. A 1440 esta pantalla es la vista principal de la maison, y es la siguiente entrega.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; width: 375px">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline">
+          <span style="font-size: 19px; color: #F5EFE4">Facturation</span>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #A3BAC0">26</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65)">/dashboard/business?section=billing</span>
+        <div style="width: 375px; position: relative; overflow: hidden; box-shadow: 0 0 0 1px rgba(203,183,143,0.15)">
+          <img src="public/flor-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+          <div style="position: absolute; inset: 0; background: #1E1E1E; opacity: .92"></div>
+          <div style="position: relative">
+            <div style="height: 44px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 13px; font-weight: 400; color: rgba(245,239,228,0.65); font-variant-numeric: tabular-nums">15:31</span><span style="font-size: 11px; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">•••</span></div>
+            <div style="height: 52px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between"><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Facturation</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.65)">Menu</span></div>
+            <div style="padding: 24px 20px 40px; display: flex; flex-direction: column; gap: 12px">
+              <h2 style="margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.15">Abonnement</h2>
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Essai gratuit · 9 jours restants</p>
+            </div>
+            <div style="padding: 0 20px 40px; display: flex; flex-direction: column; gap: 28px">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Formule</span><span style="font-size: 19px; color: #F5EFE4; font-variant-numeric: tabular-nums; text-align: right">299 € / mois</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Début</span><span style="font-size: 19px; color: #F5EFE4; text-align: right">22 septembre 2026</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Fin de l'essai</span><span style="font-size: 19px; color: #F5EFE4; text-align: right">7 octobre 2026</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Premier paiement</span><span style="font-size: 19px; color: #CBB78F; text-align: right">7 octobre 2026</span></div>
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: rgba(245,239,228,0.65)">Paiement</span><span style="font-size: 19px; color: #F5EFE4; text-align: right">Virement, géré par Curato</span></div>
+            </div>
+            <div style="padding: 0 20px 72px; display: flex; flex-direction: column; gap: 20px">
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65); max-width: 34ch">Les 15 premiers jours vous sont offerts. Nous vous contactons pour la mise en place du paiement.</p>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Une question, écrivez à <span style="color:#CBB78F">hello@curatocollective.com</span></p>
+            </div>
+            <div style="height: 22px; display: flex; align-items: center; justify-content: center"><div style="width: 108px; height: 3px; background: rgba(245,239,228,0.2); border-radius: 2px"></div></div>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.65); width: 375px">Estados: pendiente de firma, en prueba gratuita (el dibujado), abonnement activo, información no disponible, cargando.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Del código: las filas y las fechas son las de <span style="color:#CBB78F">maison-billing.tsx</span>, con los 15 días gratis, la facturación anclada al fin de la prueba y el correo real. Cambia una cosa: el estado sube al titular, en capital y champagne, en vez de esconderse en una fila dentro de un recuadro. Es el dato por el que se entra en esta pantalla.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #A3BAC0; width: 375px">Los valores largos se alinean a la derecha y envuelven a dos líneas si hace falta, sin truncar nunca una fecha ni una cifra: la regla de la fila estrecha con el valor mandando.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 32px">
+    <div style="display: flex; align-items: baseline; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(203,183,143,0.15); flex-wrap: wrap">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Índice de las 35</span>
+      <span style="font-size: 13px; color: rgba(245,239,228,0.38)">Y el orden en el que las dibujo.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 48px; max-width: 1180px">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86">Entregado · 17 de 35, más la 16b</p>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">01</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Accéder</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">02</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Mot de passe oublié</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">03</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Nouveau mot de passe</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">04</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Code de bienvenue</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">05</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Vérification</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">06</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Bienvenue</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">07</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Questionnaire</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">08</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Engagement maison</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">09</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Engagement apporteur</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">14</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Déclarer la portée</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">16</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Mon profil</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">16b</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Portrait et bio</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">19</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Ma maison</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">20</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Mon offre, la agenda</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">21</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Storytellers</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">22</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Demandes de visite</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">25</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Le rapport mensuel</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+          <div style="display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 12px; align-items: baseline"><span style="font-size: 13px; color: #8C9A86; font-variant-numeric: tabular-nums">26</span><span style="font-size: 15px; color: rgba(245,239,228,0.88)">Facturation</span><span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #8C9A86; white-space: nowrap">Hecha</span></div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: #CBB78F">Siguiente · storyteller, 10 al 18</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Del storyteller quedan la <span style="color:#CBB78F">11, fiche maison</span>, donde la dirección de arte se juega el partido, la <span style="color:#CBB78F">12, demander une visite</span> y la <span style="color:#CBB78F">13, mes visites</span> con sus seis estados. Antes de la 13 leo <span style="color:#CBB78F">visits/page.tsx</span>, que es donde ya vive la subida.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">La <span style="color:#CBB78F">13, mes visites</span> lleva los seis estados reales con su nombre y su acción. La <span style="color:#CBB78F">15, connecter Instagram</span> y la <span style="color:#CBB78F">17, suggérer une adresse</span> dejan de ser pasos técnicos escondidos.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28em; color: rgba(245,239,228,0.38)">Después · 19 al 35</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">De maison quedan la <span style="color:#CBB78F">23, vos visiteurs</span>, la <span style="color:#CBB78F">24, le carnet</span>, el <span style="color:#CBB78F">27, code QR</span> y los <span style="color:#CBB78F">28, réglages</span>, más el tablero completo a <span style="color:#CBB78F">1440</span> con el informe como vista principal. Luego apporteur, 29 y 30, y al final las transversales, 31 a 35, que son sistema y no pantalla.</p>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: rgba(245,239,228,0.65)">Una nota sobre la <span style="color:#CBB78F">22, demandes de visite</span>: si rechazar tiene consecuencias contractuales, el aviso va antes de pulsar y en el mismo sitio donde se pulsa, no en un diálogo después.</p>
+        <p style="margin: 0; font-size: 13px; line-height: 1.6; color: rgba(245,239,228,0.38)">Dime si el orden te sirve o si prefieres ver antes el informe mensual, que es el que justifica los 299 €.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400}}"></script>
+</body>
+</html>
