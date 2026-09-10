@@ -210,21 +210,32 @@ function MaisonDashboard() {
         maxWidth="1100px"
       />
 
-      <div className="max-w-[1100px] mx-auto px-5 md:px-8 py-10 md:py-12">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">
-          {tab === "profile" ? t.tabProfile : t.kicker}
-        </p>
-        <h1 className="font-serif text-[32px] md:text-[40px] font-light tracking-[0.12em] uppercase text-white leading-none mb-3">
-          {tab === "profile"
-            ? maisonName || t.tabProfile
-            : tab === "directory"
-            ? t.directoryTitle
-            : t.title}
-        </h1>
-        {tab !== "profile" && (
-          <p className="font-serif text-[14px] font-light text-white/55 mb-8">
-            {tab === "directory" ? t.directorySubtitle : t.subtitle}
-          </p>
+      <div className="max-w-[1100px] mx-auto px-pagina md:px-8 py-seccion">
+        {/* El titular es el de la sección abierta. Antes cualquier sección que
+            no fuera perfil o carnet heredaba el de storytellers, así que en
+            facturación ponía "Ceux qui racontent les histoires".
+
+            Facturación y vos visiteurs no aparecen aquí porque traen el suyo:
+            el estado del abono y la cifra del mes son mejores titulares que
+            cualquier rótulo que pudiéramos ponerles encima. */}
+        {tab !== "billing" && tab !== "visitors" && (
+          <>
+            <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">
+              {tab === "profile" ? t.tabProfile : t.kicker}
+            </p>
+            <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+              {tab === "profile"
+                ? maisonName || t.tabProfile
+                : tab === "directory"
+                ? t.directoryTitle
+                : t.title}
+            </h1>
+            {tab !== "profile" && (
+              <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">
+                {tab === "directory" ? t.directorySubtitle : t.subtitle}
+              </p>
+            )}
+          </>
         )}
 
         {tab === "roster" ? (

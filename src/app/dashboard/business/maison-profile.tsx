@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { FilePicker } from "@/components/member/file-picker";
 import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check } from "@phosphor-icons/react";
 import { translations, Lang } from "@/lib/i18n/translations";
 
@@ -19,7 +20,6 @@ const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness"
 };
 
 export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
-  const fileRef = useRef<HTMLInputElement>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [descriptionEn, setDescriptionEn] = useState("");
@@ -91,7 +91,6 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
       if (res.ok) setPhotos(d.photos ?? []);
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
@@ -333,15 +332,15 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                 </button>
               </div>
             ))}
-            <button
-              onClick={() => fileRef.current?.click()}
+            <FilePicker
+              onFiles={uploadPhotos}
+              multiple
               disabled={uploading}
-              className="aspect-square border border-dashed border-white/20 flex items-center justify-center text-white/40 hover:border-champagne/40 hover:text-champagne transition-colors disabled:opacity-50"
+              className="flex aspect-square items-center justify-center border border-dashed border-white/20 text-white/40 transition-colors hover:border-champagne/40 hover:text-champagne"
             >
               <Plus size={22} weight="thin" />
-            </button>
+            </FilePicker>
           </div>
-          <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => uploadPhotos(e.target.files)} />
           {notice && <p className="font-serif text-[12px] text-copper/80 mt-3 border-l border-copper/40 pl-3">{notice}</p>}
         </div>
 
