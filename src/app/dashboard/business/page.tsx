@@ -12,6 +12,7 @@ import MaisonProfile from "./maison-profile";
 import MaisonOffer from "./maison-offer";
 import MaisonBilling from "./maison-billing";
 import MaisonReport from "./maison-report";
+import MaisonDemandes from "./maison-demandes";
 import type { StorytellerMetrics } from "@/lib/phyllo/client";
 
 // Category UUID (migration 009) → translation key in the `dashboard` section.
@@ -240,7 +241,9 @@ function MaisonDashboard() {
         )}
 
         {tab === "roster" ? (
-          loading ? (
+          <>
+          <MaisonDemandes />
+          {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="bg-charcoal-deep h-28 animate-pulse" />
@@ -337,7 +340,8 @@ function MaisonDashboard() {
                 </div>
               ))}
             </div>
-          )
+          )}
+          </>
         ) : tab === "profile" ? (
           <div className="space-y-16">
             <MaisonProfile t={t} lang={lang} />
