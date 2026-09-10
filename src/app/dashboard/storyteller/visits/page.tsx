@@ -12,6 +12,8 @@ import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 
+type Reach = { views: number | null; accounts: number | null; interactions: number | null };
+
 type Visit = {
   id: string;
   maison: string;
@@ -19,7 +21,15 @@ type Visit = {
   status: string;
   photos: string[];
   rightsExpiresAt: string | null;
+  reach: Reach | null;
 };
+
+/** Las horas que quedan del plazo de 24 h para publicar las dos stories. */
+function horasRestantes(slotStart: string): number | null {
+  const limite = new Date(slotStart).getTime() + 24 * 60 * 60 * 1000;
+  const quedan = Math.ceil((limite - Date.now()) / (60 * 60 * 1000));
+  return quedan > 0 ? quedan : null;
+}
 
 type StatusKey = "confirmed" | "pending" | "visited" | "declined" | "cancelled" | "noShow";
 
@@ -86,6 +96,27 @@ function VisitCard({
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [vues, setVues] = useState("");
+  const [comptes, setComptes] = useState("");
+  const [interactions, setInteractions] = useState("");
+  const [guardando, setGuardando] = useState(false);
+
+  // Las cifras se envían solas, sin fotos: quien ya subió las capturas puede
+  // volver un día después a poner la portée, que es cuando Instagram la tiene.
+  async function guardarPortee() {
+    setGuardando(true);
+    const form = new FormData();
+    form.append("reservationId", visit.id);
+    if (vues) form.append("reachViews", vues);
+    if (comptes) form.append("reachAccounts", comptes);
+    if (interactions) form.append("reachInteractions", interactions);
+    try {
+      const res = await fetch("/api/reservations/visit", { method: "POST", body: form });
+      if (res.ok) onChanged();
+    } finally {
+      setGuardando(false);
+    }
+  }
 
   const statusKey = STATUS_KEY[visit.status] ?? "pending";
   const canUpload = visit.status === "confirmed" || visit.status === "completed";
@@ -180,6 +211,53 @@ function VisitCard({
               {error && <p className="text-legende text-copper">{error}</p>}
             </div>
           )}
+
+          {/* La portée. Es el dato del que vive el informe de la maison, y
+              hasta ahora no se guardaba en ninguna parte. */}
+          {visit.reach ? (
+            <div className="mt-rango">
+              <p className="mb-bloque text-capitale uppercase tracking-capitale text-sauge-text">
+                {t.reachDeclared}
+              </p>
+              <Row
+                label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.reachAccounts}</span>}
+                value={<span className="text-sous-titre tabular-nums text-text-primary">{visit.reach.accounts ?? "—"}</span>}
+              />
+              <Row
+                label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.reachViews}</span>}
+                value={<span className="text-sous-titre tabular-nums text-text-primary">{visit.reach.views ?? "—"}</span>}
+              />
+            </div>
+          ) : (
+            <div className="mt-rango">
+              <p className="text-capitale uppercase tracking-capitale text-accent">{t.reachTitle}</p>
+              <p className="mt-bloque mb-fila max-w-[46ch] text-legende text-text-secondary">{t.reachHint}</p>
+              <div className="grid grid-cols-3 gap-fila">
+                {[
+                  { etiqueta: t.reachViews, valor: vues, set: setVues },
+                  { etiqueta: t.reachAccounts, valor: comptes, set: setComptes },
+                  { etiqueta: t.reachInteractions, valor: interactions, set: setInteractions },
+                ].map((campo) => (
+                  <div key={campo.etiqueta}>
+                    <label className="mb-bloque block text-capitale uppercase tracking-capitale text-text-secondary">
+                      {campo.etiqueta}
+                    </label>
+                    <input
+                      inputMode="numeric"
+                      value={campo.valor}
+                      onChange={(e) => campo.set(e.target.value.replace(/\D/g, ""))}
+                      className="w-full min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ tabular-nums text-text-primary transition-colors duration-200 ease-curato outline-none focus:border-accent"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="mt-fila">
+                <Button onClick={guardarPortee} disabled={guardando || !comptes}>
+                  {guardando ? t.sending : t.reachSave}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -198,7 +276,16 @@ function VisitCard({
         <Row
           name
           label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
-          aside={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
+          aside={
+            <span className="text-legende tabular-nums text-brume">
+              {dateLabel}
+              {canUpload && visit.photos.length === 0 && horasRestantes(visit.slotStart) !== null && (
+                <span className="ml-fila text-copper">
+                  {t.reachCountdown.replace("{h}", String(horasRestantes(visit.slotStart)))}
+                </span>
+              )}
+            </span>
+          }
           value={
             <span className={`text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
               {t[statusKey]}
