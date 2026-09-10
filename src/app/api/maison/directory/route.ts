@@ -37,6 +37,18 @@ export async function GET() {
       data = fb.data;
     }
 
+    // Una maison de prueba no aparece en el carnet de una casa real. Consulta
+    // aparte y tolerante: sin la migración 031 no se esconde nada.
+    const pruebas = await admin.from("comercios").select("id").eq("is_test", true);
+    if (!pruebas.error && pruebas.data && pruebas.data.length > 0) {
+      const yo = await admin.from("comercios").select("is_test").eq("id", self.id).maybeSingle();
+      const soyDePrueba = Boolean(!yo.error && (yo.data as { is_test?: boolean } | null)?.is_test);
+      if (!soyDePrueba) {
+        const ocultas = new Set(pruebas.data.map((r) => r.id as string));
+        data = (data ?? []).filter((r) => !ocultas.has((r as { id: string }).id));
+      }
+    }
+
     type Row = {
       id: string; name: string | null; photos: string[] | null;
       description: string | null; description_en: string | null; description_es: string | null;

@@ -146,7 +146,31 @@ export default function InfluencerDashboard() {
         .order("signed_at", { ascending: false, nullsFirst: false });
 
       if (error) console.error("Maisons query failed:", error);
-      setMaisons((data || []) as unknown as Maison[]);
+
+      // Las maisons de prueba solo las ve un creador de prueba. Van en
+      // consultas aparte y tolerantes: si la columna is_test aún no existe
+      // (migración 031 sin aplicar), no se esconde nada y el carnet sigue
+      // exactamente como estaba. Así el orden entre merge y migración deja de
+      // poder romper el carnet.
+      let visibles = (data || []) as unknown as Maison[];
+      const pruebas = await supabase.from("comercios").select("id").eq("is_test", true);
+      if (!pruebas.error && pruebas.data && pruebas.data.length > 0) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const yo = user
+          ? await supabase
+              .from("creators")
+              .select("is_test")
+              .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+              .maybeSingle()
+          : null;
+        const soyDePrueba = Boolean(yo && !yo.error && (yo.data as { is_test?: boolean } | null)?.is_test);
+        if (!soyDePrueba) {
+          const ocultas = new Set(pruebas.data.map((r) => r.id as string));
+          visibles = visibles.filter((m) => !ocultas.has(m.id));
+        }
+      }
+
+      setMaisons(visibles);
       setMaisonsLoading(false);
     }
     loadMaisons();
