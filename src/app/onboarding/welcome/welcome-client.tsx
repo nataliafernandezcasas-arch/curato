@@ -126,7 +126,7 @@ export default function WelcomeClient() {
                 >
                   {welcomeLabels.termsLink}
                 </Link>
-                <span className="text-copper"> {welcomeLabels.required}</span>
+                <span className="text-copper-vif"> {welcomeLabels.required}</span>
               </>
             </Choice>
 
@@ -142,13 +142,13 @@ export default function WelcomeClient() {
                 >
                   {welcomeLabels.privacyLink}
                 </Link>
-                <span className="text-copper"> {welcomeLabels.required}</span>
+                <span className="text-copper-vif"> {welcomeLabels.required}</span>
               </>
             </Choice>
           </div>
 
           {error && (
-            <p className="mt-rango border-l-2 border-burgundy pl-fila text-legende text-text-primary">
+            <p className="mt-rango border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">
               {error}
             </p>
           )}

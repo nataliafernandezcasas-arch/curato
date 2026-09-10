@@ -180,7 +180,7 @@ export default function ReserverPage({ params }: { params: Promise<{ id: string 
             está, y una salida hacia donde se venía. */}
         {hecho ? (
           <div className="py-respiro">
-            <p className="text-capitale uppercase tracking-capitale text-sauge-text">{t.successTitle}</p>
+            <p className="text-capitale uppercase tracking-capitale text-sauge-vif">{t.successTitle}</p>
             <p className="mt-fila max-w-[46ch] text-corps text-text-secondary">{t.successSubtitle}</p>
             <div className="mt-seccion">
               <ButtonLink href={volver}>{t.backToAll}</ButtonLink>
@@ -323,7 +323,7 @@ export default function ReserverPage({ params }: { params: Promise<{ id: string 
             )}
 
             {error && (
-              <p className="mb-fila border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
+              <p className="mb-fila border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
             )}
 
             {/* Lo elegido se repite aquí, encima del botón: nadie debería

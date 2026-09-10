@@ -46,11 +46,11 @@ const STATUS_KEY: Record<string, StatusKey> = {
 
 // Sauge lo cumplido, copper lo que tiene plazo, burgundy lo que se cayó.
 const STATUS_TONE: Record<StatusKey, string> = {
-  confirmed: "text-sauge-text",
-  visited: "text-sauge-text",
-  pending: "text-copper",
-  declined: "text-burgundy",
-  noShow: "text-burgundy",
+  confirmed: "text-sauge-vif",
+  visited: "text-sauge-vif",
+  pending: "text-copper-vif",
+  declined: "text-burgundy-vif",
+  noShow: "text-burgundy-vif",
   cancelled: "text-text-muted",
 };
 
@@ -208,7 +208,7 @@ function VisitCard({
               >
                 {busy ? t.sending : t.addMore}
               </label>
-              {error && <p className="text-legende text-copper">{error}</p>}
+              {error && <p className="text-legende text-copper-vif">{error}</p>}
             </div>
           )}
 
@@ -216,7 +216,7 @@ function VisitCard({
               hasta ahora no se guardaba en ninguna parte. */}
           {visit.reach ? (
             <div className="mt-rango">
-              <p className="mb-bloque text-capitale uppercase tracking-capitale text-sauge-text">
+              <p className="mb-bloque text-capitale uppercase tracking-capitale text-sauge-vif">
                 {t.reachDeclared}
               </p>
               <Row
@@ -280,7 +280,7 @@ function VisitCard({
             <span className="text-legende tabular-nums text-brume">
               {dateLabel}
               {canUpload && visit.photos.length === 0 && horasRestantes(visit.slotStart) !== null && (
-                <span className="ml-fila text-copper">
+                <span className="ml-fila text-copper-vif">
                   {t.reachCountdown.replace("{h}", String(horasRestantes(visit.slotStart)))}
                 </span>
               )}
@@ -304,7 +304,7 @@ function VisitCard({
             {busy ? t.sending : t.markVisited}
           </label>
           <p className="mt-bloque text-legende text-text-secondary">{t.minPhotos}</p>
-          {error && <p className="mt-bloque text-legende text-copper">{error}</p>}
+          {error && <p className="mt-bloque text-legende text-copper-vif">{error}</p>}
         </div>
       )}
     </div>

@@ -82,7 +82,7 @@ export default async function OnboardingSurveyPage() {
     return (
       <div className="min-h-[100dvh] bg-charcoal-deep flex items-center justify-center px-5">
         <div className="text-center max-w-[480px]">
-          <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-copper/50 mb-5">
+          <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-copper-vif mb-5">
             Quelque chose ne va pas
           </p>
           <h1 className="font-serif text-[24px] md:text-[28px] font-light text-white leading-tight mb-4 tracking-wide">

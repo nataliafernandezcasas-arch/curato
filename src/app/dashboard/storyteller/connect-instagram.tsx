@@ -139,7 +139,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       </label>
 
       {error && (
-        <p className="font-serif text-[12px] text-copper/80 mb-3 border-l border-copper/40 pl-3">
+        <p className="font-serif text-[12px] text-copper-vif mb-3 border-l border-copper-vif pl-3">
           {error}
         </p>
       )}

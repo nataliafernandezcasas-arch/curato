@@ -178,7 +178,7 @@ export default function SignInPage() {
           )}
 
           {error && (
-            <p className="border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
+            <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
           )}
 
           <Button type="submit" full disabled={loading}>

@@ -164,7 +164,7 @@ export default function MaisonDemandes() {
             {d.note && <p className="mt-bloque text-legende text-text-secondary">{d.note}</p>}
 
             {/* La consecuencia, encima de los botones y con la cifra real. */}
-            <p className={`mt-fila text-legende ${faltan === 1 ? "text-copper" : "text-text-secondary"}`}>
+            <p className={`mt-fila text-legende ${faltan === 1 ? "text-copper-vif" : "text-text-secondary"}`}>
               {aviso}
             </p>
 
@@ -179,7 +179,7 @@ export default function MaisonDemandes() {
               <button
                 onClick={() => decidir(d.id, "decline")}
                 disabled={trabajando === d.id}
-                className="min-h-11 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-copper disabled:pointer-events-none disabled:opacity-45"
+                className="min-h-11 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-copper-vif disabled:pointer-events-none disabled:opacity-45"
               >
                 {t.decline}
               </button>
@@ -189,7 +189,7 @@ export default function MaisonDemandes() {
       </div>
 
       {error && (
-        <p className="mt-fila border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
+        <p className="mt-fila border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
       )}
     </Section>
   );

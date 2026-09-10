@@ -123,7 +123,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
         <div className="space-y-rango">
           <div>
             <label className="mb-bloque block text-capitale uppercase tracking-capitale text-accent">
-              {l.signatureLabel} <span className="text-copper/70">{l.required}</span>
+              {l.signatureLabel} <span className="text-copper-vif">{l.required}</span>
             </label>
             <input
               type="text"
@@ -150,13 +150,13 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
               <Link href="/privacidad" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-champagne/90 hover:text-champagne underline underline-offset-2">
                 {l.privacyLink}
               </Link>
-              <span className="text-copper/70"> {l.required}</span>
+              <span className="text-copper-vif"> {l.required}</span>
             </span>
           </label>
         </div>
 
         {error && (
-          <p className="mt-rango border-l-2 border-burgundy pl-fila text-legende text-text-primary">
+          <p className="mt-rango border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">
             {error}
           </p>
         )}

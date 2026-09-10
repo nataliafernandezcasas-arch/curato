@@ -47,7 +47,7 @@ function VerifyForm() {
       <CodeField label="Code de vérification" value={code} onChange={setCode} />
 
       {error && (
-        <p className="border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
+        <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
       )}
 
       <Button type="submit" full disabled={loading || code.length !== 6}>

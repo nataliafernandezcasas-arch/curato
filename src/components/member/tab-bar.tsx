@@ -51,7 +51,7 @@ export function TabBar({ links }: { links: NavLink[] }) {
       }}
     >
       {offline && (
-        <p className="py-etiqueta text-center text-capitale uppercase tracking-capitale text-copper">
+        <p className="py-etiqueta text-center text-capitale uppercase tracking-capitale text-copper-vif">
           Hors ligne
         </p>
       )}

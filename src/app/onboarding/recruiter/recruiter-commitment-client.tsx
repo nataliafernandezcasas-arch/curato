@@ -108,16 +108,16 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
           {/* Signature */}
           <div className="space-y-rango">
             <div>
-              <label className={labelClass}>Nom et prénom <span className="text-copper/70">*</span></label>
+              <label className={labelClass}>Nom et prénom <span className="text-copper-vif">*</span></label>
               <input type="text" value={signatory} onChange={(e) => setSignatory(e.target.value)} placeholder="Votre nom" className={`${inputClass} italic`} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className={labelClass}>Fait à <span className="text-copper/70">*</span></label>
+                <label className={labelClass}>Fait à <span className="text-copper-vif">*</span></label>
                 <input type="text" value={place} onChange={(e) => setPlace(e.target.value)} placeholder="Paris" className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>Le <span className="text-copper/70">*</span></label>
+                <label className={labelClass}>Le <span className="text-copper-vif">*</span></label>
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
               </div>
             </div>
@@ -133,13 +133,13 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
                 <Link href="/privacidad" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-champagne/90 hover:text-champagne underline underline-offset-2">
                   politique de confidentialité
                 </Link>
-                <span className="text-copper/70"> *</span>
+                <span className="text-copper-vif"> *</span>
               </span>
             </label>
           </div>
 
           {error && (
-            <p className="mt-rango border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
+            <p className="mt-rango border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
           )}
 
           <div className="mt-seccion">

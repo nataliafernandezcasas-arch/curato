@@ -50,7 +50,7 @@ export function Field({
         <p className="mt-etiqueta text-legende text-text-secondary">{hint}</p>
       )}
       {error && (
-        <p id={errorId} className="mt-etiqueta text-legende text-copper">
+        <p id={errorId} className="mt-etiqueta text-legende text-copper-vif">
           {error}
         </p>
       )}
