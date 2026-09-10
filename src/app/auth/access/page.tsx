@@ -63,7 +63,7 @@ function AccessForm() {
       />
 
       {error && (
-        <p className="border-l-2 border-burgundy pl-fila text-legende text-text-primary">{error}</p>
+        <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
       )}
 
       {/* Inactivo hasta tener las seis cifras: pulsarlo antes solo devuelve un

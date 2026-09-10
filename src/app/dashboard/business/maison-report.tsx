@@ -85,7 +85,7 @@ export default function MaisonReport() {
         <p className="mt-bloque text-legende text-text-secondary">{nombreMes}</p>
 
         {/* La cifra que justifica la suscripción. */}
-        <p className={`mt-fila text-[46px] font-light leading-none tabular-nums ${informe.belowMinimum ? "text-copper" : "text-accent"}`}>
+        <p className={`mt-fila text-[46px] font-light leading-none tabular-nums ${informe.belowMinimum ? "text-copper-vif" : "text-accent"}`}>
           {informe.visits}
         </p>
         <p className="mt-bloque text-legende text-text-secondary">
@@ -93,7 +93,7 @@ export default function MaisonReport() {
         </p>
 
         {informe.belowMinimum && (
-          <p className="mt-fila max-w-[46ch] text-corps text-copper">
+          <p className="mt-fila max-w-[46ch] text-corps text-copper-vif">
             {t.below.replace("{n}", String(informe.guaranteed))}
           </p>
         )}

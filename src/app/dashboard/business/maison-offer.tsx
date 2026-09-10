@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
-import { Plus, X, FilePdf, FloppyDisk, Check } from "@phosphor-icons/react";
+import { Plus, X, FilePdf } from "@phosphor-icons/react";
+import { Button } from "@/components/member/button";
+import { Toast, useToast } from "@/components/member/toast";
 import { Lang } from "@/lib/i18n/translations";
 
 type T = Record<string, string>;
@@ -24,7 +26,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [menuUrls, setMenuUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const { aviso, mostrar, cerrar } = useToast();
   const [uploading, setUploading] = useState(false);
   const [newBlock, setNewBlock] = useState("");
 
@@ -45,37 +47,30 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
     return availability.find((w) => w.day === day);
   }
   function toggleDay(day: number, on: boolean) {
-    setSaved(false);
     setAvailability((prev) =>
       on ? [...prev.filter((w) => w.day !== day), { day, start: "18:00", end: "22:00" }] : prev.filter((w) => w.day !== day)
     );
   }
   function setTime(day: number, field: "start" | "end", val: string) {
-    setSaved(false);
     setAvailability((prev) => prev.map((w) => (w.day === day ? { ...w, [field]: val } : w)));
   }
 
   function addBlock() {
     if (!newBlock || blocked.some((b) => b.date === newBlock)) { setNewBlock(""); return; }
-    setSaved(false);
     setBlocked((prev) => [...prev, { date: newBlock }].sort((a, b) => a.date.localeCompare(b.date)));
     setNewBlock("");
   }
   function removeBlock(date: string) {
-    setSaved(false);
     setBlocked((prev) => prev.filter((b) => b.date !== date));
   }
 
   function addService() {
-    setSaved(false);
     setServices((prev) => [...prev, { name: "", description: "", price: "" }]);
   }
   function updateService(i: number, field: keyof Service, val: string) {
-    setSaved(false);
     setServices((prev) => prev.map((s, idx) => (idx === i ? { ...s, [field]: val } : s)));
   }
   function removeService(i: number) {
-    setSaved(false);
     setServices((prev) => prev.filter((_, idx) => idx !== i));
   }
 
@@ -87,7 +82,8 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ availability, blockedSlots: blocked, services: services.filter((s) => s.name.trim()) }),
       });
-      if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+      // La confirmación llega como aviso, encima de la barra, y se va sola en 4 s.
+      if (res.ok) mostrar(t.offerSaved);
     } finally {
       setSaving(false);
     }
@@ -183,7 +179,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
                 <span className="truncate text-corps text-text-primary">{fmtDate(b.date)}</span>
                 <button
                   onClick={() => removeBlock(b.date)}
-                  className="shrink-0 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-copper"
+                  className="shrink-0 text-capitale uppercase tracking-capitale text-text-muted transition-colors duration-200 ease-curato hover:text-copper-vif"
                 >
                   {t.offerRemove}
                 </button>
@@ -205,7 +201,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         <div className="space-y-3">
           {services.map((s, i) => (
             <div key={i} className="relative pr-10">
-              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-white/40 hover:text-copper" aria-label="X"><X size={15} /></button>
+              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-white/40 hover:text-copper-vif" aria-label="X"><X size={15} /></button>
               <div className="grid sm:grid-cols-[1fr_140px] gap-3 mb-3">
                 <input value={s.name} onChange={(e) => updateService(i, "name", e.target.value)} placeholder={t.offerServiceName} className={`${inputCls} w-full`} />
                 <input value={s.price} onChange={(e) => updateService(i, "price", e.target.value)} placeholder={t.offerServicePrice} className={`${inputCls} w-full`} />
@@ -227,7 +223,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
               <a href={url} target="_blank" rel="noopener noreferrer" className="font-serif text-[13px] text-white/70 hover:text-champagne transition-colors">
                 {url.split("/").pop()?.slice(-16) || "menu"}
               </a>
-              <button onClick={() => removeMenu(url)} className="absolute top-1.5 right-1.5 text-white/40 hover:text-copper" aria-label="X"><X size={13} /></button>
+              <button onClick={() => removeMenu(url)} className="absolute top-1.5 right-1.5 text-white/40 hover:text-copper-vif" aria-label="X"><X size={13} /></button>
             </div>
           ))}
           <FilePicker
@@ -242,13 +238,13 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         </div>
       </section>
 
-      {/* Save */}
+      {/* Guardar. Era el último botón relleno de champagne de la oferta, y
+          cambiaba de texto dos segundos y medio para decir que había guardado.
+          Ahora es el botón de siempre, y la confirmación llega como aviso. */}
       <div className="flex items-center gap-4">
-        <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-8 py-3.5 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50">
-          {saved ? <Check size={15} /> : <FloppyDisk size={15} />}
-          {saved ? t.offerSaved : t.offerSave}
-        </button>
+        <Button onClick={save} disabled={saving}>{t.offerSave}</Button>
       </div>
+      <Toast aviso={aviso} onClose={cerrar} />
     </div>
   );
 }

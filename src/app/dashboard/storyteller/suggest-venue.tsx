@@ -71,7 +71,7 @@ export default function SuggestVenue() {
             placeholder={t.suggestNotePlaceholder}
             className="w-full px-5 py-3.5 border border-white/15 bg-charcoal-mid/60 text-white font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors resize-none placeholder:text-white/35"
           />
-          {error && <p className="font-serif text-[12px] text-copper/80">{error}</p>}
+          {error && <p className="font-serif text-[12px] text-copper-vif">{error}</p>}
           <button
             type="submit"
             disabled={busy}

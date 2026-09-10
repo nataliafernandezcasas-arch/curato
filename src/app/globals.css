@@ -16,15 +16,26 @@
   --color-border-hover: rgba(203,183,143,0.30);
   --color-text-primary: #F5EFE4;
   --color-text-secondary: rgba(245,239,228,0.65);
-  --color-text-muted: rgba(245,239,228,0.38);
+  /* La orientación sube del 38 % al 68 %: el 38 daba 2,8:1 sobre el fondo real
+     y se estaba usando para instrucciones. Queda por encima del 4,5:1. */
+  --color-text-muted: rgba(245,239,228,0.68);
   --color-accent: #CBB78F;
 
   /* Sauge y brume liberan al champagne, que hoy señala cinco cosas distintas.
-     Sauge es lo cumplido, brume es lo que solo informa. En texto el sauge sube
-     a #8C9A86: el #4E5A4B es para marcas y filetes, no para leerlo. */
+     Sauge es lo cumplido, brume es lo que solo informa. Para texto y marcas se usa
+     su peldaño vivo, sauge-vif: el #4E5A4B es solo superficie. */
   --color-sauge: #4E5A4B;
-  --color-sauge-text: #8C9A86;
   --color-brume: #A3BAC0;
+
+  /* Enmienda de contraste (entrega 4, 10 septies). Cada rol de estado tiene
+     dos peldaños: el profundo (copper, sauge, burgundy) queda solo para
+     superficie; el vivo es el único que puede tocar texto o marca. Medidos
+     sobre el punto más claro del fondo real, #3F3E3A, dentro del foco:
+     sauge-vif 4,9:1, copper-vif 5,0:1, burgundy-vif 5,1:1. El copper de
+     antes daba 2,7:1 ahí, muy por debajo del 4,5 que exige el propio sistema. */
+  --color-sauge-vif: #6FBF8B;
+  --color-copper-vif: #E6A455;
+  --color-burgundy-vif: #F29AA3;
 
   --color-cream: #F2EDE4;
   --color-cream-text: #2A201C;

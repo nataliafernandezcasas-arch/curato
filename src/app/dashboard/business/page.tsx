@@ -279,7 +279,7 @@ function MaisonDashboard() {
                         {c.igConnected && (
                           <span
                             title={t.igVerified}
-                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-capitale uppercase tracking-capitale text-sauge-text"
+                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-capitale uppercase tracking-capitale text-sauge-vif"
                           >
                             <InstagramLogo size={11} weight="fill" />
                             {t.igVerified}

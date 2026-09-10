@@ -275,7 +275,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               <div key={i} className="flex min-h-11 items-center gap-fila">
                 <span
                   aria-hidden
-                  className={`block h-2.5 w-2.5 shrink-0 rounded-full ${s.done ? "bg-sauge-text" : "bg-copper"}`}
+                  className={`block h-2.5 w-2.5 shrink-0 rounded-full ${s.done ? "bg-sauge-vif" : "bg-copper-vif"}`}
                 />
                 <span className={`text-corps ${s.done ? "text-text-muted" : "text-text-primary"}`}>{s.label}</span>
               </div>
@@ -290,7 +290,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         <div>
           <div className="flex items-baseline justify-between mb-1.5">
             <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70">{t.profilePhotos}</p>
-            <span className={`font-serif text-[12px] ${photosOk ? "text-champagne/60" : "text-copper/80"}`}>
+            <span className={`font-serif text-[12px] ${photosOk ? "text-champagne/60" : "text-copper-vif"}`}>
               {photos.length}/{MIN_PHOTOS}
             </span>
           </div>
@@ -341,14 +341,14 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               <Plus size={22} weight="thin" />
             </FilePicker>
           </div>
-          {notice && <p className="font-serif text-[12px] text-copper/80 mt-3 border-l border-copper/40 pl-3">{notice}</p>}
+          {notice && <p className="font-serif text-[12px] text-copper-vif mt-3 border-l border-copper-vif pl-3">{notice}</p>}
         </div>
 
         {/* Description */}
         <div>
           <div className="flex items-baseline justify-between mb-3">
             <label className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70">{t.profileDescription}</label>
-            <span className={`font-serif text-[12px] ${descLang === "fr" ? (descOk ? "text-champagne/60" : "text-copper/80") : "text-white/40"}`}>
+            <span className={`font-serif text-[12px] ${descLang === "fr" ? (descOk ? "text-champagne/60" : "text-copper-vif") : "text-white/40"}`}>
               {descValue.trim().length}/{MIN_DESC}
             </span>
           </div>
@@ -405,7 +405,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             {saving ? t.profileSaving : t.profileSave}
           </button>
           {!canSave && !saving && (
-            <span className="font-serif text-[12px] font-light text-copper/80">
+            <span className="font-serif text-[12px] font-light text-copper-vif">
               {!photosOk
                 ? t.profilePhotosNeed.replace("{n}", String(MIN_PHOTOS - photos.length))
                 : t.profileDescMin}

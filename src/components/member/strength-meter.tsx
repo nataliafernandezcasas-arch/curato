@@ -29,9 +29,9 @@ export function StrengthMeter({
   if (level === 0) return null;
 
   const shown = {
-    1: { label: words.weak, width: "33%", tone: "text-copper", bar: "bg-copper" },
+    1: { label: words.weak, width: "33%", tone: "text-copper-vif", bar: "bg-copper-vif" },
     2: { label: words.fair, width: "66%", tone: "text-accent", bar: "bg-accent" },
-    3: { label: words.strong, width: "100%", tone: "text-sauge-text", bar: "bg-sauge-text" },
+    3: { label: words.strong, width: "100%", tone: "text-sauge-vif", bar: "bg-sauge-vif" },
   }[level];
 
   return (

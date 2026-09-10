@@ -72,7 +72,7 @@ export function PullToRefresh({ onRefresh, children }: { onRefresh: () => Promis
       >
         <span
           className={`text-capitale uppercase tracking-capitale ${
-            estado === "listo" ? "text-sauge-text" : "text-text-muted"
+            estado === "listo" ? "text-sauge-vif" : "text-text-muted"
           }`}
         >
           {etiqueta}

@@ -240,7 +240,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
 
             {/* Required hint only after the user tried to advance */}
             {!answersOk && current.is_required && (
-              <p className="font-serif text-[12px] italic text-copper/70 mt-6 tracking-wide">
+              <p className="font-serif text-[12px] italic text-copper-vif mt-6 tracking-wide">
                 {t.requiredHint}
               </p>
             )}
@@ -284,7 +284,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
               />
               <span className="font-serif text-[13px] font-light text-white/70 leading-relaxed tracking-wide group-hover:text-white/90 transition-colors">
                 {t.consentLabel}
-                <span className="text-copper/70"> *</span>
+                <span className="text-copper-vif"> *</span>
               </span>
             </label>
             {!consented && (
@@ -299,7 +299,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
       {/* ── Footer: nav buttons + error ── */}
       <footer className="px-5 pb-8 md:pb-10 max-w-[760px] mx-auto w-full">
         {submitError && (
-          <p className="mb-fila border-l-2 border-burgundy pl-fila text-legende text-text-primary">
+          <p className="mb-fila border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">
             {submitError}
           </p>
         )}
