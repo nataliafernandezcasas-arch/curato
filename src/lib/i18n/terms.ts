@@ -74,7 +74,7 @@ const fr: TermsContent = {
   pageTitle: "Conditions générales d'utilisation",
   eyebrow: "Curato · Conditions",
   lastUpdatedLabel: "Dernière mise à jour",
-  lastUpdated: "25 mai 2026",
+  lastUpdated: "10 septembre 2026",
   draftNoticeTitle: "Document de travail",
   draftNoticeBody:
     "Les présentes conditions sont un projet en cours de finalisation. Elles seront mises à jour à l'issue de l'immatriculation de Curato Collective SAS et de leur revue par un conseil juridique français. Les mentions [entre crochets] sont des champs en attente.",
@@ -309,6 +309,7 @@ const fr: TermsContent = {
       blocks: [
         "**Propriété.** Le Créateur reste et demeure pleinement propriétaire du Contenu qu'il produit. Curato ne revendique aucun droit de propriété sur ce Contenu.",
         "**Licence concédée.** Pour chaque Visite, le Créateur concède à la Maison visitée la licence d'utilisation décrite à l'article 20. Il concède en outre à Curato une licence non exclusive, mondiale, gratuite, pour la durée de la relation contractuelle, afin de référencer le Contenu sur la Plateforme et dans les communications éditoriales de Curato (newsletter, réseaux sociaux propres de Curato, supports de présentation), avec attribution au Créateur.",
+        "**Portfolio de candidature.** Les photographies et la description de style que le Créateur joint à sa candidature (le « Portfolio ») restent sa propriété. S'il est admis, il concède : (i) aux Maisons membres, le droit de consulter le Portfolio sur la Plateforme, afin d'évaluer ses demandes de Visite et de découvrir son travail, à l'exclusion de tout téléchargement, de toute reproduction et de toute autre utilisation ; (ii) à Curato, une licence non exclusive, mondiale, gratuite, pour la durée de la relation contractuelle, afin de reproduire et de représenter le Portfolio sur la Plateforme, sur les réseaux sociaux propres de Curato, dans sa newsletter et dans ses documents de présentation, avec attribution au Créateur, sans sous-licence ni publicité payante. Le Créateur peut à tout moment demander, à l'adresse " + CONTACT_EMAIL + ", le retrait d'une photographie de son Portfolio : elle cesse alors d'être montrée aux Maisons, et Curato ne l'utilise plus dans de nouveaux supports. Les garanties et l'indemnisation prévues au présent article s'appliquent au Portfolio. Une candidature non retenue n'ouvre aucun de ces droits.",
         "**Garanties du Créateur.** Le Créateur déclare et garantit que :",
         {
           list: [
@@ -560,7 +561,7 @@ const en: TermsContent = {
   pageTitle: "Terms and Conditions",
   eyebrow: "Curato · Terms",
   lastUpdatedLabel: "Last updated",
-  lastUpdated: "May 25, 2026",
+  lastUpdated: "September 10, 2026",
   draftNoticeTitle: "Working draft",
   draftNoticeBody:
     "These terms are a draft pending finalisation. They will be updated once Curato Collective SAS is registered and after review by a French legal counsel. Fields in [brackets] are placeholders. The French version is the legally binding one.",
@@ -792,6 +793,7 @@ const en: TermsContent = {
       blocks: [
         "**Ownership.** The Creator remains the full owner of the Content they produce. Curato does not claim any ownership of this Content.",
         "**Licence granted.** For each Visit, the Creator grants the visited House the licence described in section 20 below. They also grant Curato a non-exclusive, worldwide, royalty-free licence, for the duration of the contractual relationship, to feature the Content on the Platform and in Curato's editorial communications (newsletter, Curato's own social channels, presentation materials), with attribution to the Creator.",
+        "**Application portfolio.** The photographs and style description the Creator attaches to their application (the \"Portfolio\") remain their property. If admitted, they grant: (i) to member Houses, the right to view the Portfolio on the Platform, to assess their Visit requests and discover their work, excluding any download, reproduction or other use; (ii) to Curato, a non-exclusive, worldwide, royalty-free licence, for the duration of the contractual relationship, to reproduce and display the Portfolio on the Platform, on Curato's own social channels, in its newsletter and in its presentation documents, with attribution to the Creator, without sublicensing or paid advertising. The Creator may at any time ask, at " + CONTACT_EMAIL + ", for a photograph to be removed from their Portfolio: it then stops being shown to Houses, and Curato no longer uses it in new materials. The warranties and indemnity in this section apply to the Portfolio. An unsuccessful application grants none of these rights.",
         "**Creator's warranties.** The Creator declares and warrants that:",
         {
           list: [
@@ -1039,7 +1041,7 @@ const es: TermsContent = {
   pageTitle: "Condiciones Generales de Uso",
   eyebrow: "Curato · Condiciones",
   lastUpdatedLabel: "Última actualización",
-  lastUpdated: "25 de mayo de 2026",
+  lastUpdated: "10 de septiembre de 2026",
   draftNoticeTitle: "Borrador",
   draftNoticeBody:
     "Estas condiciones son un borrador pendiente de finalización. Se actualizarán una vez constituida Curato Collective SAS y tras la revisión por un abogado francés. Los campos entre [corchetes] son marcadores. La versión francesa es la jurídicamente vinculante.",
@@ -1271,6 +1273,7 @@ const es: TermsContent = {
       blocks: [
         "**Propiedad.** El Creador es y permanece pleno propietario del Contenido que produce. Curato no reivindica ningún derecho de propiedad sobre este Contenido.",
         "**Licencia otorgada.** Para cada Visita, el Creador otorga a la Maison visitada la licencia descrita en la sección 20. Otorga además a Curato una licencia no exclusiva, mundial, gratuita, por la duración de la relación contractual, para referenciar el Contenido en la Plataforma y en las comunicaciones editoriales de Curato (newsletter, redes propias de Curato, soportes de presentación), con atribución al Creador.",
+        "**Portafolio de candidatura.** Las fotografías y la descripción de estilo que el Creador adjunta a su candidatura (el «Portafolio») siguen siendo de su propiedad. Si es admitido, otorga: (i) a las Maisons miembro, el derecho a consultar el Portafolio en la Plataforma, para valorar sus solicitudes de Visita y conocer su trabajo, con exclusión de toda descarga, reproducción o cualquier otro uso; (ii) a Curato, una licencia no exclusiva, mundial, gratuita, por la duración de la relación contractual, para reproducir y mostrar el Portafolio en la Plataforma, en las redes propias de Curato, en su newsletter y en sus documentos de presentación, con atribución al Creador, sin sublicencia ni publicidad pagada. El Creador puede pedir en cualquier momento, en " + CONTACT_EMAIL + ", que se retire una fotografía de su Portafolio: deja entonces de mostrarse a las Maisons, y Curato no la usa en nuevos soportes. Las garantías y la indemnización previstas en este artículo se aplican al Portafolio. Una candidatura no aceptada no otorga ninguno de estos derechos.",
         "**Garantías del Creador.** El Creador declara y garantiza que:",
         {
           list: [
