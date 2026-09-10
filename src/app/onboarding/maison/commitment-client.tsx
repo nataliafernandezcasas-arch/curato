@@ -83,7 +83,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
         <a
           href={dossierPdf}
           download={dossierFilename}
-          className="inline-flex min-h-11 items-center gap-2 border border-[rgba(203,183,143,0.3)] px-fila text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:border-accent hover:text-text-primary"
+          className="boton-cristal gap-2"
         >
           <DownloadSimple size={15} />
           {l.downloadLabel}
