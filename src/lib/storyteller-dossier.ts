@@ -1,6 +1,7 @@
 import type { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { PORTFOLIO_BUCKET, PORTFOLIO_SIGNED_URL_SECONDS } from "@/lib/candidature-portfolio";
+import { signPortraits } from "@/lib/creator-portrait";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -164,13 +165,16 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
       const club = clubById.get(id);
       const portraits = (c.portrait_urls as string[] | null) ?? [];
       const ownBio = ((c.own_bio as string | null) ?? "").trim();
+      // El retrato propio (16b) vive en un bucket privado: se firma cada vez
+      // que se enseña. Si falla, la casa ve la foto de Instagram.
+      const [retrato] = portraits[0] ? await signPortraits(admin, [portraits[0]]) : [null];
 
       out.set(id, {
         id,
         name: (c.full_name as string | null)?.trim() || (c.handle ? `@${c.handle}` : ""),
         handle: (c.handle as string | null) ?? null,
         categories: categoriesById.get(id) ?? [],
-        portrait: portraits[0] ?? x?.imageUrl ?? null,
+        portrait: retrato ?? x?.imageUrl ?? null,
         phrase: ownBio || app?.style?.trim() || null,
         portfolio,
         club: {

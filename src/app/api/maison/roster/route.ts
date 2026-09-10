@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
+import { signPortraits } from "@/lib/creator-portrait";
 
 // Content-type survey slugs → display labels (FR).
 const CONTENT_LABELS: Record<string, string> = {
@@ -35,7 +36,7 @@ export async function GET() {
     // back to the old shape if the column isn't there yet (migration 026 pending).
     const primary = await admin
       .from("creators")
-      .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id, hidden_from_roster")
+      .select("id, full_name, handle, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id, hidden_from_roster, portrait_urls, own_bio")
       .eq("stage", "active")
       .eq("hidden_from_roster", false)
       .order("followers", { ascending: false, nullsFirst: false });
@@ -103,6 +104,13 @@ export async function GET() {
         })
     );
 
+    // El retrato y la frase que el creador eligió (16b) mandan sobre los de
+    // Instagram. El retrato vive en un bucket privado: se firman todos de una vez.
+    const primerRetrato = (c: (typeof rows)[number]) => ((c.portrait_urls as string[] | null | undefined) ?? [])[0];
+    const conRetrato = rows.filter((c) => primerRetrato(c));
+    const firmados = await signPortraits(admin, conRetrato.map((c) => primerRetrato(c) as string));
+    const retratoById = new Map(conRetrato.map((c, i) => [c.id as string, firmados[i]]));
+
     const roster = rows.map((c) => {
       const er = c.engagement_rate as number | null;
       const x = extraById.get(c.id as string);
@@ -116,8 +124,8 @@ export async function GET() {
         igConnected: Boolean(c.instagram_connected),
         // engagement_rate is stored as a fraction (0.05 = 5%); expose the %.
         engagement: er != null ? Math.round(er * 1000) / 10 : null,
-        avatar: x?.avatar ?? null,
-        bio: x?.bio ?? null,
+        avatar: retratoById.get(c.id as string) ?? x?.avatar ?? null,
+        bio: ((c.own_bio as string | null | undefined) ?? "").trim() || x?.bio || null,
         avgReach: x?.avgReach ?? null,
         posts3: x?.posts3 ?? [],
       };
