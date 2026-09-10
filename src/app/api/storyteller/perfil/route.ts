@@ -11,6 +11,7 @@ import {
   isAllowedImage,
   signPortraits,
 } from "@/lib/creator-portrait";
+import { SUBJECT_MAX, SUBJECT_QUESTION, isSubject } from "@/lib/photo-subjects";
 
 /**
  * El retrato y la frase que el storyteller elige enseñar a las casas (16b).
@@ -51,12 +52,23 @@ export async function GET() {
     const { admin, creator } = r;
 
     const paths = ((creator.portrait_urls as string[] | null) ?? []).slice(0, PORTRAIT_MAX);
-    const [urls, dossiers] = await Promise.all([signPortraits(admin, paths), buildDossiers(admin, [creator.id])]);
+    const [urls, dossiers, respuesta] = await Promise.all([
+      signPortraits(admin, paths),
+      buildDossiers(admin, [creator.id]),
+      admin
+        .from("creator_survey_responses")
+        .select("answer")
+        .eq("creator_id", creator.id)
+        .eq("question_slug", SUBJECT_QUESTION)
+        .maybeSingle(),
+    ]);
     const dossier = dossiers.get(creator.id) ?? null;
+    const elegidas = Array.isArray(respuesta.data?.answer) ? (respuesta.data.answer as unknown[]) : [];
 
     return NextResponse.json({
       portraits: paths.map((path, i) => ({ path, url: urls[i] })).filter((p) => p.url),
       bio: (creator.own_bio as string | null) ?? "",
+      subjects: elegidas.filter(isSubject),
       // Sin retrato propio, la casa ve la foto de Instagram: se enseña como tal.
       inherited: paths.length === 0 ? dossier?.portrait ?? null : null,
       dossier,
@@ -103,13 +115,32 @@ export async function PATCH(request: NextRequest) {
     if ("error" in r) return r.error;
     const { admin, creator } = r;
 
-    const body = (await request.json()) as { portraits?: unknown; bio?: unknown };
+    const body = (await request.json()) as { portraits?: unknown; bio?: unknown; subjects?: unknown };
     const portraits = Array.isArray(body.portraits) ? body.portraits : [];
     if (portraits.length > PORTRAIT_MAX || !portraits.every((p) => esSuya(p, creator.id))) {
       return NextResponse.json({ error: "Portraits invalides." }, { status: 400 });
     }
     const bio = typeof body.bio === "string" ? body.bio.trim() : "";
     if (bio.length > BIO_MAX) return NextResponse.json({ error: "Phrase trop longue." }, { status: 400 });
+
+    // Qué fotografía: solo si la pantalla lo cambió. Quien trae más de dos de
+    // antes de la migración 033 puede guardar su frase sin tocarlas.
+    if (body.subjects !== undefined) {
+      const subjects = Array.isArray(body.subjects) ? [...new Set(body.subjects)] : null;
+      if (!subjects || subjects.length > SUBJECT_MAX || !subjects.every(isSubject)) {
+        return NextResponse.json({ error: "Deux au plus." }, { status: 400 });
+      }
+      const { error: e } =
+        subjects.length === 0
+          ? await admin.from("creator_survey_responses").delete().eq("creator_id", creator.id).eq("question_slug", SUBJECT_QUESTION)
+          : await admin
+              .from("creator_survey_responses")
+              .upsert(
+                { creator_id: creator.id, question_slug: SUBJECT_QUESTION, answer: subjects, answered_at: new Date().toISOString() },
+                { onConflict: "creator_id,question_slug" }
+              );
+      if (e) return NextResponse.json({ error: e.message }, { status: 500 });
+    }
 
     const { error } = await admin
       .from("creators")

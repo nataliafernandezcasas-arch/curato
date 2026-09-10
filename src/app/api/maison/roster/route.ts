@@ -3,16 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { signPortraits } from "@/lib/creator-portrait";
+import { subjectLabel } from "@/lib/photo-subjects";
 
-// Content-type survey slugs → display labels (FR).
-const CONTENT_LABELS: Record<string, string> = {
-  food: "Food",
-  hotel_reviews: "Hôtels",
-  wellness: "Bien-être",
-  fashion_adjacent: "Mode",
-  lifestyle: "Lifestyle",
-  travel: "Voyage",
-};
 
 // Roster of signed storytellers, visible to a logged-in maison: name, handle,
 // follower count, and the kind of content they make (from the onboarding survey).
@@ -69,7 +61,7 @@ export async function GET() {
       const slugs = Array.isArray(r.answer) ? (r.answer as string[]) : [];
       contentByCreator.set(
         r.creator_id,
-        slugs.map((s) => CONTENT_LABELS[s] ?? s).filter(Boolean)
+        slugs.map((s) => subjectLabel(s)).filter(Boolean)
       );
     }
 
