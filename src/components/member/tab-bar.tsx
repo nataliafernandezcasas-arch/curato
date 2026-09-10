@@ -61,11 +61,11 @@ export function TabBar({ links }: { links: NavLink[] }) {
             key={l.href}
             href={l.href}
             aria-current={l.active ? "page" : undefined}
-            className={`flex min-h-14 flex-1 items-center justify-center text-balance px-1 py-2 text-center text-capitale uppercase tracking-capitale transition-colors duration-200 ease-curato ${
-              l.active ? "text-accent" : "text-text-secondary"
-            }`}
+            className="flex min-h-14 flex-1 items-center justify-center px-1 py-bloque text-center text-capitale uppercase tracking-capitale"
           >
-            {l.label}
+            {/* La activa es una píldora de cristal; la palabra sola ya no
+                basta para decir dónde estás. */}
+            <span className={`pestana text-balance ${l.active ? "pestana-activa" : ""}`}>{l.label}</span>
           </Link>
         ))}
       </div>
