@@ -6,7 +6,7 @@ import { STORYTELLER_LINKS } from "../nav-links";
 import { Rise } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
-import { Button } from "@/components/member/button";
+import { Button, LabelButton } from "@/components/member/button";
 import { PullToRefresh } from "@/components/member/pull-to-refresh";
 import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -297,12 +297,9 @@ function VisitCard({
       {canUpload && (
         <div className="mt-fila">
           {fileInput}
-          <label
-            htmlFor={`fotos-${visit.id}`}
-            className={`inline-flex min-h-11 items-center justify-center border border-[rgba(203,183,143,0.3)] px-fila text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:border-accent hover:text-text-primary ${busy ? "pointer-events-none opacity-45" : "cursor-pointer"}`}
-          >
+          <LabelButton htmlFor={`fotos-${visit.id}`} disabled={busy}>
             {busy ? t.sending : t.markVisited}
-          </label>
+          </LabelButton>
           <p className="mt-bloque text-legende text-text-secondary">{t.minPhotos}</p>
           {error && <p className="mt-bloque text-legende text-copper">{error}</p>}
         </div>
