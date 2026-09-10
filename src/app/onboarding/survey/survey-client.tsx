@@ -10,6 +10,13 @@ import { Choice } from "@/components/member/choice";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import { submitSurvey, type SurveyAnswers } from "./actions";
+import { SUBJECT_MAX, SUBJECT_QUESTION } from "@/lib/photo-subjects";
+
+const DOS_AL_MAS: Record<Lang, string> = {
+  fr: "Deux au plus. C'est ce que les maisons lisent sous votre nom.",
+  en: "Two at most. It's what houses read under your name.",
+  es: "Dos como máximo. Es lo que las maisons leen bajo tu nombre.",
+};
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types — mirror what /onboarding/survey/page.tsx selects from the DB
@@ -91,6 +98,8 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
         // Tap-to-deselect on cards keeps the UI honest.
         return { ...prev, [slug]: cur.includes(value) ? [] : [value] };
       }
+      // Qué fotografía: dos al más, igual que en la 16b (photo-subjects.ts).
+      if (!cur.includes(value) && slug === SUBJECT_QUESTION && cur.length >= SUBJECT_MAX) return prev;
       const next = cur.includes(value) ? cur.filter((v) => v !== value) : [...cur, value];
       return { ...prev, [slug]: next };
     });
@@ -219,7 +228,11 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
               {pickQuestionText(current, lang)}
             </h1>
             <p className="font-serif text-[13px] font-light italic text-white/40 leading-relaxed mb-10 tracking-wide">
-              {current.question_type === "cards" ? t.cardsHint : t.multiSelectHint}
+              {current.slug === SUBJECT_QUESTION
+                ? DOS_AL_MAS[lang]
+                : current.question_type === "cards"
+                  ? t.cardsHint
+                  : t.multiSelectHint}
             </p>
 
             {current.question_type === "cards" ? (

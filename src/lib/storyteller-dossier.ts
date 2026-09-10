@@ -2,18 +2,9 @@ import type { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { PORTFOLIO_BUCKET, PORTFOLIO_SIGNED_URL_SECONDS } from "@/lib/candidature-portfolio";
 import { signPortraits } from "@/lib/creator-portrait";
+import { SUBJECT_QUESTION, subjectLabel } from "@/lib/photo-subjects";
 
 type Admin = ReturnType<typeof createAdminClient>;
-
-/** Content-type survey slugs → display labels. */
-export const CONTENT_LABELS: Record<string, string> = {
-  food: "Food",
-  hotel_reviews: "Hôtels",
-  wellness: "Bien-être",
-  fashion_adjacent: "Mode",
-  lifestyle: "Lifestyle",
-  travel: "Voyage",
-};
 
 /**
  * Todo lo que una maison puede saber de un storyteller, en el orden en que lo
@@ -102,7 +93,7 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
     admin
       .from("creator_survey_responses")
       .select("creator_id, answer")
-      .eq("question_slug", "content_type")
+      .eq("question_slug", SUBJECT_QUESTION)
       .in("creator_id", ids),
     // Solo visitas terminadas, y solo la cifra: nada que diga en qué casa fue.
     admin.from("reservations").select("creator_id, reach_accounts").eq("status", "completed").in("creator_id", ids),
@@ -123,7 +114,7 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
   const categoriesById = new Map<string, string[]>();
   for (const r of survey.data ?? []) {
     const slugs = Array.isArray(r.answer) ? (r.answer as string[]) : [];
-    categoriesById.set(r.creator_id, slugs.map((s) => CONTENT_LABELS[s] ?? s).filter(Boolean));
+    categoriesById.set(r.creator_id, slugs.map((s) => subjectLabel(s)).filter(Boolean));
   }
 
   const clubById = new Map<string, { visits: number; reachSum: number; reachCount: number }>();

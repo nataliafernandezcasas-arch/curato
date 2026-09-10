@@ -7,7 +7,9 @@ import { SlideIn } from "@/components/member/slide-in";
 import { StateMark } from "@/components/member/state-mark";
 import { Button } from "@/components/member/button";
 import { FilePicker } from "@/components/member/file-picker";
+import { Choice } from "@/components/member/choice";
 import { downscaleImage } from "@/lib/image-downscale";
+import { SUBJECTS, SUBJECT_MAX } from "@/lib/photo-subjects";
 
 // Los mismos límites que valida el servidor (creator-portrait.ts). No se
 // importan de allí porque ese archivo arrastra el cliente de administración.
@@ -35,6 +37,9 @@ const TEXTOS = {
     bioLabel: "Ma façon de photographier",
     bioHint: "Une phrase, avec vos mots. C'est ce que la maison lit avant de regarder.",
     bioPlaceholder: "Ce que vous aimez photographier, la lumière que vous cherchez, le genre de lieux où vous êtes chez vous.",
+    subjects: "Ce que je photographie",
+    subjectsHint: "Deux au plus. C'est ce que les maisons lisent sous votre nom.",
+    subjectsOver: "Deux au plus : retirez-en pour pouvoir enregistrer.",
     appPhotos: "Mes photographies de candidature",
     appText: (n: number) =>
       `Les ${n} photographies remises avec votre candidature. Les maisons du club les voient avec votre profil, sans pouvoir les télécharger, et Curato peut les montrer, avec votre nom, dans sa communication (article 15 des conditions générales). Pour en retirer une, écrivez-nous à ${CONTACTO}.`,
@@ -64,6 +69,9 @@ const TEXTOS = {
     bioLabel: "How I photograph",
     bioHint: "One sentence, in your words. It's what the house reads before looking.",
     bioPlaceholder: "What you love to photograph, the light you look for, the kind of places where you feel at home.",
+    subjects: "What I photograph",
+    subjectsHint: "Two at most. It's what houses read under your name.",
+    subjectsOver: "Two at most: remove some to be able to save.",
     appPhotos: "My application photographs",
     appText: (n: number) =>
       `The ${n} photographs you sent with your application. Houses in the club see them with your profile, without being able to download them, and Curato may show them, with your name, in its communications (section 15 of the terms). To remove one, write to us at ${CONTACTO}.`,
@@ -93,6 +101,9 @@ const TEXTOS = {
     bioLabel: "Mi manera de fotografiar",
     bioHint: "Una frase, con tus palabras. Es lo que la maison lee antes de mirar.",
     bioPlaceholder: "Lo que te gusta fotografiar, la luz que buscas, el tipo de lugares donde te sientes en casa.",
+    subjects: "Lo que fotografío",
+    subjectsHint: "Dos como máximo. Es lo que las maisons leen bajo tu nombre.",
+    subjectsOver: "Dos como máximo: quita alguna para poder guardar.",
     appPhotos: "Mis fotografías de candidatura",
     appText: (n: number) =>
       `Las ${n} fotografías que enviaste con tu candidatura. Las maisons del club las ven con tu perfil, sin poder descargarlas, y Curato puede mostrarlas, con tu nombre, en su comunicación (sección 15 de las condiciones generales). Para quitar alguna, escríbenos a ${CONTACTO}.`,
@@ -126,7 +137,7 @@ export function PortraitEditor({
   onSaved,
 }: {
   lang: Lang;
-  initial: { portraits: Retrato[]; bio: string; inherited: string | null; portfolio: string[] };
+  initial: { portraits: Retrato[]; bio: string; subjects: string[]; inherited: string | null; portfolio: string[] };
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -135,12 +146,18 @@ export function PortraitEditor({
 
   const [portraits, setPortraits] = useState<Retrato[]>(initial.portraits);
   const [bio, setBio] = useState(initial.bio);
+  const [subjects, setSubjects] = useState<string[]>(initial.subjects);
   const [subiendo, setSubiendo] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<{ cap?: string; texto: string } | null>(null);
 
+  const temasCambiados = [...subjects].sort().join("|") !== [...initial.subjects].sort().join("|");
+  // Quien trae más de dos de antes puede guardar sin tocarlas; si las toca,
+  // tiene que dejar dos como mucho.
+  const temasDeMas = temasCambiados && subjects.length > SUBJECT_MAX;
   const cambiado =
     bio.trim() !== initial.bio.trim() ||
+    temasCambiados ||
     portraits.map((p) => p.path).join("|") !== initial.portraits.map((p) => p.path).join("|");
 
   // Escape vuelve, y la página de debajo no se mueve mientras esto está encima.
@@ -199,7 +216,11 @@ export function PortraitEditor({
       const res = await fetch("/api/storyteller/perfil", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ portraits: portraits.map((p) => p.path), bio }),
+        body: JSON.stringify({
+          portraits: portraits.map((p) => p.path),
+          bio,
+          ...(temasCambiados ? { subjects } : {}),
+        }),
       });
       if (!res.ok) throw new Error();
       onSaved();
@@ -322,6 +343,29 @@ export function PortraitEditor({
               <p className="mt-etiqueta max-w-[46ch] text-legende text-text-secondary">{t.bioHint}</p>
             </section>
 
+            <section className="mb-seccion">
+              <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">{t.subjects}</p>
+              {SUBJECTS.map((s) => {
+                const marcada = subjects.includes(s.slug);
+                return (
+                  <Choice
+                    key={s.slug}
+                    checked={marcada}
+                    onChange={(on) =>
+                      setSubjects((prev) =>
+                        on ? (prev.length >= SUBJECT_MAX ? prev : [...prev, s.slug]) : prev.filter((x) => x !== s.slug)
+                      )
+                    }
+                  >
+                    {s[lang] ?? s.fr}
+                  </Choice>
+                );
+              })}
+              <p className={`mt-etiqueta max-w-[46ch] text-legende ${temasDeMas ? "text-copper-vif" : "text-text-secondary"}`}>
+                {temasDeMas ? t.subjectsOver : t.subjectsHint}
+              </p>
+            </section>
+
             {initial.portfolio.length > 0 && (
               <Section title={t.appPhotos}>
                 <div className="-mx-pagina flex gap-bloque overflow-x-auto px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -350,7 +394,7 @@ export function PortraitEditor({
           >
             <div className="flex flex-col gap-fila">
               {cambiado && <p className="text-capitale uppercase tracking-capitale text-copper-vif">{t.unsaved}</p>}
-              <Button full onClick={guardar} disabled={!cambiado || guardando || subiendo !== null}>
+              <Button full onClick={guardar} disabled={!cambiado || temasDeMas || guardando || subiendo !== null}>
                 {guardando ? t.saving : t.save}
               </Button>
               <p className="max-w-[46ch] text-legende text-text-secondary">{t.footnote}</p>

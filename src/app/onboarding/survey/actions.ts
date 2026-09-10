@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { SUBJECT_MAX, SUBJECT_QUESTION } from "@/lib/photo-subjects";
 
 // answers: { [question_slug]: string[] }  — array of selected option values
 export type SurveyAnswers = Record<string, string[]>;
@@ -71,7 +72,8 @@ export async function submitSurvey(answers: SurveyAnswers): Promise<
     .map(([question_slug, vals]) => ({
       creator_id: creator.id,
       question_slug,
-      answer: vals,            // jsonb column accepts arrays directly
+      // Qué fotografía: dos al más, aunque el cliente ya lo impida.
+      answer: question_slug === SUBJECT_QUESTION ? vals.slice(0, SUBJECT_MAX) : vals, // jsonb acepta arrays tal cual
       answered_at: new Date().toISOString(),
     }));
 
