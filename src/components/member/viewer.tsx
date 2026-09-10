@@ -19,12 +19,19 @@ export function Viewer({
   index,
   onClose,
   caption,
+  protect = false,
 }: {
   photos: string[];
   /** null cierra el visor. */
   index: number | null;
   onClose: () => void;
   caption?: string;
+  /**
+   * Fotografías que se miran pero no se guardan, como el portafolio de un
+   * creador: sin menú de "guardar imagen" al mantener pulsado. No impide una
+   * captura de pantalla, pero sí que guardarla sea el gesto fácil.
+   */
+  protect?: boolean;
 }) {
   const reduce = useReducedMotion() ?? false;
   const pistaRef = useRef<HTMLDivElement>(null);
@@ -85,7 +92,13 @@ export function Viewer({
             {photos.map((url, i) => (
               <div key={i} className="flex w-full shrink-0 snap-center items-center justify-center px-pagina">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="" draggable={false} className="max-h-full max-w-full object-contain" />
+                <img
+                  src={url}
+                  alt=""
+                  draggable={false}
+                  onContextMenu={protect ? (e) => e.preventDefault() : undefined}
+                  className={`max-h-full max-w-full object-contain ${protect ? "select-none [-webkit-touch-callout:none]" : ""}`}
+                />
               </div>
             ))}
           </div>

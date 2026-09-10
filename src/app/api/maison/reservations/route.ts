@@ -3,8 +3,47 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { googleCalendarUrl, buildIcs } from "@/lib/calendar";
 import { sendReservationConfirmed, sendReservationDeclined } from "@/lib/emails";
+import { buildDossiers } from "@/lib/storyteller-dossier";
+
+/**
+ * Las visitas que cuentan para el mínimo del mes: las terminadas y los
+ * rechazos de la propia casa.
+ *
+ * La pantalla dice "un refus compte comme une visite offerte", así que la cifra
+ * tiene que subir al rechazar. Antes solo contaba las terminadas, y la casa veía
+ * el mismo número justo después de que se le dijera que había cambiado.
+ *
+ * Las terminadas cuentan por el día de la visita; los rechazos, por el día en
+ * que se decidieron, que es cuando la casa gastó esa visita. Una demanda
+ * caducada no cuenta: no es un rechazo.
+ */
+async function visitasDelMes(admin: ReturnType<typeof createAdminClient>, venueId: string, desde: Date) {
+  const [terminadas, rechazadas] = await Promise.all([
+    admin
+      .from("reservations")
+      .select("id", { count: "exact", head: true })
+      .eq("venue_id", venueId)
+      .eq("status", "completed")
+      .gte("slot_start", desde.toISOString()),
+    admin
+      .from("reservations")
+      .select("id", { count: "exact", head: true })
+      .eq("venue_id", venueId)
+      .eq("status", "declined")
+      .eq("declined_reason", MOTIVO_CASA)
+      .gte("declined_at", desde.toISOString()),
+  ]);
+  return (terminadas.count ?? 0) + (rechazadas.count ?? 0);
+}
 
 const MINIMO_MENSUAL = 5;
+
+// Así marca esta ruta un rechazo de la casa, para distinguirlo de uno del admin.
+const MOTIVO_CASA = "Refusée par la maison";
+
+// Una demanda caducada se sigue enseñando unos días, para que la casa sepa que
+// se cerró sola y no crea que la ha penalizado el silencio.
+const CADUCADAS_VISIBLES_DIAS = 14;
 
 function cuando(d: Date) {
   return d.toLocaleString("fr-FR", {
@@ -37,52 +76,49 @@ export async function GET() {
     const admin = createAdminClient();
     const { data: maison } = await admin
       .from("comercios")
-      .select("id")
+      .select("id, name, availability")
       .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
       .maybeSingle();
     if (!maison) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 
+    const ahora = new Date();
+    const visiblesDesde = new Date(ahora.getTime() - CADUCADAS_VISIBLES_DIAS * 86400000);
     const { data: pendientes } = await admin
       .from("reservations")
-      .select("id, creator_id, slot_start, party_size, nights, special_requests")
+      .select("id, creator_id, slot_start, party_size, nights, special_requests, created_at")
       .eq("venue_id", maison.id)
       .eq("status", "pending_review")
+      .gte("slot_start", visiblesDesde.toISOString())
       .order("slot_start", { ascending: true });
 
     const filas = pendientes ?? [];
-    const ids = [...new Set(filas.map((r) => r.creator_id))];
-    const { data: creators } = ids.length
-      ? await admin.from("creators").select("id, full_name, handle, followers").in("id", ids)
-      : { data: [] as { id: string; full_name: string | null; handle: string | null; followers: number | null }[] };
-    const porId = new Map((creators ?? []).map((c) => [c.id, c]));
+    const dossiers = await buildDossiers(admin, filas.map((r) => r.creator_id));
 
-    // Cuántas visitas lleva el mes: sin ese número, "rechazar cuenta como
-    // visita ofrecida" es una frase abstracta.
-    const ahora = new Date();
     const desde = new Date(Date.UTC(ahora.getUTCFullYear(), ahora.getUTCMonth(), 1));
-    const { count } = await admin
-      .from("reservations")
-      .select("id", { count: "exact", head: true })
-      .eq("venue_id", maison.id)
-      .eq("status", "completed")
-      .gte("slot_start", desde.toISOString());
+    const monthVisits = await visitasDelMes(admin, maison.id, desde);
+
+    // Qué días tiene abiertos la casa. Si no llegan demandas, el motivo suele
+    // estar aquí, y la pantalla vacía lo dice.
+    const franjas = Array.isArray(maison.availability) ? (maison.availability as { day?: number }[]) : [];
+    const openDays = [...new Set(franjas.map((w) => w.day).filter((d): d is number => typeof d === "number"))];
 
     return NextResponse.json({
-      requests: filas.map((r) => {
-        const c = porId.get(r.creator_id);
-        return {
-          id: r.id,
-          name: c?.full_name ?? c?.handle ?? "",
-          handle: c?.handle ?? null,
-          followers: c?.followers ?? null,
-          slotStart: r.slot_start,
-          partySize: r.party_size,
-          nights: r.nights,
-          note: r.special_requests ?? null,
-        };
-      }),
-      monthVisits: count ?? 0,
+      maison: maison.name,
+      requests: filas.map((r) => ({
+        id: r.id,
+        slotStart: r.slot_start,
+        partySize: r.party_size,
+        nights: r.nights,
+        note: r.special_requests ?? null,
+        createdAt: r.created_at,
+        // La fecha pedida ya pasó sin respuesta: se cerró sola y no cuenta
+        // como rechazo. No se puede aceptar ni rechazar.
+        expired: new Date(r.slot_start) < ahora,
+        dossier: dossiers.get(r.creator_id) ?? null,
+      })),
+      monthVisits,
       guaranteed: MINIMO_MENSUAL,
+      openDays,
     });
   } catch (err) {
     console.error("maison reservations GET error:", err);
@@ -122,6 +158,12 @@ export async function POST(request: NextRequest) {
     }
     if (r.status !== "pending_review") {
       return NextResponse.json({ error: "Cette demande a déjà été traitée." }, { status: 409 });
+    }
+    // Aceptar una fecha que ya pasó cita a alguien a una hora que no existe, y
+    // rechazarla le costaría a la casa una visita del mes por no haber abierto
+    // la app a tiempo.
+    if (new Date(r.slot_start) < new Date()) {
+      return NextResponse.json({ error: "Cette demande a expiré.", expired: true }, { status: 409 });
     }
 
     const { data: creator } = await admin
@@ -175,7 +217,7 @@ export async function POST(request: NextRequest) {
       .update({
         status: "declined",
         declined_at: new Date().toISOString(),
-        declined_reason: "Refusée par la maison",
+        declined_reason: MOTIVO_CASA,
       })
       .eq("id", id)
       .eq("status", "pending_review");

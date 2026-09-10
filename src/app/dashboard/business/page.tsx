@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardNav from "../dashboard-nav";
 import { Row } from "@/components/member/row";
@@ -13,7 +13,8 @@ import MaisonOffer from "./maison-offer";
 import MaisonBilling from "./maison-billing";
 import MaisonReport from "./maison-report";
 import MaisonDemandes from "./maison-demandes";
-import type { StorytellerMetrics } from "@/lib/phyllo/client";
+import { DossierPane } from "./storyteller-dossier";
+import type { Dossier } from "@/lib/storyteller-dossier";
 
 // Category UUID (migration 009) → translation key in the `dashboard` section.
 const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness" | "catBeauty"> = {
@@ -76,23 +77,6 @@ function formatFollowers(n: number | null): string {
   return String(n);
 }
 
-type BizStrings = (typeof translations)[Lang]["business"];
-
-// Why this storyteller is worth a maison's attention, built from the data we
-// have. Reach/engagement come from Phyllo (connected creators); audience +
-// content fit work for everyone, so even demo creators get an argument or two.
-function whyArguments(
-  c: { followers: number | null; engagement: number | null; avgReach: number | null; content: string[] },
-  t: BizStrings
-): string[] {
-  const out: string[] = [];
-  if (c.avgReach != null) out.push(t.whyReach.replace("{n}", formatFollowers(c.avgReach)));
-  if (c.engagement != null) out.push(t.whyEngagement.replace("{pct}", String(c.engagement)));
-  if (c.content.length) out.push(t.whyContent.replace("{cats}", c.content.slice(0, 3).join(", ")));
-  if (c.followers) out.push(t.whyAudience.replace("{n}", formatFollowers(c.followers)));
-  return out;
-}
-
 export default function MaisonDashboardPage() {
   return (
     <Suspense fallback={<div className="min-h-[100dvh]" />}>
@@ -121,25 +105,25 @@ function MaisonDashboard() {
   const [directoryLoading, setDirectoryLoading] = useState(false);
   const [selected, setSelected] = useState<MaisonCard | null>(null);
   const [teller, setTeller] = useState<RosterItem | null>(null);
-  const [tellerMetrics, setTellerMetrics] = useState<StorytellerMetrics | null>(null);
+  const [tellerDossier, setTellerDossier] = useState<Dossier | null>(null);
   const [tellerLoading, setTellerLoading] = useState(false);
-  const [tellerConnected, setTellerConnected] = useState(true);
+  const [tellerFailed, setTellerFailed] = useState(false);
 
+  // La ficha del roster es el mismo dossier que acompaña a una demanda, sin
+  // la demanda: la misma pieza, con otra cabecera y sin pie.
   function openTeller(c: RosterItem) {
     setTeller(c);
-    setTellerMetrics(null);
-    setTellerConnected(c.igConnected);
-    if (!c.igConnected) return;
+    setTellerDossier(null);
+    setTellerFailed(false);
     setTellerLoading(true);
     fetch(`/api/maison/storyteller/${c.id}`)
-      .then((r) => r.json())
-      .then((d) => {
-        setTellerConnected(Boolean(d.connected));
-        setTellerMetrics(d.metrics ?? null);
-      })
-      .catch(() => setTellerMetrics(null))
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d) => setTellerDossier(d.dossier ?? null))
+      .catch(() => setTellerFailed(true))
       .finally(() => setTellerLoading(false));
   }
+
+  const closeTeller = useCallback(() => setTeller(null), []);
 
   function placeOf(m: MaisonCard): string {
     const cat = m.categoryId ? translations[lang].dashboard[CATEGORY_KEY[m.categoryId]] : "";
@@ -220,7 +204,7 @@ function MaisonDashboard() {
             Facturación y vos visiteurs no aparecen aquí porque traen el suyo:
             el estado del abono y la cifra del mes son mejores titulares que
             cualquier rótulo que pudiéramos ponerles encima. */}
-        {tab !== "billing" && tab !== "visitors" && (
+        {tab !== "billing" && tab !== "visitors" && tab !== "demandes" && (
           <>
             <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">
               {tab === "profile" ? t.tabProfile : t.kicker}
@@ -240,9 +224,12 @@ function MaisonDashboard() {
           </>
         )}
 
-        {tab === "roster" ? (
-          <>
+        {tab === "demandes" ? (
+          // Demandes trae su propio titular: cuántas personas esperan dice más
+          // que cualquier rótulo.
           <MaisonDemandes />
+        ) : tab === "roster" ? (
+          <>
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5">
               {[1, 2, 3, 4].map((i) => (
@@ -520,198 +507,15 @@ function MaisonDashboard() {
         </div>
       )}
 
-      {/* Storyteller metrics modal */}
+      {/* La ficha del storyteller: el mismo dossier que en Demandes. */}
       {teller && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 sm:p-8"
-          onClick={() => setTeller(null)}
-        >
-          <div className="relative w-full max-w-[560px] bg-charcoal-deep border border-white/10 my-4" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setTeller(null)}
-              aria-label="Fermer"
-              className="absolute top-3 right-3 z-10 p-2 bg-black/40 text-white/70 hover:text-white transition-colors"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="p-6 sm:p-8">
-              {/* Identity */}
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-charcoal-mid shrink-0 border border-white/10">
-                  {tellerMetrics?.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={tellerMetrics.imageUrl} alt="" className="w-full h-full object-cover" />
-                  ) : null}
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-serif text-[22px] font-light text-white truncate">{teller.name}</h3>
-                    {teller.igConnected && <InstagramLogo size={15} weight="fill" className="text-champagne/70 shrink-0" />}
-                  </div>
-                  {teller.handle && (
-                    <a
-                      href={`https://instagram.com/${teller.handle}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-serif text-[13px] text-champagne/70 hover:text-champagne transition-colors"
-                    >
-                      @{teller.handle}
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Bio */}
-              {tellerMetrics?.bio && (
-                <p className="font-serif text-[14px] font-light text-white/65 leading-relaxed mt-5 whitespace-pre-line">
-                  {tellerMetrics.bio}
-                </p>
-              )}
-
-              {/* Website + account type */}
-              {(tellerMetrics?.website || tellerMetrics?.isBusiness || tellerMetrics?.isVerified) && (
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4">
-                  {tellerMetrics?.website && (
-                    <a href={tellerMetrics.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
-                      <GlobeSimple size={14} />
-                      <span className="font-serif text-[13px]">{tellerMetrics.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
-                    </a>
-                  )}
-                  {tellerMetrics?.isVerified && (
-                    <span className="font-serif text-[11px] tracking-[0.15em] uppercase text-champagne/70">{t.stVerifiedBadge}</span>
-                  )}
-                  {tellerMetrics?.isBusiness && (
-                    <span className="font-serif text-[11px] tracking-[0.15em] uppercase text-white/45">{t.stBusiness}</span>
-                  )}
-                </div>
-              )}
-
-              {/* Content categories */}
-              {teller.content.length > 0 && (
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {teller.content.map((tag) => (
-                    <span key={tag} className="font-serif text-[11px] tracking-wide text-white/70 border border-white/12 px-3 py-1">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Metrics */}
-              {!teller.igConnected ? (
-                <p className="font-serif text-[13px] font-light text-white/45 mt-6 italic">{t.stNotConnected}</p>
-              ) : tellerLoading ? (
-                <div className="grid grid-cols-2 gap-px bg-white/5 mt-6">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-charcoal-deep h-20 animate-pulse" />
-                  ))}
-                </div>
-              ) : tellerMetrics ? (
-                <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-white/8 mt-6">
-                    <div className="bg-charcoal-deep p-4">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.followers}</p>
-                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">{formatFollowers(tellerMetrics.followers)}</p>
-                    </div>
-                    <div className="bg-charcoal-deep p-4">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stFollowing}</p>
-                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">{formatFollowers(tellerMetrics.following)}</p>
-                    </div>
-                    <div className="bg-charcoal-deep p-4">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stPosts}</p>
-                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">{tellerMetrics.posts ?? "—"}</p>
-                    </div>
-                    <div className="bg-charcoal-deep p-4">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stReach}</p>
-                      <p className="font-serif text-[22px] font-light text-champagne mt-1">
-                        {tellerMetrics.avgReach != null ? formatFollowers(tellerMetrics.avgReach) : "—"}
-                      </p>
-                      <p className="font-serif text-[10px] text-white/40 mt-0.5">{t.stPerPost}</p>
-                    </div>
-                    <div className="bg-charcoal-deep p-4">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.engagement}</p>
-                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">
-                        {tellerMetrics.engagementPct != null ? `${tellerMetrics.engagementPct}%` : "—"}
-                      </p>
-                      <p className="font-serif text-[10px] text-white/40 mt-0.5">
-                        {t.stLikesComments
-                          .replace("{likes}", String(tellerMetrics.avgLikes ?? 0))
-                          .replace("{comments}", String(tellerMetrics.avgComments ?? 0))}
-                      </p>
-                    </div>
-                    <div className="bg-charcoal-deep p-4">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/45">{t.stViews}</p>
-                      <p className="font-serif text-[22px] font-light text-white/90 mt-1">
-                        {tellerMetrics.avgViews != null ? formatFollowers(tellerMetrics.avgViews) : "—"}
-                      </p>
-                      <p className="font-serif text-[10px] text-white/40 mt-0.5">{t.stPerPost}</p>
-                    </div>
-                  </div>
-                  <p className="font-serif text-[11px] font-light text-white/40 leading-relaxed mt-4">{t.stHint}</p>
-
-                  {/* Why this profile serves a maison */}
-                  {(() => {
-                    const args = whyArguments(
-                      { followers: tellerMetrics.followers, engagement: tellerMetrics.engagementPct, avgReach: tellerMetrics.avgReach, content: teller.content },
-                      t
-                    );
-                    return args.length ? (
-                      <div className="mt-6 border border-champagne/20 bg-champagne/[0.04] p-5">
-                        <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/70 mb-3">{t.whyTitle}</p>
-                        <ul className="space-y-1.5">
-                          {args.map((a, i) => (
-                            <li key={i} className="font-serif text-[13px] font-light text-white/75 flex gap-2.5">
-                              <span className="text-champagne/60">·</span>
-                              <span>{a}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : null;
-                  })()}
-
-                  {/* Recent publications */}
-                  {tellerMetrics.recentPosts.length > 0 && (
-                    <div className="mt-8">
-                      <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/60 mb-4">{t.stRecent}</p>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {tellerMetrics.recentPosts.map((p, i) => (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <a
-                            key={i}
-                            href={p.url ?? undefined}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group relative block aspect-square overflow-hidden bg-charcoal-mid"
-                          >
-                            {p.thumbnail && (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={p.thumbnail} alt="" className="w-full h-full object-cover" />
-                            )}
-                            {p.sponsored && (
-                              <span className="absolute top-1 left-1 font-serif text-[8px] tracking-[0.15em] uppercase bg-champagne text-charcoal-deep px-1.5 py-0.5">
-                                {t.stSponsored}
-                              </span>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
-                              <div className="font-serif text-[10px] text-white/90 leading-tight">
-                                {p.reach != null && <div className="text-champagne">{formatFollowers(p.reach)} {t.stReachShort}</div>}
-                                <div>♥ {formatFollowers(p.likes)} · {formatFollowers(p.comments)} 💬</div>
-                              </div>
-                            </div>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <p className="font-serif text-[13px] font-light text-white/45 mt-6 italic">{t.stUnavailable}</p>
-              )}
-            </div>
-          </div>
-        </div>
+        <DossierPane
+          dossier={tellerDossier}
+          loading={tellerLoading}
+          failed={tellerFailed}
+          lang={lang}
+          onClose={closeTeller}
+        />
       )}
     </div>
   );
