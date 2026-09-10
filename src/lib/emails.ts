@@ -404,6 +404,55 @@ export async function sendReservationAlternatives(opts: {
   return sendEmail(to, `Curato · Autres créneaux, ${maisonName}`, html);
 }
 
+// ── 8. Reservation — declined by the maison (storyteller) ────────────────────
+// La casa dice que no. Hasta ahora el creador no recibía nada: un día abría sus
+// visitas y encontraba una marcada como rechazada sin que nadie se lo dijera.
+//
+// No da motivo porque la casa no lo da, y no se inventa. La última frase es
+// para quien pueda leerlo como algo personal. Y manda al carnet, no a insistir
+// en la misma casa.
+export async function sendReservationDeclined(opts: {
+  to: string;
+  firstName: string;
+  maisonName: string;
+  whenLabel: string;
+}) {
+  const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const nombre = opts.firstName && opts.firstName !== "vous" ? esc(opts.firstName) : "";
+  const maison = esc(opts.maisonName);
+
+  const html = wrap(`
+    <tr><td style="padding:40px 40px 0;">
+      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
+        Votre demande
+      </p>
+      <h1 style="margin:0;font-family:${FONT};font-size:28px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
+        Ce ne sera pas pour cette fois${nombre ? `, ${nombre}` : ""}.
+      </h1>
+    </td></tr>
+    <tr><td style="padding:20px 40px 0;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
+        <span style="color:${C.white};">${maison}</span> ne pourra pas vous recevoir le ${esc(opts.whenLabel)}.
+        Rien n'a été déduit de votre budget du mois : il reste entier pour une autre adresse.
+      </p>
+    </td></tr>
+    <tr><td style="padding:28px 40px 0;">
+      <table cellpadding="0" cellspacing="0"><tr><td style="background-color:${C.champagne};">
+        <a href="${SITE_URL}/dashboard/storyteller" style="display:inline-block;padding:14px 28px;font-family:${FONT_SANS};color:#1C1A18;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.2em;text-transform:uppercase;">
+          Découvrir le carnet
+        </a>
+      </td></tr></table>
+    </td></tr>
+    <tr><td style="padding:24px 40px 40px;">
+      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
+        Chaque maison choisit ses visites selon ses propres contraintes. Ce refus ne dit rien de vous.
+      </p>
+    </td></tr>
+  `);
+
+  return sendEmail(opts.to, `Curato · Votre demande chez ${opts.maisonName}`, html);
+}
+
 // ── Maison commitment signed ──────────────────────────────────────────────────
 // Sent to a maison right after they sign the commitment. Carries the signed
 // agreement as a PDF attachment and repeats the terms in the body as a record.

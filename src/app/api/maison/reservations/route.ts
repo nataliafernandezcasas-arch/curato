@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { googleCalendarUrl, buildIcs } from "@/lib/calendar";
-import { sendReservationConfirmed } from "@/lib/emails";
+import { sendReservationConfirmed, sendReservationDeclined } from "@/lib/emails";
 
 const MINIMO_MENSUAL = 5;
 
@@ -180,6 +180,21 @@ export async function POST(request: NextRequest) {
       .eq("id", id)
       .eq("status", "pending_review");
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // El creador se entera por correo. Si el correo falla, el rechazo no se
+    // deshace: la decisión de la casa ya está tomada y guardada.
+    try {
+      if (creator?.email) {
+        await sendReservationDeclined({
+          to: creator.email,
+          firstName: (creator.full_name || "").split(" ")[0],
+          maisonName: maison.name,
+          whenLabel: cuando(new Date(r.slot_start)),
+        });
+      }
+    } catch (mailErr) {
+      console.error("Decline email failed:", mailErr);
+    }
 
     return NextResponse.json({ ok: true, status: "declined" });
   } catch (err) {
