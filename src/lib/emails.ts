@@ -22,6 +22,7 @@ import {
 import { CandidatureAcceptee, CandidatureRecue, Lancement, MotDePasse } from "@/emails/cuenta";
 import { EngagementSigne, NouvelleMaison } from "@/emails/maison";
 import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
+import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
 import { SITE } from "@/emails/shell";
 
 const FROM = "Curato <hello@curatocollective.com>";
@@ -158,6 +159,34 @@ export async function sendReservationDeclined(opts: {
   const jour = p.whenLabel.match(JOUR_EN_TETE)?.[1]?.toLowerCase();
   const asunto = jour ? `${p.maisonName} ne peut pas vous recevoir ${jour}` : `${p.maisonName} ne peut pas vous recevoir`;
   return sendEmail(to, asunto, createElement(DemandeDeclinee, p), { text: demandeDeclineeTexto(p) });
+}
+
+// ── Stories ──────────────────────────────────────────────────────────────────
+/** A falta de seis horas del plazo, si las stories no han llegado. Una vez. */
+export async function sendRecordatorioSeisHoras(opts: {
+  to: string;
+  firstName: string;
+  maisonName: string;
+  whenLabel: string;
+  horas: number;
+}) {
+  const { to, ...p } = opts;
+  const asunto =
+    p.horas === 6 ? "Il vous reste six heures pour publier" : `Il vous reste ${p.horas} heure${p.horas > 1 ? "s" : ""} pour publier`;
+  return sendEmail(to, asunto, createElement(SeisHoras, p), { text: seisHorasTexto(p) });
+}
+
+/** A Curato: las visitas cuyo plazo acaba de vencer sin stories. */
+export async function sendAvisoStoriesManquantes(opts: {
+  to: string;
+  visitas: { storyteller: string; maison: string; whenLabel: string }[];
+}) {
+  const n = opts.visitas.length;
+  const asunto =
+    n === 1
+      ? `Stories manquantes : ${opts.visitas[0].storyteller} chez ${opts.visitas[0].maison}`
+      : `Stories manquantes : ${n} visites`;
+  return sendEmail(opts.to, asunto, createElement(StoriesManquantes, { visitas: opts.visitas }));
 }
 
 // ── Maisons ──────────────────────────────────────────────────────────────────

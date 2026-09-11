@@ -1,0 +1,30 @@
+# Cada hora, la tarea que revisa las visitas y manda los avisos de las stories
+# (/api/cron/recordatorios).
+#
+# Va en GitHub Actions y no en Vercel Cron porque el plan gratuito de Vercel
+# solo permite una tarea al día. Hace falta el mismo secreto en dos sitios:
+#   · GitHub: Settings, Secrets and variables, Actions, secreto CRON_SECRET;
+#   · Vercel: Settings, Environment Variables, CRON_SECRET (Production).
+# Sin él la ruta responde 401 y no manda nada.
+
+name: Recordatorios de stories
+
+on:
+  schedule:
+    # A los cinco minutos de cada hora, fuera del minuto cero, que es cuando
+    # GitHub va más cargado y más se retrasa.
+    - cron: "5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Llamar a la tarea
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error --max-time 120 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            https://www.curatocollective.com/api/cron/recordatorios
