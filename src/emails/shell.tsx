@@ -12,14 +12,19 @@ import { Body, Head, Html, Img, Preview } from "@react-email/components";
  *   · Todo estilo en línea y colores sólidos, sin transparencias.
  *   · color-scheme y bgcolor en cada tabla: sin eso Gmail invierte un correo
  *     que ya es oscuro y sale gris sobre gris.
- *   · Cormorant por @import y Georgia detrás. Gmail y Outlook caen a Georgia,
- *     y por eso el cuerpo va a 17 px y las capitales a 12, un peldaño por
- *     encima de la app.
+ *   · Cormorant por @import y Georgia detrás. Gmail y Outlook caen a Georgia.
+ *     El diseño pedía 17 px de cuerpo; Natalia lo vio grande y lo bajamos 5
+ *     (2026-09-11): titular 23, cuerpo 12, y nada por debajo de 12 salvo las
+ *     capitales, a 11 como en la app.
  *   · Ninguna capital depende del interletrado: Outlook lo ignora.
  */
 
 export const SITE = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
 const ASSET = "https://www.curatocollective.com";
+// La foto oscurecida de fondo. El diseño lo dejaba liso, y Natalia lo vio
+// plano (2026-09-11): vuelve la fotografía detrás, como antes. Outlook ignora
+// el fondo y cae al bgcolor, que es el mismo tono.
+const FONDO_FOTO = `${ASSET}/email-bg-dark.jpg`;
 
 export const FONT = "'Cormorant Garamond', Georgia, 'Times New Roman', serif";
 
@@ -65,8 +70,16 @@ export function Shell({
                   width="600"
                   cellPadding={0}
                   cellSpacing={0}
-                  {...{ bgcolor: COLOR.fondo }}
-                  style={{ width: "100%", maxWidth: 600, backgroundColor: COLOR.fondo }}
+                  {...{ bgcolor: COLOR.fondo, background: FONDO_FOTO }}
+                  style={{
+                    width: "100%",
+                    maxWidth: 600,
+                    backgroundColor: COLOR.fondo,
+                    backgroundImage: `url('${FONDO_FOTO}')`,
+                    backgroundPosition: "center top",
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "cover",
+                  }}
                 >
                   <tbody>
                     <tr>
@@ -94,7 +107,7 @@ export function Shell({
                     </tr>
                     <tr>
                       <td style={{ padding: "40px 40px 48px" }}>
-                        <p style={{ margin: 0, fontFamily: FONT, fontSize: 13, color: COLOR.secundaria }}>Curato · Paris</p>
+                        <p style={{ margin: 0, fontFamily: FONT, fontSize: 12, color: COLOR.secundaria }}>Curato · Paris</p>
                       </td>
                     </tr>
                   </tbody>
@@ -111,7 +124,7 @@ export function Shell({
 /** La capital: qué tipo de correo es. Champagne, o el color del estado. */
 export function Capital({ children, color = COLOR.champagne }: { children: React.ReactNode; color?: string }) {
   return (
-    <p style={{ margin: "0 0 16px", fontFamily: FONT, fontSize: 12, lineHeight: 1.4, letterSpacing: "0.28em", textTransform: "uppercase", color }}>
+    <p style={{ margin: "0 0 14px", fontFamily: FONT, fontSize: 11, lineHeight: 1.4, letterSpacing: "0.28em", textTransform: "uppercase", color }}>
       {children}
     </p>
   );
@@ -124,7 +137,7 @@ export function Titre({ children, mayusculas = false }: { children: React.ReactN
       style={{
         margin: "0 0 20px",
         fontFamily: FONT,
-        fontSize: mayusculas ? 32 : 28,
+        fontSize: mayusculas ? 27 : 23,
         fontWeight: 400,
         lineHeight: 1.2,
         letterSpacing: mayusculas ? "0.08em" : "0.01em",
@@ -138,13 +151,13 @@ export function Titre({ children, mayusculas = false }: { children: React.ReactN
 }
 
 export function Corps({ children, color = COLOR.tinta }: { children: React.ReactNode; color?: string }) {
-  return <p style={{ margin: "0 0 16px", fontFamily: FONT, fontSize: 17, lineHeight: 1.6, color }}>{children}</p>;
+  return <p style={{ margin: "0 0 14px", fontFamily: FONT, fontSize: 12, lineHeight: 1.65, color }}>{children}</p>;
 }
 
 /** Lo que se lee al margen: en tinta secundaria y en cursiva. */
 export function Nota({ children }: { children: React.ReactNode }) {
   return (
-    <p style={{ margin: "0 0 16px", fontFamily: FONT, fontSize: 15, lineHeight: 1.6, fontStyle: "italic", color: COLOR.secundaria }}>
+    <p style={{ margin: "0 0 14px", fontFamily: FONT, fontSize: 12, lineHeight: 1.65, fontStyle: "italic", color: COLOR.secundaria }}>
       {children}
     </p>
   );
@@ -156,7 +169,7 @@ export function Nota({ children }: { children: React.ReactNode }) {
  */
 export function Enlace({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <p style={{ margin: "8px 0 24px", fontFamily: FONT, fontSize: 17, lineHeight: 1.6 }}>
+    <p style={{ margin: "6px 0 20px", fontFamily: FONT, fontSize: 12, lineHeight: 1.65 }}>
       <a
         href={href}
         style={{ color: COLOR.champagne, textDecoration: "underline", textUnderlineOffset: "4px", textDecorationThickness: "1px" }}
@@ -194,8 +207,8 @@ export function Filas({ filas }: { filas: [string, React.ReactNode][] }) {
       <tbody>
         {filas.map(([etiqueta, valor], i) => (
           <tr key={i}>
-            <td style={{ padding: "12px 0", fontFamily: FONT, fontSize: 15, color: COLOR.secundaria, verticalAlign: "top" }}>{etiqueta}</td>
-            <td align="right" style={{ padding: "12px 0", fontFamily: FONT, fontSize: 17, color: COLOR.tinta, verticalAlign: "top" }}>
+            <td style={{ padding: "10px 0", fontFamily: FONT, fontSize: 12, color: COLOR.secundaria, verticalAlign: "top" }}>{etiqueta}</td>
+            <td align="right" style={{ padding: "10px 0", fontFamily: FONT, fontSize: 12, color: COLOR.tinta, verticalAlign: "top" }}>
               {valor}
             </td>
           </tr>

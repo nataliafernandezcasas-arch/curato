@@ -30,10 +30,10 @@ export function EngagementSigne(p: {
         <tbody>
           {p.terms.map((term, i) => (
             <tr key={i}>
-              <td style={{ padding: "0 14px 14px 0", verticalAlign: "top", fontFamily: FONT, fontSize: 15, color: COLOR.champagne }}>
+              <td style={{ padding: "0 14px 12px 0", verticalAlign: "top", fontFamily: FONT, fontSize: 12, color: COLOR.champagne }}>
                 {String(i + 1).padStart(2, "0")}
               </td>
-              <td style={{ padding: "0 0 14px", fontFamily: FONT, fontSize: 17, lineHeight: 1.6, color: COLOR.tinta }}>{term}</td>
+              <td style={{ padding: "0 0 12px", fontFamily: FONT, fontSize: 12, lineHeight: 1.65, color: COLOR.tinta }}>{term}</td>
             </tr>
           ))}
         </tbody>
