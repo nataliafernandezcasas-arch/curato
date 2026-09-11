@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
   const { data: venue } = await admin
     .from("comercios")
-    .select("name, address")
+    .select("name, address, photos")
     .eq("id", r.venue_id)
     .maybeSingle();
 
@@ -95,6 +95,8 @@ export async function POST(request: NextRequest) {
           maisonName,
           address: venue?.address ?? null,
           whenLabel: whenLabel(start),
+          start,
+          coverUrl: (venue?.photos as string[] | null)?.[0] ?? null,
           googleUrl: googleCalendarUrl(event),
           ics: buildIcs(event, `curato-${id}@curatocollective.com`),
         });
