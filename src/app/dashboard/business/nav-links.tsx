@@ -24,7 +24,7 @@ export function isMaisonSection(value: string | null): value is MaisonSection {
  * carnet de casas baja al menú: es pertenencia y se visita una vez al mes. La
  * oferta vive dentro de Ma maison, así que esa es la tercera.
  */
-export function MAISON_LINKS(t: T, current: MaisonSection | "reglages"): NavLink[] {
+export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr"): NavLink[] {
   const at = (section: MaisonSection) =>
     section === "profile" ? "/dashboard/business" : `/dashboard/business?section=${section}`;
 
@@ -32,6 +32,8 @@ export function MAISON_LINKS(t: T, current: MaisonSection | "reglages"): NavLink
     { href: at("demandes"), label: t.tabDemandes, active: current === "demandes" },
     { href: at("visitors"), label: t.tabVisitors, active: current === "visitors" },
     { href: at("profile"), label: t.tabProfile, active: current === "profile" },
+    // El QR de sala: se abre de pie y con prisa, así que va el primero del menú.
+    { href: "/dashboard/business/qr", label: "Code QR", active: current === "qr" },
     { href: at("roster"), label: t.tabRoster, active: current === "roster" },
     { href: at("directory"), label: t.tabDirectory, active: current === "directory" },
     { href: at("billing"), label: "Facturation", active: current === "billing" },
