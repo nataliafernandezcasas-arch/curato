@@ -4,6 +4,7 @@ import { useState } from "react";
 import { InstagramLogo, CheckCircle } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
+import { Button } from "@/components/member/button";
 
 const SDK_SRC = "https://cdn.getphyllo.com/connect/v2/phyllo-connect.js";
 const PHYLLO_ENV = "staging"; // must match the Phyllo account environment (Staging)
@@ -105,7 +106,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
 
   if (status === "done") {
     return (
-      <div className="border border-champagne/20 bg-champagne/5 px-6 py-4 mb-10 flex items-center gap-3">
+      <div className="caja-cristal px-6 py-4 mb-10 flex items-center gap-3">
         <CheckCircle size={18} weight="thin" className="text-champagne shrink-0" />
         <p className="font-serif text-[13px] font-light text-white/70">
           {t.igConnected}
@@ -115,7 +116,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
   }
 
   return (
-    <div className="border border-white/10 bg-black/20 px-6 py-5 mb-10">
+    <div className="caja-cristal px-6 py-5 mb-10">
       <div className="flex items-start gap-3 mb-4">
         <InstagramLogo size={20} weight="thin" className="text-champagne shrink-0 mt-0.5" />
         <div>
@@ -144,13 +145,9 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
         </p>
       )}
 
-      <button
-        onClick={connect}
-        disabled={!consent || status === "loading"}
-        className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
+      <Button type="button" onClick={connect} disabled={!consent || status === "loading"}>
         {status === "loading" ? t.igConnecting : t.igButton}
-      </button>
+      </Button>
     </div>
   );
 }

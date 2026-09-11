@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CheckCircle } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
+import { Button } from "@/components/member/button";
 
 export default function SuggestVenue() {
   const { lang } = useLang();
@@ -50,7 +51,7 @@ export default function SuggestVenue() {
       </p>
 
       {done ? (
-        <div className="flex items-center justify-center gap-2 border border-champagne/20 bg-champagne/5 px-6 py-4">
+        <div className="caja-cristal flex items-center justify-center gap-2 px-6 py-4">
           <CheckCircle size={18} weight="thin" className="text-champagne shrink-0" />
           <p className="font-serif text-[13px] font-light text-white/70">{t.suggestThanks}</p>
         </div>
@@ -62,23 +63,19 @@ export default function SuggestVenue() {
             onChange={(e) => setVenue(e.target.value)}
             required
             placeholder={t.suggestPlaceholder}
-            className="w-full px-5 py-3.5 border border-white/15 bg-charcoal-mid/60 text-white font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/35"
+            className="campo-cristal font-serif text-[14px] font-light"
           />
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             placeholder={t.suggestNotePlaceholder}
-            className="w-full px-5 py-3.5 border border-white/15 bg-charcoal-mid/60 text-white font-serif text-[14px] font-light focus:outline-none focus:border-champagne/40 transition-colors resize-none placeholder:text-white/35"
+            className="campo-cristal resize-none font-serif text-[14px] font-light"
           />
           {error && <p className="font-serif text-[12px] text-copper-vif">{error}</p>}
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne py-3.5 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50"
-          >
+          <Button type="submit" full disabled={busy}>
             {busy ? t.suggestSending : t.suggestSubmit}
-          </button>
+          </Button>
         </form>
       )}
     </div>

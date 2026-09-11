@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
 import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check } from "@phosphor-icons/react";
 import { translations, Lang } from "@/lib/i18n/translations";
+import { Button } from "@/components/member/button";
 
 type T = Record<string, string>;
 
@@ -195,7 +196,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         <div className="flex justify-end gap-2 mb-6">
           <button
             onClick={() => setPreview((p) => !p)}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 border font-serif text-[11px] tracking-[0.2em] uppercase transition-all duration-200 ${preview ? "border-champagne/50 text-champagne" : "border-white/15 text-white/55 hover:border-champagne/40 hover:text-champagne"}`}
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 border font-serif text-[11px] tracking-[0.2em] uppercase transition-all duration-200 ${preview ? "border-champagne/50 text-champagne" : "border-white/15 text-white/55 hover:border-champagne/40 hover:text-champagne"}`}
           >
             <Eye size={15} /> {t.profilePreview}
           </button>
@@ -203,7 +204,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             onClick={() => setEditing(true)}
             aria-label={t.profileEdit}
             title={t.profileEdit}
-            className="shrink-0 p-2.5 border border-white/15 text-white/55 hover:border-champagne/40 hover:text-champagne transition-all duration-200"
+            className="shrink-0 rounded-full p-2.5 border border-white/15 text-white/55 hover:border-champagne/40 hover:text-champagne transition-all duration-200"
           >
             <PencilSimple size={16} />
           </button>
@@ -224,7 +225,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block overflow-hidden bg-charcoal-mid mb-1.5 break-inside-avoid"
+                    className="block overflow-hidden rounded-xl bg-charcoal-mid mb-1.5 break-inside-avoid"
                   >
                     <img src={url} alt="" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700" />
                   </a>
@@ -311,21 +312,21 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                 onDragLeave={() => setDragOver((d) => (d === i ? null : d))}
                 onDrop={(e) => { if (e.dataTransfer.files?.length) { e.preventDefault(); uploadPhotos(e.dataTransfer.files); setFileDrag(false); } else handleDrop(i); }}
                 onDragEnd={() => { dragFrom.current = null; setDragOver(null); }}
-                className={`relative aspect-square overflow-hidden bg-charcoal-mid group cursor-move transition-all ${dragOver === i ? "ring-2 ring-champagne/70" : ""}`}
+                className={`relative aspect-square overflow-hidden rounded-xl bg-charcoal-mid group cursor-move transition-all ${dragOver === i ? "ring-2 ring-champagne/70" : ""}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" className="w-full h-full object-cover pointer-events-none" />
                 {i === 0 && (
-                  <span className="absolute top-2 left-2 font-serif text-[9px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne/90 px-2 py-1">
+                  <span className="absolute top-2 left-2 font-serif text-[9px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne/90 rounded-full px-2 py-1">
                     {t.profileCover}
                   </span>
                 )}
-                <span className="absolute bottom-1.5 left-1.5 text-white/70 bg-black/45 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="absolute bottom-1.5 left-1.5 text-white/70 bg-black/45 rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <DotsSixVertical size={14} />
                 </span>
                 <button
                   onClick={() => removePhoto(url)}
-                  className="absolute top-1.5 right-1.5 bg-black/70 text-white p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1.5 right-1.5 rounded-full bg-black/70 text-white p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   aria-label="Supprimer"
                 >
                   <X size={14} />
@@ -336,7 +337,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               onFiles={uploadPhotos}
               multiple
               disabled={uploading}
-              className="flex aspect-square items-center justify-center border border-dashed border-white/20 text-white/40 transition-colors hover:border-champagne/40 hover:text-champagne"
+              className="flex aspect-square items-center justify-center rounded-xl border border-dashed border-white/20 text-white/40 transition-colors hover:border-champagne/40 hover:text-champagne"
             >
               <Plus size={22} weight="thin" />
             </FilePicker>
@@ -397,13 +398,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         </div>
 
         <div className="flex items-center gap-5 pt-2">
-          <button
-            onClick={save}
-            disabled={!canSave}
-            className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-8 py-3.5 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
+          <Button onClick={save} disabled={!canSave}>
             {saving ? t.profileSaving : t.profileSave}
-          </button>
+          </Button>
           {!canSave && !saving && (
             <span className="font-serif text-[12px] font-light text-copper-vif">
               {!photosOk

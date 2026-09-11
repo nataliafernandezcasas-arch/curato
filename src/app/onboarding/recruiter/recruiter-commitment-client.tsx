@@ -55,7 +55,7 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
   }
 
   const inputClass =
-    "w-full px-5 py-4 border border-white/15 bg-charcoal-deep/50 text-white font-serif text-[16px] tracking-wide focus:outline-none focus:border-champagne/50 transition-colors";
+    "campo-cristal font-serif text-[16px] tracking-wide";
   const labelClass = "block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3";
 
   return (

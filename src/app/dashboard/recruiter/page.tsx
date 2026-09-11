@@ -6,6 +6,7 @@ import { SignOut } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
+import { Button } from "@/components/member/button";
 
 type Prospect = {
   id: string;
@@ -212,7 +213,7 @@ export default function RecruiterDashboard() {
   }
 
   const inputClass =
-    "w-full font-serif text-[14px] font-light text-white bg-white/5 border border-white/15 px-4 py-3 focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-white/25";
+    "campo-cristal font-serif text-[14px] font-light";
   const labelClass = "block font-serif text-[10px] tracking-[0.3em] uppercase text-white/35 mb-2";
 
   const firstName = (data?.recruiter.full_name || "").split(" ")[0];
@@ -254,7 +255,7 @@ export default function RecruiterDashboard() {
       </p>
 
       {/* Payouts summary */}
-      <div className="grid grid-cols-3 gap-px bg-white/10 border border-white/10 mb-12">
+      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl bg-white/10 border border-white/10 mb-12">
         {[
           { k: t.statSigned, v: loading ? "—" : String(data?.earnings.signedCount ?? 0) },
           { k: t.statPerMaison, v: eur(448.5, lang) },
@@ -268,7 +269,7 @@ export default function RecruiterDashboard() {
       </div>
 
       {/* Add a maison */}
-      <section className="border border-white/10 bg-black/20 p-8 mb-12">
+      <section className="caja-cristal p-8 mb-12">
         <h2 className="font-serif text-[15px] text-white mb-1">{t.proposeTitle}</h2>
         <p className="font-serif text-[12px] font-light text-white/45 mb-5">
           {t.proposeSub}
@@ -287,9 +288,9 @@ export default function RecruiterDashboard() {
             <input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t.phNotes} />
           </div>
           {addMsg && <p className="font-serif text-[12px] text-champagne/80">{addMsg}</p>}
-          <button type="submit" disabled={adding} className="font-serif text-[11px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40">
+          <Button type="submit" disabled={adding}>
             {adding ? t.btnProposing : t.btnPropose}
-          </button>
+          </Button>
         </form>
       </section>
 
@@ -322,7 +323,7 @@ export default function RecruiterDashboard() {
       </section>
 
       {/* Payouts / IBAN */}
-      <section className="border border-white/10 bg-black/20 p-8">
+      <section className="caja-cristal p-8">
         <h2 className="font-serif text-[15px] text-white mb-1">{t.payoutsTitle}</h2>
         <p className="font-serif text-[12px] font-light text-white/45 mb-5">
           {t.payoutsSub}
@@ -333,9 +334,7 @@ export default function RecruiterDashboard() {
             <input className={inputClass} value={iban} onChange={(e) => setIban(e.target.value)} placeholder={t.phIban} />
           </div>
           {ibanMsg && <p className="font-serif text-[12px] text-champagne/80">{ibanMsg}</p>}
-          <button type="submit" className="font-serif text-[11px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300">
-            {t.btnSaveIban}
-          </button>
+          <Button type="submit">{t.btnSaveIban}</Button>
         </form>
       </section>
     </main>

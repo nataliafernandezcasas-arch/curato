@@ -152,7 +152,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.15, type: "spring", stiffness: 180, damping: 14 }}
-            className="inline-flex items-center justify-center w-14 h-14 border border-champagne/40 mb-7"
+            className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-champagne/40 mb-7"
           >
             <Sparkle size={22} weight="fill" className="text-champagne" />
           </motion.div>

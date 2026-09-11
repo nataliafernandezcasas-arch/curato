@@ -112,7 +112,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
     if (res.ok) setMenuUrls(d.menuUrls ?? []);
   }
 
-  if (loading) return <div className="h-64 bg-border animate-pulse [animation-duration:1.6s]" />;
+  if (loading) return <div className="h-64 rounded-2xl bg-border animate-pulse [animation-duration:1.6s]" />;
 
   const inputCls =
     "min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ font-light text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted focus:border-accent";
@@ -168,7 +168,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerBlockedHint}</p>
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <input type="date" value={newBlock} onChange={(e) => setNewBlock(e.target.value)} className={inputCls} />
-          <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 border border-white/15 text-white/70 hover:border-champagne/40 hover:text-champagne px-4 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-40">
+          <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 rounded-full border border-white/15 text-white/70 hover:border-champagne/40 hover:text-champagne px-4 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-40">
             <Plus size={14} /> {t.offerAdd}
           </button>
         </div>
@@ -218,12 +218,12 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerMenuHint}</p>
         <div className="flex flex-wrap gap-3 items-center">
           {menuUrls.map((url) => (
-            <div key={url} className="relative inline-flex items-center gap-2 border border-white/12 pl-3 pr-8 py-2.5">
+            <div key={url} className="relative inline-flex items-center gap-2 rounded-full border border-white/12 pl-4 pr-9 py-2.5">
               <FilePdf size={16} className="text-champagne/70" />
               <a href={url} target="_blank" rel="noopener noreferrer" className="font-serif text-[13px] text-white/70 hover:text-champagne transition-colors">
                 {url.split("/").pop()?.slice(-16) || "menu"}
               </a>
-              <button onClick={() => removeMenu(url)} className="absolute top-1.5 right-1.5 text-white/40 hover:text-copper-vif" aria-label="X"><X size={13} /></button>
+              <button onClick={() => removeMenu(url)} className="absolute top-1/2 right-3 -translate-y-1/2 text-white/40 hover:text-copper-vif" aria-label="X"><X size={13} /></button>
             </div>
           ))}
           <FilePicker
@@ -231,7 +231,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             accept="application/pdf,image/*"
             multiple
             disabled={uploading}
-            className="inline-flex min-h-11 items-center gap-2 border border-dashed border-white/20 px-fila text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:border-champagne/40 hover:text-accent"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-white/20 px-fila text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:border-champagne/40 hover:text-accent"
           >
             <Plus size={14} /> {t.offerAdd}
           </FilePicker>
