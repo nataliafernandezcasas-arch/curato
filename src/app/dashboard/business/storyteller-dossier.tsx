@@ -102,9 +102,9 @@ const TEXTOS = {
 
 type Textos = (typeof TEXTOS)["fr"];
 
-/** Lo que enseña cómo mira: sus fotos de perfil y después las de la candidatura. */
+/** Lo que enseña cómo mira: las fotos que eligió, o las de su candidatura. */
 export function fotosDe(d: Dossier): string[] {
-  return [...(d.estilo ?? []), ...d.portfolio].slice(0, 6);
+  return d.portfolio.slice(0, 6);
 }
 
 function iniciales(name: string): string {

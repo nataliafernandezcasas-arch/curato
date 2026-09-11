@@ -255,7 +255,6 @@ export default function ProfilPage() {
             subjects: perfil.subjects ?? [],
             estilo: perfil.estilo ?? [],
             inherited: perfil.inherited,
-            portfolio: perfil.dossier?.portfolio ?? [],
           }}
           onClose={cerrarEditor}
           onSaved={() => {

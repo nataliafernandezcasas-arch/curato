@@ -18,7 +18,6 @@ const ESTILO_MAX = 6;
 const BIO_MAX = 240;
 const MAX_BYTES = 3 * 1024 * 1024;
 const ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif";
-const CONTACTO = "hello@curatocollective.com";
 
 export type Retrato = { path: string; url: string };
 
@@ -39,15 +38,13 @@ const TEXTOS = {
     bioHint: "Une phrase, avec vos mots. C'est ce que la maison lit avant de regarder.",
     bioPlaceholder: "Ce que vous aimez photographier, la lumière que vous cherchez, le genre de lieux où vous êtes chez vous.",
     estiloTitle: "Mes photographies",
-    estiloHint: "Six au plus. C'est ce que la maison regarde pour voir comment vous photographiez.",
+    estiloHint:
+      "Six au plus, celles de votre candidature comprises : gardez-les, retirez-en, ajoutez les vôtres. Les maisons les voient avec votre profil, sans pouvoir les télécharger.",
     estiloAdd: "Ajouter",
     estiloRemove: "Retirer",
     subjects: "Ce que je photographie",
     subjectsHint: "Deux au plus. C'est ce que les maisons lisent sous votre nom.",
     subjectsOver: "Deux au plus : retirez-en pour pouvoir enregistrer.",
-    appPhotos: "Mes photographies de candidature",
-    appText: (n: number) =>
-      `Les ${n} photographies remises avec votre candidature. Les maisons du club les voient avec votre profil, sans pouvoir les télécharger, et Curato peut les montrer, avec votre nom, dans sa communication (article 15 des conditions générales). Pour en retirer une, écrivez-nous à ${CONTACTO}.`,
     save: "Enregistrer",
     saving: "Un instant…",
     unsaved: "Non enregistré",
@@ -75,15 +72,13 @@ const TEXTOS = {
     bioHint: "One sentence, in your words. It's what the house reads before looking.",
     bioPlaceholder: "What you love to photograph, the light you look for, the kind of places where you feel at home.",
     estiloTitle: "My photographs",
-    estiloHint: "Six at most. It's what the house looks at to see how you photograph.",
+    estiloHint:
+      "Six at most, your application photos included: keep them, remove some, add your own. Houses see them with your profile, without being able to download them.",
     estiloAdd: "Add",
     estiloRemove: "Remove",
     subjects: "What I photograph",
     subjectsHint: "Two at most. It's what houses read under your name.",
     subjectsOver: "Two at most: remove some to be able to save.",
-    appPhotos: "My application photographs",
-    appText: (n: number) =>
-      `The ${n} photographs you sent with your application. Houses in the club see them with your profile, without being able to download them, and Curato may show them, with your name, in its communications (section 15 of the terms). To remove one, write to us at ${CONTACTO}.`,
     save: "Save",
     saving: "One moment…",
     unsaved: "Not saved",
@@ -111,15 +106,13 @@ const TEXTOS = {
     bioHint: "Una frase, con tus palabras. Es lo que la maison lee antes de mirar.",
     bioPlaceholder: "Lo que te gusta fotografiar, la luz que buscas, el tipo de lugares donde te sientes en casa.",
     estiloTitle: "Mis fotografías",
-    estiloHint: "Seis como máximo. Es lo que la maison mira para ver cómo fotografías.",
+    estiloHint:
+      "Seis como máximo, las de tu candidatura incluidas: quédatelas, quita alguna o añade las tuyas. Las maisons las ven con tu perfil, sin poder descargarlas.",
     estiloAdd: "Añadir",
     estiloRemove: "Quitar",
     subjects: "Lo que fotografío",
     subjectsHint: "Dos como máximo. Es lo que las maisons leen bajo tu nombre.",
     subjectsOver: "Dos como máximo: quita alguna para poder guardar.",
-    appPhotos: "Mis fotografías de candidatura",
-    appText: (n: number) =>
-      `Las ${n} fotografías que enviaste con tu candidatura. Las maisons del club las ven con tu perfil, sin poder descargarlas, y Curato puede mostrarlas, con tu nombre, en su comunicación (sección 15 de las condiciones generales). Para quitar alguna, escríbenos a ${CONTACTO}.`,
     save: "Guardar",
     saving: "Un momento…",
     unsaved: "Sin guardar",
@@ -150,7 +143,7 @@ export function PortraitEditor({
   onSaved,
 }: {
   lang: Lang;
-  initial: { portraits: Retrato[]; bio: string; subjects: string[]; estilo: Retrato[]; inherited: string | null; portfolio: string[] };
+  initial: { portraits: Retrato[]; bio: string; subjects: string[]; estilo: Retrato[]; inherited: string | null };
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -396,8 +389,9 @@ export function PortraitEditor({
               <p className="mt-etiqueta max-w-[46ch] text-legende text-text-secondary">{t.bioHint}</p>
             </section>
 
-            {/* Las fotos que enseñan cómo mira: la casa las ve en el dossier,
-                antes que las de la candidatura. */}
+            {/* Las fotos que enseñan cómo mira, en el orden en que la casa las
+                ve en el dossier. Llegan con las de la candidatura: se quitan,
+                se añaden, seis como máximo. */}
             <Section title={t.estiloTitle} hint={t.estiloHint}>
               <div className="grid grid-cols-3 gap-bloque">
                 {estilo.map((f) => (
@@ -452,18 +446,6 @@ export function PortraitEditor({
                 {temasDeMas ? t.subjectsOver : t.subjectsHint}
               </p>
             </section>
-
-            {initial.portfolio.length > 0 && (
-              <Section title={t.appPhotos}>
-                <div className="-mx-pagina flex gap-bloque overflow-x-auto px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {initial.portfolio.map((url, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img key={i} src={url} alt="" className="aspect-[4/5] w-[120px] shrink-0 rounded-2xl object-cover" />
-                  ))}
-                </div>
-                <p className="mt-bloque max-w-[46ch] text-legende text-text-secondary">{t.appText(initial.portfolio.length)}</p>
-              </Section>
-            )}
 
             {error && (
               <StateMark tono="caido" capital={error.cap ?? t.failCap}>
