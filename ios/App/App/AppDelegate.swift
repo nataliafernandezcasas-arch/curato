@@ -1,6 +1,24 @@
 import UIKit
 import Capacitor
 
+/// El controlador de la app: el de Capacitor, con el gesto de volver.
+///
+/// En iOS se vuelve atrás deslizando desde el borde izquierdo, como en casi
+/// todas las apps. El WKWebView de Capacitor lo trae apagado y aquí se
+/// enciende. Funciona con la navegación de la web, porque Next.js añade cada
+/// pantalla al historial. En Android no hace falta: el gesto del sistema llama
+/// al botón atrás, que native-shell.tsx ya convierte en history.back().
+///
+/// Vive en este archivo, y no en uno propio, porque este ya está en el target
+/// y así no hay que tocar a mano el proyecto de Xcode. Main.storyboard apunta
+/// a esta clase.
+class CuratoViewController: CAPBridgeViewController {
+    override func capacitorDidLoad() {
+        super.capacitorDidLoad()
+        webView?.allowsBackForwardNavigationGestures = true
+    }
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
