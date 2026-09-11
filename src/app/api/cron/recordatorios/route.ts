@@ -31,9 +31,12 @@ function cuando(d: Date) {
  * NULL), así que aunque la tarea corra dos veces a la vez nadie recibe dos.
  */
 export async function GET(request: NextRequest) {
-  const secreto = process.env.CRON_SECRET;
+  // Sin espacios ni saltos de línea en ninguno de los dos lados: al pegar una
+  // clave en un panel es fácil que se cuele un salto al final.
+  const secreto = process.env.CRON_SECRET?.replace(/\s+/g, "");
   if (!secreto) return NextResponse.json({ error: "CRON_SECRET no configurado." }, { status: 500 });
-  if (request.headers.get("authorization") !== `Bearer ${secreto}`) {
+  const recibida = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").replace(/\s+/g, "");
+  if (recibida !== secreto) {
     return NextResponse.json({ error: "No autorizado." }, { status: 401 });
   }
 

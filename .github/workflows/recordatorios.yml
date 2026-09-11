@@ -25,6 +25,13 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
+          # Sin espacios ni saltos de línea: si el secreto se pegó con un
+          # salto al final, curl rechaza la cabecera (error 43) y no llama.
+          TOKEN="$(printf '%s' "$CRON_SECRET" | tr -d '[:space:]')"
+          if [ -z "$TOKEN" ]; then
+            echo "Falta el secreto CRON_SECRET en GitHub (Settings, Secrets and variables, Actions)."
+            exit 1
+          fi
           curl --fail-with-body --silent --show-error --max-time 120 \
-            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Authorization: Bearer ${TOKEN}" \
             https://www.curatocollective.com/api/cron/recordatorios
