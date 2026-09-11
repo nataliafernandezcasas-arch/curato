@@ -231,13 +231,13 @@ function MaisonDashboard() {
         ) : tab === "roster" ? (
           <>
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/5">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="bg-charcoal-deep h-28 animate-pulse" />
               ))}
             </div>
           ) : roster.length === 0 ? (
-            <div className="text-center py-24 border border-white/10">
+            <div className="caja-cristal text-center py-24">
               <p className="font-serif text-[15px] font-light text-white/55">{t.empty}</p>
             </div>
           ) : (
@@ -252,7 +252,7 @@ function MaisonDashboard() {
                     <div className="flex min-w-0 items-start gap-fila">
                       {/* Retrato en 4:5, no un círculo. Un creador es una
                           persona a la que se mira, no un avatar de sistema. */}
-                      <div className="aspect-[4/5] w-16 shrink-0 overflow-hidden bg-surface-raised">
+                      <div className="aspect-[4/5] w-16 shrink-0 overflow-hidden rounded-[14px] bg-surface-raised">
                         {c.avatar ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={c.avatar} alt="" className="h-full w-full object-cover" />
@@ -314,7 +314,7 @@ function MaisonDashboard() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="block aspect-square overflow-hidden bg-charcoal-mid"
+                          className="block aspect-square overflow-hidden rounded-xl bg-charcoal-mid"
                         >
                           {p.thumbnail && (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -347,11 +347,11 @@ function MaisonDashboard() {
           directoryLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-charcoal-deep/60 border border-white/8 h-72 animate-pulse" />
+                <div key={i} className="rounded-2xl bg-charcoal-deep/60 border border-white/8 h-72 animate-pulse" />
               ))}
             </div>
           ) : directory.length === 0 ? (
-            <div className="text-center py-24 border border-white/10">
+            <div className="caja-cristal text-center py-24">
               <p className="font-serif text-[15px] font-light text-white/55">{t.directoryEmpty}</p>
             </div>
           ) : (
@@ -360,7 +360,7 @@ function MaisonDashboard() {
                 m.comingSoon ? (
                   <div
                     key={m.id}
-                    className="relative border border-white/10 bg-charcoal-deep/60 overflow-hidden select-none"
+                    className="relative rounded-2xl border border-white/10 bg-charcoal-deep/60 overflow-hidden select-none"
                   >
                     <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
                       {m.photos[0] ? (
@@ -371,7 +371,7 @@ function MaisonDashboard() {
                         <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-40" />
                       )}
                       <div className="absolute inset-0 bg-charcoal-deep/50 flex items-center justify-center">
-                        <span className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/80 border border-champagne/30 px-4 py-2">
+                        <span className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/80 rounded-full border border-champagne/30 bg-[rgba(245,239,228,0.06)] backdrop-blur-md px-4 py-2">
                           {t.directoryComingSoon}
                         </span>
                       </div>
@@ -385,7 +385,7 @@ function MaisonDashboard() {
                   <button
                     key={m.id}
                     onClick={() => setSelected(m)}
-                    className="text-left group border border-white/10 bg-charcoal-deep/60 overflow-hidden hover:border-champagne/30 transition-colors"
+                    className="text-left group rounded-2xl border border-white/10 bg-charcoal-deep/60 overflow-hidden hover:border-champagne/30 transition-colors"
                   >
                     <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
                       {m.photos[0] && (
@@ -405,11 +405,11 @@ function MaisonDashboard() {
         ) : visitorsLoading ? (
           <div className="space-y-8">
             {[1, 2].map((i) => (
-              <div key={i} className="h-64 border border-white/8 bg-white/5 animate-pulse" />
+              <div key={i} className="h-64 rounded-2xl border border-white/8 bg-white/5 animate-pulse" />
             ))}
           </div>
         ) : visitors.length === 0 ? (
-          <div className="text-center py-24 border border-white/10">
+          <div className="caja-cristal text-center py-24">
             <p className="font-serif text-[15px] font-light text-white/55">{t.visitorsEmpty}</p>
           </div>
         ) : (
@@ -419,7 +419,7 @@ function MaisonDashboard() {
                 <div className="grid grid-cols-2 gap-1.5">
                   {v.photos.map((url, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-charcoal-mid">
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-xl bg-charcoal-mid">
                       <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
                   ))}
@@ -450,11 +450,11 @@ function MaisonDashboard() {
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 sm:p-8"
           onClick={() => setSelected(null)}
         >
-          <div className="relative w-full max-w-[680px] bg-charcoal-deep border border-white/10 my-4" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-[680px] overflow-hidden rounded-2xl bg-charcoal-deep border border-white/10 my-4" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setSelected(null)}
               aria-label="Fermer"
-              className="absolute top-3 right-3 z-10 p-2 bg-black/50 text-white/70 hover:text-white transition-colors"
+              className="absolute top-3 right-3 z-10 rounded-full border border-[rgba(245,239,228,0.28)] p-2 bg-black/50 backdrop-blur-md text-white/70 hover:text-white transition-colors"
             >
               <X size={18} />
             </button>
@@ -477,7 +477,7 @@ function MaisonDashboard() {
                 <div className="grid grid-cols-3 gap-1.5">
                   {selected.photos.slice(1).map((url, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-charcoal-mid">
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-xl bg-charcoal-mid">
                       <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
                   ))}
