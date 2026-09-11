@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient();
     const { data: maison } = await admin
       .from("comercios")
-      .select("id, name, address")
+      .select("id, name, address, photos")
       .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
       .maybeSingle();
     if (!maison) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     // que el admin ya resolvió.
     const { data: r } = await admin
       .from("reservations")
-      .select("id, venue_id, creator_id, slot_start, nights, status")
+      .select("id, venue_id, creator_id, slot_start, nights, party_size, status")
       .eq("id", id)
       .maybeSingle();
     if (!r || r.venue_id !== maison.id) {
@@ -201,6 +201,9 @@ export async function POST(request: NextRequest) {
             maisonName: maison.name,
             address: maison.address ?? null,
             whenLabel: cuando(start),
+            start,
+            partySize: r.party_size ?? undefined,
+            coverUrl: (maison.photos as string[] | null)?.[0] ?? null,
             googleUrl: googleCalendarUrl(event),
             ics: buildIcs(event, `curato-${id}@curatocollective.com`),
           });

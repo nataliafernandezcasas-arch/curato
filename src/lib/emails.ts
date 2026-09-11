@@ -1,17 +1,48 @@
-// Curato transactional emails
-// Brand: dark editorial — warm charcoal bg, champagne (#CBB78F) accents, Georgia serif
-// Voice: contemplative, intimate, exclusive. French-first, bilingual where needed.
+// Los correos de Curato.
+//
+// Cada correo es un componente de React Email sobre la misma cáscara
+// (src/emails/shell.tsx, entrega 4, 10 sexies). Aquí solo se renderizan y se
+// mandan por Resend. Las firmas de estas funciones no cambian: quien las llama
+// no se entera del cambio.
+//
+// El asunto dice la cosa entera y se entiende sin abrir el correo, con nombre
+// propio y cifra cuando la hay. El remitente siempre es Curato, sin persona.
+
+import { createElement, type ReactElement } from "react";
+import { render } from "@react-email/render";
+import {
+  AlerteDemande,
+  AutresCreneaux,
+  DemandeDeclinee,
+  DemandeEnvoyee,
+  VisiteConfirmee,
+  demandeDeclineeTexto,
+  visiteConfirmeeTexto,
+} from "@/emails/visitas";
+import { CandidatureAcceptee, CandidatureRecue, Lancement, MotDePasse } from "@/emails/cuenta";
+import { EngagementSigne, NouvelleMaison } from "@/emails/maison";
+import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
+import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
+import { SITE } from "@/emails/shell";
 
 const FROM = "Curato <hello@curatocollective.com>";
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
 
 type Attachment = { filename: string; content: string; content_type?: string };
 
-async function sendEmail(to: string, subject: string, html: string, attachments?: Attachment[]) {
+async function sendEmail(
+  to: string,
+  subject: string,
+  email: ReactElement,
+  opts: { text?: string; attachments?: Attachment[] } = {}
+) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error("RESEND_API_KEY no configurada en .env.local");
-  const payload: Record<string, unknown> = { from: FROM, to, subject, html };
-  if (attachments && attachments.length > 0) payload.attachments = attachments;
+  const html = await render(email);
+  // El texto plano lo leen los relojes y lo mira el filtro de spam. Los correos
+  // con diseño propio lo traen escrito a mano; el resto se deriva del HTML.
+  const text = opts.text ?? (await render(email, { plainText: true }));
+  const payload: Record<string, unknown> = { from: FROM, to, subject, html, text };
+  if (opts.attachments && opts.attachments.length > 0) payload.attachments = opts.attachments;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -20,192 +51,29 @@ async function sendEmail(to: string, subject: string, html: string, attachments?
   return res.json();
 }
 
-// ── Brand palette ────────────────────────────────────────────────────────────
-const C = {
-  bg:        "#1C1A18",   // warm charcoal
-  card:      "#242220",   // slightly lighter card surface
-  border:    "#2E2B27",   // subtle border
-  champagne: "#CBB78F",   // primary accent
-  copper:    "#B56E2E",   // warm copper
-  white:     "#F5F0E8",   // warm white body text
-  muted:     "#CBC3B6",   // light warm grey (legible over the photo background)
-  faint:     "#968A7C",   // muted footer text
-};
+const PARIS = "Europe/Paris";
+const jourDe = (d: Date) => d.toLocaleDateString("fr-FR", { weekday: "long", timeZone: PARIS });
+const heureDe = (d: Date) => d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: PARIS });
+const JOUR_EN_TETE = /^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/i;
 
-// Brandbook typeface is Centaur. Its web substitute (used across the Curato
-// site) is Cormorant Garamond; clients that can't load it fall back to serif.
-// Everything is set in this one face to keep a single graphic line.
-const FONT = `'Cormorant Garamond', Georgia, 'Times New Roman', serif`;
-const FONT_SANS = FONT;
-
-// ── Email wrapper ─────────────────────────────────────────────────────────────
-function wrap(content: string) {
-  const ASSET = "https://www.curatocollective.com";
-  return `<!DOCTYPE html><html lang="fr"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');</style>
-</head>
-<body style="margin:0;padding:0;background-color:#161311;font-family:${FONT};">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#161311;">
-  <tr><td align="center" style="padding:0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" background="${ASSET}/email-bg-dark.jpg" style="max-width:560px;background-color:#161311;background-image:url('${ASSET}/email-bg-dark.jpg');background-position:center top;background-repeat:no-repeat;background-size:cover;">
-
-      <!-- Logo over the darkened photo background -->
-      <tr><td align="center" style="padding:48px 40px 36px;">
-        <img src="${ASSET}/logo-curato-simple.png" alt="curato" height="22" style="display:block;height:22px;width:auto;border:0;" />
-      </td></tr>
-
-      <!-- Content -->
-      <tr><td style="padding:0 4px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          ${content}
-        </table>
-      </td></tr>
-
-      <!-- Footer -->
-      <tr><td style="padding:36px 40px 48px;">
-        <p style="margin:0;font-family:${FONT};font-size:11px;color:${C.faint};letter-spacing:0.15px;">
-          Curato · Paris · <a href="${ASSET}" style="color:${C.faint};text-decoration:none;">curatocollective.com</a>
-        </p>
-      </td></tr>
-
-    </table>
-  </td></tr>
-</table>
-</body></html>`;
-}
-
-// ── 1. Application received ───────────────────────────────────────────────────
+// ── Candidatures ─────────────────────────────────────────────────────────────
 export async function sendApplicationReceived(to: string, name: string, type: "creator" | "business") {
-  const isCreator = type === "creator";
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Candidature reçue
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:28px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        Merci, ${name.split(" ")[0]}.
-      </h1>
-    </td></tr>
-    <tr><td style="padding:20px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        Nous avons bien reçu votre candidature en tant que
-        <span style="color:${C.white};">${isCreator ? "créateur · creator" : "maison · house"}</span>.
-        Notre équipe examine chaque profil avec attention.
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <div style="height:1px;background-color:${C.border};"></div>
-    </td></tr>
-    <tr><td style="padding:24px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Si votre candidature est retenue, vous recevrez un email de confirmation avec vos accès.
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(to, "Curato · Candidature reçue", html);
+  return sendEmail(to, "Curato · Candidature reçue", createElement(CandidatureRecue, { name, type }));
 }
 
-// ── 2. Application accepted ───────────────────────────────────────────────────
-type AcceptedOpts = {
-  to: string;
-  name: string;
-  type: "creator" | "business";
-};
+type AcceptedOpts = { to: string; name: string; type: "creator" | "business" };
 
 export async function sendApplicationAccepted(opts: AcceptedOpts) {
-  const { to, name, type } = opts;
-  const isCreator = type === "creator";
-  const firstName = name.split(" ")[0];
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Accepté · Accepted
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:30px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.2;">
-        Bienvenue dans Curato,<br/>${firstName}.
-      </h1>
-    </td></tr>
-    <tr><td style="padding:20px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        ${isCreator
-          ? "Vous faites maintenant partie de notre réseau de créateurs. Découvrez les adresses sélectionnées et utilisez votre crédit mensuel pour vivre des expériences authentiques."
-          : "Votre maison fait maintenant partie de l'écosystème Curato. Recevez des créateurs qui vous ont choisi, pas des campagnes."
-        }
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table cellpadding="0" cellspacing="0">
-        <tr><td style="background-color:${C.champagne};">
-          <a href="${SITE_URL}/auth/sign-in" style="display:inline-block;padding:14px 32px;font-family:${FONT_SANS};color:#1C1A18;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.25em;text-transform:uppercase;">
-            Accéder
-          </a>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="padding:12px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:11px;color:${C.faint};">
-        Connectez-vous avec <span style="color:${C.muted};">${to}</span>
-      </p>
-    </td></tr>
-    <tr><td style="padding:32px 40px 0;">
-      <div style="height:1px;background-color:${C.border};"></div>
-    </td></tr>
-    <tr><td style="padding:24px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Jamais une campagne. Toujours une histoire.
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(to, `Curato · Bienvenue, ${firstName}`, html);
+  const firstName = opts.name.split(" ")[0];
+  return sendEmail(opts.to, `Bienvenue dans Curato, ${firstName}`, createElement(CandidatureAcceptee, opts));
 }
 
-// ── 3. Launch event confirmation ─────────────────────────────────────────────
-
+// ── Lancement ────────────────────────────────────────────────────────────────
 export async function sendLaunchEventConfirmation(to: string, name: string) {
-  const firstName = (name || "").split(" ")[0] || "invité";
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Vous êtes inscrit
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:30px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.2;">
-        À bientôt,<br/>${firstName}.
-      </h1>
-    </td></tr>
-    <tr><td style="padding:20px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        Nous avons bien enregistré votre inscription au lancement de Curato.
-        Vous serez prévenu par email dès que la date est confirmée.
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
-        <tr><td style="padding:24px 28px;">
-          <p style="margin:0 0 4px;font-family:${FONT_SANS};font-size:10px;color:${C.faint};letter-spacing:0.3em;text-transform:uppercase;">Lancement</p>
-          <p style="margin:12px 0 16px;font-family:${FONT};font-size:20px;font-weight:400;color:${C.white};">Paris</p>
-          <div style="height:1px;background-color:${C.border};margin-bottom:14px;"></div>
-          <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};font-style:italic;">Date confirmée prochainement</p>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="padding:24px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Places limitées. La confirmation définitive vous sera envoyée avec tous les détails.
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(to, "Curato · Lancement Paris", html);
+  return sendEmail(to, "Curato · Votre inscription au lancement, Paris", createElement(Lancement, { name }));
 }
 
-// ── 4. Reservation request received (storyteller) ─────────────────────────────
+// ── Visites ──────────────────────────────────────────────────────────────────
 export async function sendReservationRequested(opts: {
   to: string;
   firstName: string;
@@ -213,43 +81,10 @@ export async function sendReservationRequested(opts: {
   whenLabel: string;
   partySize: number;
 }) {
-  const { to, firstName, maisonName, whenLabel, partySize } = opts;
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Demande reçue · Request received
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:28px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        Bien reçu, ${firstName}.
-      </h1>
-    </td></tr>
-    <tr><td style="padding:20px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        Votre demande de réservation a bien été transmise. Vous recevrez une confirmation très bientôt.
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
-        <tr><td style="padding:24px 28px;">
-          <p style="margin:0 0 4px;font-family:${FONT_SANS};font-size:10px;color:${C.faint};letter-spacing:0.3em;text-transform:uppercase;">Maison</p>
-          <p style="margin:6px 0 16px;font-family:${FONT};font-size:20px;color:${C.white};">${maisonName}</p>
-          <div style="height:1px;background-color:${C.border};margin-bottom:14px;"></div>
-          <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${whenLabel} · ${partySize} pers.</p>
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="padding:24px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Cette demande est en cours de validation. Rien n'est encore confirmé.
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(to, `Curato · Demande envoyée, ${maisonName}`, html);
+  const { to, ...p } = opts;
+  return sendEmail(to, `Demande envoyée à ${p.maisonName}`, createElement(DemandeEnvoyee, p));
 }
 
-// ── 5. Reservation request — admin alert (Natalia) ────────────────────────────
 export async function sendReservationAdminAlert(opts: {
   to: string;
   creatorName: string;
@@ -259,40 +94,14 @@ export async function sendReservationAdminAlert(opts: {
   partySize: number;
   note: string | null;
 }) {
-  const { to, creatorName, creatorHandle, maisonName, whenLabel, partySize, note } = opts;
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Nouvelle demande
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:24px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        ${creatorName}${creatorHandle ? ` <span style="color:${C.muted};">· @${creatorHandle}</span>` : ""}
-      </h1>
-    </td></tr>
-    <tr><td style="padding:24px 40px 0;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
-        <tr><td style="padding:24px 28px;">
-          <p style="margin:0 0 6px;font-family:${FONT};font-size:18px;color:${C.white};">${maisonName}</p>
-          <p style="margin:0 0 12px;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${whenLabel} · ${partySize} pers.</p>
-          ${note ? `<div style="height:1px;background-color:${C.border};margin:6px 0 12px;"></div><p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};font-style:italic;">« ${note} »</p>` : ""}
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table cellpadding="0" cellspacing="0"><tr><td style="background-color:${C.champagne};">
-        <a href="${SITE_URL}/admin/reservations" style="display:inline-block;padding:14px 32px;font-family:${FONT_SANS};color:#1C1A18;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.25em;text-transform:uppercase;">
-          Gérer la demande
-        </a>
-      </td></tr></table>
-    </td></tr>
-    <tr><td style="padding:24px 40px 40px;"></td></tr>
-  `);
-
-  return sendEmail(to, `Curato · Nouvelle demande, ${maisonName}`, html);
+  const { to, ...p } = opts;
+  return sendEmail(to, `Nouvelle demande : ${p.creatorName} chez ${p.maisonName}`, createElement(AlerteDemande, p));
 }
 
-// ── 6. Reservation confirmed (storyteller) — with calendar ────────────────────
+/**
+ * La visita confirmada. El asunto lleva casa, día y hora ("Maison Marceau vous
+ * attend jeudi à 19:30"), y el cuerpo, la portada de la propia casa.
+ */
 export async function sendReservationConfirmed(opts: {
   to: string;
   firstName: string;
@@ -301,161 +110,86 @@ export async function sendReservationConfirmed(opts: {
   whenLabel: string;
   googleUrl: string;
   ics: string;
+  /** El instante de la visita, para el asunto. */
+  start?: Date;
+  partySize?: number;
+  /** La portada de la maison, a sangre. */
+  coverUrl?: string | null;
 }) {
-  const { to, firstName, maisonName, address, whenLabel, googleUrl, ics } = opts;
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Confirmé · Confirmed
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:28px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        C'est confirmé, ${firstName}.
-      </h1>
-    </td></tr>
-    <tr><td style="padding:20px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        Votre réservation est confirmée. Nous avons hâte de vous y retrouver.
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${C.border};">
-        <tr><td style="padding:24px 28px;">
-          <p style="margin:6px 0 8px;font-family:${FONT};font-size:20px;color:${C.white};">${maisonName}</p>
-          <p style="margin:0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${whenLabel}</p>
-          ${address ? `<p style="margin:8px 0 0;font-family:${FONT_SANS};font-size:13px;color:${C.muted};">${address}</p>` : ""}
-        </td></tr>
-      </table>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table cellpadding="0" cellspacing="0"><tr><td style="background-color:${C.champagne};">
-        <a href="${googleUrl}" style="display:inline-block;padding:14px 28px;font-family:${FONT_SANS};color:#1C1A18;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.2em;text-transform:uppercase;">
-          Ajouter à Google Calendar
-        </a>
-      </td></tr></table>
-    </td></tr>
-    <tr><td style="padding:14px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;">
-        Pour Apple Calendar / Outlook, ouvrez le fichier <span style="color:${C.muted};">reservation-curato.ics</span> joint à cet email.
-      </p>
-    </td></tr>
-  `);
-
-  const attachments = [
-    {
-      filename: "reservation-curato.ics",
-      content: Buffer.from(ics).toString("base64"),
-      content_type: "text/calendar",
-    },
-  ];
-
-  return sendEmail(to, `Curato · Réservation confirmée, ${maisonName}`, html, attachments);
+  const props = {
+    maisonName: opts.maisonName,
+    address: opts.address,
+    whenLabel: opts.whenLabel,
+    partySize: opts.partySize,
+    coverUrl: opts.coverUrl ?? null,
+    googleUrl: opts.googleUrl,
+  };
+  const asunto = opts.start
+    ? `${opts.maisonName} vous attend ${jourDe(opts.start)} à ${heureDe(opts.start)}`
+    : `${opts.maisonName} vous attend`;
+  return sendEmail(opts.to, asunto, createElement(VisiteConfirmee, props), {
+    text: visiteConfirmeeTexto(props),
+    attachments: [
+      { filename: "reservation-curato.ics", content: Buffer.from(opts.ics).toString("base64"), content_type: "text/calendar" },
+    ],
+  });
 }
 
-// ── 7. Reservation — alternative créneaux proposed (storyteller) ──────────────
 export async function sendReservationAlternatives(opts: {
   to: string;
   firstName: string;
   maisonName: string;
   slots: { label: string; url: string }[];
 }) {
-  const { to, firstName, maisonName, slots } = opts;
-
-  const slotRows = slots
-    .map(
-      (s) => `
-      <tr><td style="padding:0 0 10px;">
-        <table cellpadding="0" cellspacing="0" width="100%"><tr><td style="border:1px solid ${C.border};">
-          <a href="${s.url}" style="display:block;padding:14px 22px;font-family:${FONT_SANS};font-size:14px;color:${C.white};text-decoration:none;">
-            <span style="color:${C.champagne};">→</span> ${s.label}
-          </a>
-        </td></tr></table>
-      </td></tr>`
-    )
-    .join("");
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Autres créneaux
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        Un autre moment, ${firstName} ?
-      </h1>
-    </td></tr>
-    <tr><td style="padding:20px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        Le créneau demandé chez <span style="color:${C.white};">${maisonName}</span> n'était pas disponible.
-        Voici les disponibilités proposées, choisissez celle qui vous convient :
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table width="100%" cellpadding="0" cellspacing="0">
-        ${slotRows}
-      </table>
-    </td></tr>
-    <tr><td style="padding:18px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Aucune ne convient ? Vous pouvez aussi proposer une autre date depuis votre espace.
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(to, `Curato · Autres créneaux, ${maisonName}`, html);
+  const { to, ...p } = opts;
+  return sendEmail(to, `${p.maisonName} vous propose d'autres créneaux`, createElement(AutresCreneaux, p));
 }
 
-// ── 8. Reservation — declined by the maison (storyteller) ────────────────────
-// La casa dice que no. Hasta ahora el creador no recibía nada: un día abría sus
-// visitas y encontraba una marcada como rechazada sin que nadie se lo dijera.
-//
-// No da motivo porque la casa no lo da, y no se inventa. La última frase es
-// para quien pueda leerlo como algo personal. Y manda al carnet, no a insistir
-// en la misma casa.
+/**
+ * La casa dice que no. El asunto dice casa y día ("Maison Marceau ne peut pas
+ * vous recevoir jeudi"), nunca "Mise à jour de votre demande".
+ */
 export async function sendReservationDeclined(opts: {
   to: string;
   firstName: string;
   maisonName: string;
   whenLabel: string;
 }) {
-  const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const nombre = opts.firstName && opts.firstName !== "vous" ? esc(opts.firstName) : "";
-  const maison = esc(opts.maisonName);
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Votre demande
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:28px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        Ce ne sera pas pour cette fois${nombre ? `, ${nombre}` : ""}.
-      </h1>
-    </td></tr>
-    <tr><td style="padding:20px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        <span style="color:${C.white};">${maison}</span> ne pourra pas vous recevoir le ${esc(opts.whenLabel)}.
-        Rien n'a été déduit de votre budget du mois : il reste entier pour une autre adresse.
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <table cellpadding="0" cellspacing="0"><tr><td style="background-color:${C.champagne};">
-        <a href="${SITE_URL}/dashboard/storyteller" style="display:inline-block;padding:14px 28px;font-family:${FONT_SANS};color:#1C1A18;font-size:12px;font-weight:600;text-decoration:none;letter-spacing:0.2em;text-transform:uppercase;">
-          Découvrir le carnet
-        </a>
-      </td></tr></table>
-    </td></tr>
-    <tr><td style="padding:24px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Chaque maison choisit ses visites selon ses propres contraintes. Ce refus ne dit rien de vous.
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(opts.to, `Curato · Votre demande chez ${opts.maisonName}`, html);
+  const { to, ...p } = opts;
+  const jour = p.whenLabel.match(JOUR_EN_TETE)?.[1]?.toLowerCase();
+  const asunto = jour ? `${p.maisonName} ne peut pas vous recevoir ${jour}` : `${p.maisonName} ne peut pas vous recevoir`;
+  return sendEmail(to, asunto, createElement(DemandeDeclinee, p), { text: demandeDeclineeTexto(p) });
 }
 
-// ── Maison commitment signed ──────────────────────────────────────────────────
-// Sent to a maison right after they sign the commitment. Carries the signed
-// agreement as a PDF attachment and repeats the terms in the body as a record.
+// ── Stories ──────────────────────────────────────────────────────────────────
+/** A falta de seis horas del plazo, si las stories no han llegado. Una vez. */
+export async function sendRecordatorioSeisHoras(opts: {
+  to: string;
+  firstName: string;
+  maisonName: string;
+  whenLabel: string;
+  horas: number;
+}) {
+  const { to, ...p } = opts;
+  const asunto =
+    p.horas === 6 ? "Il vous reste six heures pour publier" : `Il vous reste ${p.horas} heure${p.horas > 1 ? "s" : ""} pour publier`;
+  return sendEmail(to, asunto, createElement(SeisHoras, p), { text: seisHorasTexto(p) });
+}
+
+/** A Curato: las visitas cuyo plazo acaba de vencer sin stories. */
+export async function sendAvisoStoriesManquantes(opts: {
+  to: string;
+  visitas: { storyteller: string; maison: string; whenLabel: string }[];
+}) {
+  const n = opts.visitas.length;
+  const asunto =
+    n === 1
+      ? `Stories manquantes : ${opts.visitas[0].storyteller} chez ${opts.visitas[0].maison}`
+      : `Stories manquantes : ${n} visites`;
+  return sendEmail(opts.to, asunto, createElement(StoriesManquantes, { visitas: opts.visitas }));
+}
+
+// ── Maisons ──────────────────────────────────────────────────────────────────
 type MaisonCommitmentOpts = {
   to: string;
   subject: string;
@@ -473,92 +207,12 @@ type MaisonCommitmentOpts = {
 };
 
 export async function sendMaisonCommitment(opts: MaisonCommitmentOpts) {
-  const termsHtml = opts.terms
-    .map(
-      (term, i) => `
-      <tr><td style="padding:0 0 14px;">
-        <table cellpadding="0" cellspacing="0"><tr>
-          <td valign="top" style="padding-right:14px;font-family:${FONT};font-size:13px;color:${C.champagne};">${String(i + 1).padStart(2, "0")}</td>
-          <td style="font-family:${FONT_SANS};font-size:14px;color:${C.white};line-height:1.6;">${term}</td>
-        </tr></table>
-      </td></tr>`
-    )
-    .join("");
-
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        ${opts.heading}
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        ${opts.maisonName}
-      </h1>
-    </td></tr>
-    <tr><td style="padding:18px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        ${opts.intro}
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <div style="height:1px;background-color:${C.border};"></div>
-    </td></tr>
-    <tr><td style="padding:26px 40px 0;">
-      <table width="100%" cellpadding="0" cellspacing="0">${termsHtml}</table>
-    </td></tr>
-    <tr><td style="padding:14px 40px 0;">
-      <div style="height:1px;background-color:${C.border};"></div>
-    </td></tr>
-    <tr><td style="padding:22px 40px 40px;">
-      <p style="margin:0 0 4px;font-family:${FONT_SANS};font-size:11px;color:${C.faint};letter-spacing:0.15em;text-transform:uppercase;">
-        ${opts.signedByLabel}
-      </p>
-      <p style="margin:0 0 14px;font-family:${FONT};font-size:20px;color:${C.white};">${opts.signatory}</p>
-      <p style="margin:0 0 18px;font-family:${FONT_SANS};font-size:12px;color:${C.muted};">${opts.dateLabel}: ${opts.whenLabel}</p>
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        ${opts.confirmNote}
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(opts.to, opts.subject, html, [
-    { filename: opts.pdfFilename, content: opts.pdfBase64, content_type: "application/pdf" },
-  ]);
+  const { to, subject, pdfBase64, pdfFilename, ...p } = opts;
+  return sendEmail(to, subject, createElement(EngagementSigne, p), {
+    attachments: [{ filename: pdfFilename, content: pdfBase64, content_type: "application/pdf" }],
+  });
 }
 
-// ── Password reset ────────────────────────────────────────────────────────────
-// Sent via Resend (reliable) instead of Supabase's built-in auth email. The
-// resetUrl is a Supabase recovery action link that lands on /auth/change-password.
-export async function sendPasswordReset(to: string, resetUrl: string) {
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Réinitialisation
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        Nouveau mot de passe
-      </h1>
-    </td></tr>
-    <tr><td style="padding:18px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        Vous avez demandé à réinitialiser votre mot de passe Curato. Cliquez ci-dessous pour en choisir un nouveau. Ce lien expire dans 1 heure.
-      </p>
-    </td></tr>
-    <tr><td style="padding:28px 40px 0;">
-      <a href="${resetUrl}" style="display:inline-block;font-family:${FONT_SANS};font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:${C.bg};background-color:${C.champagne};text-decoration:none;padding:14px 28px;">
-        Choisir un nouveau mot de passe
-      </a>
-    </td></tr>
-    <tr><td style="padding:24px 40px 40px;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:12px;color:${C.faint};line-height:1.7;font-style:italic;">
-        Si vous n'êtes pas à l'origine de cette demande, ignorez cet email : votre mot de passe reste inchangé.
-      </p>
-    </td></tr>
-  `);
-
-  return sendEmail(to, "Curato · Réinitialisation de votre mot de passe", html);
-}
-
-// ── Admin alert: a maison opened its account (signed the commitment) ───────────
 export async function sendMaisonJoinedAdminAlert(opts: {
   to: string;
   maisonName: string;
@@ -566,174 +220,162 @@ export async function sendMaisonJoinedAdminAlert(opts: {
   whenLabel: string;
   planLabel: string;
 }) {
-  const html = wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 20px;font-family:${FONT_SANS};font-size:10px;font-weight:400;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">
-        Nouvelle maison
-      </p>
-      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">
-        ${opts.maisonName}
-      </h1>
-    </td></tr>
-    <tr><td style="padding:18px 40px 0;">
-      <p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">
-        vient d'ouvrir son compte et de signer son engagement Curato.
-      </p>
-    </td></tr>
-    <tr><td style="padding:26px 40px 40px;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="font-family:${FONT_SANS};font-size:13px;color:${C.white};">
-        <tr><td style="padding:6px 0;color:${C.muted};width:120px;">Signé par</td><td style="padding:6px 0;">${opts.signatory}</td></tr>
-        <tr><td style="padding:6px 0;color:${C.muted};">Formule</td><td style="padding:6px 0;">${opts.planLabel}</td></tr>
-        <tr><td style="padding:6px 0;color:${C.muted};">Date</td><td style="padding:6px 0;">${opts.whenLabel}</td></tr>
-      </table>
-    </td></tr>
-  `);
-
-  return sendEmail(opts.to, `Curato · Nouvelle maison signée : ${opts.maisonName}`, html);
+  const { to, ...p } = opts;
+  return sendEmail(to, `Nouvelle maison signée : ${p.maisonName}`, createElement(NouvelleMaison, p));
 }
 
-// ── Recruiters programme ───────────────────────────────────────────────────
+// ── Compte ───────────────────────────────────────────────────────────────────
+// Por Resend y no por el correo de Supabase, que llegaba mal. El enlace es una
+// acción de recuperación de Supabase que abre /auth/change-password.
+export async function sendPasswordReset(to: string, resetUrl: string) {
+  return sendEmail(to, "Curato · Choisissez un nouveau mot de passe", createElement(MotDePasse, { resetUrl }));
+}
+
+// ── Apporteurs ───────────────────────────────────────────────────────────────
 export const RECRUITER_COMMISSION_LABEL = "448,50 € (149,50 €/mois pendant 3 mois)";
 
-function recruiterCard(eyebrow: string, heading: string, paragraphs: string[], cta?: { label: string; url: string }) {
-  const paras = paragraphs
-    .map(
-      (p) =>
-        `<tr><td style="padding:16px 40px 0;"><p style="margin:0;font-family:${FONT_SANS};font-size:14px;color:${C.muted};line-height:1.7;">${p}</p></td></tr>`
-    )
-    .join("");
-  const button = cta
-    ? `<tr><td style="padding:26px 40px 0;"><a href="${cta.url}" style="display:inline-block;font-family:${FONT_SANS};font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:${C.bg};background-color:${C.champagne};padding:13px 26px;text-decoration:none;">${cta.label}</a></td></tr>`
-    : "";
-  return wrap(`
-    <tr><td style="padding:40px 40px 0;">
-      <p style="margin:0 0 18px;font-family:${FONT_SANS};font-size:10px;color:${C.champagne};letter-spacing:0.35em;text-transform:uppercase;">${eyebrow}</p>
-      <h1 style="margin:0;font-family:${FONT};font-size:26px;font-weight:400;color:${C.white};letter-spacing:0.02em;line-height:1.25;">${heading}</h1>
-    </td></tr>
-    ${paras}
-    ${button}
-    <tr><td style="padding:34px 40px 40px;"></td></tr>
-  `);
-}
-
 const first = (name: string) => (name || "").trim().split(" ")[0] || "";
-const DASH = `${SITE_URL}/dashboard`;
-const ADMIN_RECRUITERS = `${SITE_URL}/admin/recruiters`;
+const DASH = `${SITE}/dashboard`;
+const ADMIN_RECRUITERS = `${SITE}/admin/recruiters`;
 
-// Welcome — when an admin creates a recruiter account
+function aviso(p: { capital: string; titulo: string; parrafos: string[]; enlace?: { label: string; url: string } }) {
+  return createElement(Aviso, { ...p, preview: p.parrafos[0] ?? p.titulo });
+}
+
 export async function sendRecruiterWelcome(to: string, o: { name: string; email: string; tempPassword: string }) {
-  const html = recruiterCard(
-    "Espace Recruiter",
-    `Bienvenue, ${first(o.name)}.`,
-    [
-      `Votre espace Recruiter Curato est prêt. Connectez-vous, proposez des maisons, et suivez vos commissions.`,
-      `Identifiant : ${o.email}<br/>Mot de passe temporaire : <span style="color:${C.champagne};letter-spacing:0.08em;">${o.tempPassword}</span><br/>Vous choisirez un mot de passe personnel à la première connexion.`,
-    ],
-    { label: "Accéder à mon espace", url: `${SITE_URL}/auth/sign-in` }
-  );
-  return sendEmail(to, `Bienvenue dans Curato, ${first(o.name)}.`, html);
-}
-
-// A second role added to an existing account (e.g. a storyteller who becomes
-// a recruiter). No new password — they keep their usual login.
-export async function sendRecruiterSecondRole(to: string, o: { name: string }) {
-  const html = recruiterCard(
-    "Espace Recruiter",
-    `Bonjour, ${first(o.name)}.`,
-    [
-      `Vous avez désormais aussi accès à l'espace Recruiter de Curato, avec votre compte habituel.`,
-      `Connectez-vous comme d'habitude. Un lien « Espaces » en haut de votre tableau de bord vous permet de basculer entre vos différents espaces.`,
-    ],
-    { label: "Accéder à mon espace", url: `${SITE_URL}/auth/sign-in` }
-  );
-  return sendEmail(to, "Curato · Votre espace Recruiter est activé", html);
-}
-
-// Step 1 (submitted) — to the recruiter
-export async function sendRecruiterProspectSubmitted(to: string, o: { recruiterName: string; maisonName: string }) {
-  const html = recruiterCard(
-    "En attente de validation",
-    o.maisonName,
-    [
-      `Bonjour ${first(o.recruiterName)}, nous avons bien reçu votre proposition.`,
-      `Notre équipe la valide sous peu. Vous recevrez un email dès qu'elle sera validée. Avant cela, merci de ne pas encore contacter la maison.`,
-    ],
-    { label: "Voir mes prospects", url: DASH }
-  );
-  return sendEmail(to, `Curato · Prospect reçu : ${o.maisonName}`, html);
-}
-
-// Step 1 (submitted) — to the admin
-export async function sendAdminProspectSubmitted(to: string, o: { recruiterName: string; maisonName: string; maisonEmail: string | null }) {
-  const html = recruiterCard(
-    "Prospect à valider",
-    o.maisonName,
-    [
-      `${o.recruiterName} vient de proposer cette maison.`,
-      `Email de la maison : ${o.maisonEmail || "non renseigné"}. Validez ou refusez depuis l'admin.`,
-    ],
-    { label: "Valider dans l'admin", url: ADMIN_RECRUITERS }
-  );
-  return sendEmail(to, `Curato · Prospect à valider : ${o.maisonName}`, html);
-}
-
-// Step 2/3 (approved or rejected) — to the recruiter
-export async function sendRecruiterProspectDecision(to: string, o: { recruiterName: string; maisonName: string; decision: "approved" | "rejected" }) {
-  if (o.decision === "approved") {
-    const html = recruiterCard(
-      "Validée, à contacter",
-      o.maisonName,
-      [
-        `Bonjour ${first(o.recruiterName)}, votre maison a été validée et vous est réservée.`,
-        `Vous pouvez maintenant la contacter. Bonne chance, et tenez-nous au courant.`,
+  return sendEmail(
+    to,
+    `Bienvenue dans Curato, ${first(o.name)}`,
+    aviso({
+      capital: "Espace apporteur",
+      titulo: `Bienvenue, ${first(o.name)}`,
+      parrafos: [
+        "Votre espace apporteur Curato est prêt. Connectez-vous, proposez des maisons et suivez vos commissions.",
+        `Identifiant : ${o.email}`,
+        `Mot de passe temporaire : ${o.tempPassword}`,
+        "Vous choisirez un mot de passe personnel à la première connexion.",
       ],
-      { label: "Voir mes prospects", url: DASH }
-    );
-    return sendEmail(to, `Curato · Maison validée : ${o.maisonName}`, html);
+      enlace: { label: "Accéder à mon espace", url: `${SITE}/auth/sign-in` },
+    })
+  );
+}
+
+// Un segundo rol en una cuenta que ya existe: sin contraseña nueva.
+export async function sendRecruiterSecondRole(to: string, o: { name: string }) {
+  return sendEmail(
+    to,
+    "Curato · Votre espace apporteur est activé",
+    aviso({
+      capital: "Espace apporteur",
+      titulo: `Bonjour, ${first(o.name)}`,
+      parrafos: [
+        "Vous avez désormais aussi accès à l'espace apporteur de Curato, avec votre compte habituel.",
+        "Connectez-vous comme d'habitude : le lien « Espaces » en haut de votre tableau de bord vous fait passer d'un espace à l'autre.",
+      ],
+      enlace: { label: "Accéder à mon espace", url: `${SITE}/auth/sign-in` },
+    })
+  );
+}
+
+export async function sendRecruiterProspectSubmitted(to: string, o: { recruiterName: string; maisonName: string }) {
+  return sendEmail(
+    to,
+    `Prospect reçu : ${o.maisonName}`,
+    aviso({
+      capital: "En attente de validation",
+      titulo: o.maisonName,
+      parrafos: [
+        `Bonjour ${first(o.recruiterName)}, nous avons bien reçu votre proposition.`,
+        "Notre équipe la valide sous peu et vous recevrez un e-mail dès qu'elle le sera. D'ici là, merci de ne pas encore contacter la maison.",
+      ],
+      enlace: { label: "Voir mes prospects", url: DASH },
+    })
+  );
+}
+
+export async function sendAdminProspectSubmitted(to: string, o: { recruiterName: string; maisonName: string; maisonEmail: string | null }) {
+  return sendEmail(
+    to,
+    `Prospect à valider : ${o.maisonName}`,
+    aviso({
+      capital: "Prospect à valider",
+      titulo: o.maisonName,
+      parrafos: [
+        `${o.recruiterName} vient de proposer cette maison.`,
+        `E-mail de la maison : ${o.maisonEmail || "non renseigné"}. Validez ou refusez depuis l'admin.`,
+      ],
+      enlace: { label: "Valider dans l'admin", url: ADMIN_RECRUITERS },
+    })
+  );
+}
+
+export async function sendRecruiterProspectDecision(
+  to: string,
+  o: { recruiterName: string; maisonName: string; decision: "approved" | "rejected" }
+) {
+  if (o.decision === "approved") {
+    const p = { recruiterName: o.recruiterName, maisonName: o.maisonName };
+    return sendEmail(to, `${o.maisonName} est validée · à vous de jouer`, createElement(MaisonValidee, p), {
+      text: maisonValideeTexto(p),
+    });
   }
-  const html = recruiterCard(
-    "Non retenue",
-    o.maisonName,
-    [
-      `Bonjour ${first(o.recruiterName)}, cette maison n'a pas pu être retenue (déjà dans notre pipeline ou non éligible).`,
-      `Merci de ne pas la contacter. N'hésitez pas à en proposer d'autres !`,
-    ],
-    { label: "Proposer une maison", url: DASH }
+  return sendEmail(
+    to,
+    `${o.maisonName} n'a pas été retenue`,
+    aviso({
+      capital: "Non retenue",
+      titulo: o.maisonName,
+      parrafos: [
+        `Bonjour ${first(o.recruiterName)}, cette maison n'a pas pu être retenue : elle est déjà dans nos échanges, ou elle n'est pas éligible.`,
+        "Merci de ne pas la contacter. Et n'hésitez pas à en proposer d'autres.",
+      ],
+      enlace: { label: "Proposer une maison", url: DASH },
+    })
   );
-  return sendEmail(to, `Curato · Maison non retenue : ${o.maisonName}`, html);
 }
 
-// Step 2/3 (approved or rejected) — to the admin
-export async function sendAdminProspectDecision(to: string, o: { recruiterName: string; maisonName: string; decision: "approved" | "rejected" }) {
-  const word = o.decision === "approved" ? "validé" : "refusé";
-  const html = recruiterCard(
-    o.decision === "approved" ? "Maison validée" : "Maison refusée",
-    o.maisonName,
-    [`Vous avez ${word} la maison ${o.maisonName}, proposée par ${o.recruiterName}.`]
+export async function sendAdminProspectDecision(
+  to: string,
+  o: { recruiterName: string; maisonName: string; decision: "approved" | "rejected" }
+) {
+  const valide = o.decision === "approved";
+  return sendEmail(
+    to,
+    `${o.maisonName} ${valide ? "validée" : "refusée"}`,
+    aviso({
+      capital: valide ? "Maison validée" : "Maison refusée",
+      titulo: o.maisonName,
+      parrafos: [`Vous avez ${valide ? "validé" : "refusé"} la maison ${o.maisonName}, proposée par ${o.recruiterName}.`],
+    })
   );
-  return sendEmail(to, `Curato · ${o.maisonName} ${o.decision === "approved" ? "validée" : "refusée"}`, html);
 }
 
-// Step 4 (signed) — to the recruiter
 export async function sendRecruiterMaisonSigned(to: string, o: { recruiterName: string; maisonName: string }) {
-  const html = recruiterCard(
-    "Maison signée",
-    o.maisonName,
-    [
-      `Bravo ${first(o.recruiterName)} ! La maison que vous avez apportée vient de signer.`,
-      `Votre commission : ${RECRUITER_COMMISSION_LABEL}. Elle est versée par virement au fil des paiements de la maison. Pensez à renseigner votre IBAN dans votre espace.`,
-    ],
-    { label: "Voir mes payouts", url: DASH }
+  return sendEmail(
+    to,
+    `${o.maisonName} a signé`,
+    aviso({
+      capital: "Maison signée",
+      titulo: o.maisonName,
+      parrafos: [
+        `Bravo ${first(o.recruiterName)}, la maison que vous avez apportée vient de signer.`,
+        `Votre commission : ${RECRUITER_COMMISSION_LABEL}, versée par virement au fil des paiements de la maison. Pensez à renseigner votre IBAN dans votre espace.`,
+      ],
+      enlace: { label: "Voir mes commissions", url: DASH },
+    })
   );
-  return sendEmail(to, `Curato · Félicitations, ${o.maisonName} a signé !`, html);
 }
 
-// Step 4 (signed) — to the admin
 export async function sendAdminRecruiterMaisonSigned(to: string, o: { recruiterName: string; maisonName: string }) {
-  const html = recruiterCard(
-    "Maison signée (recruiter)",
-    o.maisonName,
-    [`La maison ${o.maisonName}, apportée par ${o.recruiterName}, vient de signer. Commission due : ${RECRUITER_COMMISSION_LABEL}.`]
+  return sendEmail(
+    to,
+    `${o.maisonName} signée, apportée par ${o.recruiterName}`,
+    aviso({
+      capital: "Maison signée",
+      titulo: o.maisonName,
+      parrafos: [
+        `La maison ${o.maisonName}, apportée par ${o.recruiterName}, vient de signer. Commission due : ${RECRUITER_COMMISSION_LABEL}.`,
+      ],
+    })
   );
-  return sendEmail(to, `Curato · ${o.maisonName} signée (apportée par ${o.recruiterName})`, html);
 }
