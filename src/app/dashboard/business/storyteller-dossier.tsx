@@ -102,6 +102,11 @@ const TEXTOS = {
 
 type Textos = (typeof TEXTOS)["fr"];
 
+/** Lo que enseña cómo mira: sus fotos de perfil y después las de la candidatura. */
+export function fotosDe(d: Dossier): string[] {
+  return [...(d.estilo ?? []), ...d.portfolio].slice(0, 6);
+}
+
 function iniciales(name: string): string {
   const parts = name.replace(/^@/, "").trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "·";
@@ -210,7 +215,7 @@ export function DossierPane({
       </SlideIn>
 
       {dossier && (
-        <Viewer photos={dossier.portfolio} index={visor} onClose={cerrarVisor} caption={t.viewerCaption} protect />
+        <Viewer photos={fotosDe(dossier)} index={visor} onClose={cerrarVisor} caption={t.viewerCaption} protect />
       )}
     </div>
   );
@@ -244,7 +249,9 @@ function Cuerpo({
 }) {
   const p = nombrePila(d.name);
   const conIg = d.audience !== null;
-  const conPortafolio = d.portfolio.length > 0;
+  // Las que sube a su perfil primero, después las de la candidatura. Seis.
+  const fotos = fotosDe(d);
+  const conPortafolio = fotos.length > 0;
   const conVisitas = d.club.visits > 0;
   const posts = d.recentPosts.filter((x) => x.thumbnail);
   const [primero, ...resto] = d.name.split(/\s+/);
@@ -299,11 +306,11 @@ function Cuerpo({
       {d.phrase && <p className="mt-rango text-champ italic text-text-primary">{t.quote(d.phrase)}</p>}
 
       <div className="mt-seccion">
-        {conPortafolio ? (
+        {conPortafolio && (
           <Section title={t.style}>
             {conIg ? (
               <div className="-mx-pagina flex snap-x gap-bloque overflow-x-auto px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {d.portfolio.map((url, i) => (
+                {fotos.map((url, i) => (
                   <button
                     key={i}
                     type="button"
@@ -319,7 +326,7 @@ function Cuerpo({
               // Sin cifras, el portafolio crece y ocupa su sitio: es lo que más
               // se acerca a lo que se quería enseñar.
               <div className="grid grid-cols-2 gap-bloque">
-                {d.portfolio.map((url, i) => (
+                {fotos.map((url, i) => (
                   <button
                     key={i}
                     type="button"
@@ -333,10 +340,14 @@ function Cuerpo({
               </div>
             )}
             <p className="mt-bloque max-w-[46ch] text-legende text-text-secondary">
-              {conIg ? t.shownStrip(d.portfolio.length) : t.shownGrid(d.portfolio.length)}
+              {t.shownStrip(fotos.length)}
             </p>
           </Section>
-        ) : posts.length > 0 ? (
+        )}
+
+        {/* Sus seis últimas publicaciones, siempre que haya: también dicen
+            cómo fotografía, y son lo que la casa verá después de la visita. */}
+        {posts.length > 0 && (
           <Section title={t.recent}>
             <div className="grid grid-cols-3 gap-1.5">
               {posts.slice(0, 6).map((post, i) => (
@@ -352,9 +363,11 @@ function Cuerpo({
                 </a>
               ))}
             </div>
-            <p className="mt-bloque max-w-[46ch] text-legende text-text-secondary">{t.beforePortfolio(p)}</p>
+            {!conPortafolio && (
+              <p className="mt-bloque max-w-[46ch] text-legende text-text-secondary">{t.beforePortfolio(p)}</p>
+            )}
           </Section>
-        ) : null}
+        )}
 
         {conVisitas ? (
           <Section title={t.club}>

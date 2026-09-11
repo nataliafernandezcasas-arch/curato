@@ -15,7 +15,7 @@ import { DossierPane } from "../../business/storyteller-dossier";
 import type { Dossier } from "@/lib/storyteller-dossier";
 import { PortraitEditor, type Retrato } from "./portrait-editor";
 
-type Perfil = { portraits: Retrato[]; bio: string; subjects: string[]; inherited: string | null; dossier: Dossier | null };
+type Perfil = { portraits: Retrato[]; bio: string; subjects: string[]; estilo: Retrato[]; inherited: string | null; dossier: Dossier | null };
 
 const TP = {
   fr: {
@@ -253,6 +253,7 @@ export default function ProfilPage() {
             portraits: perfil.portraits,
             bio: perfil.bio,
             subjects: perfil.subjects ?? [],
+            estilo: perfil.estilo ?? [],
             inherited: perfil.inherited,
             portfolio: perfil.dossier?.portfolio ?? [],
           }}

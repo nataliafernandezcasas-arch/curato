@@ -14,6 +14,7 @@ import { SUBJECTS, SUBJECT_MAX } from "@/lib/photo-subjects";
 // Los mismos límites que valida el servidor (creator-portrait.ts). No se
 // importan de allí porque ese archivo arrastra el cliente de administración.
 const PORTRAIT_MAX = 2;
+const ESTILO_MAX = 6;
 const BIO_MAX = 240;
 const MAX_BYTES = 3 * 1024 * 1024;
 const ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif";
@@ -37,6 +38,10 @@ const TEXTOS = {
     bioLabel: "Ma façon de photographier",
     bioHint: "Une phrase, avec vos mots. C'est ce que la maison lit avant de regarder.",
     bioPlaceholder: "Ce que vous aimez photographier, la lumière que vous cherchez, le genre de lieux où vous êtes chez vous.",
+    estiloTitle: "Mes photographies",
+    estiloHint: "Six au plus. C'est ce que la maison regarde pour voir comment vous photographiez.",
+    estiloAdd: "Ajouter",
+    estiloRemove: "Retirer",
     subjects: "Ce que je photographie",
     subjectsHint: "Deux au plus. C'est ce que les maisons lisent sous votre nom.",
     subjectsOver: "Deux au plus : retirez-en pour pouvoir enregistrer.",
@@ -69,6 +74,10 @@ const TEXTOS = {
     bioLabel: "How I photograph",
     bioHint: "One sentence, in your words. It's what the house reads before looking.",
     bioPlaceholder: "What you love to photograph, the light you look for, the kind of places where you feel at home.",
+    estiloTitle: "My photographs",
+    estiloHint: "Six at most. It's what the house looks at to see how you photograph.",
+    estiloAdd: "Add",
+    estiloRemove: "Remove",
     subjects: "What I photograph",
     subjectsHint: "Two at most. It's what houses read under your name.",
     subjectsOver: "Two at most: remove some to be able to save.",
@@ -101,6 +110,10 @@ const TEXTOS = {
     bioLabel: "Mi manera de fotografiar",
     bioHint: "Una frase, con tus palabras. Es lo que la maison lee antes de mirar.",
     bioPlaceholder: "Lo que te gusta fotografiar, la luz que buscas, el tipo de lugares donde te sientes en casa.",
+    estiloTitle: "Mis fotografías",
+    estiloHint: "Seis como máximo. Es lo que la maison mira para ver cómo fotografías.",
+    estiloAdd: "Añadir",
+    estiloRemove: "Quitar",
     subjects: "Lo que fotografío",
     subjectsHint: "Dos como máximo. Es lo que las maisons leen bajo tu nombre.",
     subjectsOver: "Dos como máximo: quita alguna para poder guardar.",
@@ -137,7 +150,7 @@ export function PortraitEditor({
   onSaved,
 }: {
   lang: Lang;
-  initial: { portraits: Retrato[]; bio: string; subjects: string[]; inherited: string | null; portfolio: string[] };
+  initial: { portraits: Retrato[]; bio: string; subjects: string[]; estilo: Retrato[]; inherited: string | null; portfolio: string[] };
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -147,6 +160,8 @@ export function PortraitEditor({
   const [portraits, setPortraits] = useState<Retrato[]>(initial.portraits);
   const [bio, setBio] = useState(initial.bio);
   const [subjects, setSubjects] = useState<string[]>(initial.subjects);
+  const [estilo, setEstilo] = useState<Retrato[]>(initial.estilo);
+  const [subiendoEstilo, setSubiendoEstilo] = useState(false);
   const [subiendo, setSubiendo] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<{ cap?: string; texto: string } | null>(null);
@@ -155,9 +170,11 @@ export function PortraitEditor({
   // Quien trae más de dos de antes puede guardar sin tocarlas; si las toca,
   // tiene que dejar dos como mucho.
   const temasDeMas = temasCambiados && subjects.length > SUBJECT_MAX;
+  const estiloCambiado = estilo.map((p) => p.path).join("|") !== initial.estilo.map((p) => p.path).join("|");
   const cambiado =
     bio.trim() !== initial.bio.trim() ||
     temasCambiados ||
+    estiloCambiado ||
     portraits.map((p) => p.path).join("|") !== initial.portraits.map((p) => p.path).join("|");
 
   // Escape vuelve, y la página de debajo no se mueve mientras esto está encima.
@@ -209,6 +226,41 @@ export function PortraitEditor({
     }
   }
 
+  /** Una foto de estilo más, al final de las que ya hay. */
+  async function subirEstilo(files: FileList | null) {
+    const original = files?.[0];
+    if (!original) return;
+    setError(null);
+    if (!ACCEPT.split(",").includes(original.type.toLowerCase())) {
+      setError({ texto: t.badType });
+      return;
+    }
+    setSubiendoEstilo(true);
+    try {
+      const file = await downscaleImage(original);
+      if (file.size > MAX_BYTES) {
+        setError({ texto: t.tooLarge });
+        return;
+      }
+      const form = new FormData();
+      form.set("file", file);
+      form.set("tipo", "estilo");
+      const res = await fetch("/api/storyteller/perfil", { method: "POST", body: form });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || !body.path || !body.url) {
+        setError(
+          body.error === "size" ? { texto: t.tooLarge } : body.error === "format" ? { texto: t.badType } : { cap: t.failCap, texto: t.uploadFail }
+        );
+        return;
+      }
+      setEstilo((prev) => [...prev, { path: body.path, url: body.url }].slice(0, ESTILO_MAX));
+    } catch {
+      setError({ cap: t.failCap, texto: t.uploadFail });
+    } finally {
+      setSubiendoEstilo(false);
+    }
+  }
+
   async function guardar() {
     setGuardando(true);
     setError(null);
@@ -220,6 +272,7 @@ export function PortraitEditor({
           portraits: portraits.map((p) => p.path),
           bio,
           ...(temasCambiados ? { subjects } : {}),
+          ...(estiloCambiado ? { estilo: estilo.map((p) => p.path) } : {}),
         }),
       });
       if (!res.ok) throw new Error();
@@ -343,6 +396,40 @@ export function PortraitEditor({
               <p className="mt-etiqueta max-w-[46ch] text-legende text-text-secondary">{t.bioHint}</p>
             </section>
 
+            {/* Las fotos que enseñan cómo mira: la casa las ve en el dossier,
+                antes que las de la candidatura. */}
+            <Section title={t.estiloTitle} hint={t.estiloHint}>
+              <div className="grid grid-cols-3 gap-bloque">
+                {estilo.map((f) => (
+                  <div key={f.path} className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-surface-raised">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={f.url} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setEstilo((prev) => prev.filter((x) => x.path !== f.path))}
+                      aria-label={t.estiloRemove}
+                      className="absolute right-1.5 top-1.5 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(245,239,228,0.28)] bg-[rgba(20,20,20,0.55)] text-corps text-text-primary backdrop-blur-md"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                {estilo.length < ESTILO_MAX && (
+                  <FilePicker
+                    accept={ACCEPT}
+                    disabled={subiendoEstilo}
+                    onFiles={subirEstilo}
+                    className="flex aspect-[4/5] flex-col items-center justify-center gap-etiqueta rounded-2xl border border-[rgba(245,239,228,0.24)] bg-[rgba(245,239,228,0.08)] px-bloque text-center backdrop-blur-md transition-colors duration-200 ease-curato hover:bg-[rgba(245,239,228,0.14)]"
+                  >
+                    <span className="text-sous-titre font-light text-accent">+</span>
+                    <span className="text-capitale uppercase tracking-capitale text-text-primary">
+                      {subiendoEstilo ? t.uploading : t.estiloAdd}
+                    </span>
+                  </FilePicker>
+                )}
+              </div>
+            </Section>
+
             <section className="mb-seccion">
               <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">{t.subjects}</p>
               {SUBJECTS.map((s) => {
@@ -394,7 +481,7 @@ export function PortraitEditor({
           >
             <div className="flex flex-col gap-fila">
               {cambiado && <p className="text-capitale uppercase tracking-capitale text-copper-vif">{t.unsaved}</p>}
-              <Button full onClick={guardar} disabled={!cambiado || temasDeMas || guardando || subiendo !== null}>
+              <Button full onClick={guardar} disabled={!cambiado || temasDeMas || guardando || subiendo !== null || subiendoEstilo}>
                 {guardando ? t.saving : t.save}
               </Button>
               <p className="max-w-[46ch] text-legende text-text-secondary">{t.footnote}</p>

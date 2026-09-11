@@ -11,6 +11,9 @@ export const PORTRAIT_MAX = 2;
 /** La frase sobre cómo fotografía. Lo que la casa lee antes de mirar. */
 export const BIO_MAX = 240;
 
+/** Las fotografías de estilo que sube a su perfil: seis, como la candidatura. */
+export const ESTILO_MAX = 6;
+
 /** Cuánto vale un enlace firmado. Minutos, no meses: es la cara de alguien. */
 export const PORTRAIT_SIGNED_URL_SECONDS = 60 * 60;
 

@@ -1,7 +1,7 @@
 import type { createAdminClient } from "@/lib/supabase/admin";
-import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
+import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { PORTFOLIO_BUCKET, PORTFOLIO_SIGNED_URL_SECONDS } from "@/lib/candidature-portfolio";
-import { signPortraits } from "@/lib/creator-portrait";
+import { ESTILO_MAX, signPortraits } from "@/lib/creator-portrait";
 import { SUBJECT_QUESTION, subjectLabel } from "@/lib/photo-subjects";
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -29,6 +29,12 @@ export type Dossier = {
    * licencia del artículo 15 de las CGU: la casa las mira, no las descarga.
    */
   portfolio: string[];
+  /**
+   * Las fotografías que el storyteller sube a su perfil para enseñar cómo
+   * mira (16b, migración 036), firmadas por una hora. Van antes que las de la
+   * candidatura.
+   */
+  estilo: string[];
   /**
    * Su recorrido en el club, **agregado y sin nombres de casas**: las CGU
    * tratan como confidencial lo que pasa en otro miembro.
@@ -62,7 +68,7 @@ async function phylloExtra(phylloAccountId: string): Promise<PhylloExtra | null>
     if (!account?.id) return null;
     const [profileRes, contentsRes] = await Promise.all([
       getPhylloProfile(account.id),
-      getPhylloContents(account.id, 50),
+      getPhylloFeedContents(account.id, 6),
     ]);
     const { metrics } = summarizeMetrics(profileRes?.data?.[0] ?? profileRes, contentsRes?.data ?? [], new Date().toISOString());
     return {
@@ -83,11 +89,13 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
   const ids = [...new Set(creatorIds)].filter(Boolean);
   if (ids.length === 0) return out;
 
-  const { data: creators } = await admin
-    .from("creators")
-    .select("id, full_name, handle, email, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id, portrait_urls, own_bio")
-    .in("id", ids);
-  const rows = creators ?? [];
+  const COLUMNAS =
+    "id, full_name, handle, email, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id, portrait_urls, own_bio";
+  // style_paths llega con la migración 036: sin ella, el dossier sigue sin las
+  // fotos de estilo en vez de romperse.
+  const conEstilo = await admin.from("creators").select(`${COLUMNAS}, style_paths`).in("id", ids);
+  const { data: creators } = conEstilo.error ? await admin.from("creators").select(COLUMNAS).in("id", ids) : conEstilo;
+  const rows = (creators ?? []) as Array<Record<string, unknown> & { id: string }>;
 
   const [survey, visits, applications, phyllo] = await Promise.all([
     admin
@@ -141,7 +149,7 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
   await Promise.all(
     rows.map(async (c) => {
       const id = c.id as string;
-      const app = appByEmail.get((c.email || "").trim().toLowerCase());
+      const app = appByEmail.get(((c.email as string | null) || "").trim().toLowerCase());
       let portfolio: string[] = [];
       if (app && app.paths.length > 0) {
         const { data: signed } = await admin.storage
@@ -159,6 +167,10 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
       // El retrato propio (16b) vive en un bucket privado: se firma cada vez
       // que se enseña. Si falla, la casa ve la foto de Instagram.
       const [retrato] = portraits[0] ? await signPortraits(admin, [portraits[0]]) : [null];
+      const estiloPaths = ((c.style_paths as string[] | null | undefined) ?? []).slice(0, ESTILO_MAX);
+      const estiloFirmado = (estiloPaths.length ? await signPortraits(admin, estiloPaths) : []).filter(
+        (u): u is string => Boolean(u)
+      );
 
       out.set(id, {
         id,
@@ -168,6 +180,7 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
         portrait: retrato ?? x?.imageUrl ?? null,
         phrase: ownBio || app?.style?.trim() || null,
         portfolio,
+        estilo: estiloFirmado,
         club: {
           visits: club?.visits ?? 0,
           avgReach: club && club.reachCount > 0 ? Math.round(club.reachSum / club.reachCount) : null,

@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import {
   BIO_MAX,
+  ESTILO_MAX,
   PORTRAIT_BUCKET,
   PORTRAIT_MAX,
   PORTRAIT_MAX_BYTES,
@@ -29,11 +30,13 @@ async function elCreador() {
   if (!user) return { error: NextResponse.json({ error: "Non authentifié." }, { status: 401 }) } as const;
 
   const admin = createAdminClient();
-  const { data: creator } = await admin
-    .from("creators")
-    .select("id, portrait_urls, own_bio")
-    .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
-    .maybeSingle();
+  const filtro = `owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`;
+  // style_paths llega con la migración 036: si aún no está aplicada, se sigue
+  // sin las fotos de estilo en vez de dejar a la persona sin perfil.
+  const conEstilo = await admin.from("creators").select("id, portrait_urls, own_bio, style_paths").or(filtro).maybeSingle();
+  const { data: creator } = conEstilo.error
+    ? await admin.from("creators").select("id, portrait_urls, own_bio").or(filtro).maybeSingle()
+    : conEstilo;
   if (!creator) return { error: NextResponse.json({ error: "Accès réservé aux storytellers." }, { status: 403 }) } as const;
 
   return { admin, creator } as const;
@@ -52,8 +55,10 @@ export async function GET() {
     const { admin, creator } = r;
 
     const paths = ((creator.portrait_urls as string[] | null) ?? []).slice(0, PORTRAIT_MAX);
-    const [urls, dossiers, respuesta] = await Promise.all([
+    const estiloPaths = (((creator as { style_paths?: string[] | null }).style_paths) ?? []).slice(0, ESTILO_MAX);
+    const [urls, estiloUrls, dossiers, respuesta] = await Promise.all([
       signPortraits(admin, paths),
+      signPortraits(admin, estiloPaths),
       buildDossiers(admin, [creator.id]),
       admin
         .from("creator_survey_responses")
@@ -68,6 +73,7 @@ export async function GET() {
     return NextResponse.json({
       portraits: paths.map((path, i) => ({ path, url: urls[i] })).filter((p) => p.url),
       bio: (creator.own_bio as string | null) ?? "",
+      estilo: estiloPaths.map((path, i) => ({ path, url: estiloUrls[i] })).filter((p) => p.url),
       subjects: elegidas.filter(isSubject),
       // Sin retrato propio, la casa ve la foto de Instagram: se enseña como tal.
       inherited: paths.length === 0 ? dossier?.portrait ?? null : null,
@@ -92,7 +98,10 @@ export async function POST(request: NextRequest) {
     if (file.size > PORTRAIT_MAX_BYTES) return NextResponse.json({ error: "size" }, { status: 413 });
 
     const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : file.type.startsWith("image/hei") ? "heic" : "jpg";
-    const path = `${creator.id}/${randomUUID()}.${ext}`;
+    // Un retrato va a la carpeta del creador; una foto de estilo, a su
+    // subcarpeta estilo/.
+    const carpeta = form.get("tipo") === "estilo" ? `${creator.id}/estilo` : creator.id;
+    const path = `${carpeta}/${randomUUID()}.${ext}`;
     const { error } = await admin.storage
       .from(PORTRAIT_BUCKET)
       .upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type, upsert: false });
@@ -115,7 +124,20 @@ export async function PATCH(request: NextRequest) {
     if ("error" in r) return r.error;
     const { admin, creator } = r;
 
-    const body = (await request.json()) as { portraits?: unknown; bio?: unknown; subjects?: unknown };
+    const body = (await request.json()) as { portraits?: unknown; bio?: unknown; subjects?: unknown; estilo?: unknown };
+
+    // Las fotos de estilo, solo si la pantalla las cambió.
+    if (body.estilo !== undefined) {
+      const estilo = Array.isArray(body.estilo) ? body.estilo : null;
+      if (!estilo || estilo.length > ESTILO_MAX || !estilo.every((p) => esSuya(p, creator.id))) {
+        return NextResponse.json({ error: "Photos invalides." }, { status: 400 });
+      }
+      const { error: e } = await admin.from("creators").update({ style_paths: estilo }).eq("id", creator.id);
+      if (e) return NextResponse.json({ error: "Migración 036 pendiente." }, { status: 500 });
+      const antes = (((creator as { style_paths?: string[] | null }).style_paths) ?? []).filter((p) => esSuya(p, creator.id));
+      const quitadas = antes.filter((p) => !estilo.includes(p));
+      if (quitadas.length) await admin.storage.from(PORTRAIT_BUCKET).remove(quitadas);
+    }
     const portraits = Array.isArray(body.portraits) ? body.portraits : [];
     if (portraits.length > PORTRAIT_MAX || !portraits.every((p) => esSuya(p, creator.id))) {
       return NextResponse.json({ error: "Portraits invalides." }, { status: 400 });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
+import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { signPortraits } from "@/lib/creator-portrait";
 import { subjectLabel } from "@/lib/photo-subjects";
 
@@ -81,7 +81,7 @@ export async function GET() {
             if (!account?.id) return;
             const [profileRes, contentsRes] = await Promise.all([
               getPhylloProfile(account.id),
-              getPhylloContents(account.id, 50),
+              getPhylloFeedContents(account.id, 3),
             ]);
             const { metrics } = summarizeMetrics(profileRes?.data?.[0], contentsRes?.data ?? [], "");
             extraById.set(c.id as string, {
