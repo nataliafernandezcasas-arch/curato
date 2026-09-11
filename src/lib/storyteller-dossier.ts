@@ -1,7 +1,6 @@
 import type { createAdminClient } from "@/lib/supabase/admin";
-import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
-import { PORTFOLIO_BUCKET, PORTFOLIO_SIGNED_URL_SECONDS } from "@/lib/candidature-portfolio";
-import { signPortraits } from "@/lib/creator-portrait";
+import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
+import { firmarFotos, fotosElegidas, signPortraits } from "@/lib/creator-portrait";
 import { SUBJECT_QUESTION, subjectLabel } from "@/lib/photo-subjects";
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -25,8 +24,9 @@ export type Dossier = {
   /** Su frase sobre cómo fotografía: la bio propia, o la de su candidatura. */
   phrase: string | null;
   /**
-   * Las fotografías de su candidatura, firmadas por una hora. Se enseñan con la
-   * licencia del artículo 15 de las CGU: la casa las mira, no las descarga.
+   * Sus fotografías, seis como máximo, firmadas por una hora: las que eligió en
+   * su perfil (16b, migración 036) o, mientras no las toque, las de su
+   * candidatura. La casa las mira, no las descarga.
    */
   portfolio: string[];
   /**
@@ -62,7 +62,7 @@ async function phylloExtra(phylloAccountId: string): Promise<PhylloExtra | null>
     if (!account?.id) return null;
     const [profileRes, contentsRes] = await Promise.all([
       getPhylloProfile(account.id),
-      getPhylloContents(account.id, 50),
+      getPhylloFeedContents(account.id, 6),
     ]);
     const { metrics } = summarizeMetrics(profileRes?.data?.[0] ?? profileRes, contentsRes?.data ?? [], new Date().toISOString());
     return {
@@ -83,11 +83,13 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
   const ids = [...new Set(creatorIds)].filter(Boolean);
   if (ids.length === 0) return out;
 
-  const { data: creators } = await admin
-    .from("creators")
-    .select("id, full_name, handle, email, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id, portrait_urls, own_bio")
-    .in("id", ids);
-  const rows = creators ?? [];
+  const COLUMNAS =
+    "id, full_name, handle, email, followers, followers_count, engagement_rate, instagram_connected, phyllo_account_id, portrait_urls, own_bio";
+  // style_paths llega con la migración 036: sin ella, el dossier sigue con las
+  // fotos de la candidatura en vez de romperse.
+  const conEstilo = await admin.from("creators").select(`${COLUMNAS}, style_paths`).in("id", ids);
+  const { data: creators } = conEstilo.error ? await admin.from("creators").select(COLUMNAS).in("id", ids) : conEstilo;
+  const rows = (creators ?? []) as Array<Record<string, unknown> & { id: string }>;
 
   const [survey, visits, applications, phyllo] = await Promise.all([
     admin
@@ -141,14 +143,9 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
   await Promise.all(
     rows.map(async (c) => {
       const id = c.id as string;
-      const app = appByEmail.get((c.email || "").trim().toLowerCase());
-      let portfolio: string[] = [];
-      if (app && app.paths.length > 0) {
-        const { data: signed } = await admin.storage
-          .from(PORTFOLIO_BUCKET)
-          .createSignedUrls(app.paths, PORTFOLIO_SIGNED_URL_SECONDS);
-        portfolio = (signed ?? []).map((s) => s.signedUrl).filter((u): u is string => Boolean(u));
-      }
+      const app = appByEmail.get(((c.email as string | null) || "").trim().toLowerCase());
+      const claves = fotosElegidas(c.style_paths as string[] | null | undefined, app?.paths ?? []);
+      const portfolio = (await firmarFotos(admin, claves)).filter((u): u is string => Boolean(u));
 
       const x = phylloById.get(id) ?? null;
       const connected = Boolean(c.instagram_connected && c.phyllo_account_id);

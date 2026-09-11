@@ -8,7 +8,7 @@ import { Section } from "@/components/member/section";
 import { Rise } from "@/components/member/motion";
 import { Button, ButtonLink } from "@/components/member/button";
 import { StateMark } from "@/components/member/state-mark";
-import { DossierPane } from "./storyteller-dossier";
+import { DossierPane, fotosDe } from "./storyteller-dossier";
 import { capitalizar, claveDia, compacto, dia, diaSemana, enLetra, haceCuanto, hora, nombrePila } from "./demandes-format";
 
 type Demanda = {
@@ -444,9 +444,9 @@ export default function MaisonDemandes() {
 
                   {/* La primera trae además cuatro fotos suyas: en una lista corta
                       cabe enseñar por qué merece que se abra. */}
-                  {i === 0 && d && d.portfolio.length > 0 && (
+                  {i === 0 && d && fotosDe(d).length > 0 && (
                     <div className="grid grid-cols-4 gap-1.5 px-[18px] pb-fila">
-                      {d.portfolio.slice(0, 4).map((url, j) => (
+                      {fotosDe(d).slice(0, 4).map((url, j) => (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           key={j}

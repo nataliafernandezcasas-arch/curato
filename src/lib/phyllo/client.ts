@@ -63,6 +63,29 @@ export async function getPhylloContents(accountId: string, limit = 50) {
   );
 }
 
+/**
+ * Lo más reciente de una cuenta con al menos `minimo` publicaciones del feed.
+ *
+ * Phyllo devuelve stories y publicaciones mezcladas, y quien sube muchas
+ * stories llena las primeras páginas solo con ellas: con 50 resultados, una
+ * cuenta real no traía ni una publicación. Se piden páginas de 100 hasta tener
+ * las del feed que hacen falta, como mucho `paginas`.
+ */
+export async function getPhylloFeedContents(accountId: string, minimo = 6, paginas = 3) {
+  const todos: Array<Record<string, unknown>> = [];
+  for (let i = 0; i < paginas; i++) {
+    const res = await phylloFetch(
+      `/v1/social/contents?account_id=${encodeURIComponent(accountId)}&limit=100&offset=${i * 100}`,
+      { method: "GET" }
+    );
+    const pagina = ((res as { data?: unknown } | null)?.data ?? []) as Array<Record<string, unknown>>;
+    todos.push(...pagina);
+    const feed = todos.filter((c) => (c.type as string) !== "STORY");
+    if (feed.length >= minimo || pagina.length < 100) break;
+  }
+  return { data: todos };
+}
+
 // One recent publication, with its own performance figures.
 export type PostSummary = {
   url: string | null;

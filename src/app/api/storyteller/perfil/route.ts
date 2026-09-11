@@ -5,6 +5,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import {
   BIO_MAX,
+  CANDIDATURA,
+  ESTILO_MAX,
+  firmarFotos,
+  fotosElegidas,
   PORTRAIT_BUCKET,
   PORTRAIT_MAX,
   PORTRAIT_MAX_BYTES,
@@ -29,20 +33,43 @@ async function elCreador() {
   if (!user) return { error: NextResponse.json({ error: "Non authentifié." }, { status: 401 }) } as const;
 
   const admin = createAdminClient();
-  const { data: creator } = await admin
-    .from("creators")
-    .select("id, portrait_urls, own_bio")
-    .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
-    .maybeSingle();
+  const filtro = `owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`;
+  // style_paths llega con la migración 036: si aún no está aplicada, se sigue
+  // con las fotos de la candidatura en vez de dejar a la persona sin perfil.
+  const conEstilo = await admin.from("creators").select("id, email, portrait_urls, own_bio, style_paths").or(filtro).maybeSingle();
+  const { data: creator } = conEstilo.error
+    ? await admin.from("creators").select("id, email, portrait_urls, own_bio").or(filtro).maybeSingle()
+    : conEstilo;
   if (!creator) return { error: NextResponse.json({ error: "Accès réservé aux storytellers." }, { status: 403 }) } as const;
 
   return { admin, creator } as const;
+}
+
+type Admin = ReturnType<typeof createAdminClient>;
+
+// Las fotos de su candidatura más reciente. Se enlaza por el correo, como en
+// el dossier; el ilike solo acerca, la comparación exacta es la que decide.
+async function laCandidatura(admin: Admin, email: string | null): Promise<string[]> {
+  const correo = (email || "").trim().toLowerCase();
+  if (!correo) return [];
+  const { data } = await admin
+    .from("applications")
+    .select("email, portfolio_paths, created_at")
+    .ilike("email", `%${correo}%`)
+    .not("portfolio_paths", "is", null)
+    .order("created_at", { ascending: false });
+  const app = (data ?? []).find((a) => (a.email || "").trim().toLowerCase() === correo);
+  return (app?.portfolio_paths as string[] | null) ?? [];
 }
 
 // Una ruta vale solo si está dentro de la carpeta de este creador. Sin esto,
 // alguien podría poner en su perfil la foto de otra persona.
 function esSuya(path: unknown, creatorId: string): path is string {
   return typeof path === "string" && path.startsWith(`${creatorId}/`) && !path.includes("..");
+}
+
+function estiloDe(creator: unknown): string[] | null | undefined {
+  return (creator as { style_paths?: string[] | null }).style_paths;
 }
 
 export async function GET() {
@@ -52,8 +79,11 @@ export async function GET() {
     const { admin, creator } = r;
 
     const paths = ((creator.portrait_urls as string[] | null) ?? []).slice(0, PORTRAIT_MAX);
-    const [urls, dossiers, respuesta] = await Promise.all([
+    // Sus fotos, tal como las ve la casa: si nunca las tocó, las de la candidatura.
+    const claves = fotosElegidas(estiloDe(creator), await laCandidatura(admin, creator.email as string | null));
+    const [urls, fotoUrls, dossiers, respuesta] = await Promise.all([
       signPortraits(admin, paths),
+      firmarFotos(admin, claves),
       buildDossiers(admin, [creator.id]),
       admin
         .from("creator_survey_responses")
@@ -68,6 +98,7 @@ export async function GET() {
     return NextResponse.json({
       portraits: paths.map((path, i) => ({ path, url: urls[i] })).filter((p) => p.url),
       bio: (creator.own_bio as string | null) ?? "",
+      estilo: claves.map((path, i) => ({ path, url: fotoUrls[i] })).filter((p) => p.url),
       subjects: elegidas.filter(isSubject),
       // Sin retrato propio, la casa ve la foto de Instagram: se enseña como tal.
       inherited: paths.length === 0 ? dossier?.portrait ?? null : null,
@@ -92,7 +123,10 @@ export async function POST(request: NextRequest) {
     if (file.size > PORTRAIT_MAX_BYTES) return NextResponse.json({ error: "size" }, { status: 413 });
 
     const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : file.type.startsWith("image/hei") ? "heic" : "jpg";
-    const path = `${creator.id}/${randomUUID()}.${ext}`;
+    // Un retrato va a la carpeta del creador; una foto de estilo, a su
+    // subcarpeta estilo/.
+    const carpeta = form.get("tipo") === "estilo" ? `${creator.id}/estilo` : creator.id;
+    const path = `${carpeta}/${randomUUID()}.${ext}`;
     const { error } = await admin.storage
       .from(PORTRAIT_BUCKET)
       .upload(path, Buffer.from(await file.arrayBuffer()), { contentType: file.type, upsert: false });
@@ -115,7 +149,32 @@ export async function PATCH(request: NextRequest) {
     if ("error" in r) return r.error;
     const { admin, creator } = r;
 
-    const body = (await request.json()) as { portraits?: unknown; bio?: unknown; subjects?: unknown };
+    const body = (await request.json()) as { portraits?: unknown; bio?: unknown; subjects?: unknown; estilo?: unknown };
+
+    // Sus fotos, solo si la pantalla las cambió. Cada una tiene que ser suya:
+    // de su candidatura, o subida a su carpeta estilo/.
+    if (body.estilo !== undefined) {
+      const lista = Array.isArray(body.estilo) ? [...new Set(body.estilo)] : null;
+      const candidatura = lista?.some((p) => typeof p === "string" && p.startsWith(CANDIDATURA))
+        ? await laCandidatura(admin, creator.email as string | null)
+        : [];
+      const valida = (p: unknown) =>
+        typeof p === "string" &&
+        (p.startsWith(CANDIDATURA)
+          ? candidatura.includes(p.slice(CANDIDATURA.length))
+          : esSuya(p, creator.id) && p.startsWith(`${creator.id}/estilo/`));
+      if (!lista || lista.length > ESTILO_MAX || !lista.every(valida)) {
+        return NextResponse.json({ error: "Photos invalides." }, { status: 400 });
+      }
+      const elegidas = lista as string[];
+      const { error: e } = await admin.from("creators").update({ style_paths: elegidas }).eq("id", creator.id);
+      if (e) return NextResponse.json({ error: "Migración 036 pendiente." }, { status: 500 });
+      // Solo se borra lo subido al perfil. Una foto de la candidatura sale del
+      // perfil, pero sigue en su candidatura.
+      const antes = (estiloDe(creator) ?? []).filter((p) => !p.startsWith(CANDIDATURA) && esSuya(p, creator.id));
+      const quitadas = antes.filter((p) => !elegidas.includes(p));
+      if (quitadas.length) await admin.storage.from(PORTRAIT_BUCKET).remove(quitadas);
+    }
     const portraits = Array.isArray(body.portraits) ? body.portraits : [];
     if (portraits.length > PORTRAIT_MAX || !portraits.every((p) => esSuya(p, creator.id))) {
       return NextResponse.json({ error: "Portraits invalides." }, { status: 400 });

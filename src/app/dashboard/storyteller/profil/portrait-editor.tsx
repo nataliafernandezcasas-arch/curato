@@ -14,10 +14,10 @@ import { SUBJECTS, SUBJECT_MAX } from "@/lib/photo-subjects";
 // Los mismos límites que valida el servidor (creator-portrait.ts). No se
 // importan de allí porque ese archivo arrastra el cliente de administración.
 const PORTRAIT_MAX = 2;
+const ESTILO_MAX = 6;
 const BIO_MAX = 240;
 const MAX_BYTES = 3 * 1024 * 1024;
 const ACCEPT = "image/jpeg,image/png,image/webp,image/heic,image/heif";
-const CONTACTO = "hello@curatocollective.com";
 
 export type Retrato = { path: string; url: string };
 
@@ -37,12 +37,14 @@ const TEXTOS = {
     bioLabel: "Ma façon de photographier",
     bioHint: "Une phrase, avec vos mots. C'est ce que la maison lit avant de regarder.",
     bioPlaceholder: "Ce que vous aimez photographier, la lumière que vous cherchez, le genre de lieux où vous êtes chez vous.",
+    estiloTitle: "Mes photographies",
+    estiloHint:
+      "Six au plus, celles de votre candidature comprises : gardez-les, retirez-en, ajoutez les vôtres. Les maisons les voient avec votre profil, sans pouvoir les télécharger.",
+    estiloAdd: "Ajouter",
+    estiloRemove: "Retirer",
     subjects: "Ce que je photographie",
     subjectsHint: "Deux au plus. C'est ce que les maisons lisent sous votre nom.",
     subjectsOver: "Deux au plus : retirez-en pour pouvoir enregistrer.",
-    appPhotos: "Mes photographies de candidature",
-    appText: (n: number) =>
-      `Les ${n} photographies remises avec votre candidature. Les maisons du club les voient avec votre profil, sans pouvoir les télécharger, et Curato peut les montrer, avec votre nom, dans sa communication (article 15 des conditions générales). Pour en retirer une, écrivez-nous à ${CONTACTO}.`,
     save: "Enregistrer",
     saving: "Un instant…",
     unsaved: "Non enregistré",
@@ -69,12 +71,14 @@ const TEXTOS = {
     bioLabel: "How I photograph",
     bioHint: "One sentence, in your words. It's what the house reads before looking.",
     bioPlaceholder: "What you love to photograph, the light you look for, the kind of places where you feel at home.",
+    estiloTitle: "My photographs",
+    estiloHint:
+      "Six at most, your application photos included: keep them, remove some, add your own. Houses see them with your profile, without being able to download them.",
+    estiloAdd: "Add",
+    estiloRemove: "Remove",
     subjects: "What I photograph",
     subjectsHint: "Two at most. It's what houses read under your name.",
     subjectsOver: "Two at most: remove some to be able to save.",
-    appPhotos: "My application photographs",
-    appText: (n: number) =>
-      `The ${n} photographs you sent with your application. Houses in the club see them with your profile, without being able to download them, and Curato may show them, with your name, in its communications (section 15 of the terms). To remove one, write to us at ${CONTACTO}.`,
     save: "Save",
     saving: "One moment…",
     unsaved: "Not saved",
@@ -101,12 +105,14 @@ const TEXTOS = {
     bioLabel: "Mi manera de fotografiar",
     bioHint: "Una frase, con tus palabras. Es lo que la maison lee antes de mirar.",
     bioPlaceholder: "Lo que te gusta fotografiar, la luz que buscas, el tipo de lugares donde te sientes en casa.",
+    estiloTitle: "Mis fotografías",
+    estiloHint:
+      "Seis como máximo, las de tu candidatura incluidas: quédatelas, quita alguna o añade las tuyas. Las maisons las ven con tu perfil, sin poder descargarlas.",
+    estiloAdd: "Añadir",
+    estiloRemove: "Quitar",
     subjects: "Lo que fotografío",
     subjectsHint: "Dos como máximo. Es lo que las maisons leen bajo tu nombre.",
     subjectsOver: "Dos como máximo: quita alguna para poder guardar.",
-    appPhotos: "Mis fotografías de candidatura",
-    appText: (n: number) =>
-      `Las ${n} fotografías que enviaste con tu candidatura. Las maisons del club las ven con tu perfil, sin poder descargarlas, y Curato puede mostrarlas, con tu nombre, en su comunicación (sección 15 de las condiciones generales). Para quitar alguna, escríbenos a ${CONTACTO}.`,
     save: "Guardar",
     saving: "Un momento…",
     unsaved: "Sin guardar",
@@ -137,7 +143,7 @@ export function PortraitEditor({
   onSaved,
 }: {
   lang: Lang;
-  initial: { portraits: Retrato[]; bio: string; subjects: string[]; inherited: string | null; portfolio: string[] };
+  initial: { portraits: Retrato[]; bio: string; subjects: string[]; estilo: Retrato[]; inherited: string | null };
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -147,6 +153,8 @@ export function PortraitEditor({
   const [portraits, setPortraits] = useState<Retrato[]>(initial.portraits);
   const [bio, setBio] = useState(initial.bio);
   const [subjects, setSubjects] = useState<string[]>(initial.subjects);
+  const [estilo, setEstilo] = useState<Retrato[]>(initial.estilo);
+  const [subiendoEstilo, setSubiendoEstilo] = useState(false);
   const [subiendo, setSubiendo] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<{ cap?: string; texto: string } | null>(null);
@@ -155,9 +163,11 @@ export function PortraitEditor({
   // Quien trae más de dos de antes puede guardar sin tocarlas; si las toca,
   // tiene que dejar dos como mucho.
   const temasDeMas = temasCambiados && subjects.length > SUBJECT_MAX;
+  const estiloCambiado = estilo.map((p) => p.path).join("|") !== initial.estilo.map((p) => p.path).join("|");
   const cambiado =
     bio.trim() !== initial.bio.trim() ||
     temasCambiados ||
+    estiloCambiado ||
     portraits.map((p) => p.path).join("|") !== initial.portraits.map((p) => p.path).join("|");
 
   // Escape vuelve, y la página de debajo no se mueve mientras esto está encima.
@@ -209,6 +219,41 @@ export function PortraitEditor({
     }
   }
 
+  /** Una foto de estilo más, al final de las que ya hay. */
+  async function subirEstilo(files: FileList | null) {
+    const original = files?.[0];
+    if (!original) return;
+    setError(null);
+    if (!ACCEPT.split(",").includes(original.type.toLowerCase())) {
+      setError({ texto: t.badType });
+      return;
+    }
+    setSubiendoEstilo(true);
+    try {
+      const file = await downscaleImage(original);
+      if (file.size > MAX_BYTES) {
+        setError({ texto: t.tooLarge });
+        return;
+      }
+      const form = new FormData();
+      form.set("file", file);
+      form.set("tipo", "estilo");
+      const res = await fetch("/api/storyteller/perfil", { method: "POST", body: form });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || !body.path || !body.url) {
+        setError(
+          body.error === "size" ? { texto: t.tooLarge } : body.error === "format" ? { texto: t.badType } : { cap: t.failCap, texto: t.uploadFail }
+        );
+        return;
+      }
+      setEstilo((prev) => [...prev, { path: body.path, url: body.url }].slice(0, ESTILO_MAX));
+    } catch {
+      setError({ cap: t.failCap, texto: t.uploadFail });
+    } finally {
+      setSubiendoEstilo(false);
+    }
+  }
+
   async function guardar() {
     setGuardando(true);
     setError(null);
@@ -220,6 +265,7 @@ export function PortraitEditor({
           portraits: portraits.map((p) => p.path),
           bio,
           ...(temasCambiados ? { subjects } : {}),
+          ...(estiloCambiado ? { estilo: estilo.map((p) => p.path) } : {}),
         }),
       });
       if (!res.ok) throw new Error();
@@ -343,6 +389,41 @@ export function PortraitEditor({
               <p className="mt-etiqueta max-w-[46ch] text-legende text-text-secondary">{t.bioHint}</p>
             </section>
 
+            {/* Las fotos que enseñan cómo mira, en el orden en que la casa las
+                ve en el dossier. Llegan con las de la candidatura: se quitan,
+                se añaden, seis como máximo. */}
+            <Section title={t.estiloTitle} hint={t.estiloHint}>
+              <div className="grid grid-cols-3 gap-bloque">
+                {estilo.map((f) => (
+                  <div key={f.path} className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-surface-raised">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={f.url} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setEstilo((prev) => prev.filter((x) => x.path !== f.path))}
+                      aria-label={t.estiloRemove}
+                      className="absolute right-1.5 top-1.5 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(245,239,228,0.28)] bg-[rgba(20,20,20,0.55)] text-corps text-text-primary backdrop-blur-md"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                {estilo.length < ESTILO_MAX && (
+                  <FilePicker
+                    accept={ACCEPT}
+                    disabled={subiendoEstilo}
+                    onFiles={subirEstilo}
+                    className="flex aspect-[4/5] flex-col items-center justify-center gap-etiqueta rounded-2xl border border-[rgba(245,239,228,0.24)] bg-[rgba(245,239,228,0.08)] px-bloque text-center backdrop-blur-md transition-colors duration-200 ease-curato hover:bg-[rgba(245,239,228,0.14)]"
+                  >
+                    <span className="text-sous-titre font-light text-accent">+</span>
+                    <span className="text-capitale uppercase tracking-capitale text-text-primary">
+                      {subiendoEstilo ? t.uploading : t.estiloAdd}
+                    </span>
+                  </FilePicker>
+                )}
+              </div>
+            </Section>
+
             <section className="mb-seccion">
               <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">{t.subjects}</p>
               {SUBJECTS.map((s) => {
@@ -366,18 +447,6 @@ export function PortraitEditor({
               </p>
             </section>
 
-            {initial.portfolio.length > 0 && (
-              <Section title={t.appPhotos}>
-                <div className="-mx-pagina flex gap-bloque overflow-x-auto px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {initial.portfolio.map((url, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img key={i} src={url} alt="" className="aspect-[4/5] w-[120px] shrink-0 rounded-2xl object-cover" />
-                  ))}
-                </div>
-                <p className="mt-bloque max-w-[46ch] text-legende text-text-secondary">{t.appText(initial.portfolio.length)}</p>
-              </Section>
-            )}
-
             {error && (
               <StateMark tono="caido" capital={error.cap ?? t.failCap}>
                 {error.texto}
@@ -394,7 +463,7 @@ export function PortraitEditor({
           >
             <div className="flex flex-col gap-fila">
               {cambiado && <p className="text-capitale uppercase tracking-capitale text-copper-vif">{t.unsaved}</p>}
-              <Button full onClick={guardar} disabled={!cambiado || temasDeMas || guardando || subiendo !== null}>
+              <Button full onClick={guardar} disabled={!cambiado || temasDeMas || guardando || subiendo !== null || subiendoEstilo}>
                 {guardando ? t.saving : t.save}
               </Button>
               <p className="max-w-[46ch] text-legende text-text-secondary">{t.footnote}</p>
