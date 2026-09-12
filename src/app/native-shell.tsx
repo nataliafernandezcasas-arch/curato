@@ -44,8 +44,8 @@ export default function NativeShell() {
 
     const cap = getCapacitor();
 
-    // "DARK" means light text, which is what reads over the #1E1E1E shell.
-    cap?.Plugins?.StatusBar?.setStyle({ style: "DARK" }).catch(() => {});
+    // El estilo de la barra de estado lo pone TemaSync (src/lib/tema.ts), que
+    // sabe si la pantalla va en claro o en oscuro.
 
     if (platform === "android") {
       const app = cap?.Plugins?.App;

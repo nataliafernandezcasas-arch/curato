@@ -285,8 +285,8 @@ export function PortraitEditor({
       <SlideIn>
         <div className="mx-auto flex min-h-[100dvh] max-w-[560px] flex-col">
           <header
-            className="sticky top-0 z-10 px-pagina backdrop-blur-md"
-            style={{ backgroundColor: "rgba(25,24,23,0.92)", paddingTop: "env(safe-area-inset-top, 0px)" }}
+            className="barra-panel sticky top-0 z-10 px-pagina"
+            style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
           >
             <button
               type="button"
@@ -328,7 +328,7 @@ export function PortraitEditor({
                           accept={ACCEPT}
                           disabled={subiendo !== null}
                           onFiles={(f) => subir(f, i)}
-                          className="flex aspect-[4/5] flex-col items-center justify-center gap-bloque rounded-2xl border border-[rgba(245,239,228,0.24)] bg-[rgba(245,239,228,0.08)] px-fila text-center backdrop-blur-md transition-colors duration-200 ease-curato hover:bg-[rgba(245,239,228,0.14)]"
+                          className="flex aspect-[4/5] flex-col items-center justify-center gap-bloque rounded-2xl border border-[rgba(245,239,228,0.24)] bg-[rgba(245,239,228,0.08)] px-fila text-center backdrop-blur-md transition-colors duration-200 ease-curato hover:bg-[rgba(245,239,228,0.14)] claro:border-[rgba(42,32,28,0.18)] claro:bg-[rgba(255,255,255,0.15)] claro:hover:bg-[rgba(255,255,255,0.28)]"
                         >
                           <span className="text-titre font-light text-accent">+</span>
                           <span className="text-capitale uppercase tracking-capitale text-text-primary">
@@ -413,7 +413,7 @@ export function PortraitEditor({
                     accept={ACCEPT}
                     disabled={subiendoEstilo}
                     onFiles={subirEstilo}
-                    className="flex aspect-[4/5] flex-col items-center justify-center gap-etiqueta rounded-2xl border border-[rgba(245,239,228,0.24)] bg-[rgba(245,239,228,0.08)] px-bloque text-center backdrop-blur-md transition-colors duration-200 ease-curato hover:bg-[rgba(245,239,228,0.14)]"
+                    className="flex aspect-[4/5] flex-col items-center justify-center gap-etiqueta rounded-2xl border border-[rgba(245,239,228,0.24)] bg-[rgba(245,239,228,0.08)] px-bloque text-center backdrop-blur-md transition-colors duration-200 ease-curato hover:bg-[rgba(245,239,228,0.14)] claro:border-[rgba(42,32,28,0.18)] claro:bg-[rgba(255,255,255,0.15)] claro:hover:bg-[rgba(255,255,255,0.28)]"
                   >
                     <span className="text-sous-titre font-light text-accent">+</span>
                     <span className="text-capitale uppercase tracking-capitale text-text-primary">
@@ -455,11 +455,8 @@ export function PortraitEditor({
           </div>
 
           <footer
-            className="sticky bottom-0 z-10 px-pagina pt-fila backdrop-blur-md"
-            style={{
-              backgroundColor: "rgba(20,20,20,0.92)",
-              paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))",
-            }}
+            className="pie-panel sticky bottom-0 z-10 px-pagina pt-fila"
+            style={{ paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))" }}
           >
             <div className="flex flex-col gap-fila">
               {cambiado && <p className="text-capitale uppercase tracking-capitale text-copper-vif">{t.unsaved}</p>}

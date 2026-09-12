@@ -107,8 +107,8 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
   if (status === "done") {
     return (
       <div className="caja-cristal px-6 py-4 mb-10 flex items-center gap-3">
-        <CheckCircle size={18} weight="thin" className="text-champagne shrink-0" />
-        <p className="font-serif text-[13px] font-light text-white/70">
+        <CheckCircle size={18} weight="thin" className="text-accent shrink-0" />
+        <p className="font-serif text-[13px] font-light text-text-secondary">
           {t.igConnected}
         </p>
       </div>
@@ -118,10 +118,10 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
   return (
     <div className="caja-cristal px-6 py-5 mb-10">
       <div className="flex items-start gap-3 mb-4">
-        <InstagramLogo size={20} weight="thin" className="text-champagne shrink-0 mt-0.5" />
+        <InstagramLogo size={20} weight="thin" className="text-accent shrink-0 mt-0.5" />
         <div>
-          <p className="font-serif text-[14px] text-white mb-1">{t.igTitle}</p>
-          <p className="font-serif text-[12px] font-light text-white/60 leading-relaxed">
+          <p className="font-serif text-[14px] text-text-primary mb-1">{t.igTitle}</p>
+          <p className="font-serif text-[12px] font-light text-text-secondary leading-relaxed">
             {t.igDesc}
           </p>
         </div>
@@ -132,9 +132,9 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
-          className="mt-1 accent-champagne"
+          className="mt-1 accent-accent"
         />
-        <span className="font-serif text-[11px] font-light text-white/60 leading-relaxed">
+        <span className="font-serif text-[11px] font-light text-text-secondary leading-relaxed">
           {t.igConsent}
         </span>
       </label>

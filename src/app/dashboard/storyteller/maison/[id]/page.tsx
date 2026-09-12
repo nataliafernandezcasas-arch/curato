@@ -110,7 +110,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   });
 
   return (
-    <div className="min-h-[100dvh] bg-charcoal-deep">
+    <div className="min-h-[100dvh] bg-surface">
       {/* Nav */}
       <DashboardNav
         links={STORYTELLER_LINKS(td, "addresses")}
@@ -119,20 +119,20 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
       />
 
       <div className="max-w-[1000px] mx-auto px-5 py-10">
-        <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/55 hover:text-champagne transition-colors mb-8">
+        <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-text-secondary hover:text-accent transition-colors mb-8">
           <ArrowLeft size={14} />
           {t.backToAll}
         </Link>
 
         {gated ? (
           <div className="py-respiro text-center">
-            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/70 mb-6">
+            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-accent mb-6">
               {td.comingSoonKicker}
             </p>
-            <h2 className="font-serif text-[26px] md:text-[34px] font-light tracking-[0.1em] text-white mb-6">
+            <h2 className="font-serif text-[26px] md:text-[34px] font-light tracking-[0.1em] text-text-primary mb-6">
               {td.comingSoonTitle}
             </h2>
-            <p className="font-serif text-[14px] md:text-[15px] font-light text-white/60 leading-relaxed max-w-[440px] mx-auto px-6">
+            <p className="font-serif text-[14px] md:text-[15px] font-light text-text-secondary leading-relaxed max-w-[440px] mx-auto px-6">
               {launchDateLabel
                 ? td.comingSoonBody.replace("{date}", launchDateLabel)
                 : td.comingSoonBodyNoDate}
@@ -141,11 +141,11 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
         ) : loading ? (
           <div className="space-y-6">
             <div className="aspect-[4/5] bg-border animate-pulse [animation-duration:1.6s] sm:aspect-[16/9]" />
-            <div className="h-6 bg-white/5 animate-pulse w-1/3" />
+            <div className="h-6 bg-border animate-pulse w-1/3" />
           </div>
         ) : !maison ? (
           <div className="py-respiro text-center">
-            <p className="font-serif text-[15px] font-light text-white/55">{t.notFound}</p>
+            <p className="font-serif text-[15px] font-light text-text-secondary">{t.notFound}</p>
           </div>
         ) : (
           <>
@@ -176,21 +176,24 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
             <div className="grid md:grid-cols-3 gap-10">
               {/* Left: info */}
-              <div className="md:col-span-2">
+              {/* En claro, lo que se lee va sobre vidrio: la acuarela solo toca
+                  aire y fotografías. El nombre de una casa toma brume, el rol
+                  de lo que es un lugar. */}
+              <div className="md:col-span-2 claro:vidrio claro:p-[26px]">
                 {cat && (
-                  <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/60">
+                  <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-accent">
                     {catLabelText}
                   </span>
                 )}
-                <h1 className="font-serif text-[34px] font-light text-white leading-tight mt-2 mb-1">
+                <h1 className="font-serif text-[34px] font-light text-text-primary leading-tight mt-2 mb-1 claro:text-brume">
                   {maison.name}
                 </h1>
                 {maison.arrondissement && (
-                  <p className="font-serif text-[13px] text-white/55 tracking-wide mb-6">Paris {maison.arrondissement}</p>
+                  <p className="font-serif text-[13px] text-text-secondary tracking-wide mb-6">Paris {maison.arrondissement}</p>
                 )}
 
                 {desc && (
-                  <p className="font-serif text-[15px] font-light text-white/60 leading-relaxed mb-8">
+                  <p className="font-serif text-[15px] font-light text-text-secondary leading-relaxed mb-8">
                     {desc}
                   </p>
                 )}
@@ -198,7 +201,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                 {/* Map */}
                 {maison.address && (
                   <div className="mb-8">
-                    <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/65 mb-3">{t.location}</p>
+                    <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-accent mb-3">{t.location}</p>
                     <div className="h-[180px] overflow-hidden">
                       <iframe
                         title="map"
@@ -215,7 +218,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
               {/* Right: actions */}
               <div className="md:col-span-1">
-                <div className="sticky top-20 space-y-fila">
+                <div className="sticky top-20 space-y-fila claro:vidrio claro:p-[26px]">
                   {maison.address && (
                     <Row
                       label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.location}</span>}

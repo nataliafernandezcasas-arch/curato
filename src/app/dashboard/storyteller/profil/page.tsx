@@ -125,9 +125,11 @@ export default function ProfilPage() {
       />
 
       <div className="mx-auto max-w-[900px] px-pagina py-seccion">
-        <Rise>
+        {/* En claro, cada bloque va sobre vidrio, y el titular del perfil
+            toma sauge: nada que decidir, algo cumplido. */}
+        <Rise className="claro:vidrio claro:p-[26px]">
           <p className="text-capitale uppercase tracking-capitale text-accent">{t.navProfile}</p>
-          <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+          <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px] claro:text-sauge-vif">
             {profile?.full_name ?? ""}
           </h1>
           {profile?.handle && (
@@ -138,7 +140,7 @@ export default function ProfilPage() {
         {/* Lo primero que ve una casa de esta persona: su retrato y su frase.
             Se edita aquí mismo (16b) y se puede mirar desde fuera. */}
         {perfil && (
-          <Rise index={1} className="mt-rango">
+          <Rise index={1} className="mt-rango claro:vidrio claro:p-[26px]">
             <Section title={tp.sectionTitle}>
               <div className="grid grid-cols-[96px_minmax(0,1fr)] items-start gap-fila">
                 {perfil.portraits[0]?.url || perfil.inherited ? (
@@ -183,7 +185,7 @@ export default function ProfilPage() {
         {/* Las cifras dejan de ir encerradas entre dos filetes. Son filas, y
             cada una es la suya: el crédito en champagne porque es lo que la
             persona tiene, el resto en tinta porque solo cuentan lo hecho. */}
-        <Rise index={1} className="mt-rango mb-seccion">
+        <Rise index={1} className="mt-rango mb-seccion claro:vidrio claro:p-[26px]">
           <Row
             label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.profileCredit}</span>}
             aside={<span className="text-legende text-text-muted">{t.profileOf} {credit} €</span>}
@@ -211,7 +213,7 @@ export default function ProfilPage() {
           />
         </Rise>
 
-        <Section title={t.profileHousesVisited}>
+        <Section title={t.profileHousesVisited} className="claro:vidrio claro:p-[26px]">
           {loading ? (
             <div className="space-y-bloque">
               {[1, 2].map((i) => (

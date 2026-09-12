@@ -42,18 +42,18 @@ export default function SuggestVenue() {
 
   return (
     <div className="max-w-[460px] mx-auto text-center mt-16">
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-4">
+      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-accent mb-4">
         {t.suggestKicker}
       </p>
-      <h3 className="font-serif text-[22px] font-light text-white mb-3">{t.suggestTitle}</h3>
-      <p className="font-serif text-[13px] font-light text-white/55 leading-relaxed mb-7">
+      <h3 className="font-serif text-[22px] font-light text-text-primary mb-3">{t.suggestTitle}</h3>
+      <p className="font-serif text-[13px] font-light text-text-secondary leading-relaxed mb-7">
         {t.suggestText}
       </p>
 
       {done ? (
         <div className="caja-cristal flex items-center justify-center gap-2 px-6 py-4">
-          <CheckCircle size={18} weight="thin" className="text-champagne shrink-0" />
-          <p className="font-serif text-[13px] font-light text-white/70">{t.suggestThanks}</p>
+          <CheckCircle size={18} weight="thin" className="text-accent shrink-0" />
+          <p className="font-serif text-[13px] font-light text-text-secondary">{t.suggestThanks}</p>
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-3 text-left">

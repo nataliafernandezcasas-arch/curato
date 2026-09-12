@@ -1,13 +1,22 @@
 import UIKit
+import WebKit
 import Capacitor
 
-/// El controlador de la app: el de Capacitor, con el gesto de volver.
+/// El controlador de la app: el de Capacitor, con el gesto de volver y el
+/// papel del modo claro.
 ///
 /// En iOS se vuelve atrás deslizando desde el borde izquierdo, como en casi
 /// todas las apps. El WKWebView de Capacitor lo trae apagado y aquí se
 /// enciende. Funciona con la navegación de la web, porque Next.js añade cada
 /// pantalla al historial. En Android no hace falta: el gesto del sistema llama
 /// al botón atrás, que native-shell.tsx ya convierte en history.back().
+///
+/// La franja de la hora y los rebotes del scroll no los pinta la página sino
+/// este contenedor, en el #1E1E1E de capacitor.config.ts. En modo claro la
+/// página avisa con el mensaje curatoTema y el color de su papel (src/lib/
+/// tema.ts), y aquí se pinta igual. Sin esto, la hora quedaría en tinta oscura
+/// sobre una franja negra; por eso la web no ofrece el claro a una versión de
+/// la app que no tenga este mensaje.
 ///
 /// Vive en este archivo, y no en uno propio, porque este ya está en el target
 /// y así no hay que tocar a mano el proyecto de Xcode. Main.storyboard apunta
@@ -16,6 +25,42 @@ class CuratoViewController: CAPBridgeViewController {
     override func capacitorDidLoad() {
         super.capacitorDidLoad()
         webView?.allowsBackForwardNavigationGestures = true
+        webView?.configuration.userContentController.add(PapelNativo(self), name: "curatoTema")
+    }
+
+    func pintarPapel(_ color: UIColor) {
+        view.backgroundColor = color
+        webView?.backgroundColor = color
+        webView?.scrollView.backgroundColor = color
+    }
+}
+
+/// Recibe el color del papel desde la página. Guarda el controlador en débil:
+/// WebKit retiene a quien escucha, y así no se retienen el uno al otro.
+private final class PapelNativo: NSObject, WKScriptMessageHandler {
+    private weak var controlador: CuratoViewController?
+
+    init(_ controlador: CuratoViewController) {
+        self.controlador = controlador
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let hex = message.body as? String, let color = UIColor(hexCurato: hex) else { return }
+        controlador?.pintarPapel(color)
+    }
+}
+
+private extension UIColor {
+    /// "#EDEAE1" → color. Solo seis cifras: es lo único que manda la página.
+    convenience init?(hexCurato hex: String) {
+        let limpio = hex.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "#", with: "")
+        guard limpio.count == 6, let valor = UInt32(limpio, radix: 16) else { return nil }
+        self.init(
+            red: CGFloat((valor >> 16) & 0xFF) / 255,
+            green: CGFloat((valor >> 8) & 0xFF) / 255,
+            blue: CGFloat(valor & 0xFF) / 255,
+            alpha: 1
+        )
     }
 }
 
