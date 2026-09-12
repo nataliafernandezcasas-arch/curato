@@ -30,12 +30,12 @@ export default function RoleSwitch({ current }: { current: Role }) {
 
   return (
     <div className="inline-flex items-center gap-3">
-      <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/25">Espaces</span>
+      <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-text-muted">Espaces</span>
       {others.map((s) => (
         <Link
           key={s.role}
           href={s.href}
-          className="font-serif text-[11px] tracking-[0.15em] uppercase text-champagne/70 hover:text-champagne transition-colors"
+          className="font-serif text-[11px] tracking-[0.15em] uppercase text-accent hover:text-text-primary transition-colors"
         >
           {s.label}
         </Link>

@@ -44,11 +44,8 @@ export function TabBar({ links }: { links: NavLink[] }) {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 backdrop-blur-sm sm:hidden"
-      style={{
-        backgroundColor: "rgba(30,30,30,0.72)",
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
-      }}
+      className="barra-destinos fixed inset-x-0 bottom-0 z-40 sm:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       {offline && (
         <p className="py-etiqueta text-center text-capitale uppercase tracking-capitale text-copper-vif">

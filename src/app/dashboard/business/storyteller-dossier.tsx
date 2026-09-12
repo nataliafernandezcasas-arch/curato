@@ -170,8 +170,8 @@ export function DossierPane({
           {/* La cabecera se queda arriba mientras se baja por el dossier: una
               casa llena mira la fecha y sale, una que duda sigue bajando. */}
           <header
-            className="sticky top-0 z-10 px-pagina pb-fila backdrop-blur-md"
-            style={{ backgroundColor: "rgba(25,24,23,0.92)", paddingTop: "env(safe-area-inset-top, 0px)" }}
+            className="barra-panel sticky top-0 z-10 px-pagina pb-fila"
+            style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
           >
             <button
               type="button"
@@ -202,11 +202,8 @@ export function DossierPane({
 
           {footer && (
             <footer
-              className="sticky bottom-0 z-10 px-pagina pt-fila backdrop-blur-md"
-              style={{
-                backgroundColor: "rgba(20,20,20,0.92)",
-                paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))",
-              }}
+              className="pie-panel sticky bottom-0 z-10 px-pagina pt-fila"
+              style={{ paddingBottom: "calc(16px + env(safe-area-inset-bottom, 0px))" }}
             >
               {footer}
             </footer>

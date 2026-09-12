@@ -52,10 +52,7 @@ export default function DashboardNav({
 
   return (
     <>
-    <nav
-      className="sticky top-0 z-40 backdrop-blur-sm"
-      style={{ backgroundColor: "rgba(30,30,30,0.72)" }}
-    >
+    <nav className="barra-cabecera sticky top-0 z-40">
       <div
         className="mx-auto flex h-14 w-full items-center justify-between px-5"
         style={{ maxWidth }}
@@ -64,18 +61,28 @@ export default function DashboardNav({
           {/* Home for a member is their own space, not the page that explains
               what Curato is. In the app that page should never appear at all. */}
           <Link href="/dashboard" className="shrink-0">
+            {/* El logotipo en tinta en claro: el claro original no se ve
+                sobre crema. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo-curato-simple.png"
               alt="curato"
-              style={{ height: "12px", width: "auto", display: "block" }}
+              className="block claro:hidden"
+              style={{ height: "12px", width: "auto" }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-curato-ink.png"
+              alt="curato"
+              className="hidden claro:block"
+              style={{ height: "12px", width: "auto" }}
             />
           </Link>
 
           {eyebrow && (
             <>
-              <div className="h-3 w-px shrink-0 bg-white/10" />
-              <span className="truncate font-serif text-[10px] uppercase tracking-[0.3em] text-white/45">
+              <div className="h-3 w-px shrink-0 bg-border" />
+              <span className="truncate font-serif text-[10px] uppercase tracking-[0.3em] text-text-muted">
                 {eyebrow}
               </span>
             </>
@@ -83,14 +90,14 @@ export default function DashboardNav({
 
           {links.length > 0 && (
             <>
-              <div className="hidden h-3 w-px bg-white/10 sm:block" />
+              <div className="hidden h-3 w-px bg-border sm:block" />
               <div className="hidden items-center gap-6 sm:flex">
                 {links.map((l) => (
                   <Link
                     key={l.href}
                     href={l.href}
                     className={`whitespace-nowrap font-serif text-[12px] tracking-wider transition-colors ${
-                      l.active ? "text-champagne" : "text-white/55 hover:text-champagne"
+                      l.active ? "text-accent" : "text-text-secondary hover:text-accent"
                     }`}
                   >
                     {l.label}
@@ -106,7 +113,7 @@ export default function DashboardNav({
           {settingsHref && (
             <Link
               href={settingsHref}
-              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-white/55 transition-colors hover:text-champagne"
+              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-text-secondary transition-colors hover:text-accent"
             >
               <Gear size={14} />
               {settingsLabel}

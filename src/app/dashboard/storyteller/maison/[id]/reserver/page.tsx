@@ -659,11 +659,8 @@ function Reserver({ id }: { id: string }) {
       {/* El resumen pegado abajo, encima de la barra de destinos. */}
       {!hecho && (
         <div
-          className="sticky z-30 mt-rango backdrop-blur-md"
-          style={{
-            bottom: "calc(56px + env(safe-area-inset-bottom, 0px))",
-            backgroundColor: "rgba(20,20,20,0.92)",
-          }}
+          className="pie-panel sticky z-30 mt-rango"
+          style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
         >
           <div className="mx-auto flex max-w-[560px] flex-col gap-fila px-pagina py-fila">
             {resumen ? (

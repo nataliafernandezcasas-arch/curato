@@ -23,6 +23,10 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "fr
  * The veil is heavy for the same reason. The flower has a pale, busy centre,
  * and text sitting over it was unreadable at 0.65. Legibility wins over seeing
  * more of the photograph.
+ *
+ * La imagen y el velo vienen de .fondo-flor y .fondo-flor-velo (globals.css):
+ * la flor en oscuro, la acuarela en claro. El velo que se pasa aquí es el del
+ * oscuro; el claro lleva el suyo, fijo.
  */
 export default function FloralBackdrop({
   opacity = 0.8,
@@ -50,15 +54,9 @@ export default function FloralBackdrop({
         animate={reduce || !breathe ? undefined : { scale: [1, 1.008, 1] }}
         transition={reduce || !breathe ? undefined : { duration: 18, repeat: Infinity, ease: "easeInOut" }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/flor-bg.jpg"
-          alt=""
-          className="h-full w-full object-cover object-center"
-          draggable={false}
-        />
+        <div aria-hidden className="fondo-flor h-full w-full" />
       </motion.div>
-      <div className="absolute inset-0 bg-charcoal-deep" style={{ opacity }} />
+      <div className="fondo-flor-velo absolute inset-0" style={{ "--velo": opacity } as React.CSSProperties} />
     </div>
   );
 }

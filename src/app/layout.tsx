@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import NativeShell from "./native-shell";
+import TemaSync from "./tema-sync";
+import { SCRIPT_TEMA } from "@/lib/tema";
 
 export const metadata: Metadata = {
   title: "Curato — París",
@@ -45,9 +47,18 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className="h-full">
+    // El script del tema pone data-theme en el <html> antes de la primera
+    // pintura, así que el atributo no coincide con lo que renderiza React.
+    <html lang="fr" className="h-full" suppressHydrationWarning>
+      <head>
+        {/* Inline y en el <head>, no con next/script: beforeInteractive corre
+            cuando carga el runtime de Next, después de pintar, y quien tiene el
+            claro vería un destello oscuro. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
+      </head>
       <body className="min-h-full antialiased">
         <NativeShell />
+        <TemaSync />
         <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>

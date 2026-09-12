@@ -9,6 +9,8 @@ import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
 import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
+import { Interruptor } from "@/components/member/interruptor";
+import { useTema } from "@/lib/use-tema";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -16,12 +18,43 @@ const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "es", label: "ES", name: "Español" },
 ];
 
+// El modo (entrega 5, 18 · Réglages). La frase de abajo dice el estado real,
+// no una instrucción genérica.
+const APARIENCIA = {
+  fr: {
+    titulo: "Apparence",
+    sombre: "Mode sombre",
+    suivre: "Suivre mon téléphone",
+    sigue: (claro: boolean) =>
+      `Votre téléphone est en ${claro ? "clair" : "sombre"}, donc Curato aussi. Touchez Mode sombre pour décider vous-même.`,
+    fijo: (claro: boolean) => `Curato reste en ${claro ? "clair" : "sombre"}, quoi que fasse votre téléphone.`,
+  },
+  en: {
+    titulo: "Appearance",
+    sombre: "Dark mode",
+    suivre: "Follow my phone",
+    sigue: (claro: boolean) =>
+      `Your phone is in ${claro ? "light" : "dark"} mode, so Curato is too. Tap Dark mode to decide for yourself.`,
+    fijo: (claro: boolean) => `Curato stays ${claro ? "light" : "dark"}, whatever your phone does.`,
+  },
+  es: {
+    titulo: "Apariencia",
+    sombre: "Modo oscuro",
+    suivre: "Seguir a mi teléfono",
+    sigue: (claro: boolean) =>
+      `Tu teléfono está en ${claro ? "claro" : "oscuro"}, así que Curato también. Toca Modo oscuro para decidir tú.`,
+    fijo: (claro: boolean) => `Curato se queda en ${claro ? "claro" : "oscuro"}, haga lo que haga tu teléfono.`,
+  },
+};
+
 export default function ReglagesPage() {
   const { lang, setLang } = useLang();
   const t = translations[lang].dashboard;
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [email, setEmail] = useState("");
+  const { preferencia, claro, disponible, elegir } = useTema();
+  const ta = APARIENCIA[lang] ?? APARIENCIA.fr;
 
   useEffect(() => {
     createClient()
@@ -46,11 +79,35 @@ export default function ReglagesPage() {
       />
 
       <div className="mx-auto max-w-[720px] px-pagina py-seccion">
-        <h1 className="mb-seccion text-titre uppercase tracking-titre text-text-primary">
+        <h1 className="mb-seccion text-titre uppercase tracking-titre text-text-primary claro:vidrio claro:p-[26px] claro:text-accent">
           {t.navSettings}
         </h1>
 
-        <section className="mb-12">
+        {/* Dos interruptores cubren los tres estados, y para cambiar de modo
+            se toca una sola cosa. Mientras se sigue al teléfono, Mode sombre
+            refleja lo que hace el sistema; al tocarlo, la elección pasa a ser
+            de la persona y el segundo se apaga solo. Donde el claro no se
+            puede enseñar entero (la app de iOS antes de la versión que sabe
+            cambiar su franja), la sección no aparece. */}
+        {disponible && (
+          <section className="mb-12 claro:vidrio claro:p-[26px]">
+            <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">{ta.titulo}</p>
+            <Interruptor activo={!claro} onChange={(oscuro) => elegir(oscuro ? "oscuro" : "claro")}>
+              {ta.sombre}
+            </Interruptor>
+            <Interruptor
+              activo={preferencia === "sistema"}
+              onChange={(seguir) => elegir(seguir ? "sistema" : claro ? "claro" : "oscuro")}
+            >
+              {ta.suivre}
+            </Interruptor>
+            <p className="mt-bloque max-w-[36ch] text-corps text-text-secondary">
+              {preferencia === "sistema" ? ta.sigue(claro) : ta.fijo(claro)}
+            </p>
+          </section>
+        )}
+
+        <section className="mb-12 claro:vidrio claro:p-[26px]">
           <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">
             {t.settingsLanguage}
           </p>
@@ -78,7 +135,7 @@ export default function ReglagesPage() {
 
         {/* La cuenta, que no se decía en ninguna parte. */}
         {email && (
-          <section className="mb-seccion">
+          <section className="mb-seccion claro:vidrio claro:p-[26px]">
             <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{t.settingsAccount}</p>
             <Row
               label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.settingsEmail}</span>}

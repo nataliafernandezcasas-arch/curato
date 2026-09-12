@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
+/* claro: como dark:, pero para el papel crema. Solo existe en las pantallas
+   que ya están listas (src/lib/tema.ts); en las demás no aplica nunca. */
+@custom-variant claro (&:where([data-theme="light"], [data-theme="light"] *));
+
 @theme inline {
   --color-champagne: #CBB78F;
   --color-burgundy: #763943;
@@ -9,23 +13,26 @@
   --color-charcoal-deep: #1E1E1E;
   --color-charcoal-mid: #2A2A2A;
 
-  --color-surface: #1E1E1E;
-  --color-surface-raised: #2A2A2A;
-  --color-surface-hover: #363636;
-  --color-border: rgba(203,183,143,0.15);
-  --color-border-hover: rgba(203,183,143,0.30);
-  --color-text-primary: #F5EFE4;
-  --color-text-secondary: rgba(245,239,228,0.65);
+  /* Los roles apuntan a variables que cambian con el tema (ver :root más
+     abajo). El nombre no cambia: accent sigue siendo accent en los dos modos,
+     y ninguna pantalla escribe un hexadecimal. */
+  --color-surface: var(--papel);
+  --color-surface-raised: var(--papel-alto);
+  --color-surface-hover: var(--papel-hover);
+  --color-border: var(--linea);
+  --color-border-hover: var(--linea-hover);
+  --color-text-primary: var(--tinta);
+  --color-text-secondary: var(--tinta-2);
   /* La orientación sube del 38 % al 68 %: el 38 daba 2,8:1 sobre el fondo real
      y se estaba usando para instrucciones. Queda por encima del 4,5:1. */
-  --color-text-muted: rgba(245,239,228,0.68);
-  --color-accent: #CBB78F;
+  --color-text-muted: var(--tinta-3);
+  --color-accent: var(--marca);
 
   /* Sauge y brume liberan al champagne, que hoy señala cinco cosas distintas.
      Sauge es lo cumplido, brume es lo que solo informa. Para texto y marcas se usa
      su peldaño vivo, sauge-vif: el #4E5A4B es solo superficie. */
   --color-sauge: #4E5A4B;
-  --color-brume: #A3BAC0;
+  --color-brume: var(--brume);
 
   /* Enmienda de contraste (entrega 4, 10 septies). Cada rol de estado tiene
      dos peldaños: el profundo (copper, sauge, burgundy) queda solo para
@@ -33,9 +40,9 @@
      sobre el punto más claro del fondo real, #3F3E3A, dentro del foco:
      sauge-vif 4,9:1, copper-vif 5,0:1, burgundy-vif 5,1:1. El copper de
      antes daba 2,7:1 ahí, muy por debajo del 4,5 que exige el propio sistema. */
-  --color-sauge-vif: #6FBF8B;
-  --color-copper-vif: #E6A455;
-  --color-burgundy-vif: #F29AA3;
+  --color-sauge-vif: var(--sauge-vif);
+  --color-copper-vif: var(--copper-vif);
+  --color-burgundy-vif: var(--burgundy-vif);
 
   --color-cream: #F2EDE4;
   --color-cream-text: #2A201C;
@@ -85,11 +92,64 @@
   --ease-curato: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ---------------------------------------------------------------------------
+   Los dos papeles (entrega 5, 10 terdecies: el modo claro rehecho sobre
+   fotografía). El oscuro va en :root y es el de siempre; el claro, bajo
+   [data-theme="light"], que pone en el <html> el script del layout antes de
+   la primera pintura. Solo se pone en las pantallas que ya están listas para
+   el claro (ver src/lib/tema.ts): las demás siguen en oscuro aunque la
+   persona haya elegido claro, en vez de salir con texto blanco sobre crema.
+
+   Los valores claros están medidos sobre la acuarela con su velo, en los dos
+   extremos: el papel casi blanco y la mancha de oliva. Todos pasan de 4,8:1
+   en la mancha.
+
+   En claro hay dos peldaños de tinta, no tres: el tercero no llega a 4,5:1
+   sobre crema, así que tinta-3 vale lo mismo que tinta-2. Los colores del
+   brandbook que no escriben sobre crema (champagne, brume, copper, sauge)
+   quedan para marca; cuando tienen que escribir va su peldaño profundo, el
+   mismo tono girado. */
+:root {
+  --papel: #1E1E1E;
+  --papel-alto: #2A2A2A;
+  --papel-hover: #363636;
+  --linea: rgba(203,183,143,0.15);
+  --linea-hover: rgba(203,183,143,0.30);
+  --tinta: #F5EFE4;
+  --tinta-2: rgba(245,239,228,0.65);
+  --tinta-3: rgba(245,239,228,0.68);
+  --marca: #CBB78F;
+  --brume: #A3BAC0;
+  --sauge-vif: #6FBF8B;
+  --copper-vif: #E6A455;
+  --burgundy-vif: #F29AA3;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  /* Sin foto detrás (paneles a pantalla completa, rebotes del scroll). Con
+     foto, la superficie es la acuarela al 50 % sobre este papel, con un velo
+     crema al 30 % (ver .fondo-flor). */
+  --papel: #EDEAE1;
+  --papel-alto: rgba(255,255,255,0.15);
+  --papel-hover: rgba(255,255,255,0.28);
+  --linea: rgba(42,32,28,0.18);
+  --linea-hover: rgba(42,32,28,0.32);
+  --tinta: #2A201C;
+  --tinta-2: rgba(42,32,28,0.82);
+  --tinta-3: rgba(42,32,28,0.82);
+  --marca: #4A3718;
+  --brume: #263C41;
+  --sauge-vif: #1B4227;
+  --copper-vif: #5E2F08;
+  --burgundy-vif: #5C1822;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
-  background: #1E1E1E;
-  color: #F5EFE4;
+  background: var(--papel);
+  color: var(--tinta);
   font-family: 'Cormorant Garamond', Georgia, serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -356,5 +416,263 @@ html[data-native="android"] body {
     background: rgba(245, 239, 228, 0.05);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
+  }
+
+  /* Las barras y los paneles fijos. Antes llevaban el color escrito en cada
+     pantalla; aquí tienen su versión clara. El desenfoque va en la clase y no
+     en una utilidad, que ganaría a la versión clara. */
+  .barra-cabecera {
+    background: rgba(30, 30, 30, 0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+  .barra-destinos {
+    background: rgba(30, 30, 30, 0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+  .barra-panel {
+    background: rgba(25, 24, 23, 0.92);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  .pie-panel {
+    background: rgba(20, 20, 20, 0.92);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  /* El fondo de cada pantalla (FloralBackdrop): la flor con su velo en
+     oscuro, la acuarela en claro. Una sola declaración por tema, sin un
+     condicional en cada pantalla. */
+  .fondo-flor {
+    background: url(/flor-bg.jpg) center / cover no-repeat;
+  }
+  .fondo-flor-velo {
+    background: #1E1E1E;
+    opacity: var(--velo, 0.8);
+  }
+
+  /* El interruptor de cristal (18 · Réglages). */
+  .interruptor {
+    display: flex;
+    width: 52px;
+    height: 32px;
+    padding: 3px;
+    border-radius: 16px;
+    justify-content: flex-start;
+    background: rgba(245, 239, 228, 0.10);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 0 1px rgba(245, 239, 228, 0.24);
+  }
+  .interruptor__bolita {
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background: rgba(245, 239, 228, 0.92);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  [aria-checked="true"] > .interruptor {
+    background: rgba(203, 183, 143, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), inset 0 0 0 1px rgba(203, 183, 143, 0.5);
+  }
+  [aria-checked="true"] > .interruptor .interruptor__bolita {
+    transform: translateX(20px);
+    background: #CBB78F;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .interruptor__bolita { transition: none; }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   El papel claro (entrega 5, 10 terdecies). La acuarela solo toca aire y
+   fotografías, nunca texto: todo lo que se lee va sobre un panel de vidrio.
+   El borde de cada panel no es un hilo sino un stack de sombras que imita
+   cómo un canto de vidrio recoge la luz: dos esquinas iluminadas, un halo
+   interior y una sombra mínima. No cierra la forma con una línea, así que la
+   regla de las cajas sigue en pie. */
+
+/* El panel de vidrio. Solo existe en claro: se usa con la variante,
+   claro:vidrio. En oscuro el velo es uniforme y no hace falta. */
+@utility vidrio {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  backdrop-filter: blur(14px) saturate(1.25);
+  box-shadow:
+    0 0 6px rgba(42, 32, 28, 0.03),
+    0 2px 6px rgba(42, 32, 28, 0.08),
+    inset 3px 3px 0.5px -3px rgba(42, 32, 28, 0.55),
+    inset -3px -3px 0.5px -3px rgba(42, 32, 28, 0.5),
+    inset 1px 1px 1px -0.5px rgba(42, 32, 28, 0.32),
+    inset -1px -1px 1px -0.5px rgba(42, 32, 28, 0.32),
+    inset 0 0 6px 6px rgba(255, 255, 255, 0.22),
+    inset 0 0 2px 2px rgba(255, 255, 255, 0.12),
+    0 0 12px rgba(255, 255, 255, 0.3);
+  /* Sin desenfoque, un blanco al 15 % no llega a 4,5:1: sube la opacidad. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background: rgba(255, 255, 255, 0.62);
+  }
+}
+
+@layer components {
+  /* El botón: vidrio ahumado. Un botón claro sobre papel claro no se vería.
+     El 72 % es el suelo: por debajo el texto deja de leerse. */
+  [data-theme="light"] .boton-cristal {
+    border-color: transparent;
+    background: rgba(42, 32, 28, 0.72);
+    -webkit-backdrop-filter: blur(24px) saturate(1.35);
+    backdrop-filter: blur(24px) saturate(1.35);
+    box-shadow:
+      0 0 8px rgba(42, 32, 28, 0.06),
+      0 2px 6px rgba(42, 32, 28, 0.1),
+      inset 3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.28),
+      inset -3px -3px 0.5px -3.5px rgba(255, 255, 255, 0.75),
+      inset 1px 1px 1px -0.5px rgba(255, 255, 255, 0.55),
+      inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.55),
+      inset 0 0 6px 6px rgba(255, 255, 255, 0.1),
+      inset 0 0 2px 2px rgba(255, 255, 255, 0.06),
+      0 0 12px rgba(42, 32, 28, 0.12);
+    color: #F5EFE4;
+  }
+  [data-theme="light"] .boton-cristal.pulsado,
+  [data-theme="light"] .boton-cristal:active,
+  [data-theme="light"] .boton-cristal:focus-visible {
+    background: rgba(42, 32, 28, 0.84);
+    border-color: transparent;
+  }
+  @media (hover: hover) {
+    [data-theme="light"] .boton-cristal:hover {
+      background: rgba(42, 32, 28, 0.84);
+      border-color: transparent;
+    }
+  }
+  [data-theme="light"] .boton-cristal:focus-visible {
+    outline-color: #2A201C;
+  }
+
+  /* Filtros y destinos: el mismo vidrio ahumado a dos densidades. La tinta
+     gira con el carril: por debajo del 62 % el sustrato sigue siendo claro y
+     un texto claro desaparece. */
+  [data-theme="light"] .filtro-cristal,
+  [data-theme="light"] .pestana {
+    border-color: transparent;
+    background: rgba(42, 32, 28, 0.14);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow:
+      inset 3px 3px 0.5px -3px rgba(42, 32, 28, 0.35),
+      inset -3px -3px 0.5px -3px rgba(42, 32, 28, 0.3),
+      inset 0 0 4px 3px rgba(255, 255, 255, 0.18);
+    color: rgba(42, 32, 28, 0.86);
+  }
+  [data-theme="light"] .filtro-cristal[aria-current],
+  [data-theme="light"] .pestana-activa {
+    background: rgba(42, 32, 28, 0.82);
+    box-shadow:
+      0 0 8px rgba(42, 32, 28, 0.06),
+      0 2px 6px rgba(42, 32, 28, 0.1),
+      inset 3px 3px 0.5px -3.5px rgba(255, 255, 255, 0.28),
+      inset -3px -3px 0.5px -3.5px rgba(255, 255, 255, 0.75),
+      inset 1px 1px 1px -0.5px rgba(255, 255, 255, 0.55),
+      inset -1px -1px 1px -0.5px rgba(255, 255, 255, 0.55);
+    color: #F5EFE4;
+  }
+  [data-theme="light"] .filtro-cristal:active {
+    background: rgba(42, 32, 28, 0.24);
+  }
+  @media (hover: hover) {
+    [data-theme="light"] .filtro-cristal:not([aria-current]):hover {
+      color: #2A201C;
+    }
+  }
+  [data-theme="light"] .filtro-cristal:focus-visible {
+    outline-color: #2A201C;
+  }
+
+  [data-theme="light"] .campo-cristal {
+    border-color: rgba(42, 32, 28, 0.18);
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    backdrop-filter: blur(14px) saturate(1.25);
+    color: #2A201C;
+  }
+  [data-theme="light"] .campo-cristal::placeholder {
+    color: rgba(42, 32, 28, 0.55);
+  }
+  [data-theme="light"] .campo-cristal:focus {
+    border-color: rgba(42, 32, 28, 0.45);
+  }
+
+  [data-theme="light"] .caja-cristal {
+    border-color: transparent;
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    backdrop-filter: blur(14px) saturate(1.25);
+    box-shadow:
+      0 2px 6px rgba(42, 32, 28, 0.08),
+      inset 3px 3px 0.5px -3px rgba(42, 32, 28, 0.55),
+      inset -3px -3px 0.5px -3px rgba(42, 32, 28, 0.5),
+      inset 0 0 6px 6px rgba(255, 255, 255, 0.22);
+  }
+
+  /* Barras: blanco translúcido con el canto de luz del lado que toca el
+     contenido. */
+  [data-theme="light"] .barra-cabecera {
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.25);
+    backdrop-filter: blur(14px) saturate(1.25);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.55);
+  }
+  [data-theme="light"] .barra-destinos {
+    background: rgba(255, 255, 255, 0.26);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    backdrop-filter: blur(24px) saturate(1.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+  [data-theme="light"] .barra-panel {
+    background: rgba(255, 255, 255, 0.38);
+    -webkit-backdrop-filter: blur(22px);
+    backdrop-filter: blur(22px);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.75);
+  }
+  [data-theme="light"] .pie-panel {
+    background: rgba(255, 255, 255, 0.34);
+    -webkit-backdrop-filter: blur(22px) saturate(1.2);
+    backdrop-filter: blur(22px) saturate(1.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+
+  /* La acuarela al 50 % sobre el papel, con un velo crema al 30 %. Probados
+     más altos: por encima la flor se apaga sin que nadie gane. */
+  [data-theme="light"] .fondo-flor {
+    background-image: url(/aquarelle-claire.jpg);
+    opacity: 0.5;
+  }
+  [data-theme="light"] .fondo-flor-velo {
+    background: rgba(242, 237, 228, 0.3);
+    opacity: 1;
+  }
+
+  [data-theme="light"] .interruptor {
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+  }
+  [data-theme="light"] .interruptor__bolita {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 6px rgba(42, 32, 28, 0.18);
+  }
+  [data-theme="light"] [aria-checked="true"] > .interruptor {
+    background: rgba(94, 72, 32, 0.3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 0 0 1px rgba(94, 72, 32, 0.32);
+  }
+  [data-theme="light"] [aria-checked="true"] > .interruptor .interruptor__bolita {
+    background: #4A3718;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 2px 6px rgba(42, 32, 28, 0.26);
   }
 }
