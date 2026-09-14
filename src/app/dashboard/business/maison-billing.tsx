@@ -20,8 +20,8 @@ export default function MaisonBilling() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="font-serif text-[13px] text-white/40">Chargement…</p>;
-  if (!b) return <p className="font-serif text-[13px] text-white/40">Informations de facturation indisponibles.</p>;
+  if (loading) return <p className="font-serif text-[13px] text-text-secondary">Chargement…</p>;
+  if (!b) return <p className="font-serif text-[13px] text-text-secondary">Informations de facturation indisponibles.</p>;
 
   const signed = b.signedAt ? new Date(b.signedAt) : null;
   const now = new Date();
@@ -57,7 +57,8 @@ export default function MaisonBilling() {
   ];
 
   return (
-    <div>
+    // En claro, sobre vidrio: la acuarela solo toca aire y fotografías.
+    <div className="claro:vidrio claro:p-[26px]">
       <p className="text-capitale uppercase tracking-capitale text-accent">Facturation &amp; abonnement</p>
 
       {/* El estado estaba escondido en una fila dentro de un recuadro. Es lo

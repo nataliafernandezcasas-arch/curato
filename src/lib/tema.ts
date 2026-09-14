@@ -24,8 +24,13 @@ export type Preferencia = "sistema" | "claro" | "oscuro";
 const CLAVE = "curato-tema";
 const EVENTO = "curato-tema";
 
-/** Las pantallas que ya están listas para el papel claro. */
-export const RUTAS_CLARAS = /^\/dashboard\/storyteller(\/|$)/;
+/**
+ * Las pantallas que ya están listas para el papel claro: todo el storyteller y
+ * toda la maison menos el QR, que se queda siempre sobre la carte de visite
+ * (un objeto de marca que se enseña a un desconocido no cambia con un ajuste
+ * del móvil).
+ */
+export const RUTAS_CLARAS = /^\/dashboard\/(storyteller|business(?!\/qr))(\/|$)/;
 
 /** El papel sin foto: themeColor, la franja nativa y los rebotes del scroll. */
 const PAPEL = { claro: "#EDEAE1", oscuro: "#1E1E1E" } as const;

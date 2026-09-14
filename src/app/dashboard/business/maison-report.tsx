@@ -80,7 +80,9 @@ export default function MaisonReport() {
 
   return (
     <div>
-      <Rise>
+      {/* En claro, cada bloque del informe va sobre vidrio: la acuarela solo
+          toca aire y fotografías. */}
+      <Rise className="claro:vidrio claro:p-[26px]">
         <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
         <p className="mt-bloque text-legende text-text-secondary">{nombreMes}</p>
 
@@ -100,12 +102,12 @@ export default function MaisonReport() {
       </Rise>
 
       {informe.visits === 0 ? (
-        <div className="py-respiro text-center">
+        <div className="py-respiro text-center claro:mt-seccion claro:vidrio claro:px-[26px]">
           <p className="text-corps text-text-secondary">{t.empty}</p>
         </div>
       ) : (
         <>
-          <Rise index={1} className="mt-seccion">
+          <Rise index={1} className="mt-seccion claro:vidrio claro:p-[26px]">
             <Row
               label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.reach}</span>}
               value={<span className="text-sous-titre tabular-nums text-text-primary">{informe.reach.accounts.toLocaleString(lang)}</span>}
@@ -123,7 +125,7 @@ export default function MaisonReport() {
             )}
           </Rise>
 
-          <Section title={t.storytellers} className="mt-seccion">
+          <Section title={t.storytellers} className="mt-seccion claro:vidrio claro:p-[26px]">
             {informe.storytellers.map((s, i) => (
               <Row
                 key={i}
@@ -144,7 +146,7 @@ export default function MaisonReport() {
           </Section>
 
           {informe.gallery.length > 0 && (
-            <Section title={t.published}>
+            <Section title={t.published} className="claro:vidrio claro:p-[26px]">
               <div className="grid grid-cols-3 gap-bloque">
                 {informe.gallery.map((url, i) => (
                   <button key={i} type="button" onClick={() => setVisor(i)} className="block">

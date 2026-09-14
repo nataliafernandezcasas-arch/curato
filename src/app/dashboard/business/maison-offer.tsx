@@ -123,9 +123,9 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   return (
     <div className="max-w-[820px] mx-auto space-y-14 pb-8">
       {/* Availability */}
-      <section>
+      <section className="claro:vidrio claro:p-[26px]">
         <p className={`${labelCls} mb-1`}>{t.offerAvailability}</p>
-        <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerAvailabilityHint}</p>
+        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerAvailabilityHint}</p>
         <div className="space-y-2">
           {DAY_ORDER.map((day, i) => {
             const w = winFor(day);
@@ -163,12 +163,12 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Blocked dates */}
-      <section>
+      <section className="claro:vidrio claro:p-[26px]">
         <p className={`${labelCls} mb-1`}>{t.offerBlocked}</p>
-        <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerBlockedHint}</p>
+        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerBlockedHint}</p>
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <input type="date" value={newBlock} onChange={(e) => setNewBlock(e.target.value)} className={inputCls} />
-          <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 rounded-full border border-white/15 text-white/70 hover:border-champagne/40 hover:text-champagne px-4 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-40">
+          <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 rounded-full border border-border-hover text-text-secondary hover:border-accent hover:text-accent px-4 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-40">
             <Plus size={14} /> {t.offerAdd}
           </button>
         </div>
@@ -190,18 +190,18 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Services */}
-      <section>
+      <section className="claro:vidrio claro:p-[26px]">
         <div className="flex items-baseline justify-between mb-1">
           <p className={labelCls}>{t.offerServices}</p>
-          <button onClick={addService} className="inline-flex items-center gap-1.5 text-champagne/70 hover:text-champagne font-serif text-[12px] tracking-wider uppercase transition-colors">
+          <button onClick={addService} className="inline-flex items-center gap-1.5 text-accent hover:text-text-primary font-serif text-[12px] tracking-wider uppercase transition-colors">
             <Plus size={14} /> {t.offerAdd}
           </button>
         </div>
-        <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerServicesHint}</p>
+        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerServicesHint}</p>
         <div className="space-y-3">
           {services.map((s, i) => (
             <div key={i} className="relative pr-10">
-              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-white/40 hover:text-copper-vif" aria-label="X"><X size={15} /></button>
+              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-text-muted hover:text-copper-vif" aria-label="X"><X size={15} /></button>
               <div className="grid sm:grid-cols-[1fr_140px] gap-3 mb-3">
                 <input value={s.name} onChange={(e) => updateService(i, "name", e.target.value)} placeholder={t.offerServiceName} className={`${inputCls} w-full`} />
                 <input value={s.price} onChange={(e) => updateService(i, "price", e.target.value)} placeholder={t.offerServicePrice} className={`${inputCls} w-full`} />
@@ -213,17 +213,17 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Menu / brochure */}
-      <section>
+      <section className="claro:vidrio claro:p-[26px]">
         <p className={`${labelCls} mb-1`}>{t.offerMenu}</p>
-        <p className="font-serif text-[12px] font-light text-white/40 mb-5">{t.offerMenuHint}</p>
+        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerMenuHint}</p>
         <div className="flex flex-wrap gap-3 items-center">
           {menuUrls.map((url) => (
-            <div key={url} className="relative inline-flex items-center gap-2 rounded-full border border-white/12 pl-4 pr-9 py-2.5">
-              <FilePdf size={16} className="text-champagne/70" />
-              <a href={url} target="_blank" rel="noopener noreferrer" className="font-serif text-[13px] text-white/70 hover:text-champagne transition-colors">
+            <div key={url} className="relative inline-flex items-center gap-2 rounded-full border border-border pl-4 pr-9 py-2.5">
+              <FilePdf size={16} className="text-accent" />
+              <a href={url} target="_blank" rel="noopener noreferrer" className="font-serif text-[13px] text-text-secondary hover:text-accent transition-colors">
                 {url.split("/").pop()?.slice(-16) || "menu"}
               </a>
-              <button onClick={() => removeMenu(url)} className="absolute top-1/2 right-3 -translate-y-1/2 text-white/40 hover:text-copper-vif" aria-label="X"><X size={13} /></button>
+              <button onClick={() => removeMenu(url)} className="absolute top-1/2 right-3 -translate-y-1/2 text-text-muted hover:text-copper-vif" aria-label="X"><X size={13} /></button>
             </div>
           ))}
           <FilePicker
@@ -231,7 +231,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             accept="application/pdf,image/*"
             multiple
             disabled={uploading}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-white/20 px-fila text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:border-champagne/40 hover:text-accent"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-dashed border-border-hover px-fila text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:border-accent hover:text-accent"
           >
             <Plus size={14} /> {t.offerAdd}
           </FilePicker>

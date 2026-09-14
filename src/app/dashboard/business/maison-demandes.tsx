@@ -310,11 +310,13 @@ export default function MaisonDemandes() {
 
   return (
     <div>
-      <header className="mb-seccion">
+      {/* En claro, sobre vidrio, y el titular en copper: una solicitud es lo
+          único del tablero con plazo. */}
+      <header className="mb-seccion claro:vidrio claro:p-[26px]">
         {datos?.maison && (
           <p className="mb-bloque text-capitale uppercase tracking-capitale text-text-secondary">{datos.maison}</p>
         )}
-        <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+        <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px] claro:text-copper-vif">
           {t.title[0]}
           <br />
           {t.title[1]}
@@ -344,8 +346,7 @@ export default function MaisonDemandes() {
           {[0, 1].map((i) => (
             <div
               key={i}
-              className="h-[140px] animate-pulse rounded-[20px] [animation-duration:1.6s]"
-              style={{ backgroundColor: "rgba(245,239,228,0.05)" }}
+              className="h-[140px] animate-pulse rounded-[20px] bg-[rgba(245,239,228,0.05)] [animation-duration:1.6s] claro:bg-[rgba(42,32,28,0.12)]"
             />
           ))}
         </div>
@@ -358,7 +359,7 @@ export default function MaisonDemandes() {
           {t.loadFail}
         </StateMark>
       ) : abiertas.length === 0 ? (
-        <Section>
+        <Section className="claro:vidrio claro:p-[26px]">
           <p className="text-sous-titre text-text-primary">{t.emptyTitle}</p>
           <p className="mt-etiqueta max-w-[46ch] text-corps text-text-secondary">
             {datos && datos.openDays.length > 0
@@ -409,11 +410,8 @@ export default function MaisonDemandes() {
                     setAbierta(r.id);
                     setErrorAccion("");
                   }}
-                  className="block w-full overflow-hidden rounded-[20px] text-left"
-                  style={{
-                    backgroundColor: "rgba(245,239,228,0.05)",
-                    boxShadow: "inset 0 1px 0 rgba(245,239,228,0.10)",
-                  }}
+                  // El bloque esmerilado en oscuro; en claro, el panel de vidrio.
+                  className="block w-full overflow-hidden rounded-[20px] bg-[rgba(245,239,228,0.05)] text-left shadow-[inset_0_1px_0_rgba(245,239,228,0.10)] claro:vidrio"
                 >
                   <div className="grid grid-cols-[96px_minmax(0,1fr)] items-start gap-fila px-[18px] pb-[14px] pt-fila">
                     {d?.portrait ? (
@@ -467,7 +465,7 @@ export default function MaisonDemandes() {
       )}
 
       {!cargando && !fallo && cerradas.length > 0 && (
-        <Section title={t.expiredTitle}>
+        <Section title={t.expiredTitle} className="claro:vidrio claro:p-[26px]">
           <div className="space-y-fila">
             {cerradas.map((r) => (
               <div key={r.id}>

@@ -9,6 +9,7 @@ import DashboardNav from "../../dashboard-nav";
 import { MAISON_LINKS } from "../nav-links";
 import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
+import { Apariencia } from "@/components/member/apariencia";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -50,11 +51,13 @@ export default function MaisonReglagesPage() {
       />
 
       <div className="mx-auto max-w-[720px] px-pagina py-seccion">
-        <h1 className="mb-seccion text-titre uppercase tracking-titre text-text-primary">
+        <h1 className="mb-seccion text-titre uppercase tracking-titre text-text-primary claro:vidrio claro:p-[26px] claro:text-accent">
           {t.navSettings}
         </h1>
 
-        <section className="mb-12">
+        <Apariencia lang={lang} className="mb-12 claro:vidrio claro:p-[26px]" />
+
+        <section className="mb-12 claro:vidrio claro:p-[26px]">
           <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">
             {t.settingsLanguage}
           </p>
@@ -82,7 +85,7 @@ export default function MaisonReglagesPage() {
 
         {/* La cuenta, que no se decía en ninguna parte. */}
         {email && (
-          <section className="mb-seccion">
+          <section className="mb-seccion claro:vidrio claro:p-[26px]">
             <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{t.settingsAccount}</p>
             <Row
               label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.settingsEmail}</span>}
