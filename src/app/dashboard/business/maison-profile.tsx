@@ -167,12 +167,12 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   function StorytellerPreview() {
     return (
       <div className="overflow-hidden">
-        <div className="relative aspect-[16/9] bg-charcoal-mid">
+        <div className="relative aspect-[16/9] bg-surface-raised">
           {photos[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={photos[0]} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-white/25 font-serif text-[12px]">—</div>
+            <div className="w-full h-full flex items-center justify-center text-text-muted font-serif text-[12px]">—</div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-charcoal-deep/10 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -181,7 +181,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
           </div>
         </div>
         {previewDesc && (
-          <p className="font-serif text-[14px] font-light text-white/65 leading-relaxed p-6">
+          <p className="font-serif text-[14px] font-light text-text-secondary leading-relaxed p-6">
             {previewDesc.length > 240 ? `${previewDesc.slice(0, 240)}…` : previewDesc}
           </p>
         )}
@@ -196,7 +196,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         <div className="flex justify-end gap-2 mb-6">
           <button
             onClick={() => setPreview((p) => !p)}
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 border font-serif text-[11px] tracking-[0.2em] uppercase transition-all duration-200 ${preview ? "border-champagne/50 text-champagne" : "border-white/15 text-white/55 hover:border-champagne/40 hover:text-champagne"}`}
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 border font-serif text-[11px] tracking-[0.2em] uppercase transition-all duration-200 ${preview ? "border-accent text-accent" : "border-border-hover text-text-secondary hover:border-accent hover:text-accent"}`}
           >
             <Eye size={15} /> {t.profilePreview}
           </button>
@@ -204,7 +204,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             onClick={() => setEditing(true)}
             aria-label={t.profileEdit}
             title={t.profileEdit}
-            className="shrink-0 rounded-full p-2.5 border border-white/15 text-white/55 hover:border-champagne/40 hover:text-champagne transition-all duration-200"
+            className="shrink-0 rounded-full p-2.5 border border-border-hover text-text-secondary hover:border-accent hover:text-accent transition-all duration-200"
           >
             <PencilSimple size={16} />
           </button>
@@ -225,7 +225,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block overflow-hidden rounded-xl bg-charcoal-mid mb-1.5 break-inside-avoid"
+                    className="block overflow-hidden rounded-xl bg-surface-raised mb-1.5 break-inside-avoid"
                   >
                     <img src={url} alt="" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700" />
                   </a>
@@ -234,20 +234,20 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             )}
 
             {previewDesc && (
-              <p className="font-serif text-[17px] font-light text-white/75 leading-relaxed max-w-[720px] mb-10">
+              <p className="font-serif text-[17px] font-light text-text-primary leading-relaxed max-w-[720px] mb-10 claro:vidrio claro:p-[26px]">
                 {previewDesc}
               </p>
             )}
 
             <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
               {website && (
-                <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
+                <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                   <GlobeSimple size={15} />
                   <span className="font-serif text-[13px]">{website.replace(/^https?:\/\//, "")}</span>
                 </a>
               )}
               {igHandle && (
-                <a href={`https://instagram.com/${igHandle}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
+                <a href={`https://instagram.com/${igHandle}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                   <InstagramLogo size={15} />
                   <span className="font-serif text-[13px]">@{igHandle}</span>
                 </a>
@@ -264,7 +264,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
     <div className="max-w-[1100px] mx-auto">
       {/* Let's get started — guided checklist while the profile is incomplete */}
       {(!photosOk || !descOk) && (
-        <div className="mb-seccion">
+        <div className="mb-seccion claro:vidrio claro:p-[26px]">
           <p className="text-capitale uppercase tracking-capitale text-accent">{t.gsEyebrow}</p>
           <h2 className="mt-bloque text-titre tracking-titre text-text-primary">{t.gsTitle}</h2>
           <p className="mt-fila mb-rango max-w-[46ch] text-corps text-text-secondary">{t.gsSubtitle}</p>
@@ -287,21 +287,22 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-12 items-start">
       <div className="space-y-12">
-        {/* Photos */}
-        <div>
+        {/* Photos. En claro, cada bloque del formulario va sobre vidrio: la
+            acuarela solo toca aire y fotografías. */}
+        <div className="claro:vidrio claro:p-[26px]">
           <div className="flex items-baseline justify-between mb-1.5">
-            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70">{t.profilePhotos}</p>
-            <span className={`font-serif text-[12px] ${photosOk ? "text-champagne/60" : "text-copper-vif"}`}>
+            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent">{t.profilePhotos}</p>
+            <span className={`font-serif text-[12px] ${photosOk ? "text-accent" : "text-copper-vif"}`}>
               {photos.length}/{MIN_PHOTOS}
             </span>
           </div>
-          <p className="font-serif text-[12px] font-light text-white/40 mb-4">{t.profilePhotosHint}</p>
+          <p className="font-serif text-[12px] font-light text-text-secondary mb-4">{t.profilePhotosHint}</p>
 
           <div
             onDragOver={(e) => { if (e.dataTransfer.types.includes("Files")) { e.preventDefault(); setFileDrag(true); } }}
             onDragLeave={(e) => { if (e.currentTarget === e.target) setFileDrag(false); }}
             onDrop={(e) => { if (e.dataTransfer.files?.length) { e.preventDefault(); uploadPhotos(e.dataTransfer.files); } setFileDrag(false); }}
-            className={`grid grid-cols-3 gap-2 transition-all ${fileDrag ? "ring-2 ring-champagne/60 ring-offset-2 ring-offset-charcoal-deep" : ""}`}
+            className={`grid grid-cols-3 gap-2 transition-all ${fileDrag ? "ring-2 ring-accent ring-offset-2 ring-offset-surface" : ""}`}
           >
             {photos.map((url, i) => (
               <div
@@ -312,7 +313,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                 onDragLeave={() => setDragOver((d) => (d === i ? null : d))}
                 onDrop={(e) => { if (e.dataTransfer.files?.length) { e.preventDefault(); uploadPhotos(e.dataTransfer.files); setFileDrag(false); } else handleDrop(i); }}
                 onDragEnd={() => { dragFrom.current = null; setDragOver(null); }}
-                className={`relative aspect-square overflow-hidden rounded-xl bg-charcoal-mid group cursor-move transition-all ${dragOver === i ? "ring-2 ring-champagne/70" : ""}`}
+                className={`relative aspect-square overflow-hidden rounded-xl bg-surface-raised group cursor-move transition-all ${dragOver === i ? "ring-2 ring-accent" : ""}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" className="w-full h-full object-cover pointer-events-none" />
@@ -337,7 +338,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               onFiles={uploadPhotos}
               multiple
               disabled={uploading}
-              className="flex aspect-square items-center justify-center rounded-xl border border-dashed border-white/20 text-white/40 transition-colors hover:border-champagne/40 hover:text-champagne"
+              className="flex aspect-square items-center justify-center rounded-xl border border-dashed border-border-hover text-text-secondary transition-colors hover:border-accent hover:text-accent"
             >
               <Plus size={22} weight="thin" />
             </FilePicker>
@@ -346,10 +347,10 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         </div>
 
         {/* Description */}
-        <div>
+        <div className="claro:vidrio claro:p-[26px]">
           <div className="flex items-baseline justify-between mb-3">
-            <label className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70">{t.profileDescription}</label>
-            <span className={`font-serif text-[12px] ${descLang === "fr" ? (descOk ? "text-champagne/60" : "text-copper-vif") : "text-white/40"}`}>
+            <label className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent">{t.profileDescription}</label>
+            <span className={`font-serif text-[12px] ${descLang === "fr" ? (descOk ? "text-accent" : "text-copper-vif") : "text-text-secondary"}`}>
               {descValue.trim().length}/{MIN_DESC}
             </span>
           </div>
@@ -380,19 +381,19 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             placeholder={t.profileDescPlaceholder}
             className={`${inputCls} resize-none leading-relaxed`}
           />
-          <p className="font-serif text-[12px] font-light text-white/40 mt-2">
+          <p className="font-serif text-[12px] font-light text-text-secondary mt-2">
             {descLang === "fr" ? t.profileDescMin : t.profileDescOptional}
           </p>
         </div>
 
         {/* Links */}
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4 claro:vidrio claro:p-[26px]">
           <div>
-            <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70 mb-3">{t.profileWebsite}</label>
+            <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-3">{t.profileWebsite}</label>
             <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className={inputCls} />
           </div>
           <div>
-            <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70 mb-3">{t.profileInstagram}</label>
+            <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-3">{t.profileInstagram}</label>
             <input type="text" value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@…" className={inputCls} />
           </div>
         </div>
@@ -412,11 +413,11 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
       </div>
 
       {/* Live storyteller preview */}
-      <div className="lg:sticky lg:top-6">
-        <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/70 mb-4 flex items-center gap-2"><Eye size={14} /> {t.profilePreview}</p>
+      <div className="lg:sticky lg:top-6 claro:vidrio claro:overflow-hidden claro:p-[26px]">
+        <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-4 flex items-center gap-2"><Eye size={14} /> {t.profilePreview}</p>
         <StorytellerPreview />
         {place && (
-          <p className="font-serif text-[11px] text-white/35 mt-3 flex items-center gap-1.5"><MapPin size={12} /> {place}</p>
+          <p className="font-serif text-[11px] text-text-muted mt-3 flex items-center gap-1.5"><MapPin size={12} /> {place}</p>
         )}
       </div>
       </div>

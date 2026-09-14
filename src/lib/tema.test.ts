@@ -45,10 +45,17 @@ describe("el papel antes de pintar", () => {
   });
 
   it("solo aplica en las pantallas que ya están listas", () => {
-    expect(papel({ ruta: "/dashboard/business", guardado: "claro" })).toBeNull();
     expect(papel({ ruta: "/auth/sign-in", guardado: "claro" })).toBeNull();
+    expect(papel({ ruta: "/dashboard/recruiter", guardado: "claro" })).toBeNull();
     expect(papel({ ruta: "/dashboard/storytellers", guardado: "claro" })).toBeNull();
     expect(papel({ ruta: "/dashboard/storyteller/maison/abc/reserver", guardado: "claro" })).toBe("light");
+    expect(papel({ ruta: "/dashboard/business", guardado: "claro" })).toBe("light");
+    expect(papel({ ruta: "/dashboard/business/reglages", guardado: "claro" })).toBe("light");
+  });
+
+  it("el QR de la maison se queda siempre sobre la carte de visite", () => {
+    expect(papel({ ruta: "/dashboard/business/qr", guardado: "claro" })).toBeNull();
+    expect(papel({ ruta: "/dashboard/business/qr/carton", guardado: "claro" })).toBeNull();
   });
 
   it("en la app de iOS, solo si la versión sabe pintar su franja", () => {

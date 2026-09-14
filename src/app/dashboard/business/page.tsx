@@ -205,11 +205,13 @@ function MaisonDashboard() {
             el estado del abono y la cifra del mes son mejores titulares que
             cualquier rótulo que pudiéramos ponerles encima. */}
         {tab !== "billing" && tab !== "visitors" && tab !== "demandes" && (
-          <>
+          // En claro el titular va sobre vidrio y toma accent: lo que es del
+          // miembro.
+          <div className="claro:vidrio claro:mb-seccion claro:p-[26px]">
             <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">
               {tab === "profile" ? t.tabProfile : t.kicker}
             </p>
-            <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+            <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px] claro:text-accent claro:last:mb-0">
               {tab === "profile"
                 ? maisonName || t.tabProfile
                 : tab === "directory"
@@ -217,11 +219,11 @@ function MaisonDashboard() {
                 : t.title}
             </h1>
             {tab !== "profile" && (
-              <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">
+              <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary claro:mb-0">
                 {tab === "directory" ? t.directorySubtitle : t.subtitle}
               </p>
             )}
-          </>
+          </div>
         )}
 
         {tab === "demandes" ? (
@@ -231,14 +233,14 @@ function MaisonDashboard() {
         ) : tab === "roster" ? (
           <>
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px overflow-hidden rounded-2xl bg-border">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-charcoal-deep h-28 animate-pulse" />
+                <div key={i} className="bg-surface h-28 animate-pulse" />
               ))}
             </div>
           ) : roster.length === 0 ? (
             <div className="caja-cristal text-center py-24">
-              <p className="font-serif text-[15px] font-light text-white/55">{t.empty}</p>
+              <p className="font-serif text-[15px] font-light text-text-secondary">{t.empty}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-rango md:grid-cols-2">
@@ -246,7 +248,7 @@ function MaisonDashboard() {
                 <div
                   key={c.id}
                   onClick={() => openTeller(c)}
-                  className="cursor-pointer"
+                  className="cursor-pointer claro:vidrio claro:p-[26px]"
                 >
                   <div className="flex flex-col gap-fila sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex min-w-0 items-start gap-fila">
@@ -314,7 +316,7 @@ function MaisonDashboard() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="block aspect-square overflow-hidden rounded-xl bg-charcoal-mid"
+                          className="block aspect-square overflow-hidden rounded-xl bg-surface-raised"
                         >
                           {p.thumbnail && (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -332,8 +334,8 @@ function MaisonDashboard() {
         ) : tab === "profile" ? (
           <div className="space-y-16">
             <MaisonProfile t={t} lang={lang} />
-            <div className="pt-4 border-t border-white/10">
-              <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-8">{t.tabOffer}</p>
+            <div className="pt-4 border-t border-border">
+              <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-accent mb-8">{t.tabOffer}</p>
               <MaisonOffer t={t} lang={lang} />
             </div>
           </div>
@@ -347,12 +349,12 @@ function MaisonDashboard() {
           directoryLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-2xl bg-charcoal-deep/60 border border-white/8 h-72 animate-pulse" />
+                <div key={i} className="rounded-2xl bg-surface-raised border border-border h-72 animate-pulse" />
               ))}
             </div>
           ) : directory.length === 0 ? (
             <div className="caja-cristal text-center py-24">
-              <p className="font-serif text-[15px] font-light text-white/55">{t.directoryEmpty}</p>
+              <p className="font-serif text-[15px] font-light text-text-secondary">{t.directoryEmpty}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -360,9 +362,9 @@ function MaisonDashboard() {
                 m.comingSoon ? (
                   <div
                     key={m.id}
-                    className="relative rounded-2xl border border-white/10 bg-charcoal-deep/60 overflow-hidden select-none"
+                    className="relative rounded-2xl border border-border bg-surface-raised overflow-hidden select-none claro:border-transparent claro:vidrio"
                   >
-                    <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
+                    <div className="aspect-[4/3] bg-surface-raised overflow-hidden">
                       {m.photos[0] ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={m.photos[0]} alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-60" />
@@ -377,25 +379,25 @@ function MaisonDashboard() {
                       </div>
                     </div>
                     <div className="p-5">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/50 mb-1">{placeOf(m)}</p>
-                      <div className="h-[1.1em] w-2/3 bg-white/10 rounded-sm" />
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-accent mb-1">{placeOf(m)}</p>
+                      <div className="h-[1.1em] w-2/3 bg-border rounded-sm" />
                     </div>
                   </div>
                 ) : (
                   <button
                     key={m.id}
                     onClick={() => setSelected(m)}
-                    className="text-left group rounded-2xl border border-white/10 bg-charcoal-deep/60 overflow-hidden hover:border-champagne/30 transition-colors"
+                    className="text-left group rounded-2xl border border-border bg-surface-raised overflow-hidden hover:border-accent transition-colors claro:border-transparent claro:vidrio"
                   >
-                    <div className="aspect-[4/3] bg-charcoal-mid overflow-hidden">
+                    <div className="aspect-[4/3] bg-surface-raised overflow-hidden">
                       {m.photos[0] && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={m.photos[0]} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                       )}
                     </div>
                     <div className="p-5">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/60 mb-1">{placeOf(m)}</p>
-                      <h3 className="font-serif text-[18px] font-light text-white">{m.name}</h3>
+                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-accent mb-1">{placeOf(m)}</p>
+                      <h3 className="font-serif text-[18px] font-light text-text-primary">{m.name}</h3>
                     </div>
                   </button>
                 )
@@ -405,35 +407,35 @@ function MaisonDashboard() {
         ) : visitorsLoading ? (
           <div className="space-y-8">
             {[1, 2].map((i) => (
-              <div key={i} className="h-64 rounded-2xl border border-white/8 bg-white/5 animate-pulse" />
+              <div key={i} className="h-64 rounded-2xl border border-border bg-surface-raised animate-pulse" />
             ))}
           </div>
         ) : visitors.length === 0 ? (
           <div className="caja-cristal text-center py-24">
-            <p className="font-serif text-[15px] font-light text-white/55">{t.visitorsEmpty}</p>
+            <p className="font-serif text-[15px] font-light text-text-secondary">{t.visitorsEmpty}</p>
           </div>
         ) : (
           <div className="space-y-12 max-w-[920px] mx-auto">
             {visitors.map((v) => (
-              <div key={v.id}>
+              <div key={v.id} className="claro:vidrio claro:p-[26px]">
                 <div className="grid grid-cols-2 gap-1.5">
                   {v.photos.map((url, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-xl bg-charcoal-mid">
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-xl bg-surface-raised">
                       <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
                   ))}
                 </div>
                 <div className="mt-4">
-                  <h3 className="font-serif text-[18px] font-light text-white">
+                  <h3 className="font-serif text-[18px] font-light text-text-primary">
                     {v.creator}
-                    {v.handle && <span className="text-white/45 text-[14px]"> · @{v.handle}</span>}
+                    {v.handle && <span className="text-text-secondary text-[14px]"> · @{v.handle}</span>}
                   </h3>
-                  <p className="font-serif text-[13px] text-white/60 mt-1">
+                  <p className="font-serif text-[13px] text-text-secondary mt-1">
                     {t.visitedOn.replace("{date}", fmtDate(v.visitDate))}
                   </p>
                   {v.rightsExpiresAt && (
-                    <p className="font-serif text-[12px] font-light text-white/45 mt-1 italic">
+                    <p className="font-serif text-[12px] font-light text-text-secondary mt-1 italic">
                       {t.visitorsRights.replace("{date}", fmtDate(v.rightsExpiresAt))}
                     </p>
                   )}
@@ -450,7 +452,7 @@ function MaisonDashboard() {
           className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 backdrop-blur-sm p-4 sm:p-8"
           onClick={() => setSelected(null)}
         >
-          <div className="relative w-full max-w-[680px] overflow-hidden rounded-2xl bg-charcoal-deep border border-white/10 my-4" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-[680px] overflow-hidden rounded-2xl bg-surface border border-border my-4" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setSelected(null)}
               aria-label="Fermer"
@@ -458,7 +460,7 @@ function MaisonDashboard() {
             >
               <X size={18} />
             </button>
-            <div className="relative aspect-[16/9] bg-charcoal-mid">
+            <div className="relative aspect-[16/9] bg-surface-raised">
               {selected.photos[0] && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={selected.photos[0]} alt="" className="w-full h-full object-cover" />
@@ -471,33 +473,33 @@ function MaisonDashboard() {
             </div>
             <div className="p-6 space-y-6">
               {descOf(selected) && (
-                <p className="font-serif text-[15px] font-light text-white/70 leading-relaxed">{descOf(selected)}</p>
+                <p className="font-serif text-[15px] font-light text-text-secondary leading-relaxed">{descOf(selected)}</p>
               )}
               {selected.photos.length > 1 && (
                 <div className="grid grid-cols-3 gap-1.5">
                   {selected.photos.slice(1).map((url, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-xl bg-charcoal-mid">
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-xl bg-surface-raised">
                       <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
                   ))}
                 </div>
               )}
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2 border-t border-white/8">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-2 border-t border-border">
                 {selected.website && (
-                  <a href={selected.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
+                  <a href={selected.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                     <GlobeSimple size={15} />
                     <span className="font-serif text-[13px]">{selected.website.replace(/^https?:\/\//, "")}</span>
                   </a>
                 )}
                 {selected.instagram.replace(/^@/, "").trim() && (
-                  <a href={`https://instagram.com/${selected.instagram.replace(/^@/, "").trim()}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-champagne transition-colors">
+                  <a href={`https://instagram.com/${selected.instagram.replace(/^@/, "").trim()}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                     <InstagramLogo size={15} />
                     <span className="font-serif text-[13px]">@{selected.instagram.replace(/^@/, "").trim()}</span>
                   </a>
                 )}
                 {selected.address && (
-                  <span className="inline-flex items-center gap-2 text-white/45 font-serif text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-text-secondary font-serif text-[13px]">
                     <MapPin size={14} /> {selected.address}
                   </span>
                 )}
