@@ -344,11 +344,9 @@ export default function MesVisites() {
 
       <PullToRefresh onRefresh={load}>
       <div className="mx-auto max-w-[920px] px-pagina py-seccion">
-        {/* En claro cada bloque va sobre vidrio, y el titular toma copper:
-            en Mes visites hay algo con plazo. */}
-        <Rise className="claro:vidrio claro:mb-seccion claro:p-[26px]">
+        <Rise>
           <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
-          <h1 className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-text-primary md:text-[32px] claro:mb-0 claro:text-copper-vif">
+          <h1 className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
             {t.title}
           </h1>
         </Rise>
@@ -360,7 +358,7 @@ export default function MesVisites() {
             ))}
           </div>
         ) : visits.length === 0 ? (
-          <div className="py-respiro text-center claro:vidrio claro:px-[26px]">
+          <div className="py-respiro text-center">
             <p className="text-corps text-text-secondary">{t.empty}</p>
           </div>
         ) : (
@@ -373,7 +371,7 @@ export default function MesVisites() {
               const delGrupo = visits.filter((v) => groupOf(v) === grupo);
               if (delGrupo.length === 0) return null;
               return (
-                <Section key={grupo} title={titulo} className="claro:vidrio claro:p-[26px]">
+                <Section key={grupo} title={titulo}>
                   <div className="space-y-seccion">
                     {delGrupo.map((v, i) => (
                       <Rise key={v.id} index={i}>

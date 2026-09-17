@@ -61,21 +61,13 @@ export default function DashboardNav({
           {/* Home for a member is their own space, not the page that explains
               what Curato is. In the app that page should never appear at all. */}
           <Link href="/dashboard" className="shrink-0">
-            {/* El logotipo en tinta en claro: el claro original no se ve
-                sobre crema. */}
+            {/* El logotipo en tinta (logo-curato-ink.png) vuelve con la piel
+                nueva, cuando el modo claro se rehaga. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo-curato-simple.png"
               alt="curato"
-              className="block claro:hidden"
-              style={{ height: "12px", width: "auto" }}
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo-curato-ink.png"
-              alt="curato"
-              className="hidden claro:block"
-              style={{ height: "12px", width: "auto" }}
+              style={{ height: "12px", width: "auto", display: "block" }}
             />
           </Link>
 

@@ -234,7 +234,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             )}
 
             {previewDesc && (
-              <p className="font-serif text-[17px] font-light text-text-primary leading-relaxed max-w-[720px] mb-10 claro:vidrio claro:p-[26px]">
+              <p className="font-serif text-[17px] font-light text-text-primary leading-relaxed max-w-[720px] mb-10">
                 {previewDesc}
               </p>
             )}
@@ -264,7 +264,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
     <div className="max-w-[1100px] mx-auto">
       {/* Let's get started — guided checklist while the profile is incomplete */}
       {(!photosOk || !descOk) && (
-        <div className="mb-seccion claro:vidrio claro:p-[26px]">
+        <div className="mb-seccion">
           <p className="text-capitale uppercase tracking-capitale text-accent">{t.gsEyebrow}</p>
           <h2 className="mt-bloque text-titre tracking-titre text-text-primary">{t.gsTitle}</h2>
           <p className="mt-fila mb-rango max-w-[46ch] text-corps text-text-secondary">{t.gsSubtitle}</p>
@@ -287,9 +287,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
 
       <div className="grid lg:grid-cols-[1fr_360px] gap-12 items-start">
       <div className="space-y-12">
-        {/* Photos. En claro, cada bloque del formulario va sobre vidrio: la
-            acuarela solo toca aire y fotografías. */}
-        <div className="claro:vidrio claro:p-[26px]">
+        <div>
           <div className="flex items-baseline justify-between mb-1.5">
             <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent">{t.profilePhotos}</p>
             <span className={`font-serif text-[12px] ${photosOk ? "text-accent" : "text-copper-vif"}`}>
@@ -347,7 +345,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         </div>
 
         {/* Description */}
-        <div className="claro:vidrio claro:p-[26px]">
+        <div>
           <div className="flex items-baseline justify-between mb-3">
             <label className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent">{t.profileDescription}</label>
             <span className={`font-serif text-[12px] ${descLang === "fr" ? (descOk ? "text-accent" : "text-copper-vif") : "text-text-secondary"}`}>
@@ -387,7 +385,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         </div>
 
         {/* Links */}
-        <div className="grid sm:grid-cols-2 gap-4 claro:vidrio claro:p-[26px]">
+        <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-3">{t.profileWebsite}</label>
             <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className={inputCls} />
@@ -413,7 +411,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
       </div>
 
       {/* Live storyteller preview */}
-      <div className="lg:sticky lg:top-6 claro:vidrio claro:overflow-hidden claro:p-[26px]">
+      <div className="lg:sticky lg:top-6">
         <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-4 flex items-center gap-2"><Eye size={14} /> {t.profilePreview}</p>
         <StorytellerPreview />
         {place && (

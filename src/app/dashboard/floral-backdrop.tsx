@@ -24,9 +24,8 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "fr
  * and text sitting over it was unreadable at 0.65. Legibility wins over seeing
  * more of the photograph.
  *
- * La imagen y el velo vienen de .fondo-flor y .fondo-flor-velo (globals.css):
- * la flor en oscuro, la acuarela en claro. El velo que se pasa aquí es el del
- * oscuro; el claro lleva el suyo, fijo.
+ * La imagen y el velo vienen de .fondo-flor y .fondo-flor-velo (globals.css),
+ * así que ninguna pantalla escribe la ruta ni el color.
  */
 export default function FloralBackdrop({
   opacity = 0.8,

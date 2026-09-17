@@ -176,16 +176,13 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
             <div className="grid md:grid-cols-3 gap-10">
               {/* Left: info */}
-              {/* En claro, lo que se lee va sobre vidrio: la acuarela solo toca
-                  aire y fotografías. El nombre de una casa toma brume, el rol
-                  de lo que es un lugar. */}
-              <div className="md:col-span-2 claro:vidrio claro:p-[26px]">
+              <div className="md:col-span-2">
                 {cat && (
                   <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-accent">
                     {catLabelText}
                   </span>
                 )}
-                <h1 className="font-serif text-[34px] font-light text-text-primary leading-tight mt-2 mb-1 claro:text-brume">
+                <h1 className="font-serif text-[34px] font-light text-text-primary leading-tight mt-2 mb-1">
                   {maison.name}
                 </h1>
                 {maison.arrondissement && (
@@ -218,7 +215,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
               {/* Right: actions */}
               <div className="md:col-span-1">
-                <div className="sticky top-20 space-y-fila claro:vidrio claro:p-[26px]">
+                <div className="sticky top-20 space-y-fila">
                   {maison.address && (
                     <Row
                       label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.location}</span>}
