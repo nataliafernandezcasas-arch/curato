@@ -57,8 +57,7 @@ export default function MaisonBilling() {
   ];
 
   return (
-    // En claro, sobre vidrio: la acuarela solo toca aire y fotografías.
-    <div className="claro:vidrio claro:p-[26px]">
+    <div>
       <p className="text-capitale uppercase tracking-capitale text-accent">Facturation &amp; abonnement</p>
 
       {/* El estado estaba escondido en una fila dentro de un recuadro. Es lo

@@ -205,13 +205,11 @@ function MaisonDashboard() {
             el estado del abono y la cifra del mes son mejores titulares que
             cualquier rótulo que pudiéramos ponerles encima. */}
         {tab !== "billing" && tab !== "visitors" && tab !== "demandes" && (
-          // En claro el titular va sobre vidrio y toma accent: lo que es del
-          // miembro.
-          <div className="claro:vidrio claro:mb-seccion claro:p-[26px]">
+          <div>
             <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">
               {tab === "profile" ? t.tabProfile : t.kicker}
             </p>
-            <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px] claro:text-accent claro:last:mb-0">
+            <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
               {tab === "profile"
                 ? maisonName || t.tabProfile
                 : tab === "directory"
@@ -219,7 +217,7 @@ function MaisonDashboard() {
                 : t.title}
             </h1>
             {tab !== "profile" && (
-              <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary claro:mb-0">
+              <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">
                 {tab === "directory" ? t.directorySubtitle : t.subtitle}
               </p>
             )}
@@ -248,7 +246,7 @@ function MaisonDashboard() {
                 <div
                   key={c.id}
                   onClick={() => openTeller(c)}
-                  className="cursor-pointer claro:vidrio claro:p-[26px]"
+                  className="cursor-pointer"
                 >
                   <div className="flex flex-col gap-fila sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex min-w-0 items-start gap-fila">
@@ -362,7 +360,7 @@ function MaisonDashboard() {
                 m.comingSoon ? (
                   <div
                     key={m.id}
-                    className="relative rounded-2xl border border-border bg-surface-raised overflow-hidden select-none claro:border-transparent claro:vidrio"
+                    className="relative rounded-2xl border border-border bg-surface-raised overflow-hidden select-none"
                   >
                     <div className="aspect-[4/3] bg-surface-raised overflow-hidden">
                       {m.photos[0] ? (
@@ -387,7 +385,7 @@ function MaisonDashboard() {
                   <button
                     key={m.id}
                     onClick={() => setSelected(m)}
-                    className="text-left group rounded-2xl border border-border bg-surface-raised overflow-hidden hover:border-accent transition-colors claro:border-transparent claro:vidrio"
+                    className="text-left group rounded-2xl border border-border bg-surface-raised overflow-hidden hover:border-accent transition-colors"
                   >
                     <div className="aspect-[4/3] bg-surface-raised overflow-hidden">
                       {m.photos[0] && (
@@ -417,7 +415,7 @@ function MaisonDashboard() {
         ) : (
           <div className="space-y-12 max-w-[920px] mx-auto">
             {visitors.map((v) => (
-              <div key={v.id} className="claro:vidrio claro:p-[26px]">
+              <div key={v.id}>
                 <div className="grid grid-cols-2 gap-1.5">
                   {v.photos.map((url, i) => (
                     // eslint-disable-next-line @next/next/no-img-element

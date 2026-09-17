@@ -211,16 +211,13 @@ export default function InfluencerDashboard() {
             <div className={`h-8 w-64 ${skeleton}`} />
           </div>
         ) : (
-          // En claro, lo que se lee va sobre vidrio: la acuarela solo toca
-          // aire y fotografías. El titular toma el color del rol de la
-          // pantalla: en el carnet, lo que es del miembro.
-          <div className="mb-seccion claro:vidrio claro:p-[26px]">
+          <div className="mb-seccion">
             <Rise>
               <p className="text-capitale uppercase tracking-capitale text-accent">{t.greeting}</p>
             </Rise>
 
             <Rise index={1}>
-              <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px] claro:text-accent">
+              <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
                 {profile?.full_name || profile?.handle || t.defaultName}
               </h1>
             </Rise>
@@ -271,7 +268,7 @@ export default function InfluencerDashboard() {
         {!profileLoading && profile && <ConnectInstagram connected={!!profile.instagram_connected} />}
 
         {gated ? (
-          <div className="py-respiro text-center claro:vidrio claro:px-[26px]">
+          <div className="py-respiro text-center">
             <p className="text-capitale uppercase tracking-capitale text-accent">{t.comingSoonKicker}</p>
             <h2 className="mt-fila text-titre tracking-titre text-text-primary">{t.comingSoonTitle}</h2>
             <p className="mx-auto mt-fila max-w-[46ch] text-corps text-text-secondary">
@@ -287,7 +284,7 @@ export default function InfluencerDashboard() {
           <>
             {/* Las categorías envuelven a dos líneas. La activa se marca en
                 champagne: sin fondo, sin subrayado y sin recuadro. */}
-            <div className="mb-rango claro:vidrio claro:p-[26px]">
+            <div className="mb-rango">
               <Tabs
                 tabs={FILTERS.map((f) => ({
                   label: t[f.key],
@@ -309,7 +306,7 @@ export default function InfluencerDashboard() {
                   ))}
                 </div>
               ) : filteredMaisons.length === 0 ? (
-                <div className="py-respiro text-center claro:vidrio claro:px-[26px]">
+                <div className="py-respiro text-center">
                   <p className="text-corps text-text-secondary">{t.emptyTitle}</p>
                   <p className="mt-bloque text-legende text-text-muted">{t.emptySubtitle}</p>
                   <div className="mx-auto mt-seccion max-w-[460px]">
@@ -322,11 +319,9 @@ export default function InfluencerDashboard() {
                     const label = catLabel(slugOf(maison));
                     return (
                       <Rise key={maison.id} index={i}>
-                        {/* En claro cada casa es un panel de vidrio que recorta
-                            su foto: una cosa que se toca entera. */}
                         <Link
                           href={`/dashboard/storyteller/maison/${maison.id}`}
-                          className="group block claro:vidrio claro:overflow-hidden"
+                          className="group block"
                         >
                           {maison.photos?.[0] ? (
                             <Photo
@@ -340,17 +335,17 @@ export default function InfluencerDashboard() {
                             </div>
                           )}
 
-                          <div className="mt-fila claro:mt-0 claro:px-[26px] claro:pb-[26px] claro:pt-6">
+                          <div className="mt-fila">
                             <Row
                               name
                               label={
-                                <h3 className="text-sous-titre text-text-primary transition-colors group-hover:text-accent claro:text-brume">
+                                <h3 className="text-sous-titre text-text-primary transition-colors group-hover:text-accent">
                                   {maison.name}
                                 </h3>
                               }
                               value={
                                 maison.arrondissement ? (
-                                  <span className="text-capitale uppercase tracking-capitale text-brume claro:text-text-secondary">
+                                  <span className="text-capitale uppercase tracking-capitale text-brume">
                                     Paris {maison.arrondissement}
                                   </span>
                                 ) : undefined

@@ -25,15 +25,19 @@ const CLAVE = "curato-tema";
 const EVENTO = "curato-tema";
 
 /**
- * Las pantallas que ya están listas para el papel claro: todo el storyteller y
- * toda la maison menos el QR, que se queda siempre sobre la carte de visite
- * (un objeto de marca que se enseña a un desconocido no cambia con un ajuste
- * del móvil).
+ * Las pantallas listas para el papel claro. **Hoy, ninguna.**
+ *
+ * El modo claro de la entrega 5 (paneles de vidrio al 15 % sobre una acuarela)
+ * queda retirado: la entrega 7 lo rehace sobre flor-claire.jpg con nácar, y
+ * aquí se retira antes de montarlo, que es el orden que pide el diseño. La
+ * fontanería se queda entera y dormida: el script del layout, la sincronía con
+ * la cáscara nativa y el mensaje curatoTema de iOS. Cuando la piel nueva esté,
+ * esto vuelve a ser una lista de rutas y el claro se enciende solo.
  */
-export const RUTAS_CLARAS = /^\/dashboard\/(storyteller|business(?!\/qr))(\/|$)/;
+export const RUTAS_CLARAS = /(?!)/;
 
 /** El papel sin foto: themeColor, la franja nativa y los rebotes del scroll. */
-const PAPEL = { claro: "#EDEAE1", oscuro: "#1E1E1E" } as const;
+const PAPEL = { claro: "#F2EDE4", oscuro: "#14100E" } as const;
 
 type ConMensajes = Window & {
   webkit?: { messageHandlers?: { curatoTema?: { postMessage: (color: string) => void } } };

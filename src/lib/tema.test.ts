@@ -34,32 +34,31 @@ function papel({
 }
 
 describe("el papel antes de pintar", () => {
-  it("sigue al teléfono cuando la persona no ha elegido", () => {
-    expect(papel({ ruta: "/dashboard/storyteller", telefonoClaro: true })).toBe("light");
-    expect(papel({ ruta: "/dashboard/storyteller", telefonoClaro: false })).toBeNull();
+  // El modo claro de la entrega 5 queda retirado y el de la entrega 7 todavía
+  // no existe, así que RUTAS_CLARAS no casa con nada y el script no debe poner
+  // el atributo en ninguna pantalla, elija lo que elija la persona. Cuando la
+  // piel nueva llegue, estos casos vuelven a esperar "light" en su lista.
+  const rutas = [
+    "/dashboard/storyteller",
+    "/dashboard/storyteller/visits",
+    "/dashboard/storyteller/maison/abc/reserver",
+    "/dashboard/business",
+    "/dashboard/business/reglages",
+    "/dashboard/business/qr",
+    "/dashboard/recruiter",
+    "/auth/sign-in",
+  ];
+
+  it("hoy no enciende el claro en ninguna pantalla", () => {
+    for (const ruta of rutas) {
+      expect(papel({ ruta, guardado: "claro", telefonoClaro: true })).toBeNull();
+      expect(papel({ ruta, telefonoClaro: true })).toBeNull();
+      expect(papel({ ruta, guardado: "oscuro" })).toBeNull();
+    }
   });
 
-  it("lo elegido en Réglages manda sobre el teléfono", () => {
-    expect(papel({ ruta: "/dashboard/storyteller/visits", guardado: "claro", telefonoClaro: false })).toBe("light");
-    expect(papel({ ruta: "/dashboard/storyteller/visits", guardado: "oscuro", telefonoClaro: true })).toBeNull();
-  });
-
-  it("solo aplica en las pantallas que ya están listas", () => {
-    expect(papel({ ruta: "/auth/sign-in", guardado: "claro" })).toBeNull();
-    expect(papel({ ruta: "/dashboard/recruiter", guardado: "claro" })).toBeNull();
-    expect(papel({ ruta: "/dashboard/storytellers", guardado: "claro" })).toBeNull();
-    expect(papel({ ruta: "/dashboard/storyteller/maison/abc/reserver", guardado: "claro" })).toBe("light");
-    expect(papel({ ruta: "/dashboard/business", guardado: "claro" })).toBe("light");
-    expect(papel({ ruta: "/dashboard/business/reglages", guardado: "claro" })).toBe("light");
-  });
-
-  it("el QR de la maison se queda siempre sobre la carte de visite", () => {
-    expect(papel({ ruta: "/dashboard/business/qr", guardado: "claro" })).toBeNull();
-    expect(papel({ ruta: "/dashboard/business/qr/carton", guardado: "claro" })).toBeNull();
-  });
-
-  it("en la app de iOS, solo si la versión sabe pintar su franja", () => {
+  it("la fontanería sigue entera: ni el teléfono ni la app de iOS lo encienden", () => {
     expect(papel({ ruta: "/dashboard/storyteller", guardado: "claro", ios: true })).toBeNull();
-    expect(papel({ ruta: "/dashboard/storyteller", guardado: "claro", ios: true, mensajeNativo: true })).toBe("light");
+    expect(papel({ ruta: "/dashboard/storyteller", guardado: "claro", ios: true, mensajeNativo: true })).toBeNull();
   });
 });

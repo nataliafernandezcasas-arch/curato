@@ -123,7 +123,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   return (
     <div className="max-w-[820px] mx-auto space-y-14 pb-8">
       {/* Availability */}
-      <section className="claro:vidrio claro:p-[26px]">
+      <section>
         <p className={`${labelCls} mb-1`}>{t.offerAvailability}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerAvailabilityHint}</p>
         <div className="space-y-2">
@@ -163,7 +163,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Blocked dates */}
-      <section className="claro:vidrio claro:p-[26px]">
+      <section>
         <p className={`${labelCls} mb-1`}>{t.offerBlocked}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerBlockedHint}</p>
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -190,7 +190,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Services */}
-      <section className="claro:vidrio claro:p-[26px]">
+      <section>
         <div className="flex items-baseline justify-between mb-1">
           <p className={labelCls}>{t.offerServices}</p>
           <button onClick={addService} className="inline-flex items-center gap-1.5 text-accent hover:text-text-primary font-serif text-[12px] tracking-wider uppercase transition-colors">
@@ -213,7 +213,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Menu / brochure */}
-      <section className="claro:vidrio claro:p-[26px]">
+      <section>
         <p className={`${labelCls} mb-1`}>{t.offerMenu}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerMenuHint}</p>
         <div className="flex flex-wrap gap-3 items-center">
