@@ -1,4 +1,5 @@
 import { Body, Head, Html, Img, Preview } from "@react-email/components";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * La cáscara de todos los correos de Curato (entrega 4, 10 sexies).
@@ -19,7 +20,7 @@ import { Body, Head, Html, Img, Preview } from "@react-email/components";
  *   · Ninguna capital depende del interletrado: Outlook lo ignora.
  */
 
-export const SITE = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
+export const SITE = SITE_URL;
 const ASSET = "https://www.curatocollective.com";
 // La foto oscurecida de fondo. El diseño lo dejaba liso, y Natalia lo vio
 // plano (2026-09-11): vuelve la fotografía detrás, como antes. Outlook ignora

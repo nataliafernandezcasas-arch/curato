@@ -9,7 +9,6 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>applinks:www.curatocollective.com</string>
-		<string>applinks:curatocollective.com</string>
 	</array>
 	<!-- Notificaciones. "production" es el entorno de APNs que usan TestFlight y
 	     la App Store; el emisor del servidor habla con api.push.apple.com. -->

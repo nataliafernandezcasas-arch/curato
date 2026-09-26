@@ -3,8 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { nuevoCodigo } from "@/lib/check-in";
 import { filtroDeUsuario } from "@/lib/identidad";
-
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
+import { SITE_URL } from "@/lib/site";
 
 // Una visita registrada hace menos de esto se enseña en la pantalla del QR:
 // quien la tiene abierta en sala ve que el escaneo ha funcionado.

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.curatocollective.com";
+import { SITE_URL } from "@/lib/site";
 
 export async function POST(request: NextRequest) {
   try {

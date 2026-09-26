@@ -3,8 +3,7 @@ import { isAdmin } from "@/lib/admin/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { googleCalendarUrl, buildIcs } from "@/lib/calendar";
 import { sendReservationConfirmed, sendReservationAlternatives } from "@/lib/emails";
-
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
+import { SITE_URL } from "@/lib/site";
 
 // Format a Paris-local instant for display.
 function whenLabel(d: Date): string {
