@@ -9,6 +9,9 @@ async function getMaison(admin: ReturnType<typeof createAdminClient>, userId: st
     .from("comercios")
     .select("id, availability, blocked_slots, services, menu_urls")
     .or(`owner_id.eq.${userId},email.eq.${email.toLowerCase()}`)
+    .eq("stage", "activo")
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
   return data;
 }

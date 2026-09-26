@@ -17,6 +17,9 @@ export async function GET() {
       .from("comercios")
       .select("id")
       .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .eq("stage", "activo")
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     if (!self) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 
@@ -82,7 +85,9 @@ export async function GET() {
       }
 
       // Regular directory entry: signed maison with a started profile.
-      if (m.is_reservable && ((m.photos?.length ?? 0) > 0 || (m.description || "").trim().length > 0)) {
+      // Ficha terminada, los mismos dos requisitos que el carnet del
+      // storyteller: cinco fotografías y doscientos caracteres.
+      if (m.is_reservable && (m.photos?.length ?? 0) >= 5 && (m.description || "").trim().length >= 200) {
         real.push({
           id: m.id,
           comingSoon: false,

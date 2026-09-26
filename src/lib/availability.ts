@@ -46,8 +46,11 @@ export function parisToIso(ymd: string, hm: string): string {
 // Is this instant an open booking time for the maison? A maison with no
 // configured availability is unconstrained (keeps old free-time booking working).
 export function isOpenSlot(iso: string, availability: AvailWindow[], blocked: BlockedDate[]): boolean {
-  if (!availability || availability.length === 0) return true;
   const { ymd, hm, dow } = parisParts(iso);
+  // Una fecha cerrada lo está siempre. Antes esta comprobación iba después de
+  // la salida por "sin agenda", así que una casa sin franjas semanales
+  // aceptaba justo los días que había cerrado.
   if (blocked?.some((b) => b.date === ymd)) return false;
+  if (!availability || availability.length === 0) return true;
   return availability.some((w) => w.day === dow && w.start <= hm && hm < w.end);
 }

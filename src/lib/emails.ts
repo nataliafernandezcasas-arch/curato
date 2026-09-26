@@ -20,7 +20,7 @@ import {
   visiteConfirmeeTexto,
 } from "@/emails/visitas";
 import { CandidatureAcceptee, CandidatureRecue, Lancement, MotDePasse } from "@/emails/cuenta";
-import { EngagementSigne, NouvelleMaison } from "@/emails/maison";
+import { EngagementSigne, NouvelleMaison, DemandeRecue } from "@/emails/maison";
 import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
 import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
 import { SITE } from "@/emails/shell";
@@ -48,6 +48,15 @@ async function sendEmail(
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+  // Antes esto devolvía el cuerpo sin mirar el estado, así que una clave
+  // caducada, un límite alcanzado o una dirección rechazada pasaban por envío
+  // correcto: todos los try/catch que envuelven un envío eran papel mojado y
+  // no había forma de saber qué correos no llegaban.
+  if (!res.ok) {
+    const detalle = await res.text().catch(() => "");
+    console.error(`Resend rechazó el envío a ${to} (${res.status}):`, detalle.slice(0, 300));
+    throw new Error(`Resend ${res.status}`);
+  }
   return res.json();
 }
 
@@ -83,6 +92,23 @@ export async function sendReservationRequested(opts: {
 }) {
   const { to, ...p } = opts;
   return sendEmail(to, `Demande envoyée à ${p.maisonName}`, createElement(DemandeEnvoyee, p));
+}
+
+/**
+ * A la casa: alguien quiere venir. El asunto lleva el nombre y el momento, así
+ * que se lee en la notificación sin abrir el correo.
+ */
+export async function sendMaisonNewRequest(opts: {
+  to: string;
+  creatorName: string;
+  creatorHandle: string | null;
+  maisonName: string;
+  whenLabel: string;
+  partySize: number;
+  note: string | null;
+}) {
+  const { to, ...p } = opts;
+  return sendEmail(to, `${p.creatorName} souhaite venir ${p.whenLabel}`, createElement(DemandeRecue, p));
 }
 
 export async function sendReservationAdminAlert(opts: {

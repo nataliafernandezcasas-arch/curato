@@ -1,4 +1,4 @@
-import { Capital, COLOR, Corps, Filas, FONT, Nota, Shell, Titre } from "./shell";
+import { Capital, COLOR, Corps, Enlace, Filas, FONT, Nota, SITE, Shell, Titre } from "./shell";
 
 // ── Engagement signé (maison) ──────────────────────────────────────────────
 // Lleva el acuerdo firmado en PDF y repite las condiciones en el cuerpo, como
@@ -63,6 +63,41 @@ export function NouvelleMaison(p: { maisonName: string; signatory: string; whenL
           ["Date", p.whenLabel],
         ]}
       />
+    </Shell>
+  );
+}
+
+// ── Demande reçue (maison) ─────────────────────────────────────────────────
+// La casa no recibía nada cuando alguien le pedía una visita: se enteraba solo
+// si abría la app, y el plazo de respuesta corría igual. El asunto dice quién
+// quiere venir y cuándo, para que se entienda sin abrir.
+export function DemandeRecue(p: {
+  creatorName: string;
+  creatorHandle: string | null;
+  maisonName: string;
+  whenLabel: string;
+  partySize: number;
+  note: string | null;
+}) {
+  return (
+    <Shell preview={`${p.creatorName} souhaite venir ${p.whenLabel}.`}>
+      <Capital>Nouvelle demande de visite</Capital>
+      <Titre mayusculas>{p.creatorName}</Titre>
+      <Corps>
+        {p.creatorHandle ? `@${p.creatorHandle} ` : ""}souhaite venir chez {p.maisonName}. Vous décidez, vous seule.
+      </Corps>
+      <Filas
+        filas={[
+          ["Quand", p.whenLabel],
+          ["Personnes", String(p.partySize)],
+        ]}
+      />
+      {p.note ? <Corps color={COLOR.tinta}>« {p.note} »</Corps> : null}
+      <Enlace href={`${SITE}/dashboard/business?section=demandes`}>Voir la demande</Enlace>
+      <Nota>
+        Répondez sous quarante-huit heures. Un refus compte comme une visite offerte dans votre minimum du mois, et une
+        demande laissée sans réponse compte aussi.
+      </Nota>
     </Shell>
   );
 }

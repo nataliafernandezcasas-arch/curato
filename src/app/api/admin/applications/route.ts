@@ -255,7 +255,7 @@ export async function PATCH(request: NextRequest) {
         ...(followers != null ? { followers } : {}),
       }, { onConflict: "email" });
       if (creatorErr) console.error("Creator upsert error:", creatorErr);
-    } else if (app.type === "business") {
+    } else if (app.type === "business" || app.type === "maison") {
       const { error: comercioErr } = await supabase.from("comercios").upsert({
         name: app.name,
         email: app.email,
