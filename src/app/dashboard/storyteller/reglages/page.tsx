@@ -95,7 +95,7 @@ export default function ReglagesPage() {
           </section>
         )}
 
-        <AvisosDelTelefono />
+        <AvisosDelTelefono espacio="storyteller" />
 
         <section>
           {/* Salir es un botón con su caja, no un enlace gris con un icono.
