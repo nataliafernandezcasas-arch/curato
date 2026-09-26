@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { esCodigoValido, normalizarCodigo, visitaDeHoy } from "@/lib/check-in";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 /**
  * El storyteller escanea el QR de la casa, o teclea su código, y su visita de
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     const { data: creator } = await admin
       .from("creators")
       .select("id")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();

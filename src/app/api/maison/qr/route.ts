@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { nuevoCodigo } from "@/lib/check-in";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
 
@@ -23,7 +24,7 @@ export async function GET() {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name, check_in_code")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import FloralBackdrop from "../floral-backdrop";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 // The flower sits behind the maison dashboard, matching the storyteller one,
 // darkened enough that the text and cards stay readable. FloralBackdrop owns
@@ -19,7 +20,7 @@ export default async function BusinessLayout({ children }: { children: React.Rea
   const { data: maison } = await admin
     .from("comercios")
     .select("id, commitment_accepted_at")
-    .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+    .or(filtroDeUsuario(user))
     .eq("stage", "activo")
     .order("created_at", { ascending: false })
     .limit(1)

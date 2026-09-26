@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { googleCalendarUrl, buildIcs } from "@/lib/calendar";
 import { sendReservationConfirmed, sendReservationDeclined } from "@/lib/emails";
 import { buildDossiers } from "@/lib/storyteller-dossier";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 /**
  * Las visitas que cuentan para el mínimo del mes: las terminadas y los
@@ -77,7 +78,7 @@ export async function GET() {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name, availability")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)
@@ -144,7 +145,7 @@ export async function POST(request: NextRequest) {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name, address, photos")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

@@ -16,6 +16,7 @@ import {
   signPortraits,
 } from "@/lib/creator-portrait";
 import { SUBJECT_MAX, SUBJECT_QUESTION, isSubject } from "@/lib/photo-subjects";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 /**
  * El retrato y la frase que el storyteller elige enseñar a las casas (16b).
@@ -33,7 +34,7 @@ async function elCreador() {
   if (!user) return { error: NextResponse.json({ error: "Non authentifié." }, { status: 401 }) } as const;
 
   const admin = createAdminClient();
-  const filtro = `owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`;
+  const filtro = filtroDeUsuario(user);
   // style_paths llega con la migración 036: si aún no está aplicada, se sigue
   // con las fotos de la candidatura en vez de dejar a la persona sin perfil.
   const conEstilo = await admin.from("creators").select("id, email, portrait_urls, own_bio, style_paths").or(filtro).maybeSingle();

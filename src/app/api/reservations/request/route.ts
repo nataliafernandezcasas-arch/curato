@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendReservationRequested, sendReservationAdminAlert, sendMaisonNewRequest } from "@/lib/emails";
 import { isOpenSlot } from "@/lib/availability";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 // Where new-request alerts are sent (the Curato inbox Natalia manages).
 const ADMIN_INBOX = "hello@curatocollective.com";
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
     const { data: creator } = await admin
       .from("creators")
       .select("id, full_name, handle, email")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .maybeSingle();
     if (!creator) {
       return NextResponse.json({ error: "Profil créateur introuvable." }, { status: 404 });

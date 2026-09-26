@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 const BUCKET = "content-proofs";
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
@@ -17,7 +18,7 @@ export async function GET() {
     const { data: creator } = await admin
       .from("creators")
       .select("id")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .maybeSingle();
     if (!creator) return NextResponse.json({ visits: [] });
 
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
     const { data: creator } = await admin
       .from("creators")
       .select("id")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .maybeSingle();
     if (!creator) return NextResponse.json({ error: "Profil introuvable." }, { status: 404 });
 

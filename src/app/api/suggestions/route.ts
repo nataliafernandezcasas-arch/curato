@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 // A storyteller suggests an address they'd love to see in the catalogue.
 export async function POST(request: NextRequest) {
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     const { data: creator } = await admin
       .from("creators")
       .select("id")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .maybeSingle();
 
     const { error } = await admin.from("venue_suggestions").insert({

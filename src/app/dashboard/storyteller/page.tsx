@@ -14,6 +14,7 @@ import { Rise, Photo } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Tabs } from "@/components/member/tabs";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 // A maison = a signed venue from `comercios` (is_reservable = true).
 type Maison = {
@@ -124,7 +125,7 @@ export default function InfluencerDashboard() {
       const { data: creator } = await supabase
         .from("creators")
         .select("full_name, handle, monthly_credit_cop, credit_used_cop, followers, instagram_connected")
-        .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+        .or(filtroDeUsuario(user))
         .maybeSingle();
 
       setProfile(creator);
@@ -166,7 +167,7 @@ export default function InfluencerDashboard() {
           ? await supabase
               .from("creators")
               .select("is_test")
-              .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+              .or(filtroDeUsuario(user))
               .maybeSingle()
           : null;
         const soyDePrueba = Boolean(yo && !yo.error && (yo.data as { is_test?: boolean } | null)?.is_test);

@@ -25,48 +25,30 @@ export default function SignInPage() {
   const [error, setError] = useState("");
   const [resetSent, setResetSent] = useState(false);
 
-  // Resolve a handle (or email) to the account's email address.
-  async function resolveEmail(): Promise<string | null> {
-    const lookupRes = await fetch("/api/auth/lookup-handle", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ handle }),
-    });
-    const lookupData = await lookupRes.json();
-    if (!lookupRes.ok || !lookupData.email) return null;
-    return lookupData.email as string;
-  }
-
+  // El login se hace en el servidor: el handle se traduce a correo allí y el
+  // correo no viaja al navegador. Antes había un paso previo que devolvía el
+  // correo de cualquier handle a quien lo pidiera, sin sesión.
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const email = await resolveEmail();
-      if (!email) {
-        setError(t.errorHandle);
-        return;
-      }
-
-      const { createClient } = await import("@/lib/supabase/client");
-      const supabase = createClient();
-
-      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const res = await fetch("/api/auth/sign-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier: handle, password }),
       });
+      const data = await res.json().catch(() => ({}));
 
-      if (signInErr) {
-        setError(t.errorPassword);
+      if (!res.ok) {
+        // Un solo mensaje: decir "ese handle no existe" es decir quién está en
+        // el club.
+        setError(res.status === 401 ? t.errorPassword : t.errorConnection);
         return;
       }
 
-      if (data.user?.user_metadata?.force_password_change) {
-        window.location.href = "/auth/change-password";
-      } else {
-        window.location.href = "/dashboard";
-      }
+      window.location.href = data.forcePasswordChange ? "/auth/change-password" : "/dashboard";
     } catch {
       setError(t.errorConnection);
     } finally {
