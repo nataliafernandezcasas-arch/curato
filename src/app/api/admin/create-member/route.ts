@@ -3,9 +3,10 @@ import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
 import { sendRecruiterWelcome, sendRecruiterSecondRole } from "@/lib/emails";
+import { SITE_URL } from "@/lib/site";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const BASE = process.env.NEXT_PUBLIC_APP_URL || "https://curatocollective.com";
+const BASE = SITE_URL;
 // Public host used for email image srcs and for fetching the guide PDF to
 // attach. Hardcoded to the canonical prod host so assets resolve regardless of
 // the deploy env (localhost/preview).

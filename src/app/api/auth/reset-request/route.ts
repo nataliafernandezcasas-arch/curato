@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPasswordReset } from "@/lib/emails";
-
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.curatocollective.com";
+import { SITE_URL } from "@/lib/site";
 
 // Password reset request. Resolves a handle/email to the account email, then
 // generates a Supabase recovery link and delivers it via Resend (reliable),
