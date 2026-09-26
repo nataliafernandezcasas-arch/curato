@@ -15,13 +15,23 @@ import http2 from "node:http2";
  * Sin claves configuradas, esto no hace nada y lo dice una vez. Así la app
  * funciona igual en local y en una rama de vista previa, donde nadie ha
  * instalado la app nativa.
+ *
+ * Apple tiene dos canales, y un aparato pertenece a uno solo. Xcode decide cuál
+ * según cómo firme: una app instalada por cable desde Xcode queda en el canal de
+ * pruebas, y la que baja de TestFlight o de la App Store, en el de verdad. Aquí
+ * se prueba primero el de verdad y, si Apple dice que ese aparato no es de los
+ * suyos, se reintenta en el de pruebas. Sin eso, un teléfono con la app puesta a
+ * mano no recibiría nada y su token se daría por muerto.
  */
+
+const PRODUCCION = "https://api.push.apple.com";
+const PRUEBAS = "https://api.sandbox.push.apple.com";
 
 // Se lee en cada envío y no al cargar el módulo: así una clave añadida en
 // Vercel entra en la siguiente petición, sin esperar a un despliegue.
 function claves() {
   return {
-    host: process.env.APNS_HOST || "https://api.push.apple.com",
+    host: process.env.APNS_HOST || PRODUCCION,
     bundleId: process.env.APNS_BUNDLE_ID || "com.curatocollective.app",
     teamId: process.env.APNS_TEAM_ID || "P76GMA4YCZ",
     keyId: process.env.APNS_KEY_ID || "",
@@ -103,7 +113,24 @@ export async function enviarAPNs(tokens: string[], aviso: Aviso): Promise<string
     ruta: aviso.ruta,
   });
 
-  const { host, bundleId } = claves();
+  const { host } = claves();
+  const desconocidos = await tanda(host, tokens, jwt, cuerpo, aviso.agrupar);
+  if (!desconocidos.length || host !== PRODUCCION) return desconocidos;
+
+  // Los que el canal de verdad no reconoce pueden ser de una app instalada por
+  // cable. Se vuelven a probar en el de pruebas, y solo mueren si tampoco allí.
+  return tanda(PRUEBAS, desconocidos, jwt, cuerpo, aviso.agrupar);
+}
+
+/** Una vuelta contra un canal. Devuelve los aparatos que ese canal no conoce. */
+async function tanda(
+  host: string,
+  tokens: string[],
+  jwt: string,
+  cuerpo: string,
+  agrupar?: string
+): Promise<string[]> {
+  const { bundleId } = claves();
   const sesion = http2.connect(host);
   sesion.on("error", (err) => console.error("[curato] APNs no responde:", err.message));
   const muertos: string[] = [];
@@ -124,7 +151,7 @@ export async function enviarAPNs(tokens: string[], aviso: Aviso): Promise<string
               "apns-priority": "10",
               "content-type": "application/json",
               "content-length": Buffer.byteLength(cuerpo),
-              ...(aviso.agrupar ? { "apns-collapse-id": aviso.agrupar.slice(0, 64) } : {}),
+              ...(agrupar ? { "apns-collapse-id": agrupar.slice(0, 64) } : {}),
             });
             peticion.setEncoding("utf8");
             peticion.setTimeout(8000, () => peticion.close());
@@ -137,12 +164,12 @@ export async function enviarAPNs(tokens: string[], aviso: Aviso): Promise<string
               listo();
             });
             peticion.on("close", () => {
-              // 410 es un aparato que ya no tiene la app; BadDeviceToken, uno de
-              // otro entorno o mal copiado. Ninguno de los dos vuelve a la vida.
+              // 410 es un aparato que ya no tiene la app. BadDeviceToken es un
+              // aparato que este canal no conoce, que puede ser del otro.
               if (estado === 410 || (estado === 400 && respuesta.includes("BadDeviceToken"))) {
                 muertos.push(token);
               } else if (estado && estado !== 200) {
-                console.error(`[curato] APNs ${estado}:`, respuesta);
+                console.error(`[curato] APNs ${estado} (${host}):`, respuesta);
               }
               listo();
             });
