@@ -1,4 +1,4 @@
-import { Capital, Corps, Enlace, Filas, Nota, Shell, SITE, Titre } from "./shell";
+import { Capital, Corps, Enlace, Filas, Nota, SITE, Shell, Titre } from "./shell";
 
 // ── Candidature reçue ──────────────────────────────────────────────────────
 export function CandidatureRecue(p: { name: string; type: "creator" | "business" }) {
@@ -67,6 +67,25 @@ export function MotDePasse(p: { resetUrl: string }) {
       </Corps>
       <Enlace href={p.resetUrl}>Choisir un nouveau mot de passe</Enlace>
       <Nota>Si vous n&apos;êtes pas à l&apos;origine de cette demande, ignorez ce message : votre mot de passe reste inchangé.</Nota>
+    </Shell>
+  );
+}
+
+// ── Code d'accès ───────────────────────────────────────────────────────────
+// El primer correo de Curato para quien entra. El código va en el asunto, así
+// que se lee en la notificación y se teclea sin abrir. Aquí va grande y en
+// grupos de tres, y una frase dice qué hay al otro lado.
+export function CodeDacces(p: { code: string; groupedCode: string; expiresLabel: string }) {
+  return (
+    <Shell preview={`Votre code : ${p.groupedCode}`}>
+      <Capital>Votre code de bienvenue</Capital>
+      <Titre mayusculas>{p.groupedCode}</Titre>
+      <Corps>
+        Vous êtes accepté dans Curato. Ce code vous ouvre votre espace : vingt-deux adresses parisiennes, un crédit
+        mensuel en euros et deux stories par visite. Vous choisirez votre mot de passe en entrant.
+      </Corps>
+      <Enlace href={`${SITE}/auth/access`}>Entrer avec ce code</Enlace>
+      <Nota>Le code est valable jusqu&apos;au {p.expiresLabel}. Il ne fonctionne qu&apos;avec votre adresse e-mail.</Nota>
     </Shell>
   );
 }

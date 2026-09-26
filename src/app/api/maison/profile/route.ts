@@ -10,6 +10,9 @@ async function getMaison(adminClient: ReturnType<typeof createAdminClient>, user
     .from("comercios")
     .select("id, name, description, description_en, description_es, photos, website_url, contact_instagram, arrondissement, address, category_id")
     .or(`owner_id.eq.${userId},email.eq.${email.toLowerCase()}`)
+    .eq("stage", "activo")
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
   return data;
 }

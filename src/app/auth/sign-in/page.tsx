@@ -107,11 +107,20 @@ export default function SignInPage() {
       title={mode === "reset" ? t.resetTitle : t.title}
       subtitle={mode === "reset" ? t.resetSubtitle : t.subtitle}
       footer={
-        mode === "signin" && !native ? (
+        mode === "signin" ? (
           <>
-            {t.notMember}{" "}
-            <Link href="/storytellers" className="text-accent transition-colors hover:text-text-primary">
-              {t.requestInvite}
+            {!native && (
+              <>
+                {t.notMember}{" "}
+                <Link href="/storytellers" className="text-accent transition-colors hover:text-text-primary">
+                  {t.requestInvite}
+                </Link>
+                <br />
+              </>
+            )}
+            {t.haveCode}{" "}
+            <Link href="/auth/access" className="text-accent transition-colors hover:text-text-primary">
+              {t.useCode}
             </Link>
           </>
         ) : undefined

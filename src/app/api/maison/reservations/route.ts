@@ -78,6 +78,9 @@ export async function GET() {
       .from("comercios")
       .select("id, name, availability")
       .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .eq("stage", "activo")
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     if (!maison) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 
@@ -142,6 +145,9 @@ export async function POST(request: NextRequest) {
       .from("comercios")
       .select("id, name, address, photos")
       .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .eq("stage", "activo")
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     if (!maison) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 

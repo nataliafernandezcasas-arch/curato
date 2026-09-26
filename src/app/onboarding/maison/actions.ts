@@ -57,6 +57,11 @@ export async function signCommitment(input: {
       commitment_accepted_at: acceptedAt,
       commitment_signatory: signatory,
       subscription_plan: "monthly_299",
+      // Firmar es lo que abre la casa. `is_reservable` se calcula de esta
+      // etapa (migración 009), así que sin esto una casa firmaba, completaba
+      // su ficha y seguía invisible hasta que alguien la activaba a mano
+      // desde el admin, sin que nada se lo dijera.
+      partnership_stage: "signed",
     })
     .eq("id", comercio.id);
 

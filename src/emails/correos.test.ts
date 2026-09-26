@@ -6,7 +6,9 @@ import { MaisonValidee } from "./apporteur";
 import { SeisHoras, StoriesManquantes } from "./recordatorios";
 import { CandidatureRecue, MotDePasse } from "./cuenta";
 import {
+  sendAccessCode,
   sendAvisoStoriesManquantes,
+  sendMaisonNewRequest,
   sendRecordatorioSeisHoras,
   sendRecruiterProspectDecision,
   sendReservationConfirmed,
@@ -117,5 +119,26 @@ describe("lo que se manda a Resend", () => {
     await sendRecruiterProspectDecision("a@exemple.fr", { recruiterName: "Amélie", maisonName: "La Maison Rose", decision: "rejected" });
     expect(String(enviados[0].text).length).toBeGreaterThan(40);
     expect(String(enviados[0].html)).toContain("<html");
+  });
+
+  it("la casa recibe la demanda con quién quiere venir y cuándo", async () => {
+    await sendMaisonNewRequest({
+      to: "salle@exemple.fr",
+      creatorName: "Tereza Bolkvadze",
+      creatorHandle: "terezab",
+      maisonName: "Maison Marceau",
+      whenLabel: "jeudi 22 octobre à 19:30",
+      partySize: 2,
+      note: null,
+    });
+    expect(enviados[0].subject).toBe("Tereza Bolkvadze souhaite venir jeudi 22 octobre à 19:30");
+    expect(String(enviados[0].text)).toContain("quarante-huit heures");
+  });
+
+  it("el código de bienvenida va en el asunto, en grupos de tres", async () => {
+    // Se lee en la notificación y se teclea sin abrir el correo.
+    await sendAccessCode({ to: "t@exemple.fr", code: "418062", expiresAt: new Date("2026-10-03T12:00:00Z") });
+    expect(enviados[0].subject).toBe("Votre code Curato : 418 062");
+    expect(String(enviados[0].text)).toContain("418 062");
   });
 });

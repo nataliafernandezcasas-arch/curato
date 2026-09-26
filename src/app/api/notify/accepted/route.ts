@@ -31,12 +31,17 @@ export async function POST(request: NextRequest) {
       if (error || !comercio?.email) {
         return NextResponse.json({ error: "Comercio no encontrado o sin email" }, { status: 404 });
       }
-      await sendApplicationAccepted({
-        to: comercio.email,
-        name: comercio.contact_name || comercio.name,
-        type: "business",
-      });
-      return NextResponse.json({ success: true });
+      try {
+        await sendApplicationAccepted({
+          to: comercio.email,
+          name: comercio.contact_name || comercio.name,
+          type: "business",
+        });
+      } catch (mailErr) {
+        console.error("Acceptance email failed:", mailErr);
+        return NextResponse.json({ success: true, emailSent: false });
+      }
+      return NextResponse.json({ success: true, emailSent: true });
     }
 
     // Creators path: PassKit + email
@@ -90,13 +95,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    await sendApplicationAccepted({
-      to: creator.email,
-      name: creator.full_name,
-      type: "creator",
-    });
+    let emailSent = true;
+    try {
+      await sendApplicationAccepted({
+        to: creator.email,
+        name: creator.full_name,
+        type: "creator",
+      });
+    } catch (mailErr) {
+      console.error("Acceptance email failed:", mailErr);
+      emailSent = false;
+    }
 
-    return NextResponse.json({ success: true, passUrl, googlePayUrl, memberId });
+    return NextResponse.json({ success: true, emailSent, passUrl, googlePayUrl, memberId });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("notify/accepted error:", msg);

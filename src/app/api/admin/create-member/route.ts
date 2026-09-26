@@ -287,11 +287,15 @@ export async function POST(request: NextRequest) {
           : undefined,
       });
     } else if (type === "recruiter") {
-      if (userExisted) {
-        // Existing account gaining the recruiter role: keep their password.
-        await sendRecruiterSecondRole(emailLc, { name });
-      } else {
-        await sendRecruiterWelcome(emailLc, { name, email: emailLc, tempPassword });
+      try {
+        if (userExisted) {
+          // Existing account gaining the recruiter role: keep their password.
+          await sendRecruiterSecondRole(emailLc, { name });
+        } else {
+          await sendRecruiterWelcome(emailLc, { name, email: emailLc, tempPassword });
+        }
+      } catch (mailErr) {
+        console.error("Recruiter welcome email failed:", mailErr);
       }
     } else {
       await resend.emails.send({

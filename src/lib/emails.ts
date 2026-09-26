@@ -19,8 +19,8 @@ import {
   demandeDeclineeTexto,
   visiteConfirmeeTexto,
 } from "@/emails/visitas";
-import { CandidatureAcceptee, CandidatureRecue, Lancement, MotDePasse } from "@/emails/cuenta";
-import { EngagementSigne, NouvelleMaison } from "@/emails/maison";
+import { CandidatureAcceptee, CandidatureRecue, CodeDacces, Lancement, MotDePasse } from "@/emails/cuenta";
+import { EngagementSigne, NouvelleMaison, DemandeRecue } from "@/emails/maison";
 import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
 import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
 import { SITE } from "@/emails/shell";
@@ -48,6 +48,15 @@ async function sendEmail(
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+  // Antes esto devolvía el cuerpo sin mirar el estado, así que una clave
+  // caducada, un límite alcanzado o una dirección rechazada pasaban por envío
+  // correcto: todos los try/catch que envuelven un envío eran papel mojado y
+  // no había forma de saber qué correos no llegaban.
+  if (!res.ok) {
+    const detalle = await res.text().catch(() => "");
+    console.error(`Resend rechazó el envío a ${to} (${res.status}):`, detalle.slice(0, 300));
+    throw new Error(`Resend ${res.status}`);
+  }
   return res.json();
 }
 
@@ -55,6 +64,24 @@ const PARIS = "Europe/Paris";
 const jourDe = (d: Date) => d.toLocaleDateString("fr-FR", { weekday: "long", timeZone: PARIS });
 const heureDe = (d: Date) => d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: PARIS });
 const JOUR_EN_TETE = /^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/i;
+
+/**
+ * El código de bienvenida. Va en el asunto porque se teclea sin abrir el
+ * correo, y en grupos de tres porque seis cifras seguidas se leen mal.
+ */
+export async function sendAccessCode(opts: { to: string; code: string; expiresAt: Date }) {
+  const groupedCode = `${opts.code.slice(0, 3)} ${opts.code.slice(3)}`;
+  const expiresLabel = opts.expiresAt.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    timeZone: PARIS,
+  });
+  return sendEmail(
+    opts.to,
+    `Votre code Curato : ${groupedCode}`,
+    createElement(CodeDacces, { code: opts.code, groupedCode, expiresLabel })
+  );
+}
 
 // ── Candidatures ─────────────────────────────────────────────────────────────
 export async function sendApplicationReceived(to: string, name: string, type: "creator" | "business") {
@@ -83,6 +110,23 @@ export async function sendReservationRequested(opts: {
 }) {
   const { to, ...p } = opts;
   return sendEmail(to, `Demande envoyée à ${p.maisonName}`, createElement(DemandeEnvoyee, p));
+}
+
+/**
+ * A la casa: alguien quiere venir. El asunto lleva el nombre y el momento, así
+ * que se lee en la notificación sin abrir el correo.
+ */
+export async function sendMaisonNewRequest(opts: {
+  to: string;
+  creatorName: string;
+  creatorHandle: string | null;
+  maisonName: string;
+  whenLabel: string;
+  partySize: number;
+  note: string | null;
+}) {
+  const { to, ...p } = opts;
+  return sendEmail(to, `${p.creatorName} souhaite venir ${p.whenLabel}`, createElement(DemandeRecue, p));
 }
 
 export async function sendReservationAdminAlert(opts: {

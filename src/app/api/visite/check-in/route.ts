@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
       .from("creators")
       .select("id")
       .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     if (!creator) return NextResponse.json({ error: "creator", maison: maison.name }, { status: 403 });
 

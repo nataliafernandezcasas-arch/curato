@@ -67,6 +67,12 @@ const FILTERS = [
   { slug: "belleza", key: "catBeauty" },
 ] as const;
 
+// Los dos requisitos de publicación de una ficha (pantalla 19). Se comprueban
+// aquí además de en el formulario de la maison, porque lo que decide si una
+// casa se enseña es su ficha, no su intención.
+const MIN_FOTOS = 5;
+const MIN_DESCRIPCION = 200;
+
 // A maison is flagged "Nouveau" if it was signed within the last 45 days.
 function isNew(signedAt: string | null): boolean {
   if (!signedAt) return false;
@@ -170,7 +176,11 @@ export default function InfluencerDashboard() {
         }
       }
 
-      setMaisons(visibles);
+      // Una casa aparece cuando su ficha está terminada: cinco fotografías y
+      // doscientos caracteres de descripción, los dos requisitos que su propia
+      // pantalla le pide. Sin esto, firmar la hacía visible con la ficha a
+      // medio hacer, y lo primero que veía un storyteller era un hueco.
+      setMaisons(visibles.filter((m) => (m.photos?.length ?? 0) >= MIN_FOTOS && (m.description ?? "").trim().length >= MIN_DESCRIPCION));
       setMaisonsLoading(false);
     }
     loadMaisons();

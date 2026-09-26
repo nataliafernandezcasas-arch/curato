@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendReservationRequested, sendReservationAdminAlert } from "@/lib/emails";
+import { sendReservationRequested, sendReservationAdminAlert, sendMaisonNewRequest } from "@/lib/emails";
 import { isOpenSlot } from "@/lib/availability";
 
 // Where new-request alerts are sent (the Curato inbox Natalia manages).
 const ADMIN_INBOX = "hello@curatocollective.com";
+
+// Hôtels (migración 009): se reservan por noches y con llegada fija.
+const HOTEL = "00000000-0000-0000-0000-0000000ca701";
 
 // Creates a reservation REQUEST (status = pending_review). Credits are NOT
 // deducted here — that happens when an admin confirms the request. The insert
@@ -49,7 +52,7 @@ export async function POST(request: NextRequest) {
     // 3. Validate the venue is a live, reservable maison.
     const { data: venue } = await admin
       .from("comercios")
-      .select("id, name, category_id, is_reservable, availability, blocked_slots")
+      .select("id, name, email, category_id, is_reservable, availability, blocked_slots")
       .eq("id", venueId)
       .maybeSingle();
     if (!venue || !venue.is_reservable) {
@@ -58,7 +61,12 @@ export async function POST(request: NextRequest) {
 
     // Slot must fall inside the maison's availability (if configured) and not be
     // blocked or already taken.
-    if (!isOpenSlot(slotStart, venue.availability ?? [], venue.blocked_slots ?? [])) {
+    // Un hotel no tiene franjas de llegada: su agenda semanal describe cuándo
+    // atiende, no a qué hora se puede llegar, y la pantalla manda siempre las
+    // 15:00. Comprobarla contra las franjas rechazaba todas las peticiones de
+    // cualquier hotel que tuviera agenda. Las fechas cerradas sí valen.
+    const franjas = venue.category_id === HOTEL ? [] : venue.availability ?? [];
+    if (!isOpenSlot(slotStart, franjas, venue.blocked_slots ?? [])) {
       return NextResponse.json({ error: "Créneau indisponible." }, { status: 409 });
     }
     const { data: clash } = await admin
@@ -128,6 +136,20 @@ export async function POST(request: NextRequest) {
           maisonName: venue.name,
           whenLabel,
           partySize: ps,
+        });
+      }
+      // A la casa, que es quien decide. Antes solo se avisaba al creador y al
+      // buzón de Curato, así que la casa se enteraba si abría la app mientras
+      // su plazo de cuarenta y ocho horas corría igual.
+      if (venue.email) {
+        await sendMaisonNewRequest({
+          to: venue.email,
+          creatorName: creator.full_name || creator.handle || "Un storyteller",
+          creatorHandle: creator.handle,
+          maisonName: venue.name,
+          whenLabel,
+          partySize: ps,
+          note: specialRequests || null,
         });
       }
       await sendReservationAdminAlert({

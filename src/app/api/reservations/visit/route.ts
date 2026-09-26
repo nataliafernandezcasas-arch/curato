@@ -103,11 +103,25 @@ export async function POST(request: NextRequest) {
 
     const { data: reservation } = await admin
       .from("reservations")
-      .select("id, creator_id, status, content_photo_paths, visited_at")
+      .select("id, creator_id, status, slot_start, content_photo_paths, visited_at")
       .eq("id", reservationId)
       .maybeSingle();
     if (!reservation || reservation.creator_id !== creator.id) {
       return NextResponse.json({ error: "Réservation introuvable." }, { status: 404 });
+    }
+
+    // Declarar la portée marca la visita como hecha, así que solo se puede
+    // hacer con una visita que existió: confirmada (o ya terminada, para
+    // corregir cifras) y con la fecha pasada. Sin esto, una reserva rechazada
+    // revivía como terminada, y una confirmada para la semana que viene se
+    // cerraba hoy: el recordatorio de las seis horas solo mira las
+    // confirmadas, así que después de eso las dos stories dejaban de
+    // exigirse.
+    if (reservation.status !== "confirmed" && reservation.status !== "completed") {
+      return NextResponse.json({ error: "Cette visite n'est pas confirmée." }, { status: 409 });
+    }
+    if (new Date(reservation.slot_start as string).getTime() > Date.now()) {
+      return NextResponse.json({ error: "Cette visite n'a pas encore eu lieu." }, { status: 409 });
     }
 
     // At least 2 photos are required on the first upload (logging the visit).

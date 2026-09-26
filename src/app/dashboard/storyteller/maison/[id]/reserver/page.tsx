@@ -2,7 +2,7 @@
 
 import { Suspense, use, useEffect, useId, useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DayPicker, type DayButtonProps, type ChevronProps } from "react-day-picker";
 import { enUS, es, fr } from "react-day-picker/locale";
 import DashboardNav from "../../../../dashboard-nav";
@@ -10,6 +10,7 @@ import { STORYTELLER_LINKS } from "../../../nav-links";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import { createClient } from "@/lib/supabase/client";
+import { canBypassLaunchGate, isBeforeLaunch } from "@/lib/launch";
 import { parisParts, parisToIso, type AvailWindow } from "@/lib/availability";
 import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
@@ -271,6 +272,19 @@ function Reserver({ id }: { id: string }) {
   const [hecho, setHecho] = useState(false);
   const notaId = useId();
 
+  // La puerta de lanzamiento. El carnet y la ficha ya la respetan; esta
+  // pantalla no, así que con Curato cerrado se podía mandar una demanda real
+  // escribiendo la dirección, o llegando por el enlace "?slot=" de un correo.
+  const router = useRouter();
+  const [pasa, setPasa] = useState<boolean | null>(null);
+  useEffect(() => {
+    setPasa(canBypassLaunchGate());
+  }, []);
+  const cerrado = pasa === false && isBeforeLaunch();
+  useEffect(() => {
+    if (cerrado) router.replace(`/dashboard/storyteller/maison/${id}`);
+  }, [cerrado, id, router]);
+
   useEffect(() => {
     createClient()
       .from("comercios")
@@ -443,6 +457,8 @@ function Reserver({ id }: { id: string }) {
       </button>
     </span>
   );
+
+  if (cerrado) return <div className="min-h-[100dvh]" />;
 
   return (
     <div className="min-h-[100dvh]">

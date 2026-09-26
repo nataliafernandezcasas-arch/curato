@@ -40,4 +40,13 @@ describe("una franja abierta", () => {
   it("una casa sin horario acepta cualquier hora", () => {
     expect(isOpenSlot(parisToIso("2026-10-22", "03:00"), [], [])).toBe(true);
   });
+
+  it("una casa sin horario respeta sus fechas cerradas", () => {
+    // El caso que se colaba: la comprobación de días cerrados iba después de
+    // la salida por "sin agenda", así que una casa sin franjas aceptaba justo
+    // los días que había cerrado.
+    const iso = parisToIso("2026-12-24", "20:00");
+    expect(isOpenSlot(iso, [], [{ date: "2026-12-24" }])).toBe(false);
+    expect(isOpenSlot(iso, [], [{ date: "2026-12-25" }])).toBe(true);
+  });
 });

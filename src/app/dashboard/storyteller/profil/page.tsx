@@ -105,7 +105,7 @@ export default function ProfilPage() {
         setProfile(data as Profile | null);
       }
       const res = await fetch("/api/reservations/visit", { cache: "no-store" });
-      if (res.ok) setVisits((await res.json()).reservations ?? []);
+      if (res.ok) setVisits((await res.json()).visits ?? []);
       setLoading(false);
     })().catch(() => setLoading(false));
   }, []);
