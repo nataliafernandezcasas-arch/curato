@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Universal Links: un enlace de Curato abre la app y no el navegador.
+	     Hace falta para que el correo de restablecer contraseña devuelva la
+	     sesión dentro de la app, que es donde estaba roto. El dominio sirve
+	     /.well-known/apple-app-site-association. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:www.curatocollective.com</string>
+		<string>applinks:curatocollective.com</string>
+	</array>
+	<!-- Notificaciones. "production" es el entorno de APNs que usan TestFlight y
+	     la App Store; el emisor del servidor habla con api.push.apple.com. -->
+	<key>aps-environment</key>
+	<string>production</string>
+</dict>
+</plist>

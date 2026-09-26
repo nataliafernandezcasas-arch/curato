@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendAvisoStoriesManquantes, sendRecordatorioSeisHoras } from "@/lib/emails";
+import { avisar, AVISOS } from "@/lib/push/avisos";
 import { OLVIDO_H, PLAZO_H, AVISO_ANTES_H, esCorreoDePrueba, horasQueQuedan, queToca } from "@/lib/recordatorios";
 
 // Donde llega el aviso de las stories que no llegaron.
@@ -58,8 +59,8 @@ export async function GET(request: NextRequest) {
   const venueIds = [...new Set(filas.map((v) => v.venue_id))];
   const [{ data: creators }, { data: casas }] = await Promise.all([
     creatorIds.length
-      ? admin.from("creators").select("id, full_name, handle, email, is_test").in("id", creatorIds)
-      : Promise.resolve({ data: [] as { id: string; full_name: string | null; handle: string | null; email: string | null; is_test: boolean | null }[] }),
+      ? admin.from("creators").select("id, full_name, handle, email, owner_id, is_test").in("id", creatorIds)
+      : Promise.resolve({ data: [] as { id: string; full_name: string | null; handle: string | null; email: string | null; owner_id: string | null; is_test: boolean | null }[] }),
     venueIds.length
       ? admin.from("comercios").select("id, name").in("id", venueIds)
       : Promise.resolve({ data: [] as { id: string; name: string }[] }),
@@ -102,6 +103,10 @@ export async function GET(request: NextRequest) {
         // que dos.
         console.error("Recordatorio 6h falló:", err);
       }
+      await avisar(
+        { ownerId: creador.owner_id ?? null, email: creador.email },
+        AVISOS.seisHoras(maison, horasQueQuedan(v.slot_start, ahora), v.id)
+      );
       continue;
     }
 

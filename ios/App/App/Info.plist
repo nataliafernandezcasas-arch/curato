@@ -24,6 +24,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Curato utilise l'appareil photo pour vos photographies : votre portrait, vos photographies de profil et les captures de vos stories.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Curato accède à vos photos pour envoyer vos photographies : votre portrait, vos photographies de profil et les captures de vos stories.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
