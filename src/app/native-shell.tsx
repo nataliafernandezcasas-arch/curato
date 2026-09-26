@@ -5,6 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { getCapacitor, getNativePlatform } from "@/lib/native/bridge";
 import { attachPushListeners, syncPushRegistration } from "@/lib/native/push";
 
+// El dominio que la app reclama en App.entitlements. Un enlace de otro sitio
+// se queda en el navegador, que es donde debe quedarse.
+const NUESTRO = /^(www\.)?curatocollective\.com$/;
+
 /**
  * Native-only behaviour, mounted once from the root layout.
  *
@@ -47,6 +51,23 @@ export default function NativeShell() {
     // El estilo de la barra de estado lo pone TemaSync (src/lib/tema.ts), que
     // sabe si la pantalla va en claro o en oscuro.
 
+    // Un enlace de Curato abierto desde el correo o desde un mensaje entra por
+    // aquí en vez de saltar al navegador: así el enlace de restablecer la
+    // contraseña deja la sesión dentro de la app y no fuera. Lo permite
+    // com.apple.developer.associated-domains, y lo confirma el archivo que
+    // sirve /.well-known/apple-app-site-association.
+    cap?.Plugins?.App?.addListener("appUrlOpen", ({ url }) => {
+      try {
+        const destino = new URL(url);
+        if (!NUESTRO.test(destino.hostname)) return;
+        router.replace(`${destino.pathname}${destino.search}${destino.hash}`);
+      } catch {
+        /* una URL que no se puede leer no lleva a ninguna parte */
+      }
+    })
+      .then((handle) => track(() => handle.remove()))
+      .catch(() => {});
+
     if (platform === "android") {
       const app = cap?.Plugins?.App;
       app
@@ -64,14 +85,14 @@ export default function NativeShell() {
         .catch(() => {});
     }
 
-    attachPushListeners().then(track).catch(() => {});
+    attachPushListeners((ruta) => router.push(ruta)).then(track).catch(() => {});
     void syncPushRegistration();
 
     return () => {
       disposed = true;
       cleanups.forEach((remove) => remove());
     };
-  }, []);
+  }, [router]);
 
   return null;
 }

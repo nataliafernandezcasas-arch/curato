@@ -27,10 +27,24 @@ export interface AppPlugin {
     event: "backButton",
     handler: (event: { canGoBack: boolean }) => void
   ): Promise<PluginListenerHandle>;
+  /** Un enlace de curatocollective.com abierto desde fuera de la app. */
+  addListener(
+    event: "appUrlOpen",
+    handler: (event: { url: string }) => void
+  ): Promise<PluginListenerHandle>;
   minimizeApp(): Promise<void>;
 }
 
 export type PushPermission = "prompt" | "prompt-with-rationale" | "granted" | "denied";
+
+/** Un aviso tocado. `data` trae lo que puso el emisor, entre ello `ruta`. */
+export interface PushNotificationEvent {
+  notification?: {
+    title?: string;
+    body?: string;
+    data?: Record<string, unknown> | null;
+  } | null;
+}
 
 export interface PushNotificationsPlugin {
   checkPermissions(): Promise<{ receive: PushPermission }>;
@@ -46,7 +60,7 @@ export interface PushNotificationsPlugin {
   ): Promise<PluginListenerHandle>;
   addListener(
     event: "pushNotificationReceived" | "pushNotificationActionPerformed",
-    handler: (event: unknown) => void
+    handler: (event: PushNotificationEvent) => void
   ): Promise<PluginListenerHandle>;
 }
 

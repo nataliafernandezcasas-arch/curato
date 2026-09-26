@@ -1,31 +1,59 @@
 /**
- * Push notifications for the native shell.
+ * Los avisos del teléfono, del lado de la app.
  *
- * Nothing here fires a permission prompt on launch. Asking cold, before the
- * person knows what Curato would notify them about, is the reliable way to get
- * a permanent "no" (and Apple flags it in review). The launch path only
- * re-registers a device that already said yes; `enablePushNotifications()` is
- * the opt-in, meant to be wired to a real control in the dashboard.
+ * Nada de aquí pide permiso al arrancar. Preguntar en frío, antes de que la
+ * persona sepa de qué se le va a avisar, es la manera segura de recibir un "no"
+ * definitivo (y Apple lo señala en la revisión). El arranque solo vuelve a
+ * registrar un aparato que ya dijo que sí, porque el token de Apple cambia al
+ * reinstalar o al restaurar una copia; `enablePushNotifications()` es el sí,
+ * y está detrás de una fila en Réglages que explica qué se avisa.
  *
- * Delivery credentials are NOT configured yet: APNs needs an Apple Developer
- * account and Android needs a Firebase google-services.json. Until then
- * registration fails harmlessly and we log why. See NATALIA_TODO_XCODE.md.
+ * Cuatro avisos y ninguno más, y cada uno abre su pantalla: la ruta viaja en el
+ * propio aviso (`ruta`), la pone el emisor en src/lib/push/avisos.ts.
  */
 
-import { getCapacitor, type PluginListenerHandle } from "./bridge";
+import { getCapacitor, type PluginListenerHandle, type PushNotificationEvent } from "./bridge";
 
-/**
- * TODO(push-backend): persist the token so we can actually send anything.
- * Needs a `device_tokens` table (user_id, token, platform, updated_at) plus an
- * endpoint to upsert it, then a sender that talks to APNs/FCM. Out of scope
- * until the Apple Developer account and Firebase project exist.
- */
-function handleToken(token: string, platform: string) {
-  console.info(`[curato] push token (${platform}):`, token);
+const RECUERDO = "curato-push-token";
+
+/** Guarda el token para poder retirarlo al cerrar sesión. */
+function recordar(token: string | null) {
+  try {
+    if (token) localStorage.setItem(RECUERDO, token);
+    else localStorage.removeItem(RECUERDO);
+  } catch {
+    /* sin almacenamiento, el token se vuelve a pedir en el próximo arranque */
+  }
 }
 
-/** Attaches the push listeners. Returns a cleanup function. */
-export async function attachPushListeners(): Promise<() => void> {
+async function handleToken(token: string, platform: string) {
+  try {
+    const res = await fetch("/api/push/register", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token, platform }),
+    });
+    if (!res.ok) {
+      // Sin sesión todavía (401) es lo normal en la pantalla de entrada: al
+      // volver a esta pantalla con la sesión abierta, el registro se repite.
+      console.warn("[curato] token no guardado:", res.status);
+      return;
+    }
+    recordar(token);
+  } catch (err) {
+    console.warn("[curato] token no guardado:", err);
+  }
+}
+
+/** La pantalla que abre un aviso tocado, si trae una. */
+function rutaDe(evento: PushNotificationEvent): string | null {
+  const ruta = evento?.notification?.data?.ruta;
+  // Solo una ruta interna: un aviso no puede sacar a nadie de la app.
+  return typeof ruta === "string" && ruta.startsWith("/") && !ruta.startsWith("//") ? ruta : null;
+}
+
+/** Engancha las escuchas. Devuelve la función que las suelta. */
+export async function attachPushListeners(navegar?: (ruta: string) => void): Promise<() => void> {
   const push = getCapacitor()?.Plugins?.PushNotifications;
   if (!push) return () => {};
 
@@ -34,19 +62,19 @@ export async function attachPushListeners(): Promise<() => void> {
 
   try {
     handles.push(
-      await push.addListener("registration", ({ value }) => handleToken(value, platform))
+      await push.addListener("registration", ({ value }) => void handleToken(value, platform))
     );
     handles.push(
       await push.addListener("registrationError", ({ error }) => {
-        // Expected until APNs/FCM credentials exist. Logged, never surfaced.
         console.warn("[curato] push registration failed:", error);
       })
     );
     handles.push(
-      await push.addListener("pushNotificationActionPerformed", (event) => {
-        // TODO(push-backend): route to the screen named in the payload once we
-        // define one, e.g. a new reservation opens /dashboard/business.
-        console.info("[curato] notification tapped:", event);
+      await push.addListener("pushNotificationActionPerformed", (evento) => {
+        const ruta = rutaDe(evento);
+        if (!ruta) return;
+        if (navegar) navegar(ruta);
+        else window.location.assign(ruta);
       })
     );
   } catch (err) {
@@ -57,8 +85,8 @@ export async function attachPushListeners(): Promise<() => void> {
 }
 
 /**
- * Re-registers a device that already granted permission, which refreshes a
- * token that may have rotated since the last launch. Never prompts.
+ * Vuelve a registrar un aparato que ya dio permiso, lo que refresca un token
+ * que puede haber cambiado desde el último arranque. Nunca pregunta.
  */
 export async function syncPushRegistration(): Promise<void> {
   const push = getCapacitor()?.Plugins?.PushNotifications;
@@ -72,9 +100,21 @@ export async function syncPushRegistration(): Promise<void> {
   }
 }
 
+/** Si este aparato ya dijo que sí, que no, o si todavía no se le ha preguntado. */
+export async function estadoDeLosAvisos(): Promise<"granted" | "denied" | "prompt" | null> {
+  const push = getCapacitor()?.Plugins?.PushNotifications;
+  if (!push) return null;
+  try {
+    const { receive } = await push.checkPermissions();
+    return receive === "granted" ? "granted" : receive === "denied" ? "denied" : "prompt";
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Asks for permission and registers. Call this from an explicit opt-in, after
- * explaining what we'd notify about. Resolves true if the device is registered.
+ * Pide permiso y registra. Se llama desde la fila de Réglages, después de decir
+ * de qué se avisa. Devuelve true si el aparato queda registrado.
  */
 export async function enablePushNotifications(): Promise<boolean> {
   const push = getCapacitor()?.Plugins?.PushNotifications;
@@ -91,5 +131,30 @@ export async function enablePushNotifications(): Promise<boolean> {
   } catch (err) {
     console.warn("[curato] enabling push failed:", err);
     return false;
+  }
+}
+
+/**
+ * Retira este aparato. Se llama al cerrar sesión: quien entre después en el
+ * mismo teléfono no debe leer en la pantalla apagada el nombre de las casas que
+ * visita quien entró antes.
+ */
+export async function olvidarEsteAparato(): Promise<void> {
+  let token: string | null = null;
+  try {
+    token = localStorage.getItem(RECUERDO);
+  } catch {
+    return;
+  }
+  if (!token) return;
+  recordar(null);
+  try {
+    await fetch("/api/push/register", {
+      method: "DELETE",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+  } catch {
+    /* el token se queda huérfano; el primer envío fallido lo borra */
   }
 }

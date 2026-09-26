@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendReservationRequested, sendReservationAdminAlert, sendMaisonNewRequest } from "@/lib/emails";
+import { avisar, AVISOS } from "@/lib/push/avisos";
 import { isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
 
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     // 3. Validate the venue is a live, reservable maison.
     const { data: venue } = await admin
       .from("comercios")
-      .select("id, name, email, category_id, is_reservable, availability, blocked_slots")
+      .select("id, name, email, owner_id, category_id, is_reservable, availability, blocked_slots")
       .eq("id", venueId)
       .maybeSingle();
     if (!venue || !venue.is_reservable) {
@@ -165,6 +166,13 @@ export async function POST(request: NextRequest) {
     } catch (mailErr) {
       console.error("Reservation emails failed:", mailErr);
     }
+
+    // El plazo de la casa son cuarenta y ocho horas, así que el aviso en el
+    // teléfono es lo que evita que se le vaya el tiempo sin abrir la app.
+    await avisar(
+      { ownerId: venue.owner_id ?? null, email: venue.email ?? null },
+      AVISOS.nuevaDemanda(creator.full_name || creator.handle || "Un storyteller", whenLabel, reservation.id)
+    );
 
     return NextResponse.json({ ok: true, reservationId: reservation.id, creditsCost });
   } catch {

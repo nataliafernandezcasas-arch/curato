@@ -5,6 +5,7 @@ import { googleCalendarUrl, buildIcs } from "@/lib/calendar";
 import { sendReservationConfirmed, sendReservationDeclined } from "@/lib/emails";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { avisar, AVISOS } from "@/lib/push/avisos";
 
 /**
  * Las visitas que cuentan para el mínimo del mes: las terminadas y los
@@ -175,7 +176,7 @@ export async function POST(request: NextRequest) {
 
     const { data: creator } = await admin
       .from("creators")
-      .select("full_name, email")
+      .select("full_name, email, owner_id")
       .eq("id", r.creator_id)
       .maybeSingle();
     const firstName = (creator?.full_name || "").split(" ")[0] || "vous";
@@ -219,6 +220,13 @@ export async function POST(request: NextRequest) {
         console.error("Confirmation email failed:", mailErr);
       }
 
+      // Y en el teléfono, si lo tiene. El correo llega igual: el aviso es lo
+      // que se ve sin abrir nada, no el único sitio donde se dice.
+      await avisar(
+        { ownerId: creator?.owner_id ?? null, email: creator?.email ?? null },
+        AVISOS.visitaConfirmada(maison.name, cuando(start), id)
+      );
+
       return NextResponse.json({ ok: true, status: "confirmed" });
     }
 
@@ -247,6 +255,11 @@ export async function POST(request: NextRequest) {
     } catch (mailErr) {
       console.error("Decline email failed:", mailErr);
     }
+
+    await avisar(
+      { ownerId: creator?.owner_id ?? null, email: creator?.email ?? null },
+      AVISOS.visitaRechazada(maison.name, cuando(new Date(r.slot_start)), id)
+    );
 
     return NextResponse.json({ ok: true, status: "declined" });
   } catch (err) {

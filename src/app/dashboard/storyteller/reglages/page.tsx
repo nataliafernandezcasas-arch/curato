@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { olvidarEsteAparato } from "@/lib/native/push";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
 import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
+import { AvisosDelTelefono } from "@/components/member/avisos-telefono";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -31,6 +33,7 @@ export default function ReglagesPage() {
 
   async function signOut() {
     setBusy(true);
+    await olvidarEsteAparato();
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/auth/sign-in");
@@ -91,6 +94,8 @@ export default function ReglagesPage() {
             </div>
           </section>
         )}
+
+        <AvisosDelTelefono />
 
         <section>
           {/* Salir es un botón con su caja, no un enlace gris con un icono.

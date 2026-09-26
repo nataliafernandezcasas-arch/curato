@@ -1,6 +1,6 @@
 # Lo que necesito de ti para la app
 
-Estado al 6 de septiembre de 2026. Lo que queda son cosas que piden tu
+Estado al 26 de septiembre de 2026. Lo que queda son cosas que piden tu
 contraseña o tu identidad como persona, así que no las puedo hacer yo.
 
 ---
@@ -41,32 +41,48 @@ así que no sirve para gente de fuera.
 ## 2. El riesgo que hay que vigilar
 
 Curato es una web dentro de una cáscara nativa, y la **regla 4.2 de Apple**
-rechaza apps que no aportan nada sobre el sitio. Lo que normalmente salva a una
-app así son las notificaciones push, y hoy están a medias: el cliente escucha,
-pero no hay tabla donde guardar el token ni nada que envíe nada.
-
-Si Beta App Review lo rechaza, lo primero a construir es el backend de push.
-
----
-
-## 3. Notificaciones push, cuando toque
-
-En el portal de Apple hay que crear una **APNs Key**. Se descarga una sola vez,
-guardala bien porque no se puede volver a bajar.
-
-Y en Xcode, activar la capacidad **Push Notifications** en el target. Es un
-botón en la pestaña Signing & Capabilities.
-
-Del lado del servidor falta una tabla `device_tokens` y un emisor que hable con
-APNs. Eso lo hago yo cuando exista la key.
+rechaza apps que no aportan nada sobre el sitio. Lo que salva a una app así son
+las notificaciones. Ya están construidas enteras de este lado: la tabla, el
+registro del aparato, el emisor que habla con APNs y los cuatro avisos. Solo
+falta la llave de Apple, que es el punto 3.
 
 ---
 
-## 4. Universal Links
+## 3. Notificaciones push: lo que falta es tuyo
 
-Recuperar la contraseña dentro de la app está roto y no tiene arreglo sin esto.
-Hace falta activar **Associated Domains** en Xcode y publicar un archivo en el
-dominio. Con el Team ID ya lo puedo dejar preparado.
+Todo lo demás está hecho. Quedan tres cosas que piden tu cuenta:
+
+1. **Crear la APNs Key** en el portal de Apple, en Certificates, Identifiers &
+   Profiles → Keys, marcando *Apple Push Notifications service*. Se descarga un
+   archivo `.p8` **una sola vez**: guardalo bien, no se puede volver a bajar.
+   Anotá también el Key ID, que son diez caracteres.
+2. **Pasarme las dos cosas** para ponerlas en Vercel: `APNS_KEY_ID` y
+   `APNS_PRIVATE_KEY` (el contenido del `.p8`). Sin ellas la app funciona
+   igual, simplemente no sale ningún aviso.
+3. **En Xcode**, pestaña *Signing & Capabilities* del target App: botón
+   **+ Capability** → **Push Notifications**, y comprobar que **Associated
+   Domains** también aparece. Los dos ya están escritos en `App.entitlements`,
+   así que Xcode debería mostrarlos solos; si no, se añaden con ese botón.
+
+Los cuatro avisos, y ninguno más: visita confirmada, visita rechazada, quedan
+seis horas para publicar y, para la casa, nueva demanda. Cada uno abre su
+pantalla. No hay bandeja de entrada.
+
+Nadie recibe nada sin haberlo pedido: la app no pregunta al arrancar, hay una
+fila en Réglages que dice de qué se avisa y ahí se enciende.
+
+---
+
+## 4. Universal Links: hecho
+
+Recuperar la contraseña dentro de la app estaba roto porque el enlace del correo
+abría Safari y la sesión se quedaba fuera. Ya está: la app reclama
+`curatocollective.com` en `App.entitlements` y el sitio sirve el archivo que
+Apple pide en `/.well-known/apple-app-site-association`.
+
+Dos avisos: el archivo tiene que estar publicado **antes** de instalar la app,
+porque iOS lo comprueba al instalar; y si algún día se cambia el Team ID, hay
+que cambiarlo también en `src/app/.well-known/apple-app-site-association/`.
 
 ---
 

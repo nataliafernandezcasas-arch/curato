@@ -14,7 +14,7 @@ const config: CapacitorConfig = {
   appId: "com.curatocollective.app",
   appName: "Curato",
   webDir: "mobile/www",
-  backgroundColor: "#1E1E1E",
+  backgroundColor: "#14100E",
   server: {
     // The app opens on /dashboard, never on the marketing home. Curato is
     // invitation-only, so someone holding the app is already a member and does
