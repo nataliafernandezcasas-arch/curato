@@ -6,12 +6,13 @@ import { MaisonValidee } from "./apporteur";
 import { SeisHoras, StoriesManquantes } from "./recordatorios";
 import { CandidatureRecue, MotDePasse } from "./cuenta";
 import {
+  sendAccessCode,
   sendAvisoStoriesManquantes,
+  sendMaisonNewRequest,
   sendRecordatorioSeisHoras,
   sendRecruiterProspectDecision,
   sendReservationConfirmed,
   sendReservationDeclined,
-  sendMaisonNewRequest,
 } from "@/lib/emails";
 
 const PORTADA = "https://www.curatocollective.com/Gastronomie.jpeg";
@@ -132,5 +133,12 @@ describe("lo que se manda a Resend", () => {
     });
     expect(enviados[0].subject).toBe("Tereza Bolkvadze souhaite venir jeudi 22 octobre à 19:30");
     expect(String(enviados[0].text)).toContain("quarante-huit heures");
+  });
+
+  it("el código de bienvenida va en el asunto, en grupos de tres", async () => {
+    // Se lee en la notificación y se teclea sin abrir el correo.
+    await sendAccessCode({ to: "t@exemple.fr", code: "418062", expiresAt: new Date("2026-10-03T12:00:00Z") });
+    expect(enviados[0].subject).toBe("Votre code Curato : 418 062");
+    expect(String(enviados[0].text)).toContain("418 062");
   });
 });

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     const { data: app, error } = await supabase
       .from("applications")
-      .select("id, email, status, access_code, access_code_expires_at")
+      .select("id, email, status, access_code, access_code_expires_at, access_code_attempts")
       .eq("email", email.toLowerCase().trim())
       .eq("status", "approved")
       .order("created_at", { ascending: false })
@@ -25,8 +25,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Aucune candidature approuvée trouvée pour cet e-mail." }, { status: 404 });
     }
 
+    // Seis cifras se adivinan a fuerza de intentos, así que se cuentan. A los
+    // cinco fallos el código queda bloqueado y hay que pedir otro.
+    const intentos = (app.access_code_attempts as number | null) ?? 0;
+    if (intentos >= 5) {
+      return NextResponse.json(
+        { error: "Trop de tentatives. Écrivez-nous à hello@curatocollective.com pour un nouveau code." },
+        { status: 429 }
+      );
+    }
+
     if (!app.access_code || app.access_code !== code) {
-      return NextResponse.json({ error: "Code invalide. Vérifiez votre e-mail de bienvenue." }, { status: 401 });
+      await supabase.from("applications").update({ access_code_attempts: intentos + 1 }).eq("id", app.id);
+      const quedan = 4 - intentos;
+      return NextResponse.json(
+        {
+          error:
+            quedan > 0
+              ? `Code invalide. Il vous reste ${quedan} tentative${quedan > 1 ? "s" : ""}.`
+              : "Code invalide. C'était la dernière tentative : écrivez-nous pour un nouveau code.",
+        },
+        { status: 401 }
+      );
     }
 
     if (!app.access_code_expires_at || new Date(app.access_code_expires_at) < new Date()) {
@@ -50,14 +70,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Erreur lors de la génération du lien. Réessayez." }, { status: 500 });
     }
 
-    // Invalidate the code after use
+    // El código no se borra aquí: se le deja una ventana de quince minutos.
+    // Borrarlo antes de que la sesión exista dejaba a quien se interrumpía con
+    // un código muerto y un mensaje que le decía que escribiera a Curato. El
+    // enlace de Supabase ya es de un solo uso.
     await supabase
       .from("applications")
-      .update({ access_code: null, access_code_expires_at: null })
+      .update({
+        access_code_attempts: 0,
+        access_code_expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      })
       .eq("id", app.id);
 
+    // Y acaba fijando su contraseña: entró con un código, así que todavía no
+    // tiene una suya.
+    const destino = encodeURIComponent("/auth/change-password");
     return NextResponse.json({
-      redirectTo: `${SITE_URL}/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`,
+      redirectTo: `${SITE_URL}/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink&next=${destino}`,
     });
   } catch (err) {
     console.error("verify-access-code error:", err);

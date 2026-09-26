@@ -19,7 +19,7 @@ import {
   demandeDeclineeTexto,
   visiteConfirmeeTexto,
 } from "@/emails/visitas";
-import { CandidatureAcceptee, CandidatureRecue, Lancement, MotDePasse } from "@/emails/cuenta";
+import { CandidatureAcceptee, CandidatureRecue, CodeDacces, Lancement, MotDePasse } from "@/emails/cuenta";
 import { EngagementSigne, NouvelleMaison, DemandeRecue } from "@/emails/maison";
 import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
 import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
@@ -64,6 +64,24 @@ const PARIS = "Europe/Paris";
 const jourDe = (d: Date) => d.toLocaleDateString("fr-FR", { weekday: "long", timeZone: PARIS });
 const heureDe = (d: Date) => d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: PARIS });
 const JOUR_EN_TETE = /^(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b/i;
+
+/**
+ * El código de bienvenida. Va en el asunto porque se teclea sin abrir el
+ * correo, y en grupos de tres porque seis cifras seguidas se leen mal.
+ */
+export async function sendAccessCode(opts: { to: string; code: string; expiresAt: Date }) {
+  const groupedCode = `${opts.code.slice(0, 3)} ${opts.code.slice(3)}`;
+  const expiresLabel = opts.expiresAt.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    timeZone: PARIS,
+  });
+  return sendEmail(
+    opts.to,
+    `Votre code Curato : ${groupedCode}`,
+    createElement(CodeDacces, { code: opts.code, groupedCode, expiresLabel })
+  );
+}
 
 // ── Candidatures ─────────────────────────────────────────────────────────────
 export async function sendApplicationReceived(to: string, name: string, type: "creator" | "business") {
