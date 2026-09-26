@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 const BUCKET = "content-proofs";
 // El compromiso de Curato con cada casa: cinco visitas garantizadas al mes.
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

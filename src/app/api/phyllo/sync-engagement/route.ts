@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 // Called right after the Phyllo Connect SDK reports an account connected.
 // Pulls the connected account's profile (followers + engagement) and stores it
@@ -19,7 +20,7 @@ export async function POST() {
     const { data: creator } = await admin
       .from("creators")
       .select("id, phyllo_account_id, followers")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .maybeSingle();
 
     if (!creator?.phyllo_account_id) {

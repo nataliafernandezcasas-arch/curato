@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { filtroDe } from "@/lib/identidad";
 
 const BUCKET = "maison-photos";
 
@@ -9,7 +10,7 @@ async function getMaison(adminClient: ReturnType<typeof createAdminClient>, user
   const { data } = await adminClient
     .from("comercios")
     .select("id, name, description, description_en, description_es, photos, website_url, contact_instagram, arrondissement, address, category_id")
-    .or(`owner_id.eq.${userId},email.eq.${email.toLowerCase()}`)
+    .or(filtroDe(userId, email))
     .eq("stage", "activo")
     .order("created_at", { ascending: false })
     .limit(1)

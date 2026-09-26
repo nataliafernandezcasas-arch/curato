@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { filtroDe } from "@/lib/identidad";
 
 const BUCKET = "maison-menus";
 
@@ -8,7 +9,7 @@ async function getMaison(admin: ReturnType<typeof createAdminClient>, userId: st
   const { data } = await admin
     .from("comercios")
     .select("id, availability, blocked_slots, services, menu_urls")
-    .or(`owner_id.eq.${userId},email.eq.${email.toLowerCase()}`)
+    .or(filtroDe(userId, email))
     .eq("stage", "activo")
     .order("created_at", { ascending: false })
     .limit(1)

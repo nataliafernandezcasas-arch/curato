@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildDossiers } from "@/lib/storyteller-dossier";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 // La ficha de un storyteller que la casa abre desde el roster. Es el mismo
 // dossier que acompaña a una demanda de visita, sin la demanda.
@@ -18,7 +19,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     const { data: maison } = await admin
       .from("comercios")
       .select("id")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

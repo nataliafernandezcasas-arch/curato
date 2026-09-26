@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { signPortraits } from "@/lib/creator-portrait";
 import { subjectLabel } from "@/lib/photo-subjects";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 
 // Roster of signed storytellers, visible to a logged-in maison: name, handle,
@@ -20,7 +21,7 @@ export async function GET() {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createPhylloUser, createSDKToken } from "@/lib/phyllo/client";
+import { filtroDeUsuario } from "@/lib/identidad";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     const { data: creator, error: creatorErr } = await admin
       .from("creators")
       .select("id, full_name, email, phyllo_account_id")
-      .or(`owner_id.eq.${user.id},email.eq.${(user.email || "").toLowerCase()}`)
+      .or(filtroDeUsuario(user))
       .maybeSingle();
 
     if (!creator) {
