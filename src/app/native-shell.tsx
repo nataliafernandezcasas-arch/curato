@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { getCapacitor, getNativePlatform } from "@/lib/native/bridge";
+import { esperaEscucha, getCapacitor, getNativePlatform, type Alta } from "@/lib/native/bridge";
 import { attachPushListeners, syncPushRegistration } from "@/lib/native/push";
 
 // El dominio que la app reclama en App.entitlements. Un enlace de otro sitio
@@ -48,6 +48,15 @@ export default function NativeShell() {
 
     const cap = getCapacitor();
 
+    // Engancha una escucha venga como venga, promesa u objeto, y apunta cómo
+    // soltarla. Aquí es donde estaba el fallo que dejaba la app en blanco: un
+    // .then sobre algo que en iOS no es una promesa lanza, y la excepción salía
+    // en el primer efecto, antes de pintar nada.
+    const enganchar = async (alta: Alta | undefined) => {
+      const escucha = await esperaEscucha(alta);
+      if (escucha) track(() => escucha.remove());
+    };
+
     // El estilo de la barra de estado lo pone TemaSync (src/lib/tema.ts), que
     // sabe si la pantalla va en claro o en oscuro.
 
@@ -56,22 +65,22 @@ export default function NativeShell() {
     // contraseña deja la sesión dentro de la app y no fuera. Lo permite
     // com.apple.developer.associated-domains, y lo confirma el archivo que
     // sirve /.well-known/apple-app-site-association.
-    cap?.Plugins?.App?.addListener("appUrlOpen", ({ url }) => {
-      try {
-        const destino = new URL(url);
-        if (!NUESTRO.test(destino.hostname)) return;
-        router.replace(`${destino.pathname}${destino.search}${destino.hash}`);
-      } catch {
-        /* una URL que no se puede leer no lleva a ninguna parte */
-      }
-    })
-      .then((handle) => track(() => handle.remove()))
-      .catch(() => {});
+    void enganchar(
+      cap?.Plugins?.App?.addListener("appUrlOpen", ({ url }) => {
+        try {
+          const destino = new URL(url);
+          if (!NUESTRO.test(destino.hostname)) return;
+          router.replace(`${destino.pathname}${destino.search}${destino.hash}`);
+        } catch {
+          /* una URL que no se puede leer no lleva a ninguna parte */
+        }
+      })
+    );
 
     if (platform === "android") {
       const app = cap?.Plugins?.App;
-      app
-        ?.addListener("backButton", ({ canGoBack }) => {
+      void enganchar(
+        app?.addListener("backButton", ({ canGoBack }) => {
           if (canGoBack) {
             window.history.back();
           } else {
@@ -81,8 +90,7 @@ export default function NativeShell() {
             app.minimizeApp().catch(() => {});
           }
         })
-        .then((handle) => track(() => handle.remove()))
-        .catch(() => {});
+      );
     }
 
     attachPushListeners((ruta) => router.push(ruta)).then(track).catch(() => {});
