@@ -81,7 +81,7 @@ export async function attachPushListeners(navegar?: (ruta: string) => void): Pro
     console.warn("[curato] could not attach push listeners:", err);
   }
 
-  return () => handles.forEach((handle) => handle.remove());
+  return () => handles.forEach((handle) => handle?.remove?.());
 }
 
 /**

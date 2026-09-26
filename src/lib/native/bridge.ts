@@ -22,16 +22,27 @@ export interface PluginListenerHandle {
   remove: () => void;
 }
 
+/**
+ * Lo que devuelve addListener.
+ *
+ * Dos formas, y hay que aceptar las dos: el puente nativo de iOS devuelve el
+ * manejador tal cual, y los paquetes de JavaScript devuelven una promesa. Un
+ * `.then` a secas sobre esto rompía la app entera al arrancar, porque la
+ * excepción salía dentro del primer efecto y se llevaba la página. Con este
+ * tipo, `.then` ya no compila: hay que usar await, que vale para las dos.
+ */
+export type Alta = Promise<PluginListenerHandle> | PluginListenerHandle;
+
 export interface AppPlugin {
   addListener(
     event: "backButton",
     handler: (event: { canGoBack: boolean }) => void
-  ): Promise<PluginListenerHandle>;
+  ): Alta;
   /** Un enlace de curatocollective.com abierto desde fuera de la app. */
   addListener(
     event: "appUrlOpen",
     handler: (event: { url: string }) => void
-  ): Promise<PluginListenerHandle>;
+  ): Alta;
   minimizeApp(): Promise<void>;
 }
 
@@ -53,15 +64,15 @@ export interface PushNotificationsPlugin {
   addListener(
     event: "registration",
     handler: (token: { value: string }) => void
-  ): Promise<PluginListenerHandle>;
+  ): Alta;
   addListener(
     event: "registrationError",
     handler: (error: { error: string }) => void
-  ): Promise<PluginListenerHandle>;
+  ): Alta;
   addListener(
     event: "pushNotificationReceived" | "pushNotificationActionPerformed",
     handler: (event: PushNotificationEvent) => void
-  ): Promise<PluginListenerHandle>;
+  ): Alta;
 }
 
 interface CapacitorGlobal {
@@ -77,6 +88,24 @@ interface CapacitorGlobal {
 declare global {
   interface Window {
     Capacitor?: CapacitorGlobal;
+  }
+}
+
+/**
+ * Espera un alta de escucha, venga como venga, y no lanza nunca.
+ *
+ * Es la única forma correcta de recoger lo que devuelve addListener: iOS da el
+ * manejador tal cual y los paquetes de JavaScript dan una promesa. Un `.then`
+ * sobre el primero lanza, y como estas altas se piden dentro del primer efecto
+ * de la cáscara, esa excepción dejaba la app en blanco con "This page couldn't
+ * load" en todas las pantallas.
+ */
+export async function esperaEscucha(alta: Alta | undefined | null): Promise<PluginListenerHandle | null> {
+  try {
+    const escucha = await alta;
+    return typeof escucha?.remove === "function" ? escucha : null;
+  } catch {
+    return null;
   }
 }
 
