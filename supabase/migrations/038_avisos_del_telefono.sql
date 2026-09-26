@@ -33,6 +33,13 @@ CREATE INDEX IF NOT EXISTS device_tokens_email_idx   ON device_tokens (email);
 -- Un token en manos ajenas permite mandarle avisos al teléfono de otra persona.
 ALTER TABLE device_tokens ENABLE ROW LEVEL SECURITY;
 
+-- Y el permiso a mano. En esta base las tablas nuevas no heredan privilegios,
+-- así que sin esta línea la tabla existe y nadie puede escribir en ella: la app
+-- recibía un 42501 al guardar un token y ningún aviso salía. Se da igual en la
+-- 020 y en la 027, por lo mismo. En producción se corrió aparte el 26 de
+-- septiembre de 2026, después de la 038.
+GRANT ALL ON device_tokens TO service_role;
+
 COMMENT ON TABLE device_tokens IS
   'Un aparato que aceptó recibir avisos. La llave es el token de Apple o de Google; el dueño se reescribe en cada entrada.';
 COMMENT ON COLUMN device_tokens.email IS
