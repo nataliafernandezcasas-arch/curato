@@ -29,6 +29,13 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(new URL(next, request.url));
     }
+    // The token is single-use. If this same link was already opened (a second
+    // load of the URL, a double tap), the first hit left a session behind:
+    // carry on to `next` instead of dropping the user on the sign-in form.
+    const { data } = await supabase.auth.getUser();
+    if (data.user) {
+      return NextResponse.redirect(new URL(next, request.url));
+    }
   }
 
   return NextResponse.redirect(new URL("/auth/sign-in", request.url));
