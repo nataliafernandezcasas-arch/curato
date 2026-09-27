@@ -44,7 +44,14 @@ const config: CapacitorConfig = {
     errorPath: "index.html",
   },
   ios: {
-    contentInset: "always",
+    // El hueco de la franja de estado lo pone el CSS, no UIKit.
+    //
+    // Con "always", UIKit empujaba la página hacia abajo y en reposo se veía
+    // bien, pero una barra sticky se pega al borde del WebView, y ese borde
+    // está debajo de la franja: al desplazarse, la hora y la batería quedaban
+    // encima del logotipo. El CSS sí sabe qué barra tiene que cubrir la franja
+    // con su vidrio y cuál solo tiene que apartarse. Ver globals.css.
+    contentInset: "never",
   },
   plugins: {
     PushNotifications: {

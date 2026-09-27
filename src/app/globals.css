@@ -143,16 +143,37 @@ html[data-native] body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Only Android needs the insets in CSS. On iOS, `contentInset: "always"` makes
-   UIKit inset the WebView's scroll view below the notch already, so padding
-   here as well would double the gap. Android 15+ forces edge-to-edge system
-   bars and offers no equivalent, so the status bar and the gesture pill would
-   otherwise sit on top of the content. */
-html[data-native="android"] body {
+/* El hueco de las barras del sistema.
+   Estaba solo en Android, porque en iOS se daba por hecho que lo ponía UIKit
+   con contentInset: "always". No lo pone: en el simulador, el conmutador de
+   idioma de la pantalla de entrada sale debajo del wifi y de la batería. Así
+   que la cuenta se hace aquí, y contentInset pasa a "never" para que no haya
+   dos sitios que la hagan (capacitor.config.ts).
+
+   Abajo no se toca: las barras fijas ya cubren esa franja con su propio
+   vidrio, y sumarle un hueco al body dejaría la última fila flotando. */
+html[data-native] body {
   padding-top: var(--safe-top);
-  padding-bottom: var(--safe-bottom);
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
+}
+
+/* Android 15+ fuerza las barras del sistema encima del contenido y no ofrece
+   nada equivalente a contentInset, así que ahí el pulgar también necesita el
+   hueco de abajo. */
+html[data-native="android"] body {
+  padding-bottom: var(--safe-bottom);
+}
+
+/* La cabecera es la excepción: no se aparta de la franja, la cubre.
+   Sube hasta el borde de la pantalla con un margen negativo y se devuelve el
+   hueco por dentro. Así su vidrio llega hasta arriba y el logotipo se queda
+   siempre por debajo de la hora, en reposo y desplazada, que es donde la hora
+   se comía el logotipo: una barra sticky se pega al borde del WebView, y ese
+   borde está debajo de la franja. */
+html[data-native] .barra-cabecera {
+  margin-top: calc(-1 * var(--safe-top));
+  padding-top: var(--safe-top);
 }
 
 /* ---------------------------------------------------------------------------
