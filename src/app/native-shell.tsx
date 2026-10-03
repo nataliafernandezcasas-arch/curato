@@ -70,7 +70,12 @@ export default function NativeShell() {
         try {
           const destino = new URL(url);
           if (!NUESTRO.test(destino.hostname)) return;
-          router.replace(`${destino.pathname}${destino.search}${destino.hash}`);
+          // Navegación completa, no router.replace. /auth/callback es una ruta
+          // de servidor, no una página: el router de Next la pedía como
+          // navegación de cliente y luego la volvía a cargar entera, así que el
+          // token de un solo uso del correo se gastaba en la primera petición y
+          // la segunda caía en /auth/sign-in.
+          window.location.replace(`${destino.pathname}${destino.search}${destino.hash}`);
         } catch {
           /* una URL que no se puede leer no lleva a ninguna parte */
         }
