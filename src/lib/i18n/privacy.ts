@@ -48,7 +48,7 @@ const fr: PrivacyContent = {
   pageTitle: "Politique de confidentialité",
   eyebrow: "Curato · Confidentialité",
   lastUpdatedLabel: "Dernière mise à jour",
-  lastUpdated: "10 septembre 2026",
+  lastUpdated: "3 octobre 2026",
   draftNoticeTitle: "Document de travail",
   draftNoticeBody:
     "La présente politique est un projet en cours de finalisation. Elle sera mise à jour à l'issue de l'immatriculation de Curato Collective SAS et de sa revue par un conseil juridique spécialisé en RGPD. Les mentions [entre crochets] sont des champs en attente.",
@@ -98,9 +98,12 @@ const fr: PrivacyContent = {
             "Profil créateur : nombre d'abonnés, catégories de contenu, crédit mensuel alloué, historique des visites. Si le créateur connecte son compte Instagram : ses métriques publiques (taux d'engagement, portée moyenne, vues moyennes) et un aperçu de ses publications récentes, obtenus via notre prestataire Phyllo. Le cas échéant, le portrait, la biographie et les photographies qu'il choisit d'afficher.",
             "Contenu de visite : photos et vidéos téléversées par les créateurs comme preuve de visite ; ces contenus sont visibles par la maison concernée et par l'équipe Curato. Le créateur déclare également la portée de ses publications (vues, comptes atteints, interactions), qui alimente le rapport mensuel de la maison concernée.",
             "Données techniques : journaux de connexion, identifiants de session, adresse IP, type de navigateur, dates et heures d'accès, à des fins de sécurité et de bon fonctionnement du service.",
+            "Maison membre : formule d'abonnement, date de signature, période d'essai et historique des paiements. Les données de carte bancaire sont saisies directement auprès de notre prestataire de paiement Stripe ; Curato n'y a jamais accès.",
+            "Apporteur d'affaires : nom, adresse électronique et IBAN, utilisé uniquement pour verser les commissions par virement.",
+            "Notifications : si vous activez les avis dans l'application, l'identifiant de notification de votre appareil, afin de vous les envoyer. Il est supprimé lorsque vous les désactivez.",
           ],
         },
-        "Curato ne collecte aucune donnée sensible au sens de l'article 9 du RGPD (origine, opinions, santé, orientation sexuelle, etc.). Aucune donnée bancaire n'est collectée ni stockée : le crédit mensuel est pré-alloué par Curato et ne donne pas lieu à un paiement par l'utilisateur.",
+        "Curato ne collecte aucune donnée sensible au sens de l'article 9 du RGPD (origine, opinions, santé, orientation sexuelle, etc.). Côté créateurs, aucune donnée bancaire n'est collectée : le crédit mensuel est pré-alloué par Curato et ne donne pas lieu à un paiement. Les seules données bancaires conservées par Curato sont l'IBAN des apporteurs d'affaires ; les données de carte des maisons restent chez Stripe.",
       ],
     },
     {
@@ -138,6 +141,7 @@ const fr: PrivacyContent = {
             "Vercel (Vercel Inc.) — hébergement du site et des fonctions serveur. Données traitées : journaux techniques, requêtes HTTP. Localisation : États-Unis et Union européenne (selon la région d'exécution).",
             "Resend (Resend Inc.) — envoi des emails transactionnels. Données traitées : adresse électronique, nom, contenu de l'email. Localisation : États-Unis.",
             "Phyllo (Phyllo Inc.) — analyse des publications publiques sur Instagram pour vérifier automatiquement la réalité d'une visite, associer le contenu publié à la maison concernée et fournir les métriques publiques du compte (abonnés, engagement, portée) présentées aux maisons membres. Données traitées : identifiant Instagram, identifiant interne créateur, métadonnées des publications publiques, métriques publiques du compte. Localisation : États-Unis. Ce traitement n'est activé que pour les créateurs qui connectent volontairement leur compte Instagram, après consentement explicite.",
+            "Stripe (Stripe Payments Europe, Ltd.) — encaissement de l'abonnement des maisons (en cours de mise en place). Données traitées : nom de la maison, adresse électronique, moyen de paiement (saisi directement chez Stripe, jamais transmis à Curato), historique des paiements. Localisation : Union européenne (Irlande), avec des transferts possibles vers les États-Unis.",
           ],
         },
         "Chaque sous-traitant est lié à Curato par un contrat (Data Processing Agreement) imposant des garanties équivalentes à celles de la présente politique. La liste des sous-traitants peut évoluer ; toute modification substantielle sera reflétée dans cette politique.",
@@ -156,6 +160,7 @@ const fr: PrivacyContent = {
             "Une maison membre voit également les photographies et la description de style jointes à la candidature d'un créateur admis (son portfolio), dans son espace Storytellers et lorsque le créateur lui adresse une demande de visite. Elle peut les regarder, mais ni les télécharger ni les réutiliser.",
             "Un créateur voit, pour chaque offre : le nom de la maison, son adresse, sa catégorie et la valeur du crédit accordé. Les coordonnées privées de la maison (adresse électronique du contact, numéro privé) ne sont pas exposées.",
             "Les réponses au questionnaire d'onboarding ne sont jamais partagées avec les maisons. Elles servent uniquement à l'algorithme interne de matching et à l'équipe Curato.",
+            "L'IBAN d'un apporteur d'affaires n'est visible que par lui-même et par l'équipe Curato, qui l'utilise pour verser ses commissions.",
             "L'équipe Curato (administrateurs) a accès à l'ensemble des données aux seules fins de fonctionnement et de support du service.",
           ],
         },
@@ -174,6 +179,7 @@ const fr: PrivacyContent = {
             "Inscriptions à l'évènement de lancement : jusqu'à 6 mois après la tenue de l'évènement.",
             "Contenu de visite (photos, vidéos) : tant que le compte du créateur est actif ; la maison bénéficie en parallèle de 90 jours de droits d'utilisation exclusifs à compter de la date de visite, conformément aux conditions générales.",
             "Chiffres de portée déclarés : tant que le compte du créateur est actif, pour le rapport mensuel de la maison concernée.",
+            "IBAN des apporteurs d'affaires : tant que le compte est actif, puis supprimé à sa clôture, sous réserve des pièces comptables conservées 10 ans.",
             "Journaux techniques et données d'authentification : 12 mois.",
             "Documents comptables et de facturation (le cas échéant) : 10 ans, conformément à l'article L. 123-22 du Code de commerce.",
           ],
@@ -245,7 +251,7 @@ const fr: PrivacyContent = {
       id: "transferts",
       title: "12. Transferts hors Union européenne",
       blocks: [
-        "Certains de nos sous-traitants (Vercel, Resend, Phyllo) sont établis aux États-Unis. Les transferts de données hors UE sont encadrés par les garanties prévues par le RGPD :",
+        "Certains de nos sous-traitants (Vercel, Resend, Phyllo et, le cas échéant, Stripe) sont établis aux États-Unis. Les transferts de données hors UE sont encadrés par les garanties prévues par le RGPD :",
         {
           list: [
             "Adhésion au cadre Data Privacy Framework (DPF) lorsque le prestataire y est certifié, ou",
@@ -280,7 +286,7 @@ const en: PrivacyContent = {
   pageTitle: "Privacy Policy",
   eyebrow: "Curato · Privacy",
   lastUpdatedLabel: "Last updated",
-  lastUpdated: "September 10, 2026",
+  lastUpdated: "October 3, 2026",
   draftNoticeTitle: "Working draft",
   draftNoticeBody:
     "This policy is a draft pending finalisation. It will be updated once Curato Collective SAS is registered and after review by a GDPR-qualified legal counsel. Fields in [brackets] are placeholders. The French version is the legally binding one.",
@@ -330,9 +336,12 @@ const en: PrivacyContent = {
             "Creator profile: follower count, content categories, allocated monthly credit, visit history. If the creator connects their Instagram account: their public metrics (engagement rate, average reach, average views) and a preview of their recent posts, obtained through our provider Phyllo. Where applicable, the portrait, biography and photographs they choose to display.",
             "Visit content: photos and videos uploaded by creators as proof of visit; this content is visible to the relevant house and to the Curato team. The creator also declares the reach of their posts (views, accounts reached, interactions), which feeds the relevant house's monthly report.",
             "Technical data: connection logs, session identifiers, IP address, browser type, access timestamps, for security and service operation.",
+            "Member house: subscription plan, signing date, trial period and payment history. Card details are entered directly with our payment provider Stripe; Curato never has access to them.",
+            "Referral partner: name, email address and IBAN, used solely to pay commissions by bank transfer.",
+            "Notifications: if you turn on alerts in the app, your device's notification identifier, so we can send them. It is deleted when you turn them off.",
           ],
         },
-        "Curato does not collect any special category data within the meaning of Article 9 GDPR (origin, opinions, health, sexual orientation, etc.). No banking data is collected or stored: the monthly credit is pre-allocated by Curato and does not involve any payment by the user.",
+        "Curato does not collect any special category data within the meaning of Article 9 GDPR (origin, opinions, health, sexual orientation, etc.). No banking data is collected from creators: the monthly credit is pre-allocated by Curato and does not involve any payment. The only banking data Curato keeps is referral partners' IBANs; houses' card details stay with Stripe.",
       ],
     },
     {
@@ -370,6 +379,7 @@ const en: PrivacyContent = {
             "Vercel (Vercel Inc.) — site and serverless function hosting. Data processed: technical logs, HTTP requests. Location: United States and European Union (depending on execution region).",
             "Resend (Resend Inc.) — transactional email delivery. Data processed: email, name, email content. Location: United States.",
             "Phyllo (Phyllo Inc.) — analysis of public Instagram posts to automatically verify the reality of a visit, link published content to the relevant house and provide the account's public metrics (followers, engagement, reach) shown to member houses. Data processed: Instagram handle, internal creator ID, public post metadata, the account's public metrics. Location: United States. This processing is only activated for creators who voluntarily connect their Instagram account, after explicit consent.",
+            "Stripe (Stripe Payments Europe, Ltd.) — collection of houses' subscription payments (being set up). Data processed: house name, email address, payment method (entered directly with Stripe, never sent to Curato), payment history. Location: European Union (Ireland), with possible transfers to the United States.",
           ],
         },
         "Each sub-processor is bound to Curato by a Data Processing Agreement imposing safeguards equivalent to this policy. The list of sub-processors may evolve; any substantial change will be reflected here.",
@@ -388,6 +398,7 @@ const en: PrivacyContent = {
             "A member house also sees the photographs and style description attached to an admitted creator's application (their portfolio), in its Storytellers area and when the creator sends it a visit request. It can look at them, but can neither download nor reuse them.",
             "A creator sees, for each offer: the house's name, address, category and the value of the credit granted. The house's private contact details (contact email, private number) are not exposed.",
             "Onboarding questionnaire answers are never shared with houses. They are used solely by the internal matching algorithm and by the Curato team.",
+            "A referral partner's IBAN is visible only to them and to the Curato team, which uses it to pay their commissions.",
             "The Curato team (administrators) has access to all data, strictly for the purposes of operating and supporting the service.",
           ],
         },
@@ -406,6 +417,7 @@ const en: PrivacyContent = {
             "Launch event registrations: up to 6 months after the event takes place.",
             "Visit content (photos, videos): as long as the creator's account is active; the house benefits in parallel from 90 days of exclusive usage rights from the visit date, as per the terms of service.",
             "Declared reach figures: as long as the creator's account is active, for the relevant house's monthly report.",
+            "Referral partners' IBANs: as long as the account is active, then deleted when it is closed, subject to accounting records kept for 10 years.",
             "Technical logs and authentication data: 12 months.",
             "Accounting and invoicing documents (where applicable): 10 years, as required by Article L. 123-22 of the French Commercial Code.",
           ],
@@ -477,7 +489,7 @@ const en: PrivacyContent = {
       id: "transferts",
       title: "12. Transfers outside the European Union",
       blocks: [
-        "Some of our sub-processors (Vercel, Resend, Phyllo) are established in the United States. Data transfers outside the EU are framed by the safeguards provided by the GDPR:",
+        "Some of our sub-processors (Vercel, Resend, Phyllo and, where applicable, Stripe) are established in the United States. Data transfers outside the EU are framed by the safeguards provided by the GDPR:",
         {
           list: [
             "Membership of the Data Privacy Framework (DPF) where the provider is certified, or",
@@ -512,7 +524,7 @@ const es: PrivacyContent = {
   pageTitle: "Política de Privacidad",
   eyebrow: "Curato · Privacidad",
   lastUpdatedLabel: "Última actualización",
-  lastUpdated: "10 de septiembre de 2026",
+  lastUpdated: "3 de octubre de 2026",
   draftNoticeTitle: "Borrador",
   draftNoticeBody:
     "Esta política es un borrador pendiente de finalización. Se actualizará una vez constituida Curato Collective SAS y tras la revisión por un abogado especializado en RGPD. Los campos entre [corchetes] son marcadores. La versión francesa es la jurídicamente vinculante.",
@@ -562,9 +574,12 @@ const es: PrivacyContent = {
             "Perfil de creador: número de seguidores, categorías de contenido, crédito mensual asignado, historial de visitas. Si el creador conecta su cuenta de Instagram: sus métricas públicas (tasa de engagement, alcance medio, visualizaciones medias) y una vista previa de sus publicaciones recientes, obtenidas a través de nuestro proveedor Phyllo. En su caso, el retrato, la biografía y las fotografías que elija mostrar.",
             "Contenido de visita: fotos y vídeos subidos por los creadores como prueba de visita; este contenido es visible para la maison correspondiente y para el equipo de Curato. El creador declara también el alcance de sus publicaciones (visualizaciones, cuentas alcanzadas, interacciones), que alimenta el informe mensual de la maison correspondiente.",
             "Datos técnicos: registros de conexión, identificadores de sesión, dirección IP, tipo de navegador, fechas y horas de acceso, con fines de seguridad y funcionamiento del servicio.",
+            "Maison miembro: plan de suscripción, fecha de firma, periodo de prueba e historial de pagos. Los datos de la tarjeta se introducen directamente en nuestro proveedor de pagos Stripe; Curato nunca tiene acceso a ellos.",
+            "Apporteur (agente comercial): nombre, correo electrónico e IBAN, usado únicamente para pagar las comisiones por transferencia.",
+            "Notificaciones: si activas los avisos en la app, el identificador de notificaciones de tu dispositivo, para poder enviártelos. Se elimina cuando los desactivas.",
           ],
         },
-        "Curato no recoge ningún dato sensible en el sentido del artículo 9 del RGPD (origen, opiniones, salud, orientación sexual, etc.). No se recogen ni almacenan datos bancarios: el crédito mensual es pre-asignado por Curato y no da lugar a ningún pago por parte del usuario.",
+        "Curato no recoge ningún dato sensible en el sentido del artículo 9 del RGPD (origen, opiniones, salud, orientación sexual, etc.). No se recogen datos bancarios de los creadores: el crédito mensual es pre-asignado por Curato y no da lugar a ningún pago. Los únicos datos bancarios que conserva Curato son el IBAN de los apporteurs; los datos de tarjeta de las maisons se quedan en Stripe.",
       ],
     },
     {
@@ -602,6 +617,7 @@ const es: PrivacyContent = {
             "Vercel (Vercel Inc.) — alojamiento del sitio y de funciones serverless. Datos tratados: registros técnicos, peticiones HTTP. Ubicación: Estados Unidos y Unión Europea (según la región de ejecución).",
             "Resend (Resend Inc.) — envío de correos transaccionales. Datos tratados: correo electrónico, nombre, contenido del correo. Ubicación: Estados Unidos.",
             "Phyllo (Phyllo Inc.) — análisis de las publicaciones públicas en Instagram para verificar automáticamente la realidad de una visita, asociar el contenido publicado a la maison correspondiente y proporcionar las métricas públicas de la cuenta (seguidores, engagement, alcance) que se muestran a las maisons miembro. Datos tratados: identificador de Instagram, ID interno del creador, metadatos de las publicaciones públicas, métricas públicas de la cuenta. Ubicación: Estados Unidos. Este tratamiento solo se activa para creadores que conectan voluntariamente su cuenta de Instagram, previo consentimiento explícito.",
+            "Stripe (Stripe Payments Europe, Ltd.) — cobro de la suscripción de las maisons (en proceso de implantación). Datos tratados: nombre de la maison, correo electrónico, medio de pago (introducido directamente en Stripe, nunca transmitido a Curato), historial de pagos. Ubicación: Unión Europea (Irlanda), con posibles transferencias a Estados Unidos.",
           ],
         },
         "Cada encargado del tratamiento está vinculado a Curato por un acuerdo (Data Processing Agreement) que impone garantías equivalentes a las de esta política. La lista de encargados puede evolucionar; cualquier modificación sustancial se reflejará aquí.",
@@ -620,6 +636,7 @@ const es: PrivacyContent = {
             "Una maison miembro ve también las fotografías y la descripción de estilo adjuntas a la candidatura de un creador admitido (su portafolio), en su espacio Storytellers y cuando el creador le envía una solicitud de visita. Puede mirarlas, pero no descargarlas ni reutilizarlas.",
             "Un creador ve, para cada oferta: el nombre de la maison, su dirección, su categoría y el valor del crédito asignado. Los datos de contacto privados de la maison (correo del contacto, número privado) no se exponen.",
             "Las respuestas al cuestionario de onboarding nunca se comparten con las maisons. Se utilizan únicamente por el algoritmo interno de matching y por el equipo de Curato.",
+            "El IBAN de un apporteur solo lo ven él mismo y el equipo de Curato, que lo usa para pagarle las comisiones.",
             "El equipo de Curato (administradores) tiene acceso al conjunto de los datos con el único fin de operar y dar soporte al servicio.",
           ],
         },
@@ -638,6 +655,7 @@ const es: PrivacyContent = {
             "Inscripciones al evento de lanzamiento: hasta 6 meses después de la celebración del evento.",
             "Contenido de visita (fotos, vídeos): mientras la cuenta del creador esté activa; la maison dispone en paralelo de 90 días de derechos de uso exclusivos desde la fecha de la visita, conforme a las condiciones generales.",
             "Cifras de alcance declaradas: mientras la cuenta del creador esté activa, para el informe mensual de la maison correspondiente.",
+            "IBAN de los apporteurs: mientras la cuenta esté activa; se elimina al cerrarla, salvo los justificantes contables, que se conservan 10 años.",
             "Registros técnicos y datos de autenticación: 12 meses.",
             "Documentos contables y de facturación (cuando proceda): 10 años, conforme al artículo L. 123-22 del Código de Comercio francés.",
           ],
@@ -709,7 +727,7 @@ const es: PrivacyContent = {
       id: "transferts",
       title: "12. Transferencias fuera de la Unión Europea",
       blocks: [
-        "Algunos de nuestros encargados del tratamiento (Vercel, Resend, Phyllo) están establecidos en Estados Unidos. Las transferencias de datos fuera de la UE están enmarcadas por las garantías previstas por el RGPD:",
+        "Algunos de nuestros encargados del tratamiento (Vercel, Resend, Phyllo y, en su caso, Stripe) están establecidos en Estados Unidos. Las transferencias de datos fuera de la UE están enmarcadas por las garantías previstas por el RGPD:",
         {
           list: [
             "Adhesión al marco Data Privacy Framework (DPF) cuando el proveedor está certificado, o",
