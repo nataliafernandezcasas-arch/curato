@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SignOut } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
 import { useLang } from "@/lib/i18n/LanguageContext";
+import { BorrarCuenta } from "@/components/member/borrar-cuenta";
 import type { Lang } from "@/lib/i18n/translations";
 import { Button } from "@/components/member/button";
 
@@ -337,6 +338,8 @@ export default function RecruiterDashboard() {
           <Button type="submit">{t.btnSaveIban}</Button>
         </form>
       </section>
+
+      <BorrarCuenta />
     </main>
   );
 }

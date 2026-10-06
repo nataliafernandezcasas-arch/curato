@@ -11,6 +11,7 @@ import { STORYTELLER_LINKS } from "../nav-links";
 import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
 import { AvisosDelTelefono } from "@/components/member/avisos-telefono";
+import { BorrarCuenta } from "@/components/member/borrar-cuenta";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -104,6 +105,8 @@ export default function ReglagesPage() {
             {t.signOut}
           </Button>
         </section>
+
+        <BorrarCuenta />
       </div>
     </div>
   );

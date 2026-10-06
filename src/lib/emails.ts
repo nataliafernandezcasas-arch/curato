@@ -378,6 +378,24 @@ export async function sendRecruiterProspectDecision(
   );
 }
 
+// Alguien cerró su cuenta desde Réglages. El acceso ya está cerrado; lo que
+// queda es del equipo, y el correo dice qué.
+export async function sendAccountDeletionAlert(to: string, o: { email: string }) {
+  return sendEmail(
+    to,
+    `Compte supprimé : ${o.email}`,
+    aviso({
+      capital: "Suppression de compte",
+      titulo: o.email,
+      parrafos: [
+        `Le compte ${o.email} a été supprimé depuis l'application. L'accès est déjà fermé, les notifications coupées, le profil storyteller retiré du tableau des maisons et l'IBAN apporteur effacé.`,
+        "À faire : effacer ou anonymiser les données restantes (profil, photos, candidature) selon la politique de confidentialité, et, s'il s'agit d'une maison, la retirer du carnet et régler l'abonnement.",
+        "Puis renseigner completed_at dans account_deletion_requests.",
+      ],
+    })
+  );
+}
+
 export async function sendAdminProspectDecision(
   to: string,
   o: { recruiterName: string; maisonName: string; decision: "approved" | "rejected" }
