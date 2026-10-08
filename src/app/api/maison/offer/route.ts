@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDe } from "@/lib/identidad";
+import { enRango, rangoDe } from "@/lib/oferta";
 
 const BUCKET = "maison-menus";
 
 async function getMaison(admin: ReturnType<typeof createAdminClient>, userId: string, email: string) {
   const { data } = await admin
     .from("comercios")
-    .select("id, availability, blocked_slots, services, menu_urls")
+    .select("id, category_id, availability, blocked_slots, services, menu_urls")
     .or(filtroDe(userId, email))
     .eq("stage", "activo")
     .order("created_at", { ascending: false })
@@ -37,6 +38,8 @@ export async function GET() {
       blockedSlots: m.blocked_slots ?? [],
       services: m.services ?? [],
       offerEur: await ofertaDe(admin, m.id),
+      // Entre cuánto y cuánto puede ofrecer, según su categoría.
+      offerRange: rangoDe(m.category_id as string | null),
       menuUrls: m.menu_urls ?? [],
     });
   } catch {
@@ -79,8 +82,12 @@ export async function PATCH(request: NextRequest) {
     if (Object.keys(update).length) await admin.from("comercios").update(update).eq("id", m.id);
     // El importe va aparte: si la migración 043 aún no está, lo demás se guarda.
     if ("offerEur" in body) {
-      const n = Math.round(Number(body.offerEur));
-      const offer_eur = Number.isFinite(n) && n > 0 && n <= 10000 ? n : null;
+      const rango = rangoDe(m.category_id as string | null);
+      const n = Number(body.offerEur);
+      if (body.offerEur !== null && !enRango(n, rango)) {
+        return NextResponse.json({ error: "range", ...rango }, { status: 400 });
+      }
+      const offer_eur = body.offerEur === null ? null : n;
       const { error } = await admin.from("comercios").update({ offer_eur }).eq("id", m.id);
       if (error) return NextResponse.json({ error: "offer" }, { status: 500 });
     }

@@ -115,7 +115,13 @@ export default function ProfilPage() {
           .select("monthly_credit_cop, credit_used_cop")
           .eq("email", user.email.toLowerCase())
           .maybeSingle();
-        setProfile(data as Profile | null);
+        // Lo gastado sale de las visitas del mes (src/lib/credito.ts).
+        const credito = await fetch("/api/storyteller/credito", { cache: "no-store" })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null);
+        setProfile(
+          credito ? { monthly_credit_cop: credito.mensual, credit_used_cop: credito.usado } : (data as Profile | null)
+        );
       }
       const res = await fetch("/api/reservations/visit", { cache: "no-store" });
       if (res.ok) setVisits((await res.json()).visits ?? []);

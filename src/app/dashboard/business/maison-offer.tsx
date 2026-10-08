@@ -41,24 +41,37 @@ const ERROR_MENU: Record<Lang, Record<"format" | "size" | "upload", string>> = {
 
 // La oferta es un importe: lo que la casa ofrece por visita, y el storyteller
 // lo gasta como quiera en la carta (migración 043).
-const OFERTA: Record<Lang, { title: string; hint: string; placeholder: string; perVisit: string }> = {
+const OFERTA: Record<Lang, {
+  title: string;
+  hint: string;
+  placeholder: string;
+  perVisit: string;
+  range: (min: number, max: number) => string;
+  outOfRange: (min: number, max: number) => string;
+}> = {
   fr: {
     title: "Votre offre",
     hint: "Le montant que vous offrez à chaque storyteller, par visite. Il le dépense librement sur votre carte.",
     placeholder: "200",
     perVisit: "€ par visite",
+    range: (min, max) => `Entre ${min} € et ${max} € pour votre catégorie.`,
+    outOfRange: (min, max) => `Choisissez un montant entre ${min} € et ${max} €.`,
   },
   en: {
     title: "Your offer",
     hint: "The amount you offer each storyteller, per visit. They spend it freely on your menu.",
     placeholder: "200",
     perVisit: "€ per visit",
+    range: (min, max) => `Between ${min} € and ${max} € for your category.`,
+    outOfRange: (min, max) => `Choose an amount between ${min} € and ${max} €.`,
   },
   es: {
     title: "Tu oferta",
     hint: "El importe que ofreces a cada storyteller, por visita. Lo gasta como quiera en tu carta.",
     placeholder: "200",
     perVisit: "€ por visita",
+    range: (min, max) => `Entre ${min} € y ${max} € para tu categoría.`,
+    outOfRange: (min, max) => `Elige un importe entre ${min} € y ${max} €.`,
   },
 };
 
@@ -67,6 +80,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [blocked, setBlocked] = useState<Block[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [oferta, setOferta] = useState("");
+  const [rango, setRango] = useState<{ min: number; max: number } | null>(null);
   const [menuUrls, setMenuUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -83,6 +97,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         setBlocked(d.blockedSlots ?? []);
         setServices(d.services ?? []);
         setOferta(d.offerEur ? String(d.offerEur) : "");
+        setRango(d.offerRange ?? null);
         setMenuUrls(d.menuUrls ?? []);
       })
       .catch(() => {})
@@ -187,6 +202,8 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const inputCls =
     "min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ font-light text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted focus:border-accent";
   const labelCls = "text-capitale uppercase tracking-capitale text-accent";
+  // Un importe escrito fuera del rango de su categoría no se puede guardar.
+  const fueraDeRango = Boolean(oferta && rango && (Number(oferta) < rango.min || Number(oferta) > rango.max));
   const days = DAY_LABELS[lang];
   const fmtDate = (d: string) => new Date(d + "T00:00:00").toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric" });
 
@@ -265,7 +282,10 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           precio que había antes se queda guardada, pero ya no se edita. */}
       <section className="caja-cristal p-5 sm:p-6">
         <label htmlFor="oferta-eur" className={`${labelCls} mb-1 block`}>{OFERTA[lang].title}</label>
-        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{OFERTA[lang].hint}</p>
+        <p className="font-serif text-[12px] font-light text-text-secondary mb-1">{OFERTA[lang].hint}</p>
+        {rango && (
+          <p className="font-serif text-[12px] text-accent mb-5">{OFERTA[lang].range(rango.min, rango.max)}</p>
+        )}
         <div className="flex items-baseline gap-3">
           <input
             id="oferta-eur"
@@ -277,6 +297,9 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           />
           <span className="font-serif text-[15px] text-text-secondary">{OFERTA[lang].perVisit}</span>
         </div>
+        {fueraDeRango && rango && (
+          <p className="mt-3 font-serif text-[13px] text-copper-vif">{OFERTA[lang].outOfRange(rango.min, rango.max)}</p>
+        )}
       </section>
 
       {/* Menu / brochure */}
@@ -310,7 +333,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           cambiaba de texto dos segundos y medio para decir que había guardado.
           Ahora es el botón de siempre, y la confirmación llega como aviso. */}
       <div className="flex items-center gap-4">
-        <Button onClick={save} disabled={saving}>{t.offerSave}</Button>
+        <Button onClick={save} disabled={saving || fueraDeRango}>{t.offerSave}</Button>
       </div>
       <Toast aviso={aviso} onClose={cerrar} />
     </div>
