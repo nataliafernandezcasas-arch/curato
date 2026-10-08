@@ -12,6 +12,7 @@ import { translations, type Lang } from "@/lib/i18n/translations";
 import { createClient } from "@/lib/supabase/client";
 import { canBypassLaunchGate, isBeforeLaunch } from "@/lib/launch";
 import { parisParts, parisToIso, type AvailWindow } from "@/lib/availability";
+import { agendaDe, estanciaImposible, PASO_MINUTOS, type Agenda } from "@/lib/agenda";
 import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
@@ -21,6 +22,7 @@ import { enLetra } from "../../../../business/demandes-format";
 
 type Servicio = { name: string; description: string; price: string };
 type Disponibilidad = {
+  agenda?: Agenda;
   availability: AvailWindow[];
   blocked: { date: string }[];
   taken: string[];
@@ -30,8 +32,6 @@ type Disponibilidad = {
 type Casa = { id: string; name: string; category_id: string | null };
 type Franja = { hm: string; iso: string; libre: boolean };
 
-// Los hoteles se reservan por noche de llegada; el resto, por franja.
-const HOTEL = "00000000-0000-0000-0000-0000000ca701";
 // Una casa se reserva con dos o tres semanas de antelación: tres meses sobran.
 const HORIZONTE_DIAS = 90;
 // La hora a la que se guarda una llegada de hotel.
@@ -312,7 +312,14 @@ function Reserver({ id }: { id: string }) {
       .catch(() => {});
   }, [id]);
 
-  const esHotel = casa?.category_id === HOTEL;
+  // Por fechas (un hotel) o por horas: lo decide la casa (migración 044) y,
+  // si no ha dicho nada, su categoría.
+  const agenda = useMemo(() => disp?.agenda ?? agendaDe(null, casa?.category_id ?? null), [disp, casa]);
+  const esHotel = agenda.modo === "dates";
+  // Las noches empiezan en el mínimo de la casa.
+  useEffect(() => {
+    setNoches((n) => Math.min(agenda.maxNoches, Math.max(agenda.minNoches, n)));
+  }, [agenda]);
   const conAgenda = !esHotel && (disp?.availability?.length ?? 0) > 0;
 
   const ocupadas = useMemo(
@@ -336,7 +343,7 @@ function Reserver({ id }: { id: string }) {
     for (const w of disp.availability.filter((x) => x.day === d.getDay())) {
       const [sh, sm] = w.start.split(":").map(Number);
       const [eh, em] = w.end.split(":").map(Number);
-      for (let m = sh * 60 + sm; m < eh * 60 + em; m += 30) {
+      for (let m = sh * 60 + sm; m < eh * 60 + em; m += PASO_MINUTOS) {
         const hm = `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
         const iso = parisToIso(ymd, hm);
         if (new Date(iso).getTime() <= Date.now()) continue;
@@ -351,7 +358,9 @@ function Reserver({ id }: { id: string }) {
     if (!disp) return true; // cargando: los días en su sitio, apagados
     if (d < hoy || d > ultimo) return true;
     if (cerrados.has(ymdDe(d))) return true;
-    if (esHotel) return d <= hoy; // la llegada, a partir de mañana
+    // La llegada, a partir de mañana, un día que el hotel acepte llegadas y sin
+    // ninguna noche cerrada en la estancia.
+    if (esHotel) return d <= hoy || estanciaImposible(ymdDe(d), noches, agenda, disp.blocked ?? []) !== null;
     if (conAgenda) return !disp.availability.some((w) => w.day === d.getDay());
     return false;
   }
@@ -455,14 +464,21 @@ function Reserver({ id }: { id: string }) {
     }
   }
 
+  // Con otras noches, la llegada elegida puede dejar de valer (una noche
+  // cerrada entra en la estancia): entonces se vuelve a elegir el día.
+  function cambiarNoches(n: number) {
+    setNoches(n);
+    if (dia && estanciaImposible(ymdDe(dia), n, agenda, disp?.blocked ?? []) !== null) setDia(undefined);
+  }
+
   const volver = `/dashboard/storyteller/maison/${id}`;
   // − 2 +, la misma fila para personas y noches.
-  const contador = (valor: number, set: (n: number) => void) => (
+  const contador = (valor: number, set: (n: number) => void, min = 1, max = 99) => (
     <span className="flex items-center">
       <button
         type="button"
         aria-label="−"
-        onClick={() => set(Math.max(1, valor - 1))}
+        onClick={() => set(Math.max(min, valor - 1))}
         className="flex min-h-11 w-11 items-center justify-center text-sous-titre text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
       >
         −
@@ -471,7 +487,7 @@ function Reserver({ id }: { id: string }) {
       <button
         type="button"
         aria-label="+"
-        onClick={() => set(valor + 1)}
+        onClick={() => set(Math.min(max, valor + 1))}
         className="flex min-h-11 w-11 items-center justify-center text-sous-titre text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
       >
         +
@@ -644,7 +660,7 @@ function Reserver({ id }: { id: string }) {
               {esHotel && (
                 <Row
                   label={<span className="text-corps text-text-secondary">{t.nights}</span>}
-                  value={contador(noches, setNoches)}
+                  value={contador(noches, cambiarNoches, agenda.minNoches, agenda.maxNoches)}
                 />
               )}
             </Section>

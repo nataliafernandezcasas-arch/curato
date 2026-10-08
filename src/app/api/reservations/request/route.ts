@@ -4,12 +4,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendReservationRequested, sendMaisonNewRequest } from "@/lib/emails";
 import { avisar, AVISOS } from "@/lib/push/avisos";
 import { pendientesDe } from "@/lib/pendientes";
+import { agendaDe, estanciaImposibleDesde } from "@/lib/agenda";
 import { isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { creditoDelMes, mesDeParis } from "@/lib/credito";
 
-// Hôtels (migración 009): se reservan por noches y con llegada fija.
-const HOTEL = "00000000-0000-0000-0000-0000000ca701";
 
 // Creates a reservation REQUEST (status = pending_review). Its credits_cost
 // counts against the creator's month as soon as it exists (src/lib/credito.ts)
@@ -67,8 +66,17 @@ export async function POST(request: NextRequest) {
     // atiende, no a qué hora se puede llegar, y la pantalla manda siempre las
     // 15:00. Comprobarla contra las franjas rechazaba todas las peticiones de
     // cualquier hotel que tuviera agenda. Las fechas cerradas sí valen.
-    const franjas = venue.category_id === HOTEL ? [] : venue.availability ?? [];
-    if (!isOpenSlot(slotStart, franjas, venue.blocked_slots ?? [])) {
+    //
+    // Ahora cada casa dice cómo se reserva (migración 044). Por fechas, se
+    // mira el día de llegada, el número de noches y que ninguna noche de la
+    // estancia esté cerrada; por horas, que la hora caiga en una franja.
+    const { data: conAgenda, error: sinAgenda } = await admin.from("comercios").select("agenda").eq("id", venue.id).maybeSingle();
+    const agenda = agendaDe(sinAgenda ? null : (conAgenda as { agenda?: unknown } | null)?.agenda, venue.category_id);
+    const abierta =
+      agenda.modo === "dates"
+        ? !estanciaImposibleDesde(slotStart, Number(nights) || 0, agenda, venue.blocked_slots ?? [])
+        : isOpenSlot(slotStart, venue.availability ?? [], venue.blocked_slots ?? []);
+    if (!abierta) {
       return NextResponse.json({ code: "unavailable", error: "Créneau indisponible." }, { status: 409 });
     }
     const { data: clash } = await admin

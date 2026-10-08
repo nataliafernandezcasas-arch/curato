@@ -1,0 +1,13 @@
+-- 044: el tipo de agenda de cada casa.
+--
+-- Hasta ahora todas las casas tenían una franja por día. A un hotel eso no le
+-- sirve: se reserva por fechas, no por horas. Esta columna guarda cómo se
+-- reserva cada casa:
+--
+--   { "modo": "horaires" }                     -- por horas (restaurantes, spas)
+--   { "modo": "dates", "llegadas": [0,1,2,3,4],
+--     "minNoches": 1, "maxNoches": 3 }         -- por fechas (hoteles)
+--
+-- Las franjas por horas siguen en `availability`, ahora con varias por día
+-- (p. ej. dos servicios). Sin valor, la casa usa el modo de su categoría.
+ALTER TABLE comercios ADD COLUMN IF NOT EXISTS agenda JSONB;

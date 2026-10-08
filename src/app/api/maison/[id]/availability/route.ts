@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { agendaDe } from "@/lib/agenda";
 
 // Availability of one maison for the booking picker: the weekly windows, the
 // blocked dates, and the already-taken slots (times only, no creator info).
@@ -14,7 +15,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const admin = createAdminClient();
     const { data: venue } = await admin
       .from("comercios")
-      .select("id, availability, blocked_slots, is_reservable, services, menu_urls")
+      .select("id, category_id, availability, blocked_slots, is_reservable, services, menu_urls")
       .eq("id", id)
       .maybeSingle();
     if (!venue || !venue.is_reservable) return NextResponse.json({ error: "Maison indisponible." }, { status: 404 });
@@ -26,7 +27,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       .eq("venue_id", id)
       .in("status", ["pending_review", "confirmed"]);
 
+    // Cómo se reserva (migración 044): por horas o, un hotel, por fechas.
+    const { data: conAgenda, error: sinAgenda } = await admin.from("comercios").select("agenda").eq("id", id).maybeSingle();
+    const agenda = agendaDe(sinAgenda ? null : (conAgenda as { agenda?: unknown } | null)?.agenda, venue.category_id as string | null);
+
     return NextResponse.json({
+      agenda,
       availability: venue.availability ?? [],
       blocked: venue.blocked_slots ?? [],
       taken: (taken ?? []).map((r) => r.slot_start).filter(Boolean),
