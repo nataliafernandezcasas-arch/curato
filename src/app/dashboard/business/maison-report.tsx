@@ -6,6 +6,7 @@ import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Rise, Photo } from "@/components/member/motion";
 import { Viewer } from "@/components/member/viewer";
+import { Retrato } from "@/components/member/retrato";
 
 type Informe = {
   month: string;
@@ -13,7 +14,7 @@ type Informe = {
   guaranteed: number;
   belowMinimum: boolean;
   reach: { accounts: number; views: number; interactions: number; declared: number };
-  storytellers: { name: string; handle: string | null; followers: number | null; date: string; accounts: number | null }[];
+  storytellers: { name: string; handle: string | null; portrait: string | null; followers: number | null; date: string; accounts: number | null }[];
   gallery: string[];
 };
 
@@ -128,7 +129,12 @@ export default function MaisonReport() {
               <Row
                 key={i}
                 name
-                label={<span className="text-corps text-text-primary">{s.name}</span>}
+                label={
+                  <span className="flex items-center gap-fila text-corps text-text-primary">
+                    <Retrato src={s.portrait} nombre={s.name} size={32} />
+                    {s.name}
+                  </span>
+                }
                 aside={
                   <span className="text-legende tabular-nums text-brume">
                     {new Date(s.date).toLocaleDateString(lang, { day: "numeric", month: "long" })}

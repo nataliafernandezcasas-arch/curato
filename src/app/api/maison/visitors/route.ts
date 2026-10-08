@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { retratoDeCada } from "@/lib/creator-portrait";
 
 const BUCKET = "content-proofs";
 
@@ -38,9 +39,11 @@ export async function GET() {
     const creatorIds = [...new Set(rows.map((r) => r.creator_id))];
     const { data: creators } = await admin
       .from("creators")
-      .select("id, full_name, handle")
+      .select("id, full_name, handle, portrait_urls")
       .in("id", creatorIds.length ? creatorIds : ["00000000-0000-0000-0000-000000000000"]);
     const creatorMap = new Map((creators ?? []).map((c) => [c.id, c]));
+    // La cara de quien vino, junto a sus fotos.
+    const retratos = await retratoDeCada(admin, creators ?? []);
 
     const visitors = await Promise.all(
       rows.map(async (r) => {
@@ -55,6 +58,7 @@ export async function GET() {
           id: r.id as string,
           creator: (c?.full_name as string | null) || (c?.handle ? `@${c.handle}` : "—"),
           handle: (c?.handle as string | null) ?? null,
+          portrait: retratos.get(r.creator_id) ?? null,
           visitDate: r.slot_start as string,
           rightsExpiresAt: (r.content_rights_expires_at as string | null) ?? null,
           photos,

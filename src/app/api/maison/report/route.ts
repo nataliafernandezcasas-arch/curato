@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { retratoDeCada } from "@/lib/creator-portrait";
 
 const BUCKET = "content-proofs";
 // El compromiso de Curato con cada casa: cinco visitas garantizadas al mes.
@@ -60,9 +61,10 @@ export async function GET(request: NextRequest) {
 
     const creatorIds = [...new Set(filas.map((r) => r.creator_id))];
     const { data: creators } = creatorIds.length
-      ? await admin.from("creators").select("id, full_name, handle, followers").in("id", creatorIds)
-      : { data: [] as { id: string; full_name: string | null; handle: string | null; followers: number | null }[] };
+      ? await admin.from("creators").select("id, full_name, handle, followers, portrait_urls").in("id", creatorIds)
+      : { data: [] as { id: string; full_name: string | null; handle: string | null; followers: number | null; portrait_urls: string[] | null }[] };
     const porId = new Map((creators ?? []).map((c) => [c.id, c]));
+    const retratos = await retratoDeCada(admin, creators ?? []);
 
     // Las fotografías siguen muriendo a los 90 días, como el derecho de uso.
     const ahora = Date.now();
@@ -102,6 +104,7 @@ export async function GET(request: NextRequest) {
         return {
           name: c?.full_name ?? c?.handle ?? "",
           handle: c?.handle ?? null,
+          portrait: retratos.get(r.creator_id) ?? null,
           followers: c?.followers ?? null,
           date: r.slot_start,
           accounts: (r.reach_accounts as number | null) ?? null,

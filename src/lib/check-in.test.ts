@@ -1,36 +1,47 @@
 import { describe, expect, it } from "vitest";
-import { esCodigoValido, letrasDe, mostrarCodigo, normalizarCodigo, nuevoCodigo, visitaDeHoy, type ReservaParaVisita } from "./check-in";
+import {
+  codigoDelQR,
+  contenidoDelQR,
+  esCodigoDeVisita,
+  mostrarCodigo,
+  normalizarCodigo,
+  nuevoCodigoDeVisita,
+  visitaDeHoy,
+  type ReservaParaVisita,
+} from "./check-in";
 
-describe("el código de la casa", () => {
-  it("toma las consonantes de la palabra propia, no de Maison ni de Le", () => {
-    expect(letrasDe("Maison Marceau")).toBe("MRC");
-    expect(letrasDe("Le Comptoir du Marais")).toBe("CMP");
-    // Con menos de tres consonantes, completa con la propia palabra: TOU.
-    expect(letrasDe("Hôtel de la Tour")).toBe("TOU");
-  });
-
-  it("siempre da tres letras, aunque el nombre sea corto o raro", () => {
-    expect(letrasDe("Ô")).toHaveLength(3);
-    expect(letrasDe("")).toHaveLength(3);
-    expect(letrasDe("Atelier Sainte-Anne")).toMatch(/^[A-Z]{3}$/);
-  });
-
-  it("un código nuevo son tres letras y tres cifras", () => {
-    expect(nuevoCodigo("Maison Marceau", () => 0.318)).toBe("MRC386");
-    expect(esCodigoValido(nuevoCodigo("Maison Marceau"))).toBe(true);
+describe("el código de la visita", () => {
+  it("son seis signos sin los que se confunden", () => {
+    for (let i = 0; i < 200; i++) {
+      const codigo = nuevoCodigoDeVisita();
+      expect(esCodigoDeVisita(codigo)).toBe(true);
+      expect(codigo).not.toMatch(/[O0I1]/);
+    }
+    expect(nuevoCodigoDeVisita(() => 0)).toBe("AAAAAA");
+    expect(nuevoCodigoDeVisita(() => 0.999)).toBe("999999");
   });
 
   it("acepta el código escrito de cualquier manera", () => {
-    expect(normalizarCodigo("mrc 418")).toBe("MRC418");
-    expect(normalizarCodigo(" MRC-418 ")).toBe("MRC418");
-    expect(esCodigoValido(normalizarCodigo("mrc418"))).toBe(true);
-    expect(esCodigoValido("MRC41")).toBe(false);
-    expect(esCodigoValido("418MRC")).toBe(false);
+    expect(normalizarCodigo("k7m 4qx")).toBe("K7M4QX");
+    expect(normalizarCodigo(" K7M-4QX ")).toBe("K7M4QX");
+    expect(esCodigoDeVisita(normalizarCodigo("k7m4qx"))).toBe(true);
+    expect(esCodigoDeVisita("K7M4Q")).toBe(false);
+    // Con O o 1 no es un código nuestro: nunca se generan.
+    expect(esCodigoDeVisita("K7M4Q1")).toBe(false);
   });
 
-  it("se enseña con un espacio entre letras y cifras", () => {
-    expect(mostrarCodigo("MRC418")).toBe("MRC 418");
+  it("se enseña partido en dos", () => {
+    expect(mostrarCodigo("K7M4QX")).toBe("K7M 4QX");
     expect(mostrarCodigo("raro")).toBe("raro");
+  });
+
+  it("el QR lleva el código y el Scanner lo vuelve a sacar", () => {
+    expect(codigoDelQR(contenidoDelQR("K7M4QX"))).toBe("K7M4QX");
+    // Tecleado a mano, sin prefijo, también vale.
+    expect(codigoDelQR("k7m 4qx")).toBe("K7M4QX");
+    // Un QR que no es de Curato no se confunde con un código.
+    expect(codigoDelQR("https://example.com")).toBeNull();
+    expect(codigoDelQR("CURATO-VISITE:XX")).toBeNull();
   });
 });
 

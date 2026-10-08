@@ -15,6 +15,7 @@ import MaisonReport from "./maison-report";
 import MaisonDemandes from "./maison-demandes";
 import { DossierPane } from "./storyteller-dossier";
 import type { Dossier } from "@/lib/storyteller-dossier";
+import { Retrato } from "@/components/member/retrato";
 
 // Category UUID (migration 009) → translation key in the `dashboard` section.
 const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness" | "catBeauty"> = {
@@ -65,6 +66,7 @@ type Visitor = {
   id: string;
   creator: string;
   handle: string | null;
+  portrait: string | null;
   visitDate: string;
   rightsExpiresAt: string | null;
   photos: string[];
@@ -425,9 +427,12 @@ function MaisonDashboard() {
                   ))}
                 </div>
                 <div className="mt-4">
-                  <h3 className="font-serif text-[18px] font-light text-text-primary">
-                    {v.creator}
-                    {v.handle && <span className="text-text-secondary text-[14px]"> · @{v.handle}</span>}
+                  <h3 className="flex items-center gap-3 font-serif text-[18px] font-light text-text-primary">
+                    <Retrato src={v.portrait} nombre={v.creator} />
+                    <span>
+                      {v.creator}
+                      {v.handle && <span className="text-text-secondary text-[14px]"> · @{v.handle}</span>}
+                    </span>
                   </h3>
                   <p className="font-serif text-[13px] text-text-secondary mt-1">
                     {t.visitedOn.replace("{date}", fmtDate(v.visitDate))}
