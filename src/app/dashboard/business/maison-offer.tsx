@@ -39,10 +39,34 @@ const ERROR_MENU: Record<Lang, Record<"format" | "size" | "upload", string>> = {
   },
 };
 
+// La oferta es un importe: lo que la casa ofrece por visita, y el storyteller
+// lo gasta como quiera en la carta (migración 043).
+const OFERTA: Record<Lang, { title: string; hint: string; placeholder: string; perVisit: string }> = {
+  fr: {
+    title: "Votre offre",
+    hint: "Le montant que vous offrez à chaque storyteller, par visite. Il le dépense librement sur votre carte.",
+    placeholder: "200",
+    perVisit: "€ par visite",
+  },
+  en: {
+    title: "Your offer",
+    hint: "The amount you offer each storyteller, per visit. They spend it freely on your menu.",
+    placeholder: "200",
+    perVisit: "€ per visit",
+  },
+  es: {
+    title: "Tu oferta",
+    hint: "El importe que ofreces a cada storyteller, por visita. Lo gasta como quiera en tu carta.",
+    placeholder: "200",
+    perVisit: "€ por visita",
+  },
+};
+
 export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [availability, setAvailability] = useState<Window[]>([]);
   const [blocked, setBlocked] = useState<Block[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [oferta, setOferta] = useState("");
   const [menuUrls, setMenuUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -58,6 +82,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         setAvailability(d.availability ?? []);
         setBlocked(d.blockedSlots ?? []);
         setServices(d.services ?? []);
+        setOferta(d.offerEur ? String(d.offerEur) : "");
         setMenuUrls(d.menuUrls ?? []);
       })
       .catch(() => {})
@@ -85,15 +110,6 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
     setBlocked((prev) => prev.filter((b) => b.date !== date));
   }
 
-  function addService() {
-    setServices((prev) => [...prev, { name: "", description: "", price: "" }]);
-  }
-  function updateService(i: number, field: keyof Service, val: string) {
-    setServices((prev) => prev.map((s, idx) => (idx === i ? { ...s, [field]: val } : s)));
-  }
-  function removeService(i: number) {
-    setServices((prev) => prev.filter((_, idx) => idx !== i));
-  }
 
   async function save() {
     setSaving(true);
@@ -101,7 +117,12 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       const res = await fetch("/api/maison/offer", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ availability, blockedSlots: blocked, services: services.filter((s) => s.name.trim()) }),
+        body: JSON.stringify({
+          availability,
+          blockedSlots: blocked,
+          services: services.filter((s) => s.name.trim()),
+          offerEur: oferta ? Number(oferta) : null,
+        }),
       });
       // La confirmación llega como aviso, encima de la barra, y se va sola en 4 s.
       if (res.ok) mostrar(t.offerSaved);
@@ -240,26 +261,21 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         )}
       </section>
 
-      {/* Services */}
+      {/* La oferta: un importe en euros por visita. La lista de servicios con
+          precio que había antes se queda guardada, pero ya no se edita. */}
       <section className="caja-cristal p-5 sm:p-6">
-        <div className="flex items-baseline justify-between mb-1">
-          <p className={labelCls}>{t.offerServices}</p>
-          <button onClick={addService} className="inline-flex items-center gap-1.5 text-accent hover:text-text-primary font-serif text-[12px] tracking-wider uppercase transition-colors">
-            <Plus size={14} /> {t.offerAdd}
-          </button>
-        </div>
-        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerServicesHint}</p>
-        <div className="space-y-3">
-          {services.map((s, i) => (
-            <div key={i} className="relative pr-10">
-              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-text-muted hover:text-copper-vif" aria-label={t.offerRemove}><X size={15} /></button>
-              <div className="grid sm:grid-cols-[1fr_140px] gap-3 mb-3">
-                <input value={s.name} onChange={(e) => updateService(i, "name", e.target.value)} placeholder={t.offerServiceName} className={`${inputCls} w-full`} />
-                <input value={s.price} onChange={(e) => updateService(i, "price", e.target.value)} placeholder={t.offerServicePrice} className={`${inputCls} w-full`} />
-              </div>
-              <textarea value={s.description} onChange={(e) => updateService(i, "description", e.target.value)} rows={2} placeholder={t.offerServiceDesc} className={`${inputCls} w-full resize-none`} />
-            </div>
-          ))}
+        <label htmlFor="oferta-eur" className={`${labelCls} mb-1 block`}>{OFERTA[lang].title}</label>
+        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{OFERTA[lang].hint}</p>
+        <div className="flex items-baseline gap-3">
+          <input
+            id="oferta-eur"
+            inputMode="numeric"
+            value={oferta}
+            onChange={(e) => setOferta(e.target.value.replace(/\D/g, "").slice(0, 5))}
+            placeholder={OFERTA[lang].placeholder}
+            className={`${inputCls} w-28 text-[34px] tabular-nums`}
+          />
+          <span className="font-serif text-[15px] text-text-secondary">{OFERTA[lang].perVisit}</span>
         </div>
       </section>
 

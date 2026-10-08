@@ -36,6 +36,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       services: venue.services ?? [],
       // La carta o el folleto que subió la casa, para enseñarlo en su ficha.
       menuUrls: venue.menu_urls ?? [],
+      // Lo que la casa ofrece por visita, en euros (migración 043).
+      offerEur: await (async () => {
+        const { data, error } = await admin.from("comercios").select("offer_eur").eq("id", id).maybeSingle();
+        return !error && data ? ((data as { offer_eur?: number | null }).offer_eur ?? null) : null;
+      })(),
     });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });

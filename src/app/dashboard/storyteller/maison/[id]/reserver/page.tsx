@@ -25,6 +25,7 @@ type Disponibilidad = {
   blocked: { date: string }[];
   taken: string[];
   services: Servicio[];
+  offerEur?: number | null;
 };
 type Casa = { id: string; name: string; category_id: string | null };
 type Franja = { hm: string; iso: string; libre: boolean };
@@ -62,6 +63,8 @@ const TEXTOS = {
     optional: "Optionnel",
     notePlaceholder: "Occasion, préférences…",
     rates: "Tarifs de la maison",
+    offer: "L'offre de la maison",
+    spend: "à dépenser librement sur la carte",
     pick: "Choisissez un jour et une heure.",
     pickHotel: "Choisissez votre date d'arrivée.",
     send: "Envoyer la demande",
@@ -99,6 +102,8 @@ const TEXTOS = {
     optional: "Optional",
     notePlaceholder: "Occasion, preferences…",
     rates: "House rates",
+    offer: "The house's offer",
+    spend: "to spend freely on the menu",
     pick: "Choose a day and a time.",
     pickHotel: "Choose your arrival date.",
     send: "Send the request",
@@ -136,6 +141,8 @@ const TEXTOS = {
     optional: "Opcional",
     notePlaceholder: "Ocasión, preferencias…",
     rates: "Tarifas de la maison",
+    offer: "La oferta de la maison",
+    spend: "para gastar libremente en la carta",
     pick: "Elige un día y una hora.",
     pickHotel: "Elige tu fecha de llegada.",
     send: "Enviar la solicitud",
@@ -646,7 +653,14 @@ function Reserver({ id }: { id: string }) {
               />
             </section>
 
-            {disp?.services?.some((s) => s.name?.trim()) && (
+            {disp?.offerEur ? (
+              <Section title={t.offer}>
+                <p className="text-corps text-text-secondary">
+                  <span className="mr-2 text-titre tabular-nums text-text-primary">{disp.offerEur.toLocaleString(lang)} €</span>
+                  {t.spend}
+                </p>
+              </Section>
+            ) : disp?.services?.some((s) => s.name?.trim()) && (
               <Section title={t.rates}>
                 {disp.services
                   .filter((s) => s.name?.trim())

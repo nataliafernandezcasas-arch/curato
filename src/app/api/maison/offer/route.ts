@@ -17,6 +17,13 @@ async function getMaison(admin: ReturnType<typeof createAdminClient>, userId: st
   return data;
 }
 
+// El importe de la oferta (migración 043). Aparte y tolerante: sin la columna,
+// la consulta falla y la oferta sale vacía, en vez de romper la pantalla.
+async function ofertaDe(admin: ReturnType<typeof createAdminClient>, id: string): Promise<number | null> {
+  const { data, error } = await admin.from("comercios").select("offer_eur").eq("id", id).maybeSingle();
+  return !error && data ? ((data as { offer_eur?: number | null }).offer_eur ?? null) : null;
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -29,6 +36,7 @@ export async function GET() {
       availability: m.availability ?? [],
       blockedSlots: m.blocked_slots ?? [],
       services: m.services ?? [],
+      offerEur: await ofertaDe(admin, m.id),
       menuUrls: m.menu_urls ?? [],
     });
   } catch {
@@ -69,6 +77,13 @@ export async function PATCH(request: NextRequest) {
         .slice(0, 40);
     }
     if (Object.keys(update).length) await admin.from("comercios").update(update).eq("id", m.id);
+    // El importe va aparte: si la migración 043 aún no está, lo demás se guarda.
+    if ("offerEur" in body) {
+      const n = Math.round(Number(body.offerEur));
+      const offer_eur = Number.isFinite(n) && n > 0 && n <= 10000 ? n : null;
+      const { error } = await admin.from("comercios").update({ offer_eur }).eq("id", m.id);
+      if (error) return NextResponse.json({ error: "offer" }, { status: 500 });
+    }
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
