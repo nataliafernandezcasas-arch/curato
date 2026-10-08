@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
-import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check } from "@phosphor-icons/react";
+import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check, CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
 import { Button } from "@/components/member/button";
@@ -20,6 +20,14 @@ const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness"
   "00000000-0000-0000-0000-0000000ca703": "catWellness",
   "00000000-0000-0000-0000-0000000ca704": "catBeauty",
 };
+
+/** La lista con una foto cambiada de sitio. */
+function moverFoto(fotos: string[], desde: number, hasta: number): string[] {
+  const next = [...fotos];
+  const [foto] = next.splice(desde, 1);
+  next.splice(hasta, 0, foto);
+  return next;
+}
 
 export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const [photos, setPhotos] = useState<string[]>([]);
@@ -322,12 +330,37 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                     {t.profileCover}
                   </span>
                 )}
-                <span className="absolute bottom-1.5 left-1.5 text-white/70 bg-black/45 rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* En un ordenador, los controles salen al pasar el ratón. En un
+                    teléfono no hay ratón: estaban siempre invisibles, y no se podía
+                    ni borrar ni reordenar. Ahí se ven siempre, y el arrastre, que
+                    el dedo no hace, lo sustituyen dos flechas. */}
+                <span className="absolute bottom-1.5 left-1.5 hidden rounded-full bg-black/45 p-0.5 text-white/70 opacity-0 transition-opacity group-hover:opacity-100 [@media(hover:hover)]:block">
                   <DotsSixVertical size={14} />
                 </span>
+                <div className="absolute inset-x-1.5 bottom-1.5 flex justify-between [@media(hover:hover)]:hidden">
+                  <button
+                    type="button"
+                    onClick={() => i > 0 && persistOrder(moverFoto(photos, i, i - 1))}
+                    disabled={i === 0}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white disabled:invisible"
+                    aria-label={COMUN[lang].moveBefore}
+                  >
+                    <CaretLeft size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => i < photos.length - 1 && persistOrder(moverFoto(photos, i, i + 1))}
+                    disabled={i === photos.length - 1}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white disabled:invisible"
+                    aria-label={COMUN[lang].moveAfter}
+                  >
+                    <CaretRight size={16} />
+                  </button>
+                </div>
                 <button
+                  type="button"
                   onClick={() => removePhoto(url)}
-                  className="absolute top-1.5 right-1.5 rounded-full bg-black/70 text-white p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute right-1.5 top-1.5 flex h-9 w-9 items-center justify-center rounded-full bg-black/70 text-white transition-opacity [@media(hover:hover)]:h-auto [@media(hover:hover)]:w-auto [@media(hover:hover)]:p-1 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
                   aria-label={COMUN[lang].remove}
                 >
                   <X size={14} />
