@@ -6,6 +6,7 @@ import { Plus, X, FilePdf } from "@phosphor-icons/react";
 import { Button } from "@/components/member/button";
 import { Toast, useToast } from "@/components/member/toast";
 import { Lang } from "@/lib/i18n/translations";
+import { createClient } from "@/lib/supabase/client";
 
 type T = Record<string, string>;
 type Window = { day: number; start: string; end: string };
@@ -19,6 +20,25 @@ const DAY_LABELS: Record<Lang, string[]> = {
 };
 const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // JS getDay(): Mon..Sun
 
+// Por qué falló una subida de la carta. Antes no se decía nada.
+const ERROR_MENU: Record<Lang, Record<"format" | "size" | "upload", string>> = {
+  fr: {
+    format: "Ce format n'est pas accepté : PDF, JPEG, PNG ou WEBP.",
+    size: "Ce fichier dépasse 20 Mo.",
+    upload: "L'envoi n'a pas abouti. Réessayez dans un instant.",
+  },
+  en: {
+    format: "This format isn't accepted: PDF, JPEG, PNG or WEBP.",
+    size: "This file is over 20 MB.",
+    upload: "The upload didn't go through. Try again in a moment.",
+  },
+  es: {
+    format: "Este formato no se acepta: PDF, JPEG, PNG o WEBP.",
+    size: "Este archivo pasa de 20 MB.",
+    upload: "No se pudo subir. Vuelve a intentarlo en un momento.",
+  },
+};
+
 export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [availability, setAvailability] = useState<Window[]>([]);
   const [blocked, setBlocked] = useState<Block[]>([]);
@@ -28,6 +48,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [saving, setSaving] = useState(false);
   const { aviso, mostrar, cerrar } = useToast();
   const [uploading, setUploading] = useState(false);
+  const [menuError, setMenuError] = useState<"format" | "size" | "upload" | null>(null);
   const [newBlock, setNewBlock] = useState("");
 
   useEffect(() => {
@@ -89,15 +110,43 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
     }
   }
 
+  // Directo al almacenamiento, con un permiso firmado por archivo: por el
+  // servidor, Vercel cortaba todo lo que pasara de 4,5 MB (/api/maison/offer).
   async function uploadMenu(files: FileList | null) {
     if (!files || files.length === 0) return;
+    const lista = Array.from(files);
     setUploading(true);
-    const form = new FormData();
-    Array.from(files).forEach((f) => form.append("files", f));
+    setMenuError(null);
     try {
-      const res = await fetch("/api/maison/offer", { method: "POST", body: form });
-      const d = await res.json();
-      if (res.ok) setMenuUrls(d.menuUrls ?? []);
+      const res = await fetch("/api/maison/offer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subir: lista.map((f) => ({ type: f.type, size: f.size })) }),
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok || !Array.isArray(d.permisos)) {
+        setMenuError(d.error === "format" ? "format" : d.error === "size" ? "size" : "upload");
+        return;
+      }
+      const almacen = createClient().storage.from("maison-menus");
+      const subidas: string[] = [];
+      for (let i = 0; i < lista.length; i++) {
+        const { path, token } = d.permisos[i] as { path: string; token: string };
+        const { error } = await almacen.uploadToSignedUrl(path, token, lista[i], { contentType: lista[i].type });
+        if (error) setMenuError("upload");
+        else subidas.push(path);
+      }
+      if (subidas.length === 0) return;
+      const fin = await fetch("/api/maison/offer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paths: subidas }),
+      });
+      const hecho = await fin.json().catch(() => ({}));
+      if (fin.ok) setMenuUrls(hecho.menuUrls ?? []);
+      else setMenuError("upload");
+    } catch {
+      setMenuError("upload");
     } finally {
       setUploading(false);
     }
@@ -236,6 +285,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             <Plus size={14} /> {t.offerAdd}
           </FilePicker>
         </div>
+        {menuError && <p className="mt-fila font-serif text-[13px] text-copper-vif">{ERROR_MENU[lang][menuError]}</p>}
       </section>
 
       {/* Guardar. Era el último botón relleno de champagne de la oferta, y

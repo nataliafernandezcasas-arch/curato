@@ -218,32 +218,40 @@ export function PortraitEditor({
     }
   }
 
-  /** Una foto de estilo más, al final de las que ya hay. */
+  /**
+   * Fotos de estilo, al final de las que ya hay. Se pueden elegir varias de una
+   * vez: antes se tomaba solo la primera y había que volver seis veces. Se
+   * suben de una en una (cada petición lleva una foto, por debajo del límite
+   * de Vercel) y solo las que caben hasta seis.
+   */
   async function subirEstilo(files: FileList | null) {
-    const original = files?.[0];
-    if (!original) return;
+    const libres = ESTILO_MAX - estilo.length;
+    const elegidas = Array.from(files ?? []).slice(0, Math.max(libres, 0));
+    if (elegidas.length === 0) return;
     setError(null);
-    if (!ACCEPT.split(",").includes(original.type.toLowerCase())) {
-      setError("badType");
-      return;
-    }
     setSubiendoEstilo(true);
     try {
-      const file = await downscaleImage(original);
-      if (file.size > MAX_BYTES) {
-        setError("tooLarge");
-        return;
+      for (const original of elegidas) {
+        if (!ACCEPT.split(",").includes(original.type.toLowerCase())) {
+          setError("badType");
+          continue;
+        }
+        const file = await downscaleImage(original);
+        if (file.size > MAX_BYTES) {
+          setError("tooLarge");
+          continue;
+        }
+        const form = new FormData();
+        form.set("file", file);
+        form.set("tipo", "estilo");
+        const res = await fetch("/api/storyteller/perfil", { method: "POST", body: form });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok || !body.path || !body.url) {
+          setError(body.error === "size" ? "tooLarge" : body.error === "format" ? "badType" : "uploadFail");
+          continue;
+        }
+        setEstilo((prev) => [...prev, { path: body.path, url: body.url }].slice(0, ESTILO_MAX));
       }
-      const form = new FormData();
-      form.set("file", file);
-      form.set("tipo", "estilo");
-      const res = await fetch("/api/storyteller/perfil", { method: "POST", body: form });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok || !body.path || !body.url) {
-        setError(body.error === "size" ? "tooLarge" : body.error === "format" ? "badType" : "uploadFail");
-        return;
-      }
-      setEstilo((prev) => [...prev, { path: body.path, url: body.url }].slice(0, ESTILO_MAX));
     } catch {
       setError("uploadFail");
     } finally {
@@ -408,6 +416,7 @@ export function PortraitEditor({
                 {estilo.length < ESTILO_MAX && (
                   <FilePicker
                     accept={ACCEPT}
+                    multiple
                     disabled={subiendoEstilo}
                     onFiles={subirEstilo}
                     className="flex aspect-[4/5] flex-col items-center justify-center gap-etiqueta rounded-2xl border border-[rgba(245,239,228,0.24)] bg-[rgba(245,239,228,0.08)] px-bloque text-center backdrop-blur-md transition-colors duration-200 ease-curato hover:bg-[rgba(245,239,228,0.14)]"
