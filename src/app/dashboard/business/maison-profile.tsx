@@ -21,6 +21,38 @@ const CATEGORY_KEY: Record<string, "catGastronomy" | "catHotels" | "catWellness"
   "00000000-0000-0000-0000-0000000ca704": "catBeauty",
 };
 
+// La descripción se escribe en un idioma y los otros dos los traduce Claude al
+// guardar (src/lib/traducir.ts). La casa puede retocar cualquiera.
+const TRAD: Record<Lang, {
+  writeIn: string;
+  hint: string;
+  auto: string;
+  failed: string;
+  names: Record<"fr" | "en" | "es", string>;
+}> = {
+  fr: {
+    writeIn: "Je rédige en",
+    hint: "Écrivez dans votre langue : les deux autres se traduisent à l'enregistrement. Vous pouvez ensuite les retoucher.",
+    auto: "Traduit automatiquement depuis votre texte. Vous pouvez le retoucher.",
+    failed: "Enregistré, mais la traduction n'a pas abouti. Réessayez plus tard, ou complétez les autres langues à la main.",
+    names: { fr: "Français", en: "English", es: "Español" },
+  },
+  en: {
+    writeIn: "I write in",
+    hint: "Write in your language: the other two are translated when you save. You can then fine-tune them.",
+    auto: "Translated automatically from your text. You can fine-tune it.",
+    failed: "Saved, but the translation didn't go through. Try again later, or fill in the other languages by hand.",
+    names: { fr: "Français", en: "English", es: "Español" },
+  },
+  es: {
+    writeIn: "Escribo en",
+    hint: "Escribe en tu idioma: los otros dos se traducen al guardar. Después puedes retocarlos.",
+    auto: "Traducido automáticamente de tu texto. Puedes retocarlo.",
+    failed: "Guardado, pero la traducción no salió. Vuelve a intentarlo más tarde o completa los otros idiomas a mano.",
+    names: { fr: "Français", en: "English", es: "Español" },
+  },
+};
+
 /** La lista con una foto cambiada de sitio. */
 function moverFoto(fotos: string[], desde: number, hasta: number): string[] {
   const next = [...fotos];
@@ -35,6 +67,12 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const [descriptionEn, setDescriptionEn] = useState("");
   const [descriptionEs, setDescriptionEs] = useState("");
   const [descLang, setDescLang] = useState<"fr" | "en" | "es">("fr");
+  // El idioma en que escribe la casa, lo que había al abrir y lo que retocó: con
+  // eso se decide qué traducir al guardar.
+  const [fuente, setFuente] = useState<"fr" | "en" | "es">("fr");
+  const inicial = useRef<Record<"fr" | "en" | "es", string>>({ fr: "", en: "", es: "" });
+  const tocadas = useRef<Set<"fr" | "en" | "es">>(new Set());
+  const [traduccionFallida, setTraduccionFallida] = useState(false);
   const [website, setWebsite] = useState("");
   const [instagram, setInstagram] = useState("");
   const [name, setName] = useState("");
@@ -61,12 +99,17 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         setDescription(desc);
         setDescriptionEn(d.descriptionEn ?? "");
         setDescriptionEs(d.descriptionEs ?? "");
+        const suya = d.descriptionLang === "en" || d.descriptionLang === "es" ? d.descriptionLang : "fr";
+        setFuente(suya);
+        setDescLang(suya);
+        inicial.current = { fr: desc, en: d.descriptionEn ?? "", es: d.descriptionEs ?? "" };
         setWebsite(d.website ?? "");
         setInstagram(d.instagram ?? "");
         setName(d.name ?? "");
         setArrondissement(d.arrondissement ?? null);
         setCategoryId(d.categoryId ?? null);
-        if (p.length < MIN_PHOTOS || desc.trim().length < MIN_DESC) setEditing(true);
+        const propia = suya === "en" ? d.descriptionEn ?? "" : suya === "es" ? d.descriptionEs ?? "" : desc;
+        if (p.length < MIN_PHOTOS || propia.trim().length < MIN_DESC) setEditing(true);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -141,13 +184,31 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
 
   async function save() {
     setSaving(true);
+    setTraduccionFallida(false);
+    const textos = { fr: description, en: descriptionEn, es: descriptionEs };
+    // Se traduce lo que está vacío y, si la casa cambió su propio texto, lo que
+    // no retocó a mano en esta edición.
+    const cambioLaFuente = textos[fuente].trim() !== inicial.current[fuente].trim();
+    const traducir = (["fr", "en", "es"] as const).filter(
+      (l) => l !== fuente && (!textos[l].trim() || (cambioLaFuente && !tocadas.current.has(l)))
+    );
     try {
       const res = await fetch("/api/maison/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description, descriptionEn, descriptionEs, website, instagram }),
+        body: JSON.stringify({ description, descriptionEn, descriptionEs, descriptionLang: fuente, traducir, website, instagram }),
       });
-      if (res.ok) setEditing(false);
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const guardado = { fr: d.description ?? description, en: d.descriptionEn ?? descriptionEn, es: d.descriptionEs ?? descriptionEs };
+        setDescription(guardado.fr);
+        setDescriptionEn(guardado.en);
+        setDescriptionEs(guardado.es);
+        inicial.current = guardado;
+        tocadas.current = new Set();
+        setTraduccionFallida(Boolean(d.traduccionFallida));
+        setEditing(false);
+      }
     } finally {
       setSaving(false);
     }
@@ -160,7 +221,8 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const inputCls =
     "w-full min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ font-light text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted focus:border-accent";
   const igHandle = instagram.replace(/^@/, "").trim();
-  const descLen = description.trim().length;
+  // El mínimo vale para el texto que escribe la casa, en su idioma.
+  const descLen = (fuente === "en" ? descriptionEn : fuente === "es" ? descriptionEs : description).trim().length;
   const photosOk = photos.length >= MIN_PHOTOS;
   const descOk = descLen >= MIN_DESC;
   const canSave = photosOk && descOk && !saving;
@@ -168,8 +230,12 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const catLabel = catKey ? translations[lang].dashboard[catKey] : "";
   const place = [arrondissement ? `Paris ${arrondissement}` : "Paris", catLabel].filter(Boolean).join(" · ");
   const descValue = descLang === "fr" ? description : descLang === "en" ? descriptionEn : descriptionEs;
-  const setDescValue = (v: string) =>
-    descLang === "fr" ? setDescription(v) : descLang === "en" ? setDescriptionEn(v) : setDescriptionEs(v);
+  const setDescValue = (v: string) => {
+    tocadas.current.add(descLang);
+    if (descLang === "fr") setDescription(v);
+    else if (descLang === "en") setDescriptionEn(v);
+    else setDescriptionEs(v);
+  };
   // Storyteller-facing copy: the maison's current app language, falling back to FR.
   const previewDesc = lang === "en" ? descriptionEn || description : lang === "es" ? descriptionEs || description : description;
 
@@ -203,6 +269,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   if (!editing) {
     return (
       <div className="max-w-[1100px] mx-auto">
+        {traduccionFallida && (
+          <p className="mb-6 border-l-2 border-copper-vif pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].failed}</p>
+        )}
         <div className="flex justify-end gap-2 mb-6">
           <button
             onClick={() => setPreview((p) => !p)}
@@ -383,10 +452,31 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         <div>
           <div className="flex items-baseline justify-between mb-3">
             <label className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent">{t.profileDescription}</label>
-            <span className={`font-serif text-[12px] ${descLang === "fr" ? (descOk ? "text-accent" : "text-copper-vif") : "text-text-secondary"}`}>
+            <span className={`font-serif text-[12px] ${descLang === fuente ? (descOk ? "text-accent" : "text-copper-vif") : "text-text-secondary"}`}>
               {descValue.trim().length}/{MIN_DESC}
             </span>
           </div>
+          {/* El idioma en que escribe la casa. Los otros dos los pone Claude. */}
+          <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="font-serif text-[12px] text-text-secondary">{TRAD[lang].writeIn}</span>
+            <select
+              id="idioma-descripcion"
+              value={fuente}
+              onChange={(e) => {
+                const l = e.target.value as "fr" | "en" | "es";
+                setFuente(l);
+                setDescLang(l);
+              }}
+              className="min-h-11 rounded-full border border-border bg-transparent px-3 font-serif text-[13px] text-text-primary outline-none focus:border-accent"
+            >
+              {(["fr", "en", "es"] as const).map((l) => (
+                <option key={l} value={l}>
+                  {TRAD[lang].names[l]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <p className="mb-3 font-serif text-[12px] font-light text-text-secondary">{TRAD[lang].hint}</p>
           <div className="flex gap-1.5 mb-3">
             {(["fr", "en", "es"] as const).map((lg) => {
               const filled = (lg === "fr" ? description : lg === "en" ? descriptionEn : descriptionEs).trim().length > 0;
@@ -415,7 +505,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             className={`${inputCls} resize-none leading-relaxed`}
           />
           <p className="font-serif text-[12px] font-light text-text-secondary mt-2">
-            {descLang === "fr" ? t.profileDescMin : t.profileDescOptional}
+            {descLang === fuente ? t.profileDescMin : TRAD[lang].auto}
           </p>
         </div>
 
