@@ -2,6 +2,8 @@ import type { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { firmarFotos, fotosElegidas, signPortraits } from "@/lib/creator-portrait";
 import { SUBJECT_QUESTION } from "@/lib/photo-subjects";
+import { after } from "next/server";
+import { caducadas, firmarRecientes, refrescarRecientes, type PublicacionGuardada } from "@/lib/instagram-recientes";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -81,6 +83,18 @@ async function phylloExtra(phylloAccountId: string): Promise<PhylloExtra | null>
   }
 }
 
+/**
+ * La cifra de seguidores que se enseña. La de Phyllo, salvo que sea mucho
+ * menor que la que la persona declaró en su candidatura: Phyllo en pruebas
+ * devuelve a veces 2 o 85 seguidores para una cuenta de decenas de miles. Es
+ * la misma regla que aplica la sincronización al guardarla.
+ */
+export function seguidoresCreibles(dePhyllo: number | null, declarados: number | null): number | null {
+  if (dePhyllo == null) return declarados ?? null;
+  if (declarados && dePhyllo < declarados * 0.3) return declarados;
+  return dePhyllo;
+}
+
 /** Los dossiers de varios storytellers a la vez, para no hacer una ronda por persona. */
 export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise<Map<string, Dossier>> {
   const out = new Map<string, Dossier>();
@@ -116,6 +130,31 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
       })
     ),
   ]);
+
+  // Las últimas publicaciones guardadas (migración 045), aparte y tolerante:
+  // sin la columna, se usan las que Phyllo devuelva en directo, si llegan.
+  const guardadas = new Map<string, { posts: PublicacionGuardada[]; at: string | null }>();
+  const conPublicaciones = await admin.from("creators").select("id, instagram_posts, instagram_posts_at").in("id", ids);
+  if (!conPublicaciones.error) {
+    for (const r of conPublicaciones.data ?? []) {
+      const posts = Array.isArray(r.instagram_posts) ? (r.instagram_posts as PublicacionGuardada[]) : [];
+      guardadas.set(r.id as string, { posts, at: (r.instagram_posts_at as string | null) ?? null });
+    }
+    // Las que tienen más de un día se piden de nuevo cuando ya salió la
+    // respuesta: quien abre el perfil no espera a Phyllo.
+    const viejas = rows.filter(
+      (c) => c.instagram_connected && c.phyllo_account_id && caducadas(guardadas.get(c.id as string)?.at)
+    );
+    if (viejas.length) {
+      try {
+        after(async () => {
+          for (const c of viejas) await refrescarRecientes(admin, c.id as string, c.phyllo_account_id as string);
+        });
+      } catch {
+        // Fuera de una petición (un script) no hay `after`: se refrescan otro día.
+      }
+    }
+  }
 
   const categoriesById = new Map<string, string[]>();
   for (const r of survey.data ?? []) {
@@ -160,6 +199,9 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
       // El retrato propio (16b) vive en un bucket privado: se firma cada vez
       // que se enseña. Si falla, la casa ve la foto de Instagram.
       const [retrato] = portraits[0] ? await signPortraits(admin, [portraits[0]]) : [null];
+      // Las guardadas primero: no caducan y no dependen de que Phyllo llegue a tiempo.
+      const propias = guardadas.get(id)?.posts ?? [];
+      const recientes = propias.length ? await firmarRecientes(admin, propias) : (x?.recentPosts ?? []);
 
       out.set(id, {
         id,
@@ -175,13 +217,16 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
         },
         audience: connected
           ? {
-              followers: x?.followers ?? (c.followers_count as number | null) ?? (c.followers as number | null) ?? null,
+              followers: seguidoresCreibles(
+                x?.followers ?? (c.followers_count as number | null) ?? null,
+                c.followers as number | null
+              ),
               avgReach: x?.avgReach ?? null,
               // engagement_rate se guarda como fracción (0.05 = 5 %).
               engagement: x?.engagement ?? (er != null ? Math.round(er * 1000) / 10 : null),
             }
           : null,
-        recentPosts: x?.recentPosts ?? [],
+        recentPosts: recientes,
       });
     })
   );
