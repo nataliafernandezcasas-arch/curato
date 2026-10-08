@@ -3,8 +3,31 @@
 import { useState } from "react";
 import { CheckCircle } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
-import { translations } from "@/lib/i18n/translations";
+import { translations, type Lang } from "@/lib/i18n/translations";
 import { Button } from "@/components/member/button";
+
+// Los errores llegan como código desde /api/suggestions y se traducen aquí.
+type ErrorCode = "auth" | "missing" | "server" | "connection";
+const ERRORES: Record<Lang, Record<ErrorCode, string>> = {
+  fr: {
+    auth: "Votre session a expiré. Reconnectez-vous.",
+    missing: "Indiquez une adresse.",
+    server: "Erreur. Réessayez.",
+    connection: "Erreur de connexion.",
+  },
+  en: {
+    auth: "Your session has expired. Sign in again.",
+    missing: "Enter an address.",
+    server: "Something went wrong. Try again.",
+    connection: "Connection error.",
+  },
+  es: {
+    auth: "Tu sesión ha caducado. Vuelve a entrar.",
+    missing: "Escribe una dirección.",
+    server: "Algo ha fallado. Vuelve a intentarlo.",
+    connection: "Error de conexión.",
+  },
+};
 
 export default function SuggestVenue() {
   const { lang } = useLang();
@@ -14,13 +37,13 @@ export default function SuggestVenue() {
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<ErrorCode | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!venue.trim()) return;
     setBusy(true);
-    setError("");
+    setError(null);
     try {
       const res = await fetch("/api/suggestions", {
         method: "POST",
@@ -29,12 +52,12 @@ export default function SuggestVenue() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Erreur.");
+        setError(data.code === "auth" || data.code === "missing" ? data.code : "server");
         return;
       }
       setDone(true);
     } catch {
-      setError("Erreur de connexion.");
+      setError("connection");
     } finally {
       setBusy(false);
     }
@@ -72,7 +95,7 @@ export default function SuggestVenue() {
             placeholder={t.suggestNotePlaceholder}
             className="campo-cristal resize-none font-serif text-[14px] font-light"
           />
-          {error && <p className="font-serif text-[12px] text-copper-vif">{error}</p>}
+          {error && <p className="font-serif text-[12px] text-copper-vif">{ERRORES[lang][error]}</p>}
           <Button type="submit" full disabled={busy}>
             {busy ? t.suggestSending : t.suggestSubmit}
           </Button>

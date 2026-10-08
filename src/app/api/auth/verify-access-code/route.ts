@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE_URL } from "@/lib/site";
 
+// Cada error lleva un `code` estable: la pantalla lo traduce al idioma del
+// miembro. El `error` en francés se queda para quien aún lea el texto.
 export async function POST(request: NextRequest) {
   try {
     const { email, code } = await request.json();
     if (!email || !code) {
-      return NextResponse.json({ error: "Email et code requis." }, { status: 400 });
+      return NextResponse.json({ code: "missing", error: "Email et code requis." }, { status: 400 });
     }
 
     const supabase = createAdminClient();
@@ -21,7 +23,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (error || !app) {
-      return NextResponse.json({ error: "Aucune candidature approuvée trouvée pour cet e-mail." }, { status: 404 });
+      return NextResponse.json({ code: "not_found", error: "Aucune candidature approuvée trouvée pour cet e-mail." }, { status: 404 });
     }
 
     // Seis cifras se adivinan a fuerza de intentos, así que se cuentan. A los
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
     const intentos = (app.access_code_attempts as number | null) ?? 0;
     if (intentos >= 5) {
       return NextResponse.json(
-        { error: "Trop de tentatives. Écrivez-nous à hello@curatocollective.com pour un nouveau code." },
+        { code: "too_many", error: "Trop de tentatives. Écrivez-nous à hello@curatocollective.com pour un nouveau code." },
         { status: 429 }
       );
     }
@@ -39,6 +41,8 @@ export async function POST(request: NextRequest) {
       const quedan = 4 - intentos;
       return NextResponse.json(
         {
+          code: "invalid",
+          remaining: Math.max(quedan, 0),
           error:
             quedan > 0
               ? `Code invalide. Il vous reste ${quedan} tentative${quedan > 1 ? "s" : ""}.`
@@ -49,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!app.access_code_expires_at || new Date(app.access_code_expires_at) < new Date()) {
-      return NextResponse.json({ error: "Ce code a expiré. Contactez-nous à hello@curatocollective.com." }, { status: 401 });
+      return NextResponse.json({ code: "expired", error: "Ce code a expiré. Contactez-nous à hello@curatocollective.com." }, { status: 401 });
     }
 
     // Generate a magic link so the user gets a real Supabase session
@@ -66,7 +70,7 @@ export async function POST(request: NextRequest) {
     const hashedToken = linkData?.properties?.hashed_token;
     if (linkError || !hashedToken) {
       console.error("generateLink error:", linkError);
-      return NextResponse.json({ error: "Erreur lors de la génération du lien. Réessayez." }, { status: 500 });
+      return NextResponse.json({ code: "link", error: "Erreur lors de la génération du lien. Réessayez." }, { status: 500 });
     }
 
     // El código no se borra aquí: se le deja una ventana de quince minutos.
@@ -89,6 +93,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error("verify-access-code error:", err);
-    return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });
+    return NextResponse.json({ code: "server", error: "Erreur serveur." }, { status: 500 });
   }
 }

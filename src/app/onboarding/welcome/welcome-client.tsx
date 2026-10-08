@@ -33,13 +33,14 @@ export default function WelcomeClient() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // La clave del error y no el texto: así cambia con el idioma.
+  const [error, setError] = useState<"errorMustAccept" | "errorGeneric" | null>(null);
 
   const canSubmit = termsAccepted && privacyAccepted && !submitting;
 
   async function handleSubmit() {
     if (!termsAccepted || !privacyAccepted) {
-      setError(welcomeLabels.errorMustAccept);
+      setError("errorMustAccept");
       return;
     }
     setSubmitting(true);
@@ -47,7 +48,9 @@ export default function WelcomeClient() {
 
     const res = await completeWelcome({ termsAccepted, privacyAccepted });
     if (!res.ok) {
-      setError(`${welcomeLabels.errorGeneric} (${res.error})`);
+      // El código técnico va a la consola, no a la pantalla.
+      console.error("completeWelcome:", res.error);
+      setError("errorGeneric");
       setSubmitting(false);
       return;
     }
@@ -60,7 +63,7 @@ export default function WelcomeClient() {
     <div className="min-h-[100dvh] bg-charcoal-deep text-white">
       {/* Floating language switcher — fixed top-right, subtle.
           Lets the storyteller switch between FR/EN/ES without breaking
-          the scroll. ES currently falls back to FR (Canva translation
+          the scroll. ES still shows the FR slides (Canva translation
           pending). Pointer-events-none on the wrapper so it never blocks
           the underlying scroll/click; the buttons themselves opt back in. */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-2 pointer-events-none">
@@ -72,7 +75,7 @@ export default function WelcomeClient() {
             className={`pointer-events-auto bg-black/40 px-2.5 py-1.5 text-capitale tracking-capitale backdrop-blur-md transition-colors duration-200 ease-curato ${
               lang === key ? "text-accent" : "text-text-secondary hover:text-text-primary"
             }`}
-            aria-label={`Switch to ${label}`}
+            aria-label={`${welcomeLabels.switchLang} ${label}`}
             aria-pressed={lang === key}
           >
             {label}
@@ -81,7 +84,7 @@ export default function WelcomeClient() {
       </div>
 
       {/* Stacked slides — full bleed, no gaps */}
-      <section aria-label="Dossier Curato">
+      <section aria-label={welcomeLabels.dossierLabel}>
         {welcomeSlides.map((slide, i) => (
           <img
             key={slide.src}
@@ -98,7 +101,7 @@ export default function WelcomeClient() {
       {/* Acceptance block — lives in the same scroll, separated by a
           dark band so the storyteller knows they've reached the action. */}
       <section
-        aria-label="Acceptation des conditions"
+        aria-label={welcomeLabels.acceptSectionLabel}
         className="bg-surface px-pagina py-respiro"
       >
         <div className="max-w-[680px] mx-auto">
@@ -149,7 +152,7 @@ export default function WelcomeClient() {
 
           {error && (
             <p className="mt-rango border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">
-              {error}
+              {welcomeLabels[error]}
             </p>
           )}
 

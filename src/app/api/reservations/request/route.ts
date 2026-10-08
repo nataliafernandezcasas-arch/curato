@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // cualquier hotel que tuviera agenda. Las fechas cerradas sí valen.
     const franjas = venue.category_id === HOTEL ? [] : venue.availability ?? [];
     if (!isOpenSlot(slotStart, franjas, venue.blocked_slots ?? [])) {
-      return NextResponse.json({ error: "Créneau indisponible." }, { status: 409 });
+      return NextResponse.json({ code: "unavailable", error: "Créneau indisponible." }, { status: 409 });
     }
     const { data: clash } = await admin
       .from("reservations")
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       .in("status", ["pending_review", "confirmed"])
       .maybeSingle();
     if (clash) {
-      return NextResponse.json({ error: "Créneau déjà réservé." }, { status: 409 });
+      return NextResponse.json({ code: "taken", error: "Créneau déjà réservé." }, { status: 409 });
     }
 
     // 4. Compute the credit cost from the venue's category (hotels bill per night).
@@ -115,7 +115,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertErr) {
-      return NextResponse.json({ error: `Erreur : ${insertErr.message}` }, { status: 500 });
+      console.error("Reservation insert error:", insertErr);
+      return NextResponse.json({ error: "Erreur serveur. Réessayez." }, { status: 500 });
     }
 
     // 6. Notify the storyteller + admin. Best-effort: a mail failure must never

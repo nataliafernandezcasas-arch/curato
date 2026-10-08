@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Dossier } from "@/lib/storyteller-dossier";
 import type { Lang } from "@/lib/i18n/translations";
+import { subjectLabel } from "@/lib/photo-subjects";
 import { Section } from "@/components/member/section";
 import { SlideIn } from "@/components/member/slide-in";
 import { StateMark } from "@/components/member/state-mark";
@@ -294,7 +295,7 @@ function Cuerpo({
               </a>
             )}
             {d.handle && d.categories.length > 0 && " · "}
-            {d.categories.join(", ")}
+            {d.categories.map((s) => subjectLabel(s, lang)).join(", ")}
           </p>
         )}
       </div>

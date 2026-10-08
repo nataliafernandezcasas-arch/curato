@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Gear } from "@phosphor-icons/react";
 import { TabBar, TabBarSpacer, MAX_DESTINOS } from "@/components/member/tab-bar";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { translations } from "@/lib/i18n/translations";
+import { COMUN } from "@/lib/i18n/comun";
 
 export type NavLink = { href: string; label: string; active?: boolean };
 
@@ -25,7 +28,7 @@ export default function DashboardNav({
   eyebrow,
   roleSwitch,
   settingsHref,
-  settingsLabel = "Réglages",
+  settingsLabel: settingsLabelProp,
   maxWidth = "1200px",
 }: {
   links?: NavLink[];
@@ -39,6 +42,9 @@ export default function DashboardNav({
 }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
+  const { lang } = useLang();
+  const c = COMUN[lang];
+  const settingsLabel = settingsLabelProp ?? translations[lang].dashboard.navSettings;
 
   // A stale open panel over a new page is worse than no panel, and Escape is
   // what anyone reaches for first.
@@ -118,7 +124,7 @@ export default function DashboardNav({
           aria-expanded={open}
           className="-mr-2 min-h-11 px-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent sm:hidden"
         >
-          {open ? "Fermer" : "Menu"}
+          {open ? c.close : c.menu}
         </button>
       </div>
 

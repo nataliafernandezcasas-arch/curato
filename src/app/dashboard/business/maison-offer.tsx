@@ -201,7 +201,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         <div className="space-y-3">
           {services.map((s, i) => (
             <div key={i} className="relative pr-10">
-              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-text-muted hover:text-copper-vif" aria-label="X"><X size={15} /></button>
+              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-text-muted hover:text-copper-vif" aria-label={t.offerRemove}><X size={15} /></button>
               <div className="grid sm:grid-cols-[1fr_140px] gap-3 mb-3">
                 <input value={s.name} onChange={(e) => updateService(i, "name", e.target.value)} placeholder={t.offerServiceName} className={`${inputCls} w-full`} />
                 <input value={s.price} onChange={(e) => updateService(i, "price", e.target.value)} placeholder={t.offerServicePrice} className={`${inputCls} w-full`} />
@@ -221,9 +221,9 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             <div key={url} className="relative inline-flex items-center gap-2 rounded-full border border-border pl-4 pr-9 py-2.5">
               <FilePdf size={16} className="text-accent" />
               <a href={url} target="_blank" rel="noopener noreferrer" className="font-serif text-[13px] text-text-secondary hover:text-accent transition-colors">
-                {url.split("/").pop()?.slice(-16) || "menu"}
+                {url.split("/").pop()?.slice(-16) || t.offerMenu}
               </a>
-              <button onClick={() => removeMenu(url)} className="absolute top-1/2 right-3 -translate-y-1/2 text-text-muted hover:text-copper-vif" aria-label="X"><X size={13} /></button>
+              <button onClick={() => removeMenu(url)} className="absolute top-1/2 right-3 -translate-y-1/2 text-text-muted hover:text-copper-vif" aria-label={t.offerRemove}><X size={13} /></button>
             </div>
           ))}
           <FilePicker

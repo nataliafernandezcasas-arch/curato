@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
+import { COMUN } from "@/lib/i18n/comun";
 import Link from "next/link";
 import { AuthShell } from "@/components/member/auth-shell";
 import { Button } from "@/components/member/button";
@@ -22,7 +23,8 @@ export default function SignInPage() {
   const native = useNativePlatform();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // La clave del error, no el texto: si cambia el idioma, el error cambia con él.
+  const [error, setError] = useState<"" | "errorPassword" | "errorConnection">("");
   const [resetSent, setResetSent] = useState(false);
 
   // El login se hace en el servidor: el handle se traduce a correo allí y el
@@ -44,13 +46,13 @@ export default function SignInPage() {
       if (!res.ok) {
         // Un solo mensaje: decir "ese handle no existe" es decir quién está en
         // el club.
-        setError(res.status === 401 ? t.errorPassword : t.errorConnection);
+        setError(res.status === 401 ? "errorPassword" : "errorConnection");
         return;
       }
 
       window.location.href = data.forcePasswordChange ? "/auth/change-password" : "/dashboard";
     } catch {
-      setError(t.errorConnection);
+      setError("errorConnection");
     } finally {
       setLoading(false);
     }
@@ -72,7 +74,7 @@ export default function SignInPage() {
       });
       setResetSent(true);
     } catch {
-      setError(t.errorConnection);
+      setError("errorConnection");
     } finally {
       setLoading(false);
     }
@@ -152,7 +154,7 @@ export default function SignInPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Masquer" : "Afficher"}
+                  aria-label={showPassword ? COMUN[lang].hide : COMUN[lang].show}
                   className="absolute bottom-2 right-0 text-text-muted transition-colors hover:text-accent"
                 >
                   {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
@@ -169,7 +171,7 @@ export default function SignInPage() {
           )}
 
           {error && (
-            <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
+            <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{t[error]}</p>
           )}
 
           <Button type="submit" full disabled={loading}>

@@ -4,6 +4,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createPhylloUser, createSDKToken } from "@/lib/phyllo/client";
 import { filtroDeUsuario } from "@/lib/identidad";
 
+// Every error carries a stable `code` (consent, auth, not_found, token,
+// exists, create, server) that the client translates. `error` is kept, in
+// French, for logs and older clients.
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
@@ -15,7 +18,7 @@ export async function POST(request: NextRequest) {
     // If you remove this check, update the privacy policy first.
     if (phylloConsent !== true) {
       return NextResponse.json(
-        { error: "Le consentement explicite est requis pour connecter votre compte Instagram." },
+        { code: "consent", error: "Le consentement explicite est requis pour connecter votre compte Instagram." },
         { status: 400 }
       );
     }
@@ -24,7 +27,7 @@ export async function POST(request: NextRequest) {
     // match the creator by the auth link first, email as a fallback.
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+    if (!user) return NextResponse.json({ code: "auth", error: "Non authentifié." }, { status: 401 });
 
     const admin = createAdminClient();
     const { data: creator, error: creatorErr } = await admin
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (!creator) {
       console.error("Creator not found for user:", user.id, creatorErr?.message);
-      return NextResponse.json({ error: "No encontramos tu cuenta." }, { status: 404 });
+      return NextResponse.json({ code: "not_found", error: "Compte introuvable." }, { status: 404 });
     }
 
     // If already has Phyllo account, just create new SDK token
@@ -44,7 +47,7 @@ export async function POST(request: NextRequest) {
       const tokenData = await createSDKToken(creator.phyllo_account_id);
       console.log("SDK token response:", JSON.stringify(tokenData).slice(0, 100));
       if (!tokenData.sdk_token) {
-        return NextResponse.json({ error: "Error generando token de Phyllo" }, { status: 500 });
+        return NextResponse.json({ code: "token", error: "Erreur lors de la génération du jeton Phyllo." }, { status: 500 });
       }
       return NextResponse.json({ sdk_token: tokenData.sdk_token, user_id: creator.phyllo_account_id });
     }
@@ -59,9 +62,9 @@ export async function POST(request: NextRequest) {
       console.error("Phyllo user creation failed:", JSON.stringify(phylloUser));
       // If external_id already exists, try to find existing user
       if (phylloUser.error?.message?.includes("external_id")) {
-        return NextResponse.json({ error: "Usuario ya existe en Phyllo. Contacta soporte." }, { status: 500 });
+        return NextResponse.json({ code: "exists", error: "Cet utilisateur existe déjà chez Phyllo. Contactez le support." }, { status: 500 });
       }
-      return NextResponse.json({ error: "Error creando usuario en Phyllo: " + (phylloUser.error?.message || "desconocido") }, { status: 500 });
+      return NextResponse.json({ code: "create", error: "Erreur lors de la création de l'utilisateur Phyllo." }, { status: 500 });
     }
 
     // Save Phyllo user ID
@@ -73,6 +76,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ sdk_token: tokenData.sdk_token, user_id: phylloUser.id });
   } catch (err) {
     console.error("Phyllo create-user error:", err);
-    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+    return NextResponse.json({ code: "server", error: "Erreur interne." }, { status: 500 });
   }
 }

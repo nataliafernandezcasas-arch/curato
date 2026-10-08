@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { COMUN } from "@/lib/i18n/comun";
 
 /**
  * Una hoja que sube desde abajo, para elecciones cortas.
@@ -25,6 +27,7 @@ export function Sheet({
   children: React.ReactNode;
 }) {
   const reduce = useReducedMotion() ?? false;
+  const { lang } = useLang();
 
   useEffect(() => {
     if (!open) return;
@@ -39,7 +42,7 @@ export function Sheet({
         <>
           {/* El fondo se atenúa, no se cubre de negro: sigues sabiendo dónde estás. */}
           <motion.button
-            aria-label="Fermer"
+            aria-label={COMUN[lang].close}
             onClick={onClose}
             className="fixed inset-0 z-40 bg-surface/60"
             initial={{ opacity: 0 }}

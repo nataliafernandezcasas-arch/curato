@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Eye, EyeSlash } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
+import { COMUN } from "@/lib/i18n/comun";
 import { AuthShell } from "@/components/member/auth-shell";
 import { Button } from "@/components/member/button";
 import { Field } from "@/components/member/field";
@@ -16,18 +17,19 @@ export default function ChangePasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // La clave del error, no el texto: si cambia el idioma, el error cambia con él.
+  const [error, setError] = useState<"" | "errorMin" | "errorMatch" | "errorUpdate" | "errorConnection">("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 8) {
-      setError(t.errorMin);
+      setError("errorMin");
       return;
     }
     if (password !== confirm) {
-      setError(t.errorMatch);
+      setError("errorMatch");
       return;
     }
     setLoading(true);
@@ -41,12 +43,12 @@ export default function ChangePasswordPage() {
         data: { force_password_change: false },
       });
       if (updateErr) {
-        setError(t.errorUpdate);
+        setError("errorUpdate");
         return;
       }
       window.location.href = "/dashboard";
     } catch {
-      setError(t.errorConnection);
+      setError("errorConnection");
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,7 @@ export default function ChangePasswordPage() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Masquer" : "Afficher"}
+              aria-label={showPassword ? COMUN[lang].hide : COMUN[lang].show}
               className="absolute bottom-2 right-0 text-text-muted transition-colors hover:text-accent"
             >
               {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
@@ -97,7 +99,7 @@ export default function ChangePasswordPage() {
           <button
             type="button"
             onClick={() => setShowConfirm(!showConfirm)}
-            aria-label={showConfirm ? "Masquer" : "Afficher"}
+            aria-label={showConfirm ? COMUN[lang].hide : COMUN[lang].show}
             className="absolute bottom-2 right-0 text-text-muted transition-colors hover:text-accent"
           >
             {showConfirm ? <EyeSlash size={18} /> : <Eye size={18} />}
@@ -105,7 +107,7 @@ export default function ChangePasswordPage() {
         </div>
 
         {error && (
-          <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{error}</p>
+          <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{t[error]}</p>
         )}
 
         <Button type="submit" full disabled={loading}>

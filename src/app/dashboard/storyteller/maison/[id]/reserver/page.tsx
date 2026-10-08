@@ -415,7 +415,8 @@ function Reserver({ id }: { id: string }) {
       });
       if (res.status === 409) {
         const body = await res.json().catch(() => ({}));
-        setAviso(String(body.error ?? "").includes("déjà") ? "tomada" : "rechazada");
+        // El código de la ruta, no su texto: el texto puede cambiar de idioma.
+        setAviso(body.code === "taken" ? "tomada" : "rechazada");
         setFranja("");
         // Lo ocupado ha cambiado: se vuelve a pedir.
         fetch(`/api/maison/${id}/availability`, { cache: "no-store" })

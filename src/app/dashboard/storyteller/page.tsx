@@ -15,6 +15,7 @@ import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Tabs } from "@/components/member/tabs";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { pickLang } from "@/lib/i18n/pick-lang";
 
 // A maison = a signed venue from `comercios` (is_reservable = true).
 type Maison = {
@@ -23,6 +24,8 @@ type Maison = {
   arrondissement: string | null;
   address: string | null;
   description: string | null;
+  description_en: string | null;
+  description_es: string | null;
   photos: string[] | null;
   website_url: string | null;
   signed_at: string | null;
@@ -147,7 +150,7 @@ export default function InfluencerDashboard() {
       const { data, error } = await supabase
         .from("comercios")
         .select(
-          "id, name, arrondissement, address, description, photos, website_url, signed_at, category_id"
+          "id, name, arrondissement, address, description, description_en, description_es, photos, website_url, signed_at, category_id"
         )
         .eq("is_reservable", true)
         .order("signed_at", { ascending: false, nullsFirst: false });
@@ -372,9 +375,11 @@ export default function InfluencerDashboard() {
                               )}
                             </p>
 
+                            {/* La descripción en el idioma del storyteller; si la casa no
+                                la ha traducido, la francesa. */}
                             {maison.description && (
                               <p className="mt-bloque line-clamp-3 text-corps text-text-secondary">
-                                {maison.description}
+                                {pickLang({ fr: maison.description, en: maison.description_en, es: maison.description_es }, lang)}
                               </p>
                             )}
 

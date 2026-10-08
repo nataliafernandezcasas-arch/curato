@@ -143,7 +143,7 @@ const STATUS_STYLE: Record<Prospect["effectiveStatus"], { dot: string; text: str
 const LANGS: Lang[] = ["fr", "en", "es"];
 
 function eur(n: number, lang: Lang): string {
-  if (lang === "en") return "€" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (lang === "en") return "€" + n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const locale = lang === "es" ? "es-ES" : "fr-FR";
   return n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
 }
@@ -159,10 +159,12 @@ export default function RecruiterDashboard() {
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [adding, setAdding] = useState(false);
-  const [addMsg, setAddMsg] = useState("");
+  // Los avisos se guardan por su clave en T, no por su texto: si cambia el
+  // idioma, cambian con él.
+  const [addMsg, setAddMsg] = useState<"" | "msgProposed" | "msgError">("");
 
   const [iban, setIban] = useState("");
-  const [ibanMsg, setIbanMsg] = useState("");
+  const [ibanMsg, setIbanMsg] = useState<"" | "msgIbanSaved" | "msgIbanError">("");
 
   const load = useCallback(async () => {
     const res = await fetch("/api/recruiter", { cache: "no-store" });
@@ -189,10 +191,10 @@ export default function RecruiterDashboard() {
     setAdding(false);
     if (res.ok) {
       setName(""); setEmail(""); setNotes("");
-      setAddMsg(t.msgProposed);
+      setAddMsg("msgProposed");
       load();
     } else {
-      setAddMsg(t.msgError);
+      setAddMsg("msgError");
     }
   }
 
@@ -204,7 +206,7 @@ export default function RecruiterDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "save_iban", iban }),
     });
-    setIbanMsg(res.ok ? t.msgIbanSaved : t.msgIbanError);
+    setIbanMsg(res.ok ? "msgIbanSaved" : "msgIbanError");
   }
 
   async function signOut() {
@@ -288,7 +290,7 @@ export default function RecruiterDashboard() {
             <label className={labelClass}>{t.lblNotes}</label>
             <input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t.phNotes} />
           </div>
-          {addMsg && <p className="font-serif text-[12px] text-champagne/80">{addMsg}</p>}
+          {addMsg && <p className="font-serif text-[12px] text-champagne/80">{t[addMsg]}</p>}
           <Button type="submit" disabled={adding}>
             {adding ? t.btnProposing : t.btnPropose}
           </Button>
@@ -334,7 +336,7 @@ export default function RecruiterDashboard() {
             <label className={labelClass}>{t.lblIban}</label>
             <input className={inputClass} value={iban} onChange={(e) => setIban(e.target.value)} placeholder={t.phIban} />
           </div>
-          {ibanMsg && <p className="font-serif text-[12px] text-champagne/80">{ibanMsg}</p>}
+          {ibanMsg && <p className="font-serif text-[12px] text-champagne/80">{t[ibanMsg]}</p>}
           <Button type="submit">{t.btnSaveIban}</Button>
         </form>
       </section>

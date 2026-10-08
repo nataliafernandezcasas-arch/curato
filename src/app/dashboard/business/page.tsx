@@ -8,6 +8,7 @@ import { MAISON_LINKS, isMaisonSection, type MaisonSection } from "./nav-links";
 import { GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
+import { COMUN } from "@/lib/i18n/comun";
 import MaisonProfile from "./maison-profile";
 import MaisonOffer from "./maison-offer";
 import MaisonBilling from "./maison-billing";
@@ -453,7 +454,7 @@ function MaisonDashboard() {
           <div className="relative w-full max-w-[680px] overflow-hidden rounded-2xl bg-surface border border-border my-4" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setSelected(null)}
-              aria-label="Fermer"
+              aria-label={COMUN[lang].close}
               className="absolute top-3 right-3 z-10 rounded-full border border-[rgba(245,239,228,0.28)] p-2 bg-black/50 backdrop-blur-md text-white/70 hover:text-white transition-colors"
             >
               <X size={18} />

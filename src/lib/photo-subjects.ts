@@ -24,19 +24,19 @@ export const SUBJECTS = [
 export type SubjectSlug = (typeof SUBJECTS)[number]["slug"];
 
 // Las respuestas de antes de la migración 033, por si se lee alguna sin
-// traducir: se enseñan con la etiqueta que tenían.
-const ANTIGUAS: Record<string, string> = {
-  food: "Food",
-  hotel_reviews: "Hôtels",
-  wellness: "Bien-être",
-  fashion_adjacent: "Mode",
-  lifestyle: "Lifestyle",
-  travel: "Voyage",
+// traducir: se enseñan con la etiqueta que tenían, en el idioma de quien mira.
+const ANTIGUAS: Record<string, Record<Lang, string>> = {
+  food: { fr: "Food", en: "Food", es: "Food" },
+  hotel_reviews: { fr: "Hôtels", en: "Hotels", es: "Hoteles" },
+  wellness: { fr: "Bien-être", en: "Wellness", es: "Bienestar" },
+  fashion_adjacent: { fr: "Mode", en: "Fashion", es: "Moda" },
+  lifestyle: { fr: "Lifestyle", en: "Lifestyle", es: "Lifestyle" },
+  travel: { fr: "Voyage", en: "Travel", es: "Viajes" },
 };
 
 export function subjectLabel(slug: string, lang: Lang = "fr"): string {
   const s = SUBJECTS.find((x) => x.slug === slug);
-  return s ? s[lang] : ANTIGUAS[slug] ?? slug;
+  return s ? s[lang] : ANTIGUAS[slug]?.[lang] ?? slug;
 }
 
 export function isSubject(value: unknown): value is SubjectSlug {

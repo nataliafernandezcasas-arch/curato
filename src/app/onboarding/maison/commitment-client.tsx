@@ -26,17 +26,18 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
   const [signatory, setSignatory] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // La clave del error, no el texto: así sigue al idioma si se cambia después.
+  const [error, setError] = useState<"errorMustAccept" | "errorMustSign" | "errorGeneric" | null>(null);
 
   const canSubmit = accepted && signatory.trim().length >= 2 && !submitting;
 
   async function handleSubmit() {
     if (!accepted) {
-      setError(l.errorMustAccept);
+      setError("errorMustAccept");
       return;
     }
     if (signatory.trim().length < 2) {
-      setError(l.errorMustSign);
+      setError("errorMustSign");
       return;
     }
     setSubmitting(true);
@@ -44,7 +45,9 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
 
     const res = await signCommitment({ accepted, signatory, lang });
     if (!res.ok) {
-      setError(res.error === "must_sign" ? l.errorMustSign : res.error === "must_accept" ? l.errorMustAccept : `${l.errorGeneric} (${res.error})`);
+      // El código técnico a la consola; en pantalla, un mensaje traducido.
+      if (res.error !== "must_sign" && res.error !== "must_accept") console.error("signCommitment:", res.error);
+      setError(res.error === "must_sign" ? "errorMustSign" : res.error === "must_accept" ? "errorMustAccept" : "errorGeneric");
       setSubmitting(false);
       return;
     }
@@ -71,7 +74,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
       </div>
 
       {/* Presentation dossier — stacked full-bleed pages */}
-      <section aria-label="Dossier Curato">
+      <section aria-label={l.dossierEyebrow}>
         {dossierSlides.map((src, i) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img key={src} src={src} alt="" loading={i === 0 ? "eager" : "lazy"} className="block w-full h-auto" />
@@ -157,7 +160,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
 
         {error && (
           <p className="mt-rango border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">
-            {error}
+            {l[error]}
           </p>
         )}
 

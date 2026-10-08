@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { NavLink } from "@/app/dashboard/dashboard-nav";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import type { Lang } from "@/lib/i18n/translations";
+
+const SIN_CONEXION: Record<Lang, string> = { fr: "Hors ligne", en: "Offline", es: "Sin conexión" };
 
 /**
  * La barra de destinos, abajo.
@@ -25,6 +29,7 @@ export const MAX_DESTINOS = 3;
 
 export function TabBar({ links }: { links: NavLink[] }) {
   const [offline, setOffline] = useState(false);
+  const { lang } = useLang();
 
   // Sin conexión se dice aquí, en una palabra, y deja de ser una pantalla
   // entera que tapaba lo que la persona estaba mirando.
@@ -49,7 +54,7 @@ export function TabBar({ links }: { links: NavLink[] }) {
     >
       {offline && (
         <p className="py-etiqueta text-center text-capitale uppercase tracking-capitale text-copper-vif">
-          Hors ligne
+          {SIN_CONEXION[lang]}
         </p>
       )}
       <div className="flex items-stretch justify-around">
