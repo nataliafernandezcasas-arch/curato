@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { visitaDeHoy } from "@/lib/check-in";
 
 const BUCKET = "content-proofs";
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
@@ -24,7 +25,7 @@ export async function GET() {
 
     const { data: reservations } = await admin
       .from("reservations")
-      .select("id, venue_id, slot_start, status, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at")
+      .select("id, venue_id, slot_start, slot_end, status, visited_at, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at")
       .eq("creator_id", creator.id)
       .order("slot_start", { ascending: false });
 
@@ -46,6 +47,9 @@ export async function GET() {
           maison: venueName.get(r.venue_id) ?? "—",
           slotStart: r.slot_start as string,
           status: r.status as string,
+          // Hoy es el día de la visita: es cuando hay código que enseñar.
+          today: Boolean(visitaDeHoy([r])),
+          visitedAt: (r.visited_at as string | null) ?? null,
           photos,
           rightsExpiresAt: (r.content_rights_expires_at as string | null) ?? null,
           reach: r.reach_declared_at

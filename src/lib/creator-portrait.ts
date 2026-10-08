@@ -41,6 +41,21 @@ export async function signPortraits(admin: Admin, paths: string[]): Promise<(str
 }
 
 /**
+ * El primer retrato de cada persona, firmado, en una sola llamada. Quien no
+ * subió ninguno no aparece en el mapa: la pantalla pone sus iniciales.
+ */
+export async function retratoDeCada(
+  admin: Admin,
+  personas: { id: string; portrait_urls?: string[] | null }[]
+): Promise<Map<string, string>> {
+  const conRetrato = personas.filter((p) => p.portrait_urls?.length);
+  const firmados = await signPortraits(admin, conRetrato.map((p) => p.portrait_urls![0]));
+  const out = new Map<string, string>();
+  conRetrato.forEach((p, i) => firmados[i] && out.set(p.id, firmados[i]!));
+  return out;
+}
+
+/**
  * Las fotos que ve la casa: las que la persona eligió en su perfil o, mientras
  * no las haya tocado (null), las de su candidatura.
  */

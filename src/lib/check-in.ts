@@ -1,49 +1,54 @@
 import { parisParts } from "@/lib/availability";
 
-// El registro de la visita en sala (pantalla 27). Aquí vive la lógica pura: el
-// código de la casa y cuál es la visita de hoy. Las rutas solo leen y escriben.
+// El registro de la visita en sala. El storyteller enseña el código de su
+// visita y la casa lo escanea (migración 040). Aquí vive la lógica pura: el
+// código, lo que lleva el QR y cuál es la visita de hoy. Las rutas solo leen y
+// escriben.
 
-/** "mrc 418", "MRC-418" o "Mrc418" son el mismo código: MRC418. */
+/** "k7m 4qx", "K7M-4QX" o "k7m4qx" son el mismo código: K7M4QX. */
 export function normalizarCodigo(entrada: string): string {
   return entrada
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
     .replace(/[^A-Z0-9]/g, "");
 }
 
-export function esCodigoValido(codigo: string): boolean {
-  return /^[A-Z]{3}\d{3}$/.test(codigo);
+// Sin O ni 0, sin I ni 1: dicho en voz alta o tecleado con prisa, no se
+// confunden. Treinta y dos signos a la sexta son mil millones de códigos.
+const SIGNOS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const LARGO = 6;
+
+export function esCodigoDeVisita(codigo: string): boolean {
+  return new RegExp(`^[${SIGNOS}]{${LARGO}}$`).test(codigo);
 }
 
-/** MRC418 se enseña como MRC 418: se lee de un vistazo y se teclea sin error. */
+/** Un código nuevo para una visita. */
+export function nuevoCodigoDeVisita(azar: () => number = Math.random): string {
+  let codigo = "";
+  for (let i = 0; i < LARGO; i++) codigo += SIGNOS[Math.floor(azar() * SIGNOS.length)];
+  return codigo;
+}
+
+/** K7M4QX se enseña como K7M 4QX: se lee de un vistazo y se teclea sin error. */
 export function mostrarCodigo(codigo: string): string {
-  return esCodigoValido(codigo) ? `${codigo.slice(0, 3)} ${codigo.slice(3)}` : codigo;
+  return esCodigoDeVisita(codigo) ? `${codigo.slice(0, 3)} ${codigo.slice(3)}` : codigo;
 }
 
-// Palabras que no dicen qué casa es: "Maison Marceau" es Marceau.
-const GENERICAS = new Set(["MAISON", "HOTEL", "LE", "LA", "LES", "L", "DE", "DU", "DES", "CHEZ", "RESTAURANT", "CAFE", "SPA", "ATELIER"]);
+// Lo que lleva el QR. No es una URL a propósito: si alguien lo escanea con la
+// cámara del teléfono no abre nada, solo lo entiende el Scanner de la casa.
+const PREFIJO_QR = "CURATO-VISITE:";
 
-/** Tres letras que recuerdan a la casa: las consonantes de su palabra propia. */
-export function letrasDe(nombre: string): string {
-  const palabras = normalizarCodigo(nombre.replace(/['’\-]/g, " ").replace(/\s+/g, "_"))
-    .split(/[^A-Z]+/)
-    .filter(Boolean);
-  const propias = nombre
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toUpperCase()
-    .split(/[^A-Z]+/)
-    .filter((p) => p && !GENERICAS.has(p));
-  const base = (propias[0] ?? palabras[0] ?? "CUR").replace(/[^A-Z]/g, "");
-  const consonantes = base.replace(/[AEIOUY]/g, "");
-  const letras = (consonantes.length >= 3 ? consonantes : base + "XXX").slice(0, 3);
-  return letras.padEnd(3, "X");
+export function contenidoDelQR(codigo: string): string {
+  return PREFIJO_QR + codigo;
 }
 
-/** Un código nuevo: tres letras de la casa y tres cifras. */
-export function nuevoCodigo(nombre: string, azar: () => number = Math.random): string {
-  return `${letrasDe(nombre)}${100 + Math.floor(azar() * 900)}`;
+/** El código que hay dentro de un QR leído, o null si no es de Curato. */
+export function codigoDelQR(texto: string): string | null {
+  const limpio = texto.trim();
+  const crudo = limpio.toUpperCase().startsWith(PREFIJO_QR) ? limpio.slice(PREFIJO_QR.length) : limpio;
+  const codigo = normalizarCodigo(crudo);
+  return esCodigoDeVisita(codigo) ? codigo : null;
 }
 
 export type ReservaParaVisita = {

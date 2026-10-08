@@ -6,7 +6,7 @@ import { STORYTELLER_LINKS } from "../nav-links";
 import { Rise } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
-import { Button, LabelButton } from "@/components/member/button";
+import { Button, ButtonLink, LabelButton } from "@/components/member/button";
 import { PullToRefresh } from "@/components/member/pull-to-refresh";
 import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -19,9 +19,19 @@ type Visit = {
   maison: string;
   slotStart: string;
   status: string;
+  today: boolean;
+  visitedAt: string | null;
   photos: string[];
   rightsExpiresAt: string | null;
   reach: Reach | null;
+};
+
+// El código de la visita (migración 040): el storyteller lo enseña y la casa
+// lo escanea.
+const CODIGO: Record<Lang, { show: string; done: string }> = {
+  fr: { show: "Mon code de visite", done: "Visite enregistrée par la maison" },
+  en: { show: "My visit code", done: "Visit recorded by the maison" },
+  es: { show: "Mi código de visita", done: "Visita registrada por la maison" },
 };
 
 /** Las horas que quedan del plazo de 24 h para publicar las dos stories. */
@@ -295,6 +305,17 @@ function VisitCard({
           }
         />
       </Envoltura>
+
+      {/* El día de la visita, lo primero es el código: se enseña al llegar. */}
+      {visit.status === "confirmed" && visit.today && (
+        <div className="mt-fila">
+          {visit.visitedAt ? (
+            <p className="text-capitale uppercase tracking-capitale text-sauge-vif">{CODIGO[lang].done}</p>
+          ) : (
+            <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/code`}>{CODIGO[lang].show}</ButtonLink>
+          )}
+        </div>
+      )}
 
       {canUpload && (
         <div className="mt-fila">
