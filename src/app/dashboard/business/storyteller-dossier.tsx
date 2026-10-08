@@ -219,6 +219,22 @@ export function DossierPane({
   );
 }
 
+/**
+ * El mismo dossier, dentro de una página y no encima de ella: el storyteller
+ * se ve en su perfil exactamente como lo ve una casa.
+ */
+export function DossierInline({ dossier, lang }: { dossier: Dossier; lang: Lang }) {
+  const t = TEXTOS[lang] ?? TEXTOS.fr;
+  const [visor, setVisor] = useState<number | null>(null);
+  const cerrarVisor = useCallback(() => setVisor(null), []);
+  return (
+    <>
+      <Cuerpo d={dossier} t={t} lang={lang} note={null} onOpen={setVisor} />
+      <Viewer photos={fotosDe(dossier)} index={visor} onClose={cerrarVisor} caption={t.viewerCaption} protect />
+    </>
+  );
+}
+
 function Cifra({ label, value, fuerte = false }: { label: string; value: string; fuerte?: boolean }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-fila">
