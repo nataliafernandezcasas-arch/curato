@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
 import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check } from "@phosphor-icons/react";
 import { translations, Lang } from "@/lib/i18n/translations";
+import { COMUN } from "@/lib/i18n/comun";
 import { Button } from "@/components/member/button";
 
 type T = Record<string, string>;
@@ -35,7 +36,8 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const [editing, setEditing] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState("");
+  // Un aviso y no su texto: si cambia el idioma, el aviso cambia con él.
+  const [hdRejected, setHdRejected] = useState(false);
   const [preview, setPreview] = useState(false);
   const dragFrom = useRef<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
@@ -77,13 +79,13 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
 
   async function uploadPhotos(files: FileList | null) {
     if (!files || files.length === 0) return;
-    setNotice("");
+    setHdRejected(false);
     setUploading(true);
     try {
       const arr = Array.from(files);
       const checks = await Promise.all(arr.map(isHd));
       const ok = arr.filter((_, i) => checks[i]);
-      if (ok.length < arr.length) setNotice(t.profileHdRejected);
+      if (ok.length < arr.length) setHdRejected(true);
       if (ok.length === 0) return;
       const form = new FormData();
       ok.forEach((f) => form.append("files", f));
@@ -326,7 +328,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                 <button
                   onClick={() => removePhoto(url)}
                   className="absolute top-1.5 right-1.5 rounded-full bg-black/70 text-white p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  aria-label="Supprimer"
+                  aria-label={COMUN[lang].remove}
                 >
                   <X size={14} />
                 </button>
@@ -341,7 +343,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               <Plus size={22} weight="thin" />
             </FilePicker>
           </div>
-          {notice && <p className="font-serif text-[12px] text-copper-vif mt-3 border-l border-copper-vif pl-3">{notice}</p>}
+          {hdRejected && <p className="font-serif text-[12px] text-copper-vif mt-3 border-l border-copper-vif pl-3">{t.profileHdRejected}</p>}
         </div>
 
         {/* Description */}

@@ -231,7 +231,8 @@ export default function MaisonDemandes() {
   const [fallo, setFallo] = useState(false);
   const [abierta, setAbierta] = useState<string | null>(null);
   const [trabajando, setTrabajando] = useState(false);
-  const [errorAccion, setErrorAccion] = useState("");
+  // La clave del aviso, no el texto, para que siga al idioma.
+  const [errorAccion, setErrorAccion] = useState<"" | "expiredNow" | "actionError">("");
   const [resultado, setResultado] = useState<Resultado | null>(null);
 
   const cargar = useCallback(async () => {
@@ -274,7 +275,7 @@ export default function MaisonDemandes() {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setErrorAccion(body.expired ? t.expiredNow : t.actionError);
+        setErrorAccion(body.expired ? "expiredNow" : "actionError");
         if (body.expired) await cargar();
         return;
       }
@@ -283,7 +284,7 @@ export default function MaisonDemandes() {
       await cargar();
       window.scrollTo({ top: 0 });
     } catch {
-      setErrorAccion(t.actionError);
+      setErrorAccion("actionError");
     } finally {
       setTrabajando(false);
     }
@@ -508,7 +509,7 @@ export default function MaisonDemandes() {
                   {aviso}
                 </p>
                 {errorAccion && (
-                  <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{errorAccion}</p>
+                  <p className="border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">{t[errorAccion]}</p>
                 )}
                 <Button full onClick={() => decidir(demanda, "confirm")} disabled={trabajando}>
                   {trabajando ? t.working : t.accept}

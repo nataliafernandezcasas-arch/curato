@@ -1,7 +1,7 @@
 import type { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { firmarFotos, fotosElegidas, signPortraits } from "@/lib/creator-portrait";
-import { SUBJECT_QUESTION, subjectLabel } from "@/lib/photo-subjects";
+import { SUBJECT_QUESTION } from "@/lib/photo-subjects";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -18,6 +18,10 @@ export type Dossier = {
   id: string;
   name: string;
   handle: string | null;
+  /**
+   * Lo que fotografía, como claves (photo-subjects.ts) y no como etiquetas:
+   * quien lo pinta las traduce al idioma de quien mira.
+   */
   categories: string[];
   /** El retrato que eligió el creador; si no eligió ninguno, el de Instagram. */
   portrait: string | null;
@@ -116,7 +120,7 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
   const categoriesById = new Map<string, string[]>();
   for (const r of survey.data ?? []) {
     const slugs = Array.isArray(r.answer) ? (r.answer as string[]) : [];
-    categoriesById.set(r.creator_id, slugs.map((s) => subjectLabel(s)).filter(Boolean));
+    categoriesById.set(r.creator_id, slugs.filter((s) => typeof s === "string" && s.length > 0));
   }
 
   const clubById = new Map<string, { visits: number; reachSum: number; reachCount: number }>();

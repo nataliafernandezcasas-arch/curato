@@ -157,7 +157,8 @@ export function PortraitEditor({
   const [subiendoEstilo, setSubiendoEstilo] = useState(false);
   const [subiendo, setSubiendo] = useState<number | null>(null);
   const [guardando, setGuardando] = useState(false);
-  const [error, setError] = useState<{ cap?: string; texto: string } | null>(null);
+  // La clave del texto y no el texto: si cambia el idioma, el aviso cambia con él.
+  const [error, setError] = useState<"badType" | "tooLarge" | "uploadFail" | "saveFail" | null>(null);
 
   const temasCambiados = [...subjects].sort().join("|") !== [...initial.subjects].sort().join("|");
   // Quien trae más de dos de antes puede guardar sin tocarlas; si las toca,
@@ -187,14 +188,14 @@ export function PortraitEditor({
     if (!original) return;
     setError(null);
     if (!ACCEPT.split(",").includes(original.type.toLowerCase())) {
-      setError({ texto: t.badType });
+      setError("badType");
       return;
     }
     setSubiendo(hueco);
     try {
       const file = await downscaleImage(original);
       if (file.size > MAX_BYTES) {
-        setError({ texto: t.tooLarge });
+        setError("tooLarge");
         return;
       }
       const form = new FormData();
@@ -202,9 +203,7 @@ export function PortraitEditor({
       const res = await fetch("/api/storyteller/perfil", { method: "POST", body: form });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body.path || !body.url) {
-        setError(
-          body.error === "size" ? { texto: t.tooLarge } : body.error === "format" ? { texto: t.badType } : { cap: t.failCap, texto: t.uploadFail }
-        );
+        setError(body.error === "size" ? "tooLarge" : body.error === "format" ? "badType" : "uploadFail");
         return;
       }
       setPortraits((prev) => {
@@ -213,7 +212,7 @@ export function PortraitEditor({
         return next.filter(Boolean).slice(0, PORTRAIT_MAX);
       });
     } catch {
-      setError({ cap: t.failCap, texto: t.uploadFail });
+      setError("uploadFail");
     } finally {
       setSubiendo(null);
     }
@@ -225,14 +224,14 @@ export function PortraitEditor({
     if (!original) return;
     setError(null);
     if (!ACCEPT.split(",").includes(original.type.toLowerCase())) {
-      setError({ texto: t.badType });
+      setError("badType");
       return;
     }
     setSubiendoEstilo(true);
     try {
       const file = await downscaleImage(original);
       if (file.size > MAX_BYTES) {
-        setError({ texto: t.tooLarge });
+        setError("tooLarge");
         return;
       }
       const form = new FormData();
@@ -241,14 +240,12 @@ export function PortraitEditor({
       const res = await fetch("/api/storyteller/perfil", { method: "POST", body: form });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body.path || !body.url) {
-        setError(
-          body.error === "size" ? { texto: t.tooLarge } : body.error === "format" ? { texto: t.badType } : { cap: t.failCap, texto: t.uploadFail }
-        );
+        setError(body.error === "size" ? "tooLarge" : body.error === "format" ? "badType" : "uploadFail");
         return;
       }
       setEstilo((prev) => [...prev, { path: body.path, url: body.url }].slice(0, ESTILO_MAX));
     } catch {
-      setError({ cap: t.failCap, texto: t.uploadFail });
+      setError("uploadFail");
     } finally {
       setSubiendoEstilo(false);
     }
@@ -271,7 +268,7 @@ export function PortraitEditor({
       if (!res.ok) throw new Error();
       onSaved();
     } catch {
-      setError({ texto: t.saveFail });
+      setError("saveFail");
     } finally {
       setGuardando(false);
     }
@@ -448,8 +445,8 @@ export function PortraitEditor({
             </section>
 
             {error && (
-              <StateMark tono="caido" capital={error.cap ?? t.failCap}>
-                {error.texto}
+              <StateMark tono="caido" capital={t.failCap}>
+                {t[error]}
               </StateMark>
             )}
           </div>

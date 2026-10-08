@@ -201,7 +201,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                     <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-accent mb-3">{t.location}</p>
                     <div className="h-[180px] overflow-hidden">
                       <iframe
-                        title="map"
+                        title={t.location}
                         src={`https://maps.google.com/maps?q=${encodeURIComponent(maison.address)}&z=15&output=embed`}
                         className="w-full h-full"
                         style={{ border: 0, filter: "grayscale(0.4) contrast(0.9)" }}

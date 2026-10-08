@@ -9,6 +9,7 @@ import { Button } from "@/components/member/button";
 import { Choice } from "@/components/member/choice";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
+import { pickLang } from "@/lib/i18n/pick-lang";
 import { submitSurvey, type SurveyAnswers } from "./actions";
 import { SUBJECT_MAX, SUBJECT_QUESTION } from "@/lib/photo-subjects";
 
@@ -42,7 +43,8 @@ export type SurveyQuestion = {
 };
 
 // ────────────────────────────────────────────────────────────────────────────
-// i18n helpers — fall back to ES if FR/EN labels are missing on a row
+// i18n helpers — if a row lacks the requested language, fall back to FR,
+// then EN, then ES (see pickLang)
 // ────────────────────────────────────────────────────────────────────────────
 
 const LANGS: { key: Lang; label: string }[] = [
@@ -52,15 +54,11 @@ const LANGS: { key: Lang; label: string }[] = [
 ];
 
 function pickQuestionText(q: SurveyQuestion, lang: Lang): string {
-  if (lang === "es") return q.question_text_es;
-  if (lang === "fr") return q.question_text_fr ?? q.question_text_es;
-  return q.question_text_en ?? q.question_text_es;
+  return pickLang({ fr: q.question_text_fr, en: q.question_text_en, es: q.question_text_es }, lang);
 }
 
 function pickOptionLabel(opt: SurveyOption, lang: Lang): string {
-  if (lang === "es") return opt.label_es;
-  if (lang === "fr") return opt.label_fr ?? opt.label_es;
-  return opt.label_en ?? opt.label_es;
+  return pickLang({ fr: opt.label_fr, en: opt.label_en, es: opt.label_es }, lang);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -76,7 +74,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
   const [answers, setAnswers] = useState<SurveyAnswers>({});
   const [direction, setDirection] = useState<1 | -1>(1);
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState(false);
   const [done, setDone] = useState(false);
   const [consented, setConsented] = useState(false);
 
@@ -124,12 +122,13 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
 
   async function handleSubmit() {
     setSubmitting(true);
-    setSubmitError(null);
+    setSubmitError(false);
     const res = await submitSurvey(answers);
     if (!res.ok) {
-      // Surface the actual server-side error code so we can diagnose
-      // why the upsert / completion flag flip failed.
-      setSubmitError(`${t.error} (${res.error})`);
+      // El código del servidor va a la consola para diagnosticar; en
+      // pantalla, solo el mensaje traducido.
+      console.error("submitSurvey:", res.error);
+      setSubmitError(true);
       setSubmitting(false);
       return;
     }
@@ -313,7 +312,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
       <footer className="px-5 pb-8 md:pb-10 max-w-[760px] mx-auto w-full">
         {submitError && (
           <p className="mb-fila border-l-2 border-burgundy-vif pl-fila text-legende text-text-primary">
-            {submitError}
+            {t.error}
           </p>
         )}
         <div className="flex items-center justify-between gap-fila pt-fila">

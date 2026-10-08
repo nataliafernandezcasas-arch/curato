@@ -38,16 +38,17 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">(
     connected ? "done" : "idle"
   );
-  const [error, setError] = useState("");
+  // La clave del mensaje, no el texto: así sigue al idioma.
+  const [error, setError] = useState<"igErrorSession" | "igErrorInit" | "igErrorFailed" | null>(null);
 
   async function connect() {
     setStatus("loading");
-    setError("");
+    setError(null);
     try {
       const { createClient } = await import("@/lib/supabase/client");
       const { data: { user } } = await createClient().auth.getUser();
       if (!user?.email) {
-        setError(t.igErrorSession);
+        setError("igErrorSession");
         setStatus("error");
         return;
       }
@@ -59,7 +60,8 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       });
       const data = await res.json();
       if (!res.ok || !data.sdk_token) {
-        setError(data.error || t.igErrorInit);
+        // La ruta manda un código; aquí solo importa si la sesión caducó.
+        setError(data.code === "auth" ? "igErrorSession" : "igErrorInit");
         setStatus("error");
         return;
       }
@@ -92,14 +94,14 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
       pc.on("exit", (_reason: string, _userId: string) => setStatus((s) => (s === "done" ? s : "idle")));
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       pc.on("connectionFailure", (_reason: string, _workPlatformId: string, _userId: string) => {
-        setError(t.igErrorFailed);
+        setError("igErrorFailed");
         setStatus("error");
       });
 
       pc.open();
     } catch (e) {
       console.error("Phyllo connect error:", e);
-      setError(t.igErrorFailed);
+      setError("igErrorFailed");
       setStatus("error");
     }
   }
@@ -141,7 +143,7 @@ export default function ConnectInstagram({ connected }: { connected: boolean }) 
 
       {error && (
         <p className="font-serif text-[12px] text-copper-vif mb-3 border-l border-copper-vif pl-3">
-          {error}
+          {t[error]}
         </p>
       )}
 

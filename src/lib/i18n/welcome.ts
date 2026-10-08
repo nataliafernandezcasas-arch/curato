@@ -9,7 +9,8 @@
 // JPGs live in /public/onboarding/{lang}/ where {lang} is fr | en | es.
 // Each language is a full export of the dossier from Canva — the text and
 // visuals are baked into each image, so our code never overlays text on
-// top of the slides. Spanish is not yet ready; falls back to French.
+// top of the slides. Spanish images are not ready yet; ES shows the French
+// images (with Spanish alt texts and labels).
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { Lang } from "./translations";
@@ -18,11 +19,12 @@ type Slide = { src: string; alt: string };
 
 // Slide sources indexed by language. The 10 file names are identical across
 // languages (slide-01.jpg through slide-10.jpg), only the folder changes.
-function slidesFor(lang: "fr" | "en"): Slide[] {
-  const alts = lang === "fr" ? altsFr : altsEn;
+// The alt texts follow the reader's language even while the images don't
+// (ES still shows the FR export).
+function slidesFor(folder: "fr" | "en", alts: string[]): Slide[] {
   return Array.from({ length: 10 }, (_, i) => {
     const n = String(i + 1).padStart(2, "0");
-    return { src: `/onboarding/${lang}/slide-${n}.jpg`, alt: alts[i] };
+    return { src: `/onboarding/${folder}/slide-${n}.jpg`, alt: alts[i] };
   });
 }
 
@@ -52,17 +54,31 @@ const altsEn = [
   "Join Curato",
 ];
 
+const altsEs = [
+  "Curato — Para los Storytellers",
+  "Documento confidencial",
+  "Cómo funciona",
+  "Categorías: Hostelería, Gastronomía, Bienestar, Conciencia",
+  "Recibes tus créditos · Cuentas la historia",
+  "Ajustado a tu audiencia",
+  "Tus compromisos (1/2)",
+  "Tus compromisos (2/2)",
+  "Lo que recibes",
+  "Unirte a Curato",
+];
+
 // Returns the slide list for the user's language. Falls back to FR (legally
 // binding) for languages not yet translated, so we never break the flow.
 export function getWelcomeSlides(lang: Lang): Slide[] {
-  if (lang === "en") return slidesFor("en");
-  // ES not yet ready — fall back to FR.
-  return slidesFor("fr");
+  if (lang === "en") return slidesFor("en", altsEn);
+  // ES images not yet ready — FR images, Spanish alt texts.
+  if (lang === "es") return slidesFor("fr", altsEs);
+  return slidesFor("fr", altsFr);
 }
 
 // ─── Labels per language ─────────────────────────────────────────────────────
 // Used by the acceptance block at the bottom of the scroll. FR is the legally
-// binding default; EN ships now; ES falls back to FR until ready.
+// binding default; EN and ES are translations of it.
 
 type Labels = {
   acceptEyebrow: string;
@@ -77,6 +93,9 @@ type Labels = {
   submitting: string;
   errorGeneric: string;
   errorMustAccept: string;
+  switchLang: string;
+  dossierLabel: string;
+  acceptSectionLabel: string;
 };
 
 const labelsFr: Labels = {
@@ -94,6 +113,9 @@ const labelsFr: Labels = {
   errorGeneric: "Une erreur est survenue. Réessayez dans un instant.",
   errorMustAccept:
     "Merci d'accepter les Conditions Générales et la Politique de Confidentialité pour continuer.",
+  switchLang: "Passer en",
+  dossierLabel: "Dossier Curato",
+  acceptSectionLabel: "Acceptation des conditions",
 };
 
 const labelsEn: Labels = {
@@ -111,10 +133,33 @@ const labelsEn: Labels = {
   errorGeneric: "Something went wrong. Try again in a moment.",
   errorMustAccept:
     "Please accept the Terms and Conditions and the Privacy Policy to continue.",
+  switchLang: "Switch to",
+  dossierLabel: "Curato dossier",
+  acceptSectionLabel: "Accepting the terms",
+};
+
+const labelsEs: Labels = {
+  acceptEyebrow: "Último paso",
+  acceptTitle: "Para completar tu llegada",
+  acceptIntro:
+    "Antes de descubrir el carnet y empezar tu primera temporada, confirma que has leído y aceptas nuestros dos documentos fundacionales.",
+  termsLabel: "He leído y acepto las",
+  termsLink: "Condiciones Generales",
+  privacyLabel: "He leído y acepto la",
+  privacyLink: "Política de Privacidad",
+  required: "*",
+  enterCurato: "Entrar en Curato",
+  submitting: "Un momento…",
+  errorGeneric: "Algo ha fallado. Vuelve a intentarlo en un momento.",
+  errorMustAccept:
+    "Acepta las Condiciones Generales y la Política de Privacidad para continuar.",
+  switchLang: "Cambiar a",
+  dossierLabel: "Dossier de Curato",
+  acceptSectionLabel: "Aceptación de las condiciones",
 };
 
 export function getWelcomeLabels(lang: Lang): Labels {
   if (lang === "en") return labelsEn;
-  // ES not ready — fall back to FR (legally binding default).
+  if (lang === "es") return labelsEs;
   return labelsFr;
 }

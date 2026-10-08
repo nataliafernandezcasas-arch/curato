@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useLang } from "@/lib/i18n/LanguageContext";
+import { COMUN } from "@/lib/i18n/comun";
 
 /**
  * El visor a pantalla completa.
@@ -34,6 +36,7 @@ export function Viewer({
   protect?: boolean;
 }) {
   const reduce = useReducedMotion() ?? false;
+  const { lang } = useLang();
   const pistaRef = useRef<HTMLDivElement>(null);
   const [actual, setActual] = useState(index ?? 0);
   const abierto = index !== null;
@@ -77,7 +80,7 @@ export function Viewer({
               onClick={onClose}
               className="min-h-11 text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:text-text-primary"
             >
-              Fermer
+              {COMUN[lang].close}
             </button>
           </div>
 

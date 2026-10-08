@@ -95,7 +95,9 @@ function VisitCard({
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  // El único error es el de las fotos que faltan: se guarda el hecho, no el
+  // texto, para que siga al idioma.
+  const [error, setError] = useState(false);
   const [vues, setVues] = useState("");
   const [comptes, setComptes] = useState("");
   const [interactions, setInteractions] = useState("");
@@ -140,12 +142,12 @@ function VisitCard({
     if (!files || files.length === 0) return;
     // At least 2 photos required to log a visit (only on the first upload).
     if (visit.photos.length === 0 && files.length < 2) {
-      setError(t.minPhotos);
+      setError(true);
       if (fileRef.current) fileRef.current.value = "";
       return;
     }
     setBusy(true);
-    setError("");
+    setError(false);
     const form = new FormData();
     form.append("reservationId", visit.id);
     Array.from(files).forEach((f) => form.append("files", f));
@@ -208,7 +210,7 @@ function VisitCard({
               >
                 {busy ? t.sending : t.addMore}
               </label>
-              {error && <p className="text-legende text-copper-vif">{error}</p>}
+              {error && <p className="text-legende text-copper-vif">{t.minPhotos}</p>}
             </div>
           )}
 
@@ -301,7 +303,7 @@ function VisitCard({
             {busy ? t.sending : t.markVisited}
           </LabelButton>
           <p className="mt-bloque text-legende text-text-secondary">{t.minPhotos}</p>
-          {error && <p className="mt-bloque text-legende text-copper-vif">{error}</p>}
+          {error && <p className="mt-bloque text-legende text-copper-vif">{t.minPhotos}</p>}
         </div>
       )}
     </div>

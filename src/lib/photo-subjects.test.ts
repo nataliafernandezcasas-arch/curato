@@ -15,6 +15,7 @@ describe("qué fotografía cada storyteller", () => {
 
   it("una respuesta de antes de la 033 se sigue leyendo", () => {
     expect(subjectLabel("travel")).toBe("Voyage");
+    expect(subjectLabel("travel", "es")).toBe("Viajes");
     expect(subjectLabel("algo-raro")).toBe("algo-raro");
   });
 

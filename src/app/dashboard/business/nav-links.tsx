@@ -2,7 +2,15 @@ import type { NavLink } from "../dashboard-nav";
 
 export type MaisonSection = "profile" | "demandes" | "roster" | "visitors" | "directory" | "billing";
 
-type T = { tabProfile: string; tabDemandes: string; tabRoster: string; tabVisitors: string; tabDirectory: string };
+type T = {
+  tabProfile: string;
+  tabDemandes: string;
+  tabRoster: string;
+  tabVisitors: string;
+  tabDirectory: string;
+  navQrScan: string;
+  navBilling: string;
+};
 
 const SECTIONS: string[] = ["profile", "demandes", "roster", "visitors", "directory", "billing"];
 
@@ -33,9 +41,9 @@ export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr"): 
     { href: at("visitors"), label: t.tabVisitors, active: current === "visitors" },
     { href: at("profile"), label: t.tabProfile, active: current === "profile" },
     // El QR de sala: se abre de pie y con prisa, así que va el primero del menú.
-    { href: "/dashboard/business/qr", label: "Code QR", active: current === "qr" },
+    { href: "/dashboard/business/qr", label: t.navQrScan, active: current === "qr" },
     { href: at("roster"), label: t.tabRoster, active: current === "roster" },
     { href: at("directory"), label: t.tabDirectory, active: current === "directory" },
-    { href: at("billing"), label: "Facturation", active: current === "billing" },
+    { href: at("billing"), label: t.navBilling, active: current === "billing" },
   ];
 }
