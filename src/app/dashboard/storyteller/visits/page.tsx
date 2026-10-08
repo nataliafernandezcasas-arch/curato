@@ -21,6 +21,8 @@ type Visit = {
   status: string;
   today: boolean;
   visitedAt: string | null;
+  partySize?: number;
+  calendar?: { google: string; ics: string } | null;
   photos: string[];
   rightsExpiresAt: string | null;
   reach: Reach | null;
@@ -32,6 +34,15 @@ const CODIGO: Record<Lang, { show: string; done: string }> = {
   fr: { show: "Mon code de visite", done: "Visite enregistrée par la maison" },
   en: { show: "My visit code", done: "Visit recorded by the maison" },
   es: { show: "Mi código de visita", done: "Visita registrada por la maison" },
+};
+
+// Apuntar la visita en el calendario del teléfono, una a una. Los dos enlaces
+// se abren fuera de la app: Google en su web o su app, el .ics en Safari, que
+// es quien sabe añadirlo al calendario de Apple.
+const CALENDARIO: Record<Lang, { add: string; google: string; apple: string; party: (n: number) => string }> = {
+  fr: { add: "Ajouter à mon calendrier", google: "Google", apple: "Apple", party: (n) => (n > 1 ? `${n} personnes` : "1 personne") },
+  en: { add: "Add to my calendar", google: "Google", apple: "Apple", party: (n) => (n > 1 ? `${n} people` : "1 person") },
+  es: { add: "Añadir a mi calendario", google: "Google", apple: "Apple", party: (n) => (n > 1 ? `${n} personas` : "1 persona") },
 };
 
 /** Las horas que quedan del plazo de 24 h para publicar las dos stories. */
@@ -305,6 +316,33 @@ function VisitCard({
           }
         />
       </Envoltura>
+
+      {visit.calendar && (
+        <div className="mt-bloque">
+          <p className="text-legende tabular-nums text-text-secondary">
+            {new Date(visit.slotStart).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" })}
+            {" · "}
+            {CALENDARIO[lang].party(visit.partySize ?? 1)}
+          </p>
+          <p className="mt-fila text-capitale uppercase tracking-capitale text-text-secondary">{CALENDARIO[lang].add}</p>
+          <div className="flex gap-rango">
+            {[
+              { href: visit.calendar.google, label: CALENDARIO[lang].google },
+              { href: visit.calendar.ics, label: CALENDARIO[lang].apple },
+            ].map((enlace) => (
+              <a
+                key={enlace.label}
+                href={enlace.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center text-legende text-accent underline underline-offset-4 transition-colors hover:text-text-primary"
+              >
+                {enlace.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* El día de la visita, lo primero es el código: se enseña al llegar. */}
       {visit.status === "confirmed" && visit.today && (
