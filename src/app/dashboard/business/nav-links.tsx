@@ -10,6 +10,7 @@ type T = {
   tabDirectory: string;
   navQrScan: string;
   navBilling: string;
+  navCalendar: string;
 };
 
 const SECTIONS: string[] = ["profile", "demandes", "roster", "visitors", "directory", "billing"];
@@ -32,7 +33,7 @@ export function isMaisonSection(value: string | null): value is MaisonSection {
  * carnet de casas baja al menú: es pertenencia y se visita una vez al mes. La
  * oferta vive dentro de Ma maison, así que esa es la tercera.
  */
-export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr"): NavLink[] {
+export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr" | "calendrier"): NavLink[] {
   const at = (section: MaisonSection) =>
     section === "profile" ? "/dashboard/business" : `/dashboard/business?section=${section}`;
 
@@ -42,6 +43,8 @@ export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr"): 
     { href: at("profile"), label: t.tabProfile, active: current === "profile" },
     // El QR de sala: se abre de pie y con prisa, así que va el primero del menú.
     { href: "/dashboard/business/qr", label: t.navQrScan, active: current === "qr" },
+    // Quién viene, cuándo y cuántos: lo que la sala mira antes del servicio.
+    { href: "/dashboard/business/calendrier", label: t.navCalendar, active: current === "calendrier" },
     { href: at("roster"), label: t.tabRoster, active: current === "roster" },
     { href: at("directory"), label: t.tabDirectory, active: current === "directory" },
     { href: at("billing"), label: t.navBilling, active: current === "billing" },

@@ -56,3 +56,41 @@ export function buildIcs(e: CalEvent, uid: string): string {
     .filter(Boolean)
     .join("\r\n");
 }
+
+/** Lo que dura una visita en el calendario: las noches de un hotel, o dos horas. */
+export function finDeVisita(start: Date, nights: number | null | undefined): Date {
+  return nights ? new Date(start.getTime() + nights * 86400000) : new Date(start.getTime() + 2 * 3600000);
+}
+
+/**
+ * El evento de una visita, visto desde cada lado: el storyteller apunta la
+ * casa a la que va; la casa, a quién recibe y cuántos son.
+ */
+export function eventoDeVisita(v: {
+  lado: "storyteller" | "maison";
+  maison: string;
+  address: string | null;
+  storyteller: string;
+  handle: string | null;
+  slotStart: string;
+  nights: number | null;
+  partySize: number;
+}): CalEvent {
+  const start = new Date(v.slotStart);
+  const personas = v.partySize > 1 ? `${v.partySize} personnes` : "1 personne";
+  return v.lado === "storyteller"
+    ? {
+        title: `Curato · ${v.maison}`,
+        start,
+        end: finDeVisita(start, v.nights),
+        location: v.address ?? "",
+        description: `Visite Curato chez ${v.maison}, ${personas}. Votre code de visite est dans l'app, le jour même.`,
+      }
+    : {
+        title: `Curato · ${v.storyteller} (${personas})`,
+        start,
+        end: finDeVisita(start, v.nights),
+        location: v.address ?? "",
+        description: `Visite Curato : ${v.storyteller}${v.handle ? ` (@${v.handle.replace(/^@/, "")})` : ""}, ${personas}. Scannez son code à l'arrivée.`,
+      };
+}

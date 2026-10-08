@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendReservationRequested, sendReservationAdminAlert, sendMaisonNewRequest } from "@/lib/emails";
+import { sendReservationRequested, sendMaisonNewRequest } from "@/lib/emails";
 import { avisar, AVISOS } from "@/lib/push/avisos";
 import { isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
-
-// Where new-request alerts are sent (the Curato inbox Natalia manages).
-const ADMIN_INBOX = "hello@curatocollective.com";
 
 // Hôtels (migración 009): se reservan por noches y con llegada fija.
 const HOTEL = "00000000-0000-0000-0000-0000000ca701";
@@ -119,7 +116,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Erreur serveur. Réessayez." }, { status: 500 });
     }
 
-    // 6. Notify the storyteller + admin. Best-effort: a mail failure must never
+    // 6. Notify the storyteller and the maison. Best-effort: a mail failure must never
     // fail the request — the reservation is already recorded.
     const whenLabel = new Date(slotStart).toLocaleString("fr-FR", {
       weekday: "long",
@@ -155,15 +152,8 @@ export async function POST(request: NextRequest) {
           note: specialRequests || null,
         });
       }
-      await sendReservationAdminAlert({
-        to: ADMIN_INBOX,
-        creatorName: creator.full_name || creator.email || "Créateur",
-        creatorHandle: creator.handle,
-        maisonName: venue.name,
-        whenLabel,
-        partySize: ps,
-        note: specialRequests || null,
-      });
+      // A Curato ya no le llega un correo por demanda: decide la casa, y el
+      // panel de admin las enseña todas.
     } catch (mailErr) {
       console.error("Reservation emails failed:", mailErr);
     }

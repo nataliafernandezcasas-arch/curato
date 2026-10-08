@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { visitaDeHoy } from "@/lib/check-in";
+import { eventoDeVisita, googleCalendarUrl } from "@/lib/calendar";
+import { enlaceIcs } from "@/lib/calendar-enlaces";
 
 const BUCKET = "content-proofs";
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
@@ -18,21 +20,23 @@ export async function GET() {
     const admin = createAdminClient();
     const { data: creator } = await admin
       .from("creators")
-      .select("id")
+      .select("id, full_name, handle")
       .or(filtroDeUsuario(user))
       .maybeSingle();
     if (!creator) return NextResponse.json({ visits: [] });
 
     const { data: reservations } = await admin
       .from("reservations")
-      .select("id, venue_id, slot_start, slot_end, status, visited_at, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at")
+      .select("id, venue_id, slot_start, slot_end, nights, party_size, status, visited_at, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at")
       .eq("creator_id", creator.id)
       .order("slot_start", { ascending: false });
 
     const rows = reservations ?? [];
     const venueIds = [...new Set(rows.map((r) => r.venue_id))];
-    const { data: venues } = await admin.from("comercios").select("id, name").in("id", venueIds);
+    const { data: venues } = await admin.from("comercios").select("id, name, address").in("id", venueIds);
     const venueName = new Map((venues ?? []).map((v) => [v.id, v.name as string]));
+    const venueAddress = new Map((venues ?? []).map((v) => [v.id, (v.address as string | null) ?? null]));
+    const ahora = Date.now();
 
     const visits = await Promise.all(
       rows.map(async (r) => {
@@ -50,6 +54,27 @@ export async function GET() {
           // Hoy es el día de la visita: es cuando hay código que enseñar.
           today: Boolean(visitaDeHoy([r])),
           visitedAt: (r.visited_at as string | null) ?? null,
+          partySize: (r.party_size as number | null) ?? 1,
+          // Para apuntarla en su calendario: solo una visita confirmada que
+          // todavía no ha pasado.
+          calendar:
+            r.status === "confirmed" && new Date(r.slot_end ?? r.slot_start).getTime() > ahora - 3 * 3600000
+              ? {
+                  google: googleCalendarUrl(
+                    eventoDeVisita({
+                      lado: "storyteller",
+                      maison: venueName.get(r.venue_id) ?? "Curato",
+                      address: venueAddress.get(r.venue_id) ?? null,
+                      storyteller: (creator.full_name as string | null) ?? "",
+                      handle: (creator.handle as string | null) ?? null,
+                      slotStart: r.slot_start as string,
+                      nights: (r.nights as number | null) ?? null,
+                      partySize: (r.party_size as number | null) ?? 1,
+                    })
+                  ),
+                  ics: enlaceIcs(r.id as string, "storyteller"),
+                }
+              : null,
           photos,
           rightsExpiresAt: (r.content_rights_expires_at as string | null) ?? null,
           reach: r.reach_declared_at
