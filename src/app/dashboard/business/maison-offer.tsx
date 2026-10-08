@@ -76,8 +76,70 @@ const OFERTA: Record<Lang, {
   },
 };
 
+// Cómo se reserva la casa (migración 044): por horas, con una o varias
+// franjas por día, o por fechas, como un hotel.
+type Agenda = { modo: "horaires" | "dates"; llegadas: number[]; minNoches: number; maxNoches: number };
+const AGENDA: Record<Lang, {
+  horaires: string;
+  dates: string;
+  horairesHint: string;
+  datesHint: string;
+  addService: string;
+  removeService: string;
+  arrivals: string;
+  arrivalsHint: string;
+  minNights: string;
+  maxNights: string;
+  short: string[];
+  notSaved: string;
+}> = {
+  fr: {
+    horaires: "Par horaires",
+    dates: "Par dates",
+    horairesHint: "Restaurants, spas, beauté : une ou plusieurs plages par jour, par exemple deux services. Le storyteller choisit son heure d'arrivée dans une plage.",
+    datesHint: "Hôtels : sans horaires. Les jours où l'on peut arriver et le nombre de nuits ; fermez les dates complètes plus bas.",
+    addService: "Ajouter une plage",
+    removeService: "Retirer cette plage",
+    arrivals: "Jours d'arrivée",
+    arrivalsHint: "Les jours où un storyteller peut commencer son séjour.",
+    minNights: "Nuits minimum",
+    maxNights: "Nuits maximum",
+    short: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+    notSaved: "Le type d'agenda n'a pas été enregistré. Le reste, si.",
+  },
+  en: {
+    horaires: "By time",
+    dates: "By dates",
+    horairesHint: "Restaurants, spas, beauty: one or more windows a day, for example two services. The storyteller picks an arrival time inside a window.",
+    datesHint: "Hotels: no times. The days guests can arrive and the number of nights; close full dates below.",
+    addService: "Add a window",
+    removeService: "Remove this window",
+    arrivals: "Arrival days",
+    arrivalsHint: "The days a storyteller can start their stay.",
+    minNights: "Minimum nights",
+    maxNights: "Maximum nights",
+    short: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    notSaved: "The type of schedule wasn't saved. Everything else was.",
+  },
+  es: {
+    horaires: "Por horas",
+    dates: "Por fechas",
+    horairesHint: "Restaurantes, spas, belleza: una o varias franjas por día, por ejemplo dos servicios. El storyteller elige su hora de llegada dentro de una franja.",
+    datesHint: "Hoteles: sin horas. Los días en que se puede llegar y el número de noches; cierra las fechas completas más abajo.",
+    addService: "Añadir una franja",
+    removeService: "Quitar esta franja",
+    arrivals: "Días de llegada",
+    arrivalsHint: "Los días en que un storyteller puede empezar su estancia.",
+    minNights: "Noches mínimas",
+    maxNights: "Noches máximas",
+    short: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+    notSaved: "El tipo de agenda no se guardó. Lo demás, sí.",
+  },
+};
+
 export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [availability, setAvailability] = useState<Window[]>([]);
+  const [agenda, setAgenda] = useState<Agenda>({ modo: "horaires", llegadas: [0, 1, 2, 3, 4, 5, 6], minNoches: 1, maxNoches: 3 });
   const [blocked, setBlocked] = useState<Block[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [oferta, setOferta] = useState("");
@@ -95,6 +157,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       .then((r) => r.json())
       .then((d) => {
         setAvailability(d.availability ?? []);
+        if (d.agenda) setAgenda(d.agenda);
         setBlocked(d.blockedSlots ?? []);
         setServices(d.services ?? []);
         setOferta(d.offerEur ? String(d.offerEur) : "");
@@ -105,16 +168,43 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       .finally(() => setLoading(false));
   }, []);
 
-  function winFor(day: number) {
-    return availability.find((w) => w.day === day);
-  }
+  // Las franjas se editan por su posición en la lista: un día puede tener
+  // varias (un primer y un segundo servicio).
   function toggleDay(day: number, on: boolean) {
     setAvailability((prev) =>
-      on ? [...prev.filter((w) => w.day !== day), { day, start: "18:00", end: "22:00" }] : prev.filter((w) => w.day !== day)
+      on ? [...prev, { day, start: "18:00", end: "22:00" }] : prev.filter((w) => w.day !== day)
     );
   }
-  function setTime(day: number, field: "start" | "end", val: string) {
-    setAvailability((prev) => prev.map((w) => (w.day === day ? { ...w, [field]: val } : w)));
+  function addWindow(day: number) {
+    setAvailability((prev) => {
+      const delDia = prev.filter((w) => w.day === day);
+      const ultima = delDia[delDia.length - 1];
+      // La nueva empieza donde acaba la anterior, para no partir de cero.
+      const start = ultima?.end ?? "18:00";
+      const [h, m] = start.split(":").map(Number);
+      const end = `${String(Math.min(h + 2, 23)).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+      return [...prev, { day, start, end }];
+    });
+  }
+  function setTime(index: number, field: "start" | "end", val: string) {
+    setAvailability((prev) => prev.map((w, i) => (i === index ? { ...w, [field]: val } : w)));
+  }
+  function removeWindow(index: number) {
+    setAvailability((prev) => prev.filter((_, i) => i !== index));
+  }
+  function toggleLlegada(day: number) {
+    setAgenda((a) => ({
+      ...a,
+      llegadas: a.llegadas.includes(day) ? a.llegadas.filter((d) => d !== day) : [...a.llegadas, day].sort(),
+    }));
+  }
+  function setNoches(campo: "minNoches" | "maxNoches", n: number) {
+    setAgenda((a) => {
+      const v = Math.min(14, Math.max(1, n));
+      return campo === "minNoches"
+        ? { ...a, minNoches: v, maxNoches: Math.max(a.maxNoches, v) }
+        : { ...a, maxNoches: v, minNoches: Math.min(a.minNoches, v) };
+    });
   }
 
   function addBlock() {
@@ -135,6 +225,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           availability,
+          agenda,
           blockedSlots: blocked,
           services: services.filter((s) => s.name.trim()),
           offerEur: oferta ? Number(oferta) : null,
@@ -142,6 +233,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       });
       // La confirmación llega como aviso, encima de la barra, y se va sola en 4 s.
       if (res.ok) mostrar(t.offerSaved);
+      else if ((await res.json().catch(() => ({}))).error === "agenda") mostrar(AGENDA[lang].notSaved);
     } finally {
       setSaving(false);
     }
@@ -206,50 +298,128 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   // Un importe escrito fuera del rango de su categoría no se puede guardar.
   const fueraDeRango = Boolean(oferta && rango && (Number(oferta) < rango.min || Number(oferta) > rango.max));
   const days = DAY_LABELS[lang];
+  const ta = AGENDA[lang] ?? AGENDA.fr;
   const fmtDate = (d: string) => new Date(d + "T00:00:00").toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric" });
 
   return (
     <div className="max-w-[820px] mx-auto space-y-6 pb-8">
       {/* Cada bloque de la oferta, en su burbuja de cristal: se lee como una
           tarjeta de la app sobre la flor del fondo, y no como texto suelto. */}
-      {/* Availability */}
+      {/* Availability: por horas (una o varias franjas por día) o, un hotel,
+          por fechas (días de llegada y noches). */}
       <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerAvailability}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerAvailabilityHint}</p>
-        <div className="space-y-2">
-          {DAY_ORDER.map((day, i) => {
-            const w = winFor(day);
-            return (
-              <div key={day} className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-fila py-bloque">
-                <button
-                  type="button"
-                  onClick={() => toggleDay(day, !w)}
-                  aria-pressed={!!w}
-                  className="group flex min-w-0 items-center gap-fila text-left"
-                >
-                  <span
-                    aria-hidden
-                    className={`block h-2.5 w-2.5 shrink-0 rounded-full border transition-colors duration-200 ease-curato ${
-                      w ? "border-accent bg-accent" : "border-text-muted group-hover:border-accent"
-                    }`}
-                  />
-                  <span className={`truncate text-corps ${w ? "text-text-primary" : "text-text-muted"}`}>
-                    {days[i]}
-                  </span>
-                </button>
-                {w ? (
-                  <div className="flex shrink-0 items-center gap-bloque">
-                    <input type="time" value={w.start} onChange={(e) => setTime(day, "start", e.target.value)} className={`${inputCls} w-[99px] text-center`} />
-                    <span className="shrink-0 text-text-muted">→</span>
-                    <input type="time" value={w.end} onChange={(e) => setTime(day, "end", e.target.value)} className={`${inputCls} w-[99px] text-center`} />
-                  </div>
-                ) : (
-                  <span className="shrink-0 text-legende text-text-muted">{t.offerClosed}</span>
-                )}
-              </div>
-            );
-          })}
+
+        <div role="radiogroup" className="mb-fila grid grid-cols-2 gap-bloque rounded-full border border-border p-1">
+          {(["horaires", "dates"] as const).map((modo) => (
+            <button
+              key={modo}
+              type="button"
+              role="radio"
+              aria-checked={agenda.modo === modo}
+              onClick={() => setAgenda((a) => ({ ...a, modo }))}
+              className={`min-h-11 rounded-full text-capitale uppercase tracking-capitale transition-colors duration-200 ease-curato ${
+                agenda.modo === modo ? "bg-accent text-surface" : "text-text-secondary hover:text-accent"
+              }`}
+            >
+              {ta[modo]}
+            </button>
+          ))}
         </div>
+        <p className="mb-5 font-serif text-[12px] font-light text-text-secondary">
+          {agenda.modo === "dates" ? ta.datesHint : ta.horairesHint}
+        </p>
+
+        {agenda.modo === "horaires" ? (
+          <div className="divide-y divide-border">
+            {DAY_ORDER.map((day, i) => {
+              const franjas = availability.map((w, idx) => ({ w, idx })).filter(({ w }) => w.day === day);
+              const abierto = franjas.length > 0;
+              return (
+                <div key={day} className="py-bloque">
+                  <div className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-fila">
+                    <button
+                      type="button"
+                      onClick={() => toggleDay(day, !abierto)}
+                      aria-pressed={abierto}
+                      className="group flex min-w-0 items-center gap-fila text-left"
+                    >
+                      <span
+                        aria-hidden
+                        className={`block h-2.5 w-2.5 shrink-0 rounded-full border transition-colors duration-200 ease-curato ${
+                          abierto ? "border-accent bg-accent" : "border-text-muted group-hover:border-accent"
+                        }`}
+                      />
+                      <span className={`text-corps ${abierto ? "text-text-primary" : "text-text-muted"}`}>{days[i]}</span>
+                    </button>
+                    {!abierto && <span className="shrink-0 text-legende text-text-muted">{t.offerClosed}</span>}
+                  </div>
+                  {abierto && (
+                    <div className="pl-[26px]">
+                      {franjas.map(({ w, idx }) => (
+                        <div key={idx} className="flex items-center gap-bloque">
+                          <input type="time" value={w.start} onChange={(e) => setTime(idx, "start", e.target.value)} className={`${inputCls} w-[104px] text-center`} />
+                          <span className="shrink-0 text-text-muted">→</span>
+                          <input type="time" value={w.end} onChange={(e) => setTime(idx, "end", e.target.value)} className={`${inputCls} w-[104px] text-center`} />
+                          <button
+                            type="button"
+                            onClick={() => removeWindow(idx)}
+                            aria-label={ta.removeService}
+                            className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center text-text-muted transition-colors hover:text-copper-vif"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => addWindow(day)}
+                        className="inline-flex min-h-11 items-center gap-1.5 text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-accent"
+                      >
+                        <Plus size={12} /> {ta.addService}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <>
+            <p className="text-corps text-text-primary">{ta.arrivals}</p>
+            <p className="mb-fila font-serif text-[12px] font-light text-text-secondary">{ta.arrivalsHint}</p>
+            <div className="mb-rango grid grid-cols-7 gap-1.5">
+              {DAY_ORDER.map((day, i) => {
+                const si = agenda.llegadas.includes(day);
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => toggleLlegada(day)}
+                    aria-pressed={si}
+                    aria-label={days[i]}
+                    className={`min-h-11 rounded-full border text-[12px] transition-colors duration-200 ease-curato ${
+                      si ? "border-accent bg-accent text-surface" : "border-border text-text-muted hover:border-accent hover:text-accent"
+                    }`}
+                  >
+                    {ta.short[i]}
+                  </button>
+                );
+              })}
+            </div>
+            {(["minNoches", "maxNoches"] as const).map((campo) => (
+              <div key={campo} className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-fila">
+                <span className="text-corps text-text-primary">{campo === "minNoches" ? ta.minNights : ta.maxNights}</span>
+                <span className="flex items-center">
+                  <button type="button" aria-label="−" onClick={() => setNoches(campo, agenda[campo] - 1)} className="flex min-h-11 w-11 items-center justify-center text-sous-titre text-text-secondary transition-colors hover:text-accent">−</button>
+                  <span className="w-8 text-center text-sous-titre tabular-nums text-text-primary">{agenda[campo]}</span>
+                  <button type="button" aria-label="+" onClick={() => setNoches(campo, agenda[campo] + 1)} className="flex min-h-11 w-11 items-center justify-center text-sous-titre text-text-secondary transition-colors hover:text-accent">+</button>
+                </span>
+              </div>
+            ))}
+          </>
+        )}
       </section>
 
       {/* Blocked dates */}

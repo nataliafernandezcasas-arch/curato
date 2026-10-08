@@ -105,7 +105,7 @@ export default function DashboardNav({
 
   return (
     <>
-    <nav className="barra-cabecera sticky top-0 z-40">
+    <nav className={`barra-cabecera sticky top-0 z-40 ${open ? "barra-abierta" : ""}`}>
       <div
         className="mx-auto flex h-14 w-full items-center justify-between px-5"
         style={{ maxWidth }}
@@ -202,7 +202,10 @@ export default function DashboardNav({
             exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
             transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="bg-surface/95 px-pagina py-rango backdrop-blur-sm">
+            {/* Sin fondo propio: el de la barra sigue por debajo, al 65 %, y se
+                ve la flor detrás. Antes el panel ponía otro casi opaco encima
+                y quedaba negro. */}
+            <div className="px-pagina py-rango">
               <div className="flex flex-col gap-fila">
                 {/* Los destinos que no caben abajo viven aquí. Sin esto, la
                     quinta sección de una maison no se podía alcanzar. */}

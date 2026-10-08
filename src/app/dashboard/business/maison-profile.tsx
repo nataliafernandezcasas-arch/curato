@@ -6,6 +6,7 @@ import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye
 import { translations, Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
 import { Button } from "@/components/member/button";
+import { Collage } from "@/components/member/collage";
 
 type T = Record<string, string>;
 
@@ -296,19 +297,8 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         ) : (
           <>
             {photos.length > 0 && (
-              <div className="columns-2 md:columns-3 gap-1.5 mb-10">
-                {photos.map((url, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <a
-                    key={i}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block overflow-hidden rounded-xl bg-surface-raised mb-1.5 break-inside-avoid"
-                  >
-                    <img src={url} alt="" className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700" />
-                  </a>
-                ))}
+              <div className="mb-10">
+                <Collage photos={photos} />
               </div>
             )}
 

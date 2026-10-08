@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { ArrowLeft } from "@phosphor-icons/react";
 import type { Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
 
@@ -96,7 +98,9 @@ function Visor({ url, lang, onClose }: { url: string; lang: Lang; onClose: () =>
     };
   }, [onClose]);
 
-  return (
+  // En el body: dentro de una caja con desenfoque (la oferta de la casa), un
+  // `fixed` queda encerrado en la caja y el visor salía diminuto.
+  return createPortal(
     <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-surface">
       <header
         className="barra-panel sticky top-0 z-10 flex items-center justify-end px-pagina"
@@ -105,9 +109,10 @@ function Visor({ url, lang, onClose }: { url: string; lang: Lang; onClose: () =>
         <button
           type="button"
           onClick={onClose}
-          className="flex min-h-[52px] items-center text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:text-text-primary"
+          aria-label={COMUN[lang].close}
+          className="-mr-2 flex h-[52px] w-11 items-center justify-center text-accent transition-colors duration-200 ease-curato hover:text-text-primary"
         >
-          {COMUN[lang].close}
+          <ArrowLeft size={22} />
         </button>
       </header>
       <div ref={caja} className="mx-auto max-w-[900px] px-pagina pb-seccion pt-fila">
@@ -124,7 +129,8 @@ function Visor({ url, lang, onClose }: { url: string; lang: Lang; onClose: () =>
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { COMUN } from "@/lib/i18n/comun";
@@ -16,6 +18,8 @@ import { COMUN } from "@/lib/i18n/comun";
  * nadie necesita ver el grano de un mantel, y el gesto de ampliar se come el de
  * pasar a la siguiente.
  */
+const sinSuscripcion = () => () => {};
+
 export function Viewer({
   photos,
   index,
@@ -62,7 +66,13 @@ export function Viewer({
     pista.scrollTo({ left: (index ?? 0) * pista.clientWidth, behavior: "instant" as ScrollBehavior });
   }, [abierto, index]);
 
-  return (
+  // Se pinta en el body y no donde está: dentro de una caja con desenfoque
+  // (caja-cristal), un `fixed` queda encerrado en la caja y no ocupa la
+  // pantalla. En el servidor no hay body: ahí no se pinta nada.
+  const enCliente = useSyncExternalStore(sinSuscripcion, () => true, () => false);
+  if (!enCliente) return null;
+
+  return createPortal(
     <AnimatePresence>
       {abierto && (
         <motion.div
@@ -72,15 +82,19 @@ export function Viewer({
           exit={{ opacity: 0 }}
           transition={{ duration: reduce ? 0.12 : 0.26, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex items-center justify-between px-pagina py-fila">
+          <div
+            className="flex items-center justify-between px-pagina py-fila"
+            style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+          >
             <span className="text-capitale uppercase tracking-capitale tabular-nums text-text-secondary">
               {actual + 1} / {photos.length}
             </span>
             <button
               onClick={onClose}
-              className="min-h-11 text-capitale uppercase tracking-capitale text-accent transition-colors duration-200 ease-curato hover:text-text-primary"
+              aria-label={COMUN[lang].close}
+              className="-mr-2 flex h-11 w-11 items-center justify-center text-accent transition-colors duration-200 ease-curato hover:text-text-primary"
             >
-              {COMUN[lang].close}
+              <ArrowLeft size={22} />
             </button>
           </div>
 
@@ -111,6 +125,7 @@ export function Viewer({
           )}
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

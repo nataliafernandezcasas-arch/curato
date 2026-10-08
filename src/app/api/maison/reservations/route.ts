@@ -7,6 +7,7 @@ import { buildDossiers } from "@/lib/storyteller-dossier";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { avisar, AVISOS } from "@/lib/push/avisos";
 import { pendientesDe } from "@/lib/pendientes";
+import { agendaDe } from "@/lib/agenda";
 
 /**
  * Las visitas que cuentan para el mínimo del mes: las terminadas y los
@@ -79,7 +80,7 @@ export async function GET() {
     const admin = createAdminClient();
     const { data: maison } = await admin
       .from("comercios")
-      .select("id, name, availability")
+      .select("id, name, category_id, availability")
       .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
@@ -105,8 +106,14 @@ export async function GET() {
 
     // Qué días tiene abiertos la casa. Si no llegan demandas, el motivo suele
     // estar aquí, y la pantalla vacía lo dice.
+    // Un hotel por fechas: los días en que se puede llegar (migración 044).
+    const { data: conAgenda, error: sinAgenda } = await admin.from("comercios").select("agenda").eq("id", maison.id).maybeSingle();
+    const agenda = agendaDe(sinAgenda ? null : (conAgenda as { agenda?: unknown } | null)?.agenda, maison.category_id as string | null);
     const franjas = Array.isArray(maison.availability) ? (maison.availability as { day?: number }[]) : [];
-    const openDays = [...new Set(franjas.map((w) => w.day).filter((d): d is number => typeof d === "number"))];
+    const openDays =
+      agenda.modo === "dates"
+        ? agenda.llegadas
+        : [...new Set(franjas.map((w) => w.day).filter((d): d is number => typeof d === "number"))];
 
     return NextResponse.json({
       maison: maison.name,

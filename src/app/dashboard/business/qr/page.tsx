@@ -2,6 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { FlorDeFondo, FranjaSuperior } from "@/components/member/flor-de-fondo";
 import jsQR from "jsqr";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { StateMark } from "@/components/member/state-mark";
@@ -254,6 +255,9 @@ export default function MaisonScanner({ searchParams }: { searchParams: Promise<
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: BURDEOS, color: TINTA }}>
+      <FranjaSuperior color={BURDEOS} />
+      {/* El mismo fondo que la pantalla del código del storyteller. */}
+      <FlorDeFondo />
       <div
         className="relative mx-auto flex min-h-full max-w-[420px] flex-col px-pagina pb-seccion"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}

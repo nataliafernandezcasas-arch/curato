@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDe } from "@/lib/identidad";
 import { enRango, rangoDe } from "@/lib/oferta";
+import { agendaDe } from "@/lib/agenda";
 
 const BUCKET = "maison-menus";
 
@@ -25,6 +26,13 @@ async function ofertaDe(admin: ReturnType<typeof createAdminClient>, id: string)
   return !error && data ? ((data as { offer_eur?: number | null }).offer_eur ?? null) : null;
 }
 
+// El tipo de agenda (migración 044), aparte y tolerante como la oferta: sin la
+// columna, la casa usa el modo de su categoría.
+async function agendaGuardada(admin: ReturnType<typeof createAdminClient>, id: string): Promise<unknown> {
+  const { data, error } = await admin.from("comercios").select("agenda").eq("id", id).maybeSingle();
+  return !error && data ? (data as { agenda?: unknown }).agenda ?? null : null;
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -38,6 +46,7 @@ export async function GET() {
       blockedSlots: m.blocked_slots ?? [],
       services: m.services ?? [],
       offerEur: await ofertaDe(admin, m.id),
+      agenda: agendaDe(await agendaGuardada(admin, m.id), m.category_id as string | null),
       // Entre cuánto y cuánto puede ofrecer, según su categoría.
       offerRange: rangoDe(m.category_id as string | null),
       menuUrls: m.menu_urls ?? [],
@@ -62,6 +71,8 @@ export async function PATCH(request: NextRequest) {
     if (Array.isArray(body.availability)) {
       update.availability = body.availability
         .filter((w: { day: number; start: string; end: string }) => typeof w?.day === "number" && w.start && w.end)
+        // Varias franjas por día (dos servicios): se ordenan por día y hora.
+        .sort((a: { day: number; start: string }, b: { day: number; start: string }) => a.day - b.day || a.start.localeCompare(b.start))
         .slice(0, 40);
     }
     if (Array.isArray(body.blockedSlots)) {
@@ -80,6 +91,13 @@ export async function PATCH(request: NextRequest) {
         .slice(0, 40);
     }
     if (Object.keys(update).length) await admin.from("comercios").update(update).eq("id", m.id);
+    // La agenda va aparte: si la migración 044 aún no está, lo demás se guarda
+    // y la pantalla lo dice.
+    if (body.agenda && typeof body.agenda === "object") {
+      const agenda = agendaDe(body.agenda, m.category_id as string | null);
+      const { error } = await admin.from("comercios").update({ agenda }).eq("id", m.id);
+      if (error) return NextResponse.json({ error: "agenda" }, { status: 500 });
+    }
     // El importe va aparte: si la migración 043 aún no está, lo demás se guarda.
     if ("offerEur" in body) {
       const rango = rangoDe(m.category_id as string | null);

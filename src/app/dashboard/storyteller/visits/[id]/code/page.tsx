@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { FlorDeFondo } from "@/components/member/flor-de-fondo";
 import { useParams } from "next/navigation";
 import QRCode from "react-qr-code";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -132,18 +133,7 @@ export default function CodigoDeVisita() {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: BURDEOS, color: TINTA }}>
-      <div
-        aria-hidden
-        className="pointer-events-none fixed bottom-0 left-0 h-[300px] w-[300px] bg-no-repeat"
-        style={{
-          backgroundImage: "url(/carte-visite-curato.png)",
-          backgroundSize: "auto 300px",
-          backgroundPosition: "left bottom",
-          opacity: 0.55,
-          maskImage: "radial-gradient(circle at 30% 70%, black 35%, transparent 72%)",
-          WebkitMaskImage: "radial-gradient(circle at 30% 70%, black 35%, transparent 72%)",
-        }}
-      />
+      <FlorDeFondo />
 
       <div
         className="relative mx-auto flex min-h-full max-w-[420px] flex-col px-pagina pb-seccion"
