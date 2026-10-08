@@ -31,7 +31,7 @@ type MaisonAvail = {
 const OFERTA = {
   fr: { title: "L'offre", spend: "à dépenser librement sur la carte, par visite", menu: "Menu / brochure" },
   en: { title: "The offer", spend: "to spend freely on the menu, per visit", menu: "Menu / brochure" },
-  es: { title: "La oferta", spend: "para gastar libremente en la carta, por visita", menu: "Carta / folleto", file: (n: number) => `Documento ${n}` },
+  es: { title: "La oferta", spend: "para gastar libremente en la carta, por visita", menu: "Carta / folleto" },
 };
 
 type Maison = {
