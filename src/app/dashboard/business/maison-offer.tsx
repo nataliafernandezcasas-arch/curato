@@ -39,10 +39,48 @@ const ERROR_MENU: Record<Lang, Record<"format" | "size" | "upload", string>> = {
   },
 };
 
+// La oferta es un importe: lo que la casa ofrece por visita, y el storyteller
+// lo gasta como quiera en la carta (migración 043).
+const OFERTA: Record<Lang, {
+  title: string;
+  hint: string;
+  placeholder: string;
+  perVisit: string;
+  range: (min: number, max: number) => string;
+  outOfRange: (min: number, max: number) => string;
+}> = {
+  fr: {
+    title: "Votre offre",
+    hint: "Le montant que vous offrez à chaque storyteller, par visite. Il le dépense librement sur votre carte.",
+    placeholder: "200",
+    perVisit: "€ par visite",
+    range: (min, max) => `Entre ${min} € et ${max} € pour votre catégorie.`,
+    outOfRange: (min, max) => `Choisissez un montant entre ${min} € et ${max} €.`,
+  },
+  en: {
+    title: "Your offer",
+    hint: "The amount you offer each storyteller, per visit. They spend it freely on your menu.",
+    placeholder: "200",
+    perVisit: "€ per visit",
+    range: (min, max) => `Between ${min} € and ${max} € for your category.`,
+    outOfRange: (min, max) => `Choose an amount between ${min} € and ${max} €.`,
+  },
+  es: {
+    title: "Tu oferta",
+    hint: "El importe que ofreces a cada storyteller, por visita. Lo gasta como quiera en tu carta.",
+    placeholder: "200",
+    perVisit: "€ por visita",
+    range: (min, max) => `Entre ${min} € y ${max} € para tu categoría.`,
+    outOfRange: (min, max) => `Elige un importe entre ${min} € y ${max} €.`,
+  },
+};
+
 export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [availability, setAvailability] = useState<Window[]>([]);
   const [blocked, setBlocked] = useState<Block[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [oferta, setOferta] = useState("");
+  const [rango, setRango] = useState<{ min: number; max: number } | null>(null);
   const [menuUrls, setMenuUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -58,6 +96,8 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         setAvailability(d.availability ?? []);
         setBlocked(d.blockedSlots ?? []);
         setServices(d.services ?? []);
+        setOferta(d.offerEur ? String(d.offerEur) : "");
+        setRango(d.offerRange ?? null);
         setMenuUrls(d.menuUrls ?? []);
       })
       .catch(() => {})
@@ -85,15 +125,6 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
     setBlocked((prev) => prev.filter((b) => b.date !== date));
   }
 
-  function addService() {
-    setServices((prev) => [...prev, { name: "", description: "", price: "" }]);
-  }
-  function updateService(i: number, field: keyof Service, val: string) {
-    setServices((prev) => prev.map((s, idx) => (idx === i ? { ...s, [field]: val } : s)));
-  }
-  function removeService(i: number) {
-    setServices((prev) => prev.filter((_, idx) => idx !== i));
-  }
 
   async function save() {
     setSaving(true);
@@ -101,7 +132,12 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       const res = await fetch("/api/maison/offer", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ availability, blockedSlots: blocked, services: services.filter((s) => s.name.trim()) }),
+        body: JSON.stringify({
+          availability,
+          blockedSlots: blocked,
+          services: services.filter((s) => s.name.trim()),
+          offerEur: oferta ? Number(oferta) : null,
+        }),
       });
       // La confirmación llega como aviso, encima de la barra, y se va sola en 4 s.
       if (res.ok) mostrar(t.offerSaved);
@@ -166,13 +202,17 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const inputCls =
     "min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ font-light text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted focus:border-accent";
   const labelCls = "text-capitale uppercase tracking-capitale text-accent";
+  // Un importe escrito fuera del rango de su categoría no se puede guardar.
+  const fueraDeRango = Boolean(oferta && rango && (Number(oferta) < rango.min || Number(oferta) > rango.max));
   const days = DAY_LABELS[lang];
   const fmtDate = (d: string) => new Date(d + "T00:00:00").toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric" });
 
   return (
-    <div className="max-w-[820px] mx-auto space-y-14 pb-8">
+    <div className="max-w-[820px] mx-auto space-y-6 pb-8">
+      {/* Cada bloque de la oferta, en su burbuja de cristal: se lee como una
+          tarjeta de la app sobre la flor del fondo, y no como texto suelto. */}
       {/* Availability */}
-      <section>
+      <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerAvailability}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerAvailabilityHint}</p>
         <div className="space-y-2">
@@ -212,7 +252,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Blocked dates */}
-      <section>
+      <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerBlocked}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerBlockedHint}</p>
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -238,31 +278,32 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         )}
       </section>
 
-      {/* Services */}
-      <section>
-        <div className="flex items-baseline justify-between mb-1">
-          <p className={labelCls}>{t.offerServices}</p>
-          <button onClick={addService} className="inline-flex items-center gap-1.5 text-accent hover:text-text-primary font-serif text-[12px] tracking-wider uppercase transition-colors">
-            <Plus size={14} /> {t.offerAdd}
-          </button>
+      {/* La oferta: un importe en euros por visita. La lista de servicios con
+          precio que había antes se queda guardada, pero ya no se edita. */}
+      <section className="caja-cristal p-5 sm:p-6">
+        <label htmlFor="oferta-eur" className={`${labelCls} mb-1 block`}>{OFERTA[lang].title}</label>
+        <p className="font-serif text-[12px] font-light text-text-secondary mb-1">{OFERTA[lang].hint}</p>
+        {rango && (
+          <p className="font-serif text-[12px] text-accent mb-5">{OFERTA[lang].range(rango.min, rango.max)}</p>
+        )}
+        <div className="flex items-baseline gap-3">
+          <input
+            id="oferta-eur"
+            inputMode="numeric"
+            value={oferta}
+            onChange={(e) => setOferta(e.target.value.replace(/\D/g, "").slice(0, 5))}
+            placeholder={OFERTA[lang].placeholder}
+            className={`${inputCls} w-28 text-[34px] tabular-nums`}
+          />
+          <span className="font-serif text-[15px] text-text-secondary">{OFERTA[lang].perVisit}</span>
         </div>
-        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerServicesHint}</p>
-        <div className="space-y-3">
-          {services.map((s, i) => (
-            <div key={i} className="relative pr-10">
-              <button onClick={() => removeService(i)} className="absolute top-3 right-3 text-text-muted hover:text-copper-vif" aria-label={t.offerRemove}><X size={15} /></button>
-              <div className="grid sm:grid-cols-[1fr_140px] gap-3 mb-3">
-                <input value={s.name} onChange={(e) => updateService(i, "name", e.target.value)} placeholder={t.offerServiceName} className={`${inputCls} w-full`} />
-                <input value={s.price} onChange={(e) => updateService(i, "price", e.target.value)} placeholder={t.offerServicePrice} className={`${inputCls} w-full`} />
-              </div>
-              <textarea value={s.description} onChange={(e) => updateService(i, "description", e.target.value)} rows={2} placeholder={t.offerServiceDesc} className={`${inputCls} w-full resize-none`} />
-            </div>
-          ))}
-        </div>
+        {fueraDeRango && rango && (
+          <p className="mt-3 font-serif text-[13px] text-copper-vif">{OFERTA[lang].outOfRange(rango.min, rango.max)}</p>
+        )}
       </section>
 
       {/* Menu / brochure */}
-      <section>
+      <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerMenu}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerMenuHint}</p>
         <div className="flex flex-wrap gap-3 items-center">
@@ -292,7 +333,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           cambiaba de texto dos segundos y medio para decir que había guardado.
           Ahora es el botón de siempre, y la confirmación llega como aviso. */}
       <div className="flex items-center gap-4">
-        <Button onClick={save} disabled={saving}>{t.offerSave}</Button>
+        <Button onClick={save} disabled={saving || fueraDeRango}>{t.offerSave}</Button>
       </div>
       <Toast aviso={aviso} onClose={cerrar} />
     </div>

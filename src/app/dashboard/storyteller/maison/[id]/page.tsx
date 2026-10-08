@@ -22,14 +22,15 @@ type MaisonAvail = {
   taken: string[];
   services: MaisonService[];
   menuUrls?: string[];
+  offerEur?: number | null;
 };
 
 // La oferta de la casa en su ficha. Solo se veía en la pantalla de reserva, así
 // que nadie sabía qué ofrecía una casa antes de empezar a pedir mesa.
 const OFERTA = {
-  fr: { title: "L'offre", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
-  en: { title: "The offer", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
-  es: { title: "La oferta", menu: "Carta / folleto", file: (n: number) => `Documento ${n}` },
+  fr: { title: "L'offre", spend: "à dépenser librement sur la carte, par visite", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
+  en: { title: "The offer", spend: "to spend freely on the menu, per visit", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
+  es: { title: "La oferta", spend: "para gastar libremente en la carta, por visita", menu: "Carta / folleto", file: (n: number) => `Documento ${n}` },
 };
 
 type Maison = {
@@ -68,7 +69,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const { id } = use(params);
   const [maison, setMaison] = useState<Maison | null>(null);
   const [loading, setLoading] = useState(true);
-  const [oferta, setOferta] = useState<{ services: MaisonService[]; menuUrls: string[] } | null>(null);
+  const [oferta, setOferta] = useState<{ services: MaisonService[]; menuUrls: string[]; eur: number | null } | null>(null);
 
   const router = useRouter();
   const [preview, setPreview] = useState(false);
@@ -105,7 +106,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
     fetch(`/api/maison/${id}/availability`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: MaisonAvail | null) =>
-        d && setOferta({ services: (d.services ?? []).filter((s) => s.name?.trim()), menuUrls: d.menuUrls ?? [] })
+        d && setOferta({ services: (d.services ?? []).filter((s) => s.name?.trim()), menuUrls: d.menuUrls ?? [], eur: d.offerEur ?? null })
       )
       .catch(() => {});
   }, [id]);
@@ -214,10 +215,20 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   </p>
                 )}
 
-                {oferta && (oferta.services.length > 0 || oferta.menuUrls.length > 0) && (
+                {oferta && (oferta.eur || oferta.services.length > 0 || oferta.menuUrls.length > 0) && (
                   <div className="mb-8">
                     <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-accent mb-3">{OFERTA[lang].title}</p>
-                    {oferta.services.map((s, i) => (
+                    {/* El importe que la casa ofrece; si aún no lo ha puesto, sus
+                        servicios de antes. */}
+                    {oferta.eur ? (
+                      <p className="text-corps text-text-secondary">
+                        <span className="mr-2 text-titre tabular-nums text-text-primary">
+                          {oferta.eur.toLocaleString(lang)} €
+                        </span>
+                        {OFERTA[lang].spend}
+                      </p>
+                    ) : null}
+                    {!oferta.eur && oferta.services.map((s, i) => (
                       <Row
                         key={i}
                         label={<span className="text-corps text-text-primary">{s.name}</span>}

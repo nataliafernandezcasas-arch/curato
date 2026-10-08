@@ -9,8 +9,10 @@ export const COMUN: Record<Lang, {
   hide: string;
   remove: string;
   menu: string;
+  moveBefore: string;
+  moveAfter: string;
 }> = {
-  fr: { close: "Fermer", show: "Afficher", hide: "Masquer", remove: "Supprimer", menu: "Menu" },
-  en: { close: "Close", show: "Show", hide: "Hide", remove: "Remove", menu: "Menu" },
-  es: { close: "Cerrar", show: "Mostrar", hide: "Ocultar", remove: "Quitar", menu: "Menú" },
+  fr: { close: "Fermer", show: "Afficher", hide: "Masquer", remove: "Supprimer", menu: "Menu", moveBefore: "Avancer", moveAfter: "Reculer" },
+  en: { close: "Close", show: "Show", hide: "Hide", remove: "Remove", menu: "Menu", moveBefore: "Move earlier", moveAfter: "Move later" },
+  es: { close: "Cerrar", show: "Mostrar", hide: "Ocultar", remove: "Quitar", menu: "Menú", moveBefore: "Adelantar", moveAfter: "Atrasar" },
 };

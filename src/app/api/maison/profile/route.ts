@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDe } from "@/lib/identidad";
+import { traducirDescripcion, type Idioma } from "@/lib/traducir";
+
+const IDIOMAS: Idioma[] = ["fr", "en", "es"];
+const COLUMNA: Record<Idioma, "description" | "description_en" | "description_es"> = {
+  fr: "description",
+  en: "description_en",
+  es: "description_es",
+};
+
+// El idioma en que escribe la casa (migración 042). Aparte y tolerante: sin la
+// columna, la consulta falla y se supone el francés, en vez de romper el perfil.
+async function idiomaDe(adminClient: ReturnType<typeof createAdminClient>, id: string): Promise<Idioma> {
+  const { data, error } = await adminClient.from("comercios").select("description_lang").eq("id", id).maybeSingle();
+  const l = !error && data ? (data as { description_lang?: string | null }).description_lang : null;
+  return l === "en" || l === "es" ? l : "fr";
+}
 
 const BUCKET = "maison-photos";
 
@@ -33,6 +49,7 @@ export async function GET() {
       description: maison.description ?? "",
       descriptionEn: maison.description_en ?? "",
       descriptionEs: maison.description_es ?? "",
+      descriptionLang: await idiomaDe(admin, maison.id),
       photos: maison.photos ?? [],
       website: maison.website_url ?? "",
       instagram: maison.contact_instagram ?? "",
@@ -59,10 +76,25 @@ export async function PATCH(request: NextRequest) {
 
     const update: Record<string, unknown> = {};
 
+    let traducidas: Partial<Record<Idioma, string>> | null = {};
+    let fuente: Idioma | null = null;
     if ("description" in body || "website" in body || "instagram" in body) {
-      update.description = (body.description || "").slice(0, 2000);
-      update.description_en = (body.descriptionEn || "").slice(0, 2000) || null;
-      update.description_es = (body.descriptionEs || "").slice(0, 2000) || null;
+      const textos: Record<Idioma, string> = {
+        fr: (body.description || "").slice(0, 2000),
+        en: (body.descriptionEn || "").slice(0, 2000),
+        es: (body.descriptionEs || "").slice(0, 2000),
+      };
+      // La casa escribe en un idioma; los que la pantalla pide traducir (los que
+      // están vacíos, o los que no retocó cuando cambió su texto) los pone Claude.
+      fuente = IDIOMAS.includes(body.descriptionLang) ? (body.descriptionLang as Idioma) : "fr";
+      const pedidos = Array.isArray(body.traducir)
+        ? (body.traducir as unknown[]).filter((l): l is Idioma => IDIOMAS.includes(l as Idioma) && l !== fuente)
+        : [];
+      if (pedidos.length) {
+        traducidas = await traducirDescripcion(textos[fuente], fuente, pedidos);
+        for (const [l, t] of Object.entries(traducidas ?? {})) textos[l as Idioma] = t.slice(0, 2000);
+      }
+      for (const l of IDIOMAS) update[COLUMNA[l]] = l === "fr" ? textos.fr : textos[l] || null;
       update.website_url = (body.website || "").trim().slice(0, 300) || null;
       update.contact_instagram = (body.instagram || "").trim().slice(0, 100) || null;
     }
@@ -80,8 +112,20 @@ export async function PATCH(request: NextRequest) {
 
     if (Object.keys(update).length) {
       await admin.from("comercios").update(update).eq("id", maison.id);
+      // Aparte, por si la migración 042 aún no está: sin la columna, lo demás
+      // ya se guardó.
+      if (fuente) await admin.from("comercios").update({ description_lang: fuente }).eq("id", maison.id);
     }
-    return NextResponse.json({ ok: true, photos });
+    return NextResponse.json({
+      ok: true,
+      photos,
+      // Lo que quedó guardado, traducciones incluidas, para que la pantalla lo enseñe.
+      description: update.description,
+      descriptionEn: update.description_en ?? "",
+      descriptionEs: update.description_es ?? "",
+      // null si se pidió traducir y no se pudo: la pantalla lo dice.
+      traduccionFallida: traducidas === null,
+    });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
   }

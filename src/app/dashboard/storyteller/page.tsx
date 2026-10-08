@@ -131,7 +131,12 @@ export default function InfluencerDashboard() {
         .or(filtroDeUsuario(user))
         .maybeSingle();
 
-      setProfile(creator);
+      // Lo gastado sale de las visitas del mes (src/lib/credito.ts), no de un
+      // contador que nadie actualizaba.
+      const credito = await fetch("/api/storyteller/credito", { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null);
+      setProfile(creator && credito ? { ...creator, monthly_credit_cop: credito.mensual, credit_used_cop: credito.usado } : creator);
       setProfileLoading(false);
     }
     loadProfile();

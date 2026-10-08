@@ -5,12 +5,14 @@ import { sendReservationRequested, sendMaisonNewRequest } from "@/lib/emails";
 import { avisar, AVISOS } from "@/lib/push/avisos";
 import { isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { creditoDelMes, mesDeParis } from "@/lib/credito";
 
 // Hôtels (migración 009): se reservan por noches y con llegada fija.
 const HOTEL = "00000000-0000-0000-0000-0000000ca701";
 
-// Creates a reservation REQUEST (status = pending_review). Credits are NOT
-// deducted here — that happens when an admin confirms the request. The insert
+// Creates a reservation REQUEST (status = pending_review). Its credits_cost
+// counts against the creator's month as soon as it exists (src/lib/credito.ts)
+// and stops counting if the request is declined or cancelled. The insert
 // runs through the service-role client because the RLS insert guard on
 // `reservations` requires a signed creator + a sufficient monthly credit
 // balance, neither of which a request needs to satisfy up front.
@@ -79,9 +81,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ code: "taken", error: "Créneau déjà réservé." }, { status: 409 });
     }
 
-    // 4. Compute the credit cost from the venue's category (hotels bill per night).
+    // 4. Lo que cuesta la visita: la oferta de la casa en euros (migración 043),
+    // que es lo que el storyteller gasta. Una casa que aún no la ha puesto
+    // cuesta lo de su categoría, como antes (los hoteles, por noches).
+    const { data: conOferta, error: sinOferta } = await admin
+      .from("comercios")
+      .select("offer_eur")
+      .eq("id", venue.id)
+      .maybeSingle();
+    const ofertaEur = !sinOferta ? ((conOferta as { offer_eur?: number | null } | null)?.offer_eur ?? null) : null;
     let creditsCost = 0;
-    if (venue.category_id) {
+    if (ofertaEur) {
+      creditsCost = ofertaEur;
+    } else if (venue.category_id) {
       const { data: cost } = await admin
         .from("category_costs")
         .select("credits_per_booking, unit")
@@ -92,6 +104,18 @@ export async function POST(request: NextRequest) {
           cost.unit === "night" && nights && nights > 0
             ? cost.credits_per_booking * nights
             : cost.credits_per_booking;
+      }
+    }
+
+    // Que le quede crédito en el mes de la visita. Lo pedido y no decidido ya
+    // cuenta: si no, se podrían pedir cinco cenas con el crédito de una.
+    if (creditsCost > 0) {
+      const credito = await creditoDelMes(admin, creator.id, mesDeParis(slotStart));
+      if (credito.mensual > 0 && creditsCost > credito.restante) {
+        return NextResponse.json(
+          { code: "credit", restante: credito.restante, error: "Crédit insuffisant pour ce mois." },
+          { status: 409 }
+        );
       }
     }
 
