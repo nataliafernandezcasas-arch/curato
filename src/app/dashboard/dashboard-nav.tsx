@@ -2,14 +2,59 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Gear } from "@phosphor-icons/react";
-import { TabBar, TabBarSpacer, MAX_DESTINOS } from "@/components/member/tab-bar";
+import { Gear, CaretDown } from "@phosphor-icons/react";
+import { TabBar, TabBarSpacer, MAX_DESTINOS, Cifra } from "@/components/member/tab-bar";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
 
-export type NavLink = { href: string; label: string; active?: boolean };
+export type NavLink = {
+  href: string;
+  label: string;
+  active?: boolean;
+  /** Qué se cuenta en este destino. La cifra la pone la barra, no la página. */
+  contador?: "demandes";
+  cifra?: number;
+};
+
+/**
+ * Las demandas por responder de la casa, para la cifra de la barra. Se vuelve
+ * a pedir al volver a la app. Si la cifra cambió desde la última vez, se pide
+ * también que el icono del teléfono la ponga al día: una demanda que caduca
+ * sin respuesta no manda ningún aviso que la baje.
+ */
+function useDemandesPendientes(activo: boolean): number {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!activo) return;
+    let vivo = true;
+    const cargar = async () => {
+      const res = await fetch("/api/maison/pendientes", { cache: "no-store" }).catch(() => null);
+      if (!res?.ok || !vivo) return;
+      const { n: cifra } = (await res.json()) as { n: number };
+      setN(cifra);
+      let ultima: string | null = null;
+      try {
+        ultima = localStorage.getItem("curato.icono");
+      } catch {}
+      if (ultima !== String(cifra)) {
+        await fetch("/api/maison/pendientes?icono=1", { cache: "no-store" }).catch(() => null);
+        try {
+          localStorage.setItem("curato.icono", String(cifra));
+        } catch {}
+      }
+    };
+    void cargar();
+    const alVolver = () => document.visibilityState === "visible" && void cargar();
+    document.addEventListener("visibilitychange", alVolver);
+    return () => {
+      vivo = false;
+      document.removeEventListener("visibilitychange", alVolver);
+    };
+  }, [activo]);
+  return n;
+}
 
 /**
  * The bar across the top of every dashboard.
@@ -24,7 +69,7 @@ export type NavLink = { href: string; label: string; active?: boolean };
  * moves horizontally.
  */
 export default function DashboardNav({
-  links = [],
+  links: enlaces = [],
   eyebrow,
   roleSwitch,
   settingsHref,
@@ -45,6 +90,8 @@ export default function DashboardNav({
   const { lang } = useLang();
   const c = COMUN[lang];
   const settingsLabel = settingsLabelProp ?? translations[lang].dashboard.navSettings;
+  const demandes = useDemandesPendientes(enlaces.some((l) => l.contador === "demandes"));
+  const links = enlaces.map((l) => (l.contador === "demandes" ? { ...l, cifra: demandes } : l));
 
   // A stale open panel over a new page is worse than no panel, and Escape is
   // what anyone reaches for first.
@@ -65,8 +112,10 @@ export default function DashboardNav({
       >
         <div className="flex min-w-0 items-center gap-4 sm:gap-6">
           {/* Home for a member is their own space, not the page that explains
-              what Curato is. In the app that page should never appear at all. */}
-          <Link href="/dashboard" className="shrink-0">
+              what Curato is. In the app that page should never appear at all.
+              En el teléfono el logotipo abre el menú: el botón «Menu» de la
+              derecha competía con la barra y nadie lo encontraba. */}
+          <Link href="/dashboard" className="hidden shrink-0 sm:block">
             {/* El logotipo en tinta (logo-curato-ink.png) vuelve con la piel
                 nueva, cuando el modo claro se rehaga. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -76,6 +125,24 @@ export default function DashboardNav({
               style={{ height: "12px", width: "auto", display: "block" }}
             />
           </Link>
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-label={open ? c.close : c.menu}
+            className="-ml-2 flex min-h-11 shrink-0 items-center gap-2 px-2 sm:hidden"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-curato-simple.png"
+              alt="curato"
+              style={{ height: "12px", width: "auto", display: "block" }}
+            />
+            <CaretDown
+              size={11}
+              className={`text-text-muted transition-transform duration-300 ease-curato ${open ? "rotate-180" : ""}`}
+            />
+          </button>
 
           {eyebrow && (
             <>
@@ -99,6 +166,7 @@ export default function DashboardNav({
                     }`}
                   >
                     {l.label}
+                    {!!l.cifra && <Cifra n={l.cifra} />}
                   </Link>
                 ))}
               </div>
@@ -119,13 +187,6 @@ export default function DashboardNav({
           )}
         </div>
 
-        <button
-          onClick={() => setOpen((o) => !o)}
-          aria-expanded={open}
-          className="-mr-2 min-h-11 px-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent sm:hidden"
-        >
-          {open ? c.close : c.menu}
-        </button>
       </div>
 
       <AnimatePresence initial={false}>

@@ -49,6 +49,11 @@ export type Aviso = {
   ruta: string;
   /** Dos avisos con la misma marca se sustituyen en vez de acumularse. */
   agrupar?: string;
+  /**
+   * La cifra del icono de la app. Sin título, el aviso solo cambia esa cifra:
+   * no suena ni aparece en la pantalla.
+   */
+  insignia?: number;
 };
 
 export function apnsConfigurado(): boolean {
@@ -107,19 +112,20 @@ export async function enviarAPNs(tokens: string[], aviso: Aviso): Promise<string
 
   const cuerpo = JSON.stringify({
     aps: {
-      alert: { title: aviso.titulo, body: aviso.cuerpo },
-      sound: "default",
+      ...(aviso.titulo ? { alert: { title: aviso.titulo, body: aviso.cuerpo }, sound: "default" } : {}),
+      ...(aviso.insignia !== undefined ? { badge: aviso.insignia } : {}),
     },
     ruta: aviso.ruta,
   });
 
   const { host } = claves();
-  const desconocidos = await tanda(host, tokens, jwt, cuerpo, aviso.agrupar);
+  const conTitulo = Boolean(aviso.titulo);
+  const desconocidos = await tanda(host, tokens, jwt, cuerpo, aviso.agrupar, conTitulo);
   if (!desconocidos.length || host !== PRODUCCION) return desconocidos;
 
   // Los que el canal de verdad no reconoce pueden ser de una app instalada por
   // cable. Se vuelven a probar en el de pruebas, y solo mueren si tampoco allí.
-  return tanda(PRUEBAS, desconocidos, jwt, cuerpo, aviso.agrupar);
+  return tanda(PRUEBAS, desconocidos, jwt, cuerpo, aviso.agrupar, conTitulo);
 }
 
 /** Una vuelta contra un canal. Devuelve los aparatos que ese canal no conoce. */
@@ -128,7 +134,8 @@ async function tanda(
   tokens: string[],
   jwt: string,
   cuerpo: string,
-  agrupar?: string
+  agrupar?: string,
+  titulo = true
 ): Promise<string[]> {
   const { bundleId } = claves();
   const sesion = http2.connect(host);
@@ -148,7 +155,8 @@ async function tanda(
               authorization: `bearer ${jwt}`,
               "apns-topic": bundleId,
               "apns-push-type": "alert",
-              "apns-priority": "10",
+              // Solo la cifra del icono no tiene prisa: Apple pide prioridad 5.
+              "apns-priority": titulo ? "10" : "5",
               "content-type": "application/json",
               "content-length": Buffer.byteLength(cuerpo),
               ...(agrupar ? { "apns-collapse-id": agrupar.slice(0, 64) } : {}),

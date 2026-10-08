@@ -38,7 +38,8 @@ export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr" | 
     section === "profile" ? "/dashboard/business" : `/dashboard/business?section=${section}`;
 
   return [
-    { href: at("demandes"), label: t.tabDemandes, active: current === "demandes" },
+    // Lleva la cifra de demandas por responder (src/lib/pendientes.ts).
+    { href: at("demandes"), label: t.tabDemandes, active: current === "demandes", contador: "demandes" },
     { href: at("visitors"), label: t.tabVisitors, active: current === "visitors" },
     { href: at("profile"), label: t.tabProfile, active: current === "profile" },
     // El QR de sala: se abre de pie y con prisa, así que va el primero del menú.

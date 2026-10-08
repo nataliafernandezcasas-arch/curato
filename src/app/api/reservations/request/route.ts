@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendReservationRequested, sendMaisonNewRequest } from "@/lib/emails";
 import { avisar, AVISOS } from "@/lib/push/avisos";
+import { pendientesDe } from "@/lib/pendientes";
 import { isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { creditoDelMes, mesDeParis } from "@/lib/credito";
@@ -186,7 +187,12 @@ export async function POST(request: NextRequest) {
     // teléfono es lo que evita que se le vaya el tiempo sin abrir la app.
     await avisar(
       { ownerId: venue.owner_id ?? null, email: venue.email ?? null },
-      AVISOS.nuevaDemanda(creator.full_name || creator.handle || "Un storyteller", whenLabel, reservation.id)
+      AVISOS.nuevaDemanda(
+        creator.full_name || creator.handle || "Un storyteller",
+        whenLabel,
+        reservation.id,
+        await pendientesDe(admin, venue.id)
+      )
     );
 
     return NextResponse.json({ ok: true, reservationId: reservation.id, creditsCost });
