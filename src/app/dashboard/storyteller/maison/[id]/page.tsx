@@ -21,6 +21,15 @@ type MaisonAvail = {
   blocked: { date: string }[];
   taken: string[];
   services: MaisonService[];
+  menuUrls?: string[];
+};
+
+// La oferta de la casa en su ficha. Solo se veía en la pantalla de reserva, así
+// que nadie sabía qué ofrecía una casa antes de empezar a pedir mesa.
+const OFERTA = {
+  fr: { title: "L'offre", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
+  en: { title: "The offer", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
+  es: { title: "La oferta", menu: "Carta / folleto", file: (n: number) => `Documento ${n}` },
 };
 
 type Maison = {
@@ -59,6 +68,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const { id } = use(params);
   const [maison, setMaison] = useState<Maison | null>(null);
   const [loading, setLoading] = useState(true);
+  const [oferta, setOferta] = useState<{ services: MaisonService[]; menuUrls: string[] } | null>(null);
 
   const router = useRouter();
   const [preview, setPreview] = useState(false);
@@ -89,6 +99,15 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
       setLoading(false);
     }
     load();
+  }, [id]);
+
+  useEffect(() => {
+    fetch(`/api/maison/${id}/availability`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: MaisonAvail | null) =>
+        d && setOferta({ services: (d.services ?? []).filter((s) => s.name?.trim()), menuUrls: d.menuUrls ?? [] })
+      )
+      .catch(() => {});
   }, [id]);
 
 
@@ -193,6 +212,36 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   <p className="font-serif text-[15px] font-light text-text-secondary leading-relaxed mb-8">
                     {desc}
                   </p>
+                )}
+
+                {oferta && (oferta.services.length > 0 || oferta.menuUrls.length > 0) && (
+                  <div className="mb-8">
+                    <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-accent mb-3">{OFERTA[lang].title}</p>
+                    {oferta.services.map((s, i) => (
+                      <Row
+                        key={i}
+                        label={<span className="text-corps text-text-primary">{s.name}</span>}
+                        aside={s.description?.trim() ? <span className="text-legende text-text-secondary">{s.description}</span> : undefined}
+                        value={s.price?.trim() ? <span className="text-legende tabular-nums text-text-primary">{s.price}</span> : undefined}
+                      />
+                    ))}
+                    {oferta.menuUrls.length > 0 && (
+                      <div className="mt-fila">
+                        <p className="text-capitale uppercase tracking-capitale text-text-secondary">{OFERTA[lang].menu}</p>
+                        {oferta.menuUrls.map((url, i) => (
+                          <a
+                            key={url}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-bloque flex min-h-11 items-center text-legende text-accent underline underline-offset-4 transition-colors hover:text-text-primary"
+                          >
+                            {OFERTA[lang].file(i + 1)}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 {/* Map */}

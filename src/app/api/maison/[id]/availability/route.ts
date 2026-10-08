@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const admin = createAdminClient();
     const { data: venue } = await admin
       .from("comercios")
-      .select("id, availability, blocked_slots, is_reservable, services")
+      .select("id, availability, blocked_slots, is_reservable, services, menu_urls")
       .eq("id", id)
       .maybeSingle();
     if (!venue || !venue.is_reservable) return NextResponse.json({ error: "Maison indisponible." }, { status: 404 });
@@ -34,6 +34,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       // creador recibe euros, así que lo que ve antes de reservar tiene que ser
       // el precio real de la casa y no una unidad inventada.
       services: venue.services ?? [],
+      // La carta o el folleto que subió la casa, para enseñarlo en su ficha.
+      menuUrls: venue.menu_urls ?? [],
     });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
