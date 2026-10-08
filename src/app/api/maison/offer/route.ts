@@ -75,37 +75,70 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// Upload a menu file (PDF / image).
+// Los formatos y el peso que admite el bucket (migración 023): veinte megas.
+const MENU_TIPOS: Record<string, string> = {
+  "application/pdf": "pdf",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
+const MENU_MAX_BYTES = 20 * 1024 * 1024;
+
+/**
+ * La carta o el folleto de la casa, en dos pasos.
+ *
+ * Antes el archivo pasaba por aquí, y Vercel corta cualquier petición de más
+ * de 4,5 MB: una carta en PDF casi siempre pesa más, y la subida fallaba sin
+ * decir nada. Ahora el archivo va directo del teléfono al almacenamiento:
+ *
+ *   1. `{ subir: [{ type, size }] }` → un permiso firmado por archivo;
+ *   2. el navegador sube cada archivo con su permiso;
+ *   3. `{ paths: [...] }` → se añaden a la casa.
+ */
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
+    if (!user) return NextResponse.json({ error: "auth" }, { status: 401 });
     const admin = createAdminClient();
     const m = await getMaison(admin, user.id, user.email || "");
-    if (!m) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
+    if (!m) return NextResponse.json({ error: "maison" }, { status: 403 });
 
-    const form = await request.formData();
-    const files = (form.getAll("files") as File[]).filter((f) => f && typeof f.arrayBuffer === "function");
-    const newUrls: string[] = [];
-    for (const file of files) {
-      const ext = (file.name.split(".").pop() || "pdf").toLowerCase();
-      const path = `maisons/${m.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const { error: upErr } = await admin.storage.from(BUCKET).upload(path, buffer, {
-        contentType: file.type || "application/pdf",
-        upsert: false,
-      });
-      if (upErr) { console.error("Menu upload error:", upErr); continue; }
-      const { data } = admin.storage.from(BUCKET).getPublicUrl(path);
-      if (data?.publicUrl) newUrls.push(data.publicUrl);
+    const body = (await request.json().catch(() => ({}))) as {
+      subir?: { type?: string; size?: number }[];
+      paths?: unknown;
+    };
+
+    if (Array.isArray(body.subir)) {
+      const permisos = [];
+      for (const f of body.subir.slice(0, 10)) {
+        const ext = MENU_TIPOS[(f.type ?? "").toLowerCase()];
+        if (!ext) return NextResponse.json({ error: "format" }, { status: 415 });
+        if (!f.size || f.size > MENU_MAX_BYTES) return NextResponse.json({ error: "size" }, { status: 413 });
+        const path = `maisons/${m.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(path);
+        if (error || !data) {
+          console.error("Menu signed URL error:", error);
+          return NextResponse.json({ error: "upload" }, { status: 500 });
+        }
+        permisos.push({ path: data.path, token: data.token });
+      }
+      return NextResponse.json({ permisos });
     }
-    const menuUrls = [...(m.menu_urls ?? []), ...newUrls];
+
+    // Solo rutas de su propia carpeta: llegan del navegador.
+    const carpeta = `maisons/${m.id}/`;
+    const paths = Array.isArray(body.paths)
+      ? body.paths.filter((p): p is string => typeof p === "string" && p.startsWith(carpeta) && !p.includes(".."))
+      : [];
+    if (paths.length === 0) return NextResponse.json({ error: "paths" }, { status: 400 });
+    const nuevas = paths.map((p) => admin.storage.from(BUCKET).getPublicUrl(p).data.publicUrl).filter(Boolean);
+    const menuUrls = [...(m.menu_urls ?? []), ...nuevas.filter((u) => !(m.menu_urls ?? []).includes(u))];
     await admin.from("comercios").update({ menu_urls: menuUrls }).eq("id", m.id);
     return NextResponse.json({ ok: true, menuUrls });
   } catch (err) {
     console.error("Menu POST error:", err);
-    return NextResponse.json({ error: "Erreur lors de l'envoi." }, { status: 500 });
+    return NextResponse.json({ error: "upload" }, { status: 500 });
   }
 }
 
