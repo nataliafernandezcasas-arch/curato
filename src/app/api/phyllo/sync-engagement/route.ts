@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
-import { refrescarRecientes } from "@/lib/instagram-recientes";
+import { refrescarConPhyllo } from "@/lib/instagram-recientes";
+import { graphConfigurado } from "@/lib/instagram-graph";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
@@ -66,8 +67,9 @@ export async function POST() {
     }
 
     await admin.from("creators").update(update).eq("id", creator.id);
-    // Sus últimas publicaciones, con las fotos copiadas a nuestro bucket.
-    after(() => refrescarRecientes(admin, creator.id, creator.phyllo_account_id as string));
+    // Sus últimas publicaciones, con las fotos copiadas a nuestro bucket. Con
+    // la API de Instagram configurada, de eso se encarga la tarea de cada hora.
+    if (!graphConfigurado()) after(() => refrescarConPhyllo(admin, creator.id, creator.phyllo_account_id as string));
 
     return NextResponse.json({ ok: true, engagement_rate: engagementRate, metrics });
   } catch (err) {

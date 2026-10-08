@@ -2,8 +2,8 @@ import type { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { firmarFotos, fotosElegidas, signPortraits } from "@/lib/creator-portrait";
 import { SUBJECT_QUESTION } from "@/lib/photo-subjects";
-import { after } from "next/server";
-import { caducadas, firmarRecientes, refrescarRecientes, type PublicacionGuardada } from "@/lib/instagram-recientes";
+import { firmarRecientes, type PublicacionGuardada } from "@/lib/instagram-recientes";
+import { graphConfigurado } from "@/lib/instagram-graph";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -94,6 +94,8 @@ export function phylloDePrueba(url = process.env.PHYLLO_API_URL): boolean {
 /**
  * La cifra de seguidores que se enseña.
  *
+ * Primero la de Instagram, que la tarea de cada hora lee con la API oficial.
+ * Si no hay (cuenta personal, o la API sin configurar):
  * Con Phyllo en pruebas manda la del admin (la ficha del storyteller, campo
  * «Abonnés»). Con Phyllo de verdad, la suya, salvo que sea mucho menor que la
  * del admin: es la misma regla que aplica la sincronización al guardarla.
@@ -101,8 +103,11 @@ export function phylloDePrueba(url = process.env.PHYLLO_API_URL): boolean {
 export function seguidoresCreibles(
   dePhyllo: number | null,
   declarados: number | null,
-  deprueba = phylloDePrueba()
+  deprueba = phylloDePrueba(),
+  deInstagram: number | null = null
 ): number | null {
+  // La de Instagram, leída cada día por la API oficial, manda sobre todas.
+  if (deInstagram != null) return deInstagram;
   if (deprueba && declarados) return declarados;
   if (dePhyllo == null) return declarados ?? null;
   if (declarados && dePhyllo < declarados * 0.3) return declarados;
@@ -140,33 +145,25 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
     Promise.all(
       rows.map(async (c) => {
         if (!c.instagram_connected || !c.phyllo_account_id) return [c.id as string, null] as const;
+        // Con la API de Instagram, las cifras y las fotos ya están guardadas:
+        // no se espera a Phyllo al abrir un perfil.
+        if (graphConfigurado()) return [c.id as string, null] as const;
         return [c.id as string, await withTimeout(phylloExtra(c.phyllo_account_id as string), PHYLLO_TIMEOUT_MS)] as const;
       })
     ),
   ]);
 
-  // Las últimas publicaciones guardadas (migración 045), aparte y tolerante:
-  // sin la columna, se usan las que Phyllo devuelva en directo, si llegan.
-  const guardadas = new Map<string, { posts: PublicacionGuardada[]; at: string | null }>();
-  const conPublicaciones = await admin.from("creators").select("id, instagram_posts, instagram_posts_at").in("id", ids);
-  if (!conPublicaciones.error) {
-    for (const r of conPublicaciones.data ?? []) {
-      const posts = Array.isArray(r.instagram_posts) ? (r.instagram_posts as PublicacionGuardada[]) : [];
-      guardadas.set(r.id as string, { posts, at: (r.instagram_posts_at as string | null) ?? null });
-    }
-    // Las que tienen más de un día se piden de nuevo cuando ya salió la
-    // respuesta: quien abre el perfil no espera a Phyllo.
-    const viejas = rows.filter(
-      (c) => c.instagram_connected && c.phyllo_account_id && caducadas(guardadas.get(c.id as string)?.at)
-    );
-    if (viejas.length) {
-      try {
-        after(async () => {
-          for (const c of viejas) await refrescarRecientes(admin, c.id as string, c.phyllo_account_id as string);
-        });
-      } catch {
-        // Fuera de una petición (un script) no hay `after`: se refrescan otro día.
-      }
+  // Lo que la tarea de cada hora guarda de Instagram (migración 045): las
+  // últimas publicaciones y los seguidores. Aparte y tolerante: sin las
+  // columnas, se usa lo que Phyllo devuelva en directo, si llega.
+  const guardadas = new Map<string, { posts: PublicacionGuardada[]; followers: number | null }>();
+  const conInstagram = await admin.from("creators").select("id, instagram_posts, instagram_followers").in("id", ids);
+  if (!conInstagram.error) {
+    for (const r of conInstagram.data ?? []) {
+      guardadas.set(r.id as string, {
+        posts: Array.isArray(r.instagram_posts) ? (r.instagram_posts as PublicacionGuardada[]) : [],
+        followers: (r.instagram_followers as number | null) ?? null,
+      });
     }
   }
 
@@ -229,11 +226,13 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
           visits: club?.visits ?? 0,
           avgReach: club && club.reachCount > 0 ? Math.round(club.reachSum / club.reachCount) : null,
         },
-        audience: connected
+        audience: connected || guardadas.get(id)?.followers != null
           ? {
               followers: seguidoresCreibles(
                 x?.followers ?? (c.followers_count as number | null) ?? null,
-                c.followers as number | null
+                c.followers as number | null,
+                phylloDePrueba(),
+                guardadas.get(id)?.followers ?? null
               ),
               avgReach: x?.avgReach ?? null,
               // engagement_rate se guarda como fracción (0.05 = 5 %).

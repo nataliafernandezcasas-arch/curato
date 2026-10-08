@@ -5,7 +5,7 @@ import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMe
 import { signPortraits } from "@/lib/creator-portrait";
 import { subjectLabel } from "@/lib/photo-subjects";
 import { filtroDeUsuario } from "@/lib/identidad";
-import { seguidoresCreibles } from "@/lib/storyteller-dossier";
+import { phylloDePrueba, seguidoresCreibles } from "@/lib/storyteller-dossier";
 
 
 // Roster of signed storytellers, visible to a logged-in maison: name, handle,
@@ -108,6 +108,15 @@ export async function GET() {
     const firmados = await signPortraits(admin, conRetrato.map((c) => primerRetrato(c) as string));
     const retratoById = new Map(conRetrato.map((c, i) => [c.id as string, firmados[i]]));
 
+    // Los seguidores que la tarea de cada hora lee de Instagram (migración 045).
+    const { data: deInstagram, error: sinInstagram } = await admin
+      .from("creators")
+      .select("id, instagram_followers")
+      .in("id", rows.map((c) => c.id as string));
+    const igById = new Map(
+      sinInstagram ? [] : (deInstagram ?? []).map((r) => [r.id as string, (r.instagram_followers as number | null) ?? null])
+    );
+
     const roster = rows.map((c) => {
       const er = c.engagement_rate as number | null;
       const x = extraById.get(c.id as string);
@@ -115,9 +124,13 @@ export async function GET() {
         id: c.id as string,
         name: (c.full_name as string | null) || (c.handle ? `@${c.handle}` : "—"),
         handle: (c.handle as string | null) ?? null,
-        // Prefer the live Phyllo count when we have one; otherwise the survey figure.
-        // La misma regla que el dossier: con Phyllo en pruebas, la del admin.
-        followers: seguidoresCreibles((c.followers_count as number | null) ?? null, (c.followers as number | null) ?? null),
+        // La misma regla que el dossier: Instagram, luego Phyllo, luego el admin.
+        followers: seguidoresCreibles(
+          (c.followers_count as number | null) ?? null,
+          (c.followers as number | null) ?? null,
+          phylloDePrueba(),
+          igById.get(c.id as string) ?? null
+        ),
         content: contentByCreator.get(c.id) ?? [],
         igConnected: Boolean(c.instagram_connected),
         // engagement_rate is stored as a fraction (0.05 = 5%); expose the %.
