@@ -20,7 +20,7 @@ import {
   visiteConfirmeeTexto,
 } from "@/emails/visitas";
 import { CandidatureAcceptee, CandidatureRecue, CodeDacces, Lancement, MotDePasse } from "@/emails/cuenta";
-import { EngagementSigne, NouvelleMaison, DemandeRecue } from "@/emails/maison";
+import { EngagementSigne, NouvelleMaison, DemandeRecue, AvisoDerechos, avisoDerechosTexto, type AvisoDerechosProps } from "@/emails/maison";
 import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
 import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
 import { SITE } from "@/emails/shell";
@@ -127,6 +127,19 @@ export async function sendMaisonNewRequest(opts: {
 }) {
   const { to, ...p } = opts;
   return sendEmail(to, `${p.creatorName} souhaite venir ${p.whenLabel}`, createElement(DemandeRecue, p));
+}
+
+/**
+ * A la casa: su exclusividad sobre las fotos de una visita acaba en siete días
+ * ("7d") o acaba de terminar ("fin"). Informa, no pide borrar nada: después
+ * de los 90 días la licencia sigue, sin exclusividad.
+ */
+export async function sendAvisoDerechos(to: string, p: AvisoDerechosProps) {
+  const asunto =
+    p.fase === "7d"
+      ? `Exclusivité des photos de ${p.storytellerName} : fin le ${p.expiresLabel}`
+      : `Fin de l'exclusivité sur les photos de ${p.storytellerName}`;
+  return sendEmail(to, asunto, createElement(AvisoDerechos, p), { text: avisoDerechosTexto(p) });
 }
 
 export async function sendReservationAdminAlert(opts: {

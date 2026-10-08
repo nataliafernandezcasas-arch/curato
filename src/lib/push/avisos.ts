@@ -2,10 +2,12 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { enviarAPNs, type Aviso } from "./apns";
 
 /**
- * Los cuatro avisos, y ninguno más.
+ * Los seis avisos, y ninguno más.
  *
  * El diseño es explícito: visita confirmada, visita rechazada, quedan seis
- * horas para publicar y, para la casa, nueva demanda. Cada uno abre su pantalla
+ * horas para publicar y, para la casa, nueva demanda y el fin de su
+ * exclusividad sobre unas fotos (siete días antes y el mismo día; migración
+ * 041). Cada uno abre su pantalla
  * y ahí muere. No hay bandeja de entrada: lo pendiente ya vive en À faire y en
  * Demandes, y una bandeja sería un segundo sitio con la misma información.
  *
@@ -16,6 +18,7 @@ import { enviarAPNs, type Aviso } from "./apns";
 const VISITAS = "/dashboard/storyteller/visits";
 const CARNET = "/dashboard/storyteller";
 const DEMANDES = "/dashboard/business";
+const VISITEURS = "/dashboard/business?section=visitors";
 
 const PALABRAS = ["aucune", "une", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix"];
 
@@ -48,6 +51,23 @@ export const AVISOS = {
     cuerpo: `${storyteller} demande une table ${cuando}.`,
     ruta: DEMANDES,
     agrupar: `demande-${id}`,
+  }),
+
+  // Informan, no piden borrar: tras los 90 días la casa conserva una licencia
+  // no exclusiva. Comparten grupo para que el del día del fin sustituya al de
+  // los siete días en la pantalla.
+  derechosSieteDias: (storyteller: string, fecha: string, id: string): Aviso => ({
+    titulo: "Plus que sept jours d'exclusivité",
+    cuerpo: `Votre exclusivité sur les photos de ${storyteller} se termine le ${fecha}.`,
+    ruta: VISITEURS,
+    agrupar: `droits-${id}`,
+  }),
+
+  derechosFin: (storyteller: string, id: string): Aviso => ({
+    titulo: "L'exclusivité a pris fin",
+    cuerpo: `Les photos de ${storyteller} restent utilisables sur vos canaux, sans exclusivité.`,
+    ruta: VISITEURS,
+    agrupar: `droits-${id}`,
   }),
 };
 

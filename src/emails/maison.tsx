@@ -101,3 +101,69 @@ export function DemandeRecue(p: {
     </Shell>
   );
 }
+
+// ── Fin de l'exclusivité (maison) ──────────────────────────────────────────
+// La casa tiene 90 días de exclusividad desde que el storyteller sube las
+// fotos; después sigue pudiendo usarlas, sin exclusividad (CGU, artículo 20),
+// pero desaparecen de su tablero. Dos correos: siete días antes y el día del
+// fin. Ninguno pide borrar nada, porque las condiciones no lo piden.
+export type AvisoDerechosProps = {
+  maisonName: string;
+  storytellerName: string;
+  expiresLabel: string;
+  fase: "7d" | "fin";
+};
+
+const VISITEURS = `${SITE}/dashboard/business?section=visitors`;
+
+function avisoDerechosParrafos(p: AvisoDerechosProps) {
+  if (p.fase === "7d") {
+    return {
+      preview: `L'exclusivité sur les photos de ${p.storytellerName} se termine le ${p.expiresLabel}.`,
+      titre: "Plus que sept jours d'exclusivité",
+      parrafos: [
+        `Les droits d'usage exclusifs de ${p.maisonName} sur les photos de ${p.storytellerName} se terminent le ${p.expiresLabel}, quatre-vingt-dix jours après leur dépôt sur Curato.`,
+        "Ensuite, vous pourrez toujours les utiliser sur vos propres canaux, sans exclusivité, comme le prévoient les conditions générales. Elles n'apparaîtront plus dans votre espace Curato : enregistrez dès maintenant celles que vous souhaitez garder.",
+      ],
+      nota: "Nous vous écrirons une dernière fois le jour où l'exclusivité prend fin.",
+    };
+  }
+  return {
+    preview: `L'exclusivité sur les photos de ${p.storytellerName} a pris fin.`,
+    titre: "L'exclusivité a pris fin",
+    parrafos: [
+      `Depuis le ${p.expiresLabel}, les droits d'usage de ${p.maisonName} sur les photos de ${p.storytellerName} ne sont plus exclusifs : quatre-vingt-dix jours se sont écoulés depuis leur dépôt sur Curato.`,
+      "Vous pouvez continuer à les utiliser sur vos propres canaux, sans exclusivité, comme le prévoient les conditions générales ; le storyteller peut désormais les confier à d'autres. Elles n'apparaissent plus dans votre espace Curato.",
+    ],
+    nota: "C'est notre dernier message à ce sujet.",
+  };
+}
+
+export function AvisoDerechos(p: AvisoDerechosProps) {
+  const t = avisoDerechosParrafos(p);
+  return (
+    <Shell preview={t.preview}>
+      <Capital>Droits d&apos;usage</Capital>
+      <Titre>{t.titre}</Titre>
+      {t.parrafos.map((texto) => (
+        <Corps key={texto}>{texto}</Corps>
+      ))}
+      {/* Solo el primero lleva enlace: el día del fin las fotos ya no están. */}
+      {p.fase === "7d" ? <Enlace href={VISITEURS}>Voir les photos</Enlace> : null}
+      <Nota>{t.nota}</Nota>
+    </Shell>
+  );
+}
+
+export function avisoDerechosTexto(p: AvisoDerechosProps): string {
+  const t = avisoDerechosParrafos(p);
+  return [
+    `${t.titre}.`,
+    "",
+    ...t.parrafos.flatMap((texto) => [texto, ""]),
+    ...(p.fase === "7d" ? [`Voir les photos : ${VISITEURS}`, ""] : []),
+    t.nota,
+    "",
+    "Curato · Paris",
+  ].join("\n");
+}

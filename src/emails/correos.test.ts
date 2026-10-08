@@ -5,8 +5,10 @@ import { AlerteDemande, DemandeDeclinee, DemandeEnvoyee, VisiteConfirmee } from 
 import { MaisonValidee } from "./apporteur";
 import { SeisHoras, StoriesManquantes } from "./recordatorios";
 import { CandidatureRecue, MotDePasse } from "./cuenta";
+import { AvisoDerechos } from "./maison";
 import {
   sendAccessCode,
+  sendAvisoDerechos,
   sendAvisoStoriesManquantes,
   sendMaisonNewRequest,
   sendRecordatorioSeisHoras,
@@ -37,6 +39,8 @@ const CORREOS: [string, ReactElement][] = [
   ["stories que faltan", createElement(StoriesManquantes, { visitas: [{ storyteller: "Tereza", maison: "Maison Marceau", whenLabel: "jeudi" }] })],
   ["candidatura recibida", createElement(CandidatureRecue, { name: "Tereza Bolkvadze", type: "creator" })],
   ["contraseña", createElement(MotDePasse, { resetUrl: "https://curatocollective.com/auth/change-password" })],
+  ["derechos, siete días", createElement(AvisoDerechos, { maisonName: "Maison Marceau", storytellerName: "Tereza", expiresLabel: "mercredi 21 janvier", fase: "7d" })],
+  ["derechos, fin", createElement(AvisoDerechos, { maisonName: "Maison Marceau", storytellerName: "Tereza", expiresLabel: "mercredi 21 janvier", fase: "fin" })],
 ];
 
 describe("la cáscara de todos los correos", () => {
@@ -133,6 +137,19 @@ describe("lo que se manda a Resend", () => {
     });
     expect(enviados[0].subject).toBe("Tereza Bolkvadze souhaite venir jeudi 22 octobre à 19:30");
     expect(String(enviados[0].text)).toContain("quarante-huit heures");
+  });
+
+  it("el fin de la exclusividad informa a la casa y no le pide borrar nada", async () => {
+    const p = { maisonName: "Maison Marceau", storytellerName: "Tereza Bolkvadze", expiresLabel: "mercredi 21 janvier" };
+    await sendAvisoDerechos("salle@exemple.fr", { ...p, fase: "7d" });
+    await sendAvisoDerechos("salle@exemple.fr", { ...p, fase: "fin" });
+    expect(enviados[0].subject).toBe("Exclusivité des photos de Tereza Bolkvadze : fin le mercredi 21 janvier");
+    expect(String(enviados[0].text)).toContain("section=visitors");
+    expect(enviados[1].subject).toBe("Fin de l'exclusivité sur les photos de Tereza Bolkvadze");
+    for (const e of enviados) {
+      expect(String(e.text)).toContain("sans exclusivité");
+      expect(String(e.text)).not.toMatch(/supprim|effac/i);
+    }
   });
 
   it("el código de bienvenida va en el asunto, en grupos de tres", async () => {

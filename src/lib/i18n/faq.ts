@@ -148,7 +148,7 @@ const fr: FaqContent = {
           },
           {
             q: "À qui appartient le contenu que je publie ?",
-            a: "Le contenu vous appartient. Vous accordez simplement à Curato et à la maison concernée une licence exclusive d'utilisation pendant 90 jours à compter de la publication.",
+            a: "Le contenu vous appartient. Vous accordez simplement à Curato et à la maison concernée une licence exclusive d'utilisation pendant 90 jours à compter du dépôt du contenu sur Curato.",
           },
           {
             q: "Que se passe-t-il après les 90 jours ?",
@@ -385,7 +385,7 @@ const en: FaqContent = {
           },
           {
             q: "Who owns the content I publish?",
-            a: "The content belongs to you. You simply grant Curato and the maison involved an exclusive usage license for 90 days from the date of publication.",
+            a: "The content belongs to you. You simply grant Curato and the maison involved an exclusive usage license for 90 days from the upload of the content to Curato.",
           },
           {
             q: "What happens after the 90 days?",
@@ -621,7 +621,7 @@ const es: FaqContent = {
           },
           {
             q: "¿De quién es el contenido que publico?",
-            a: "El contenido te pertenece. Simplemente otorgas a Curato y a la casa correspondiente una licencia exclusiva de uso durante 90 días desde la fecha de publicación.",
+            a: "El contenido te pertenece. Simplemente otorgas a Curato y a la casa correspondiente una licencia exclusiva de uso durante 90 días desde la subida del contenido a Curato.",
           },
           {
             q: "¿Qué pasa después de los 90 días?",

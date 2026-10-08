@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     const { data: reservation } = await admin
       .from("reservations")
-      .select("id, creator_id, status, slot_start, content_photo_paths, visited_at")
+      .select("id, creator_id, status, slot_start, content_photo_paths, visited_at, content_uploaded_at, content_rights_expires_at")
       .eq("id", reservationId)
       .maybeSingle();
     if (!reservation || reservation.creator_id !== creator.id) {
@@ -161,8 +161,14 @@ export async function POST(request: NextRequest) {
     };
     if (newPaths.length > 0) {
       update.content_photo_paths = allPaths;
-      update.content_uploaded_at = now.toISOString();
-      update.content_rights_expires_at = new Date(now.getTime() + NINETY_DAYS_MS).toISOString();
+      // Los 90 días cuentan desde la primera subida y no se mueven: si cada
+      // foto añadida reiniciara el plazo, la exclusividad de la casa se
+      // alargaría sin fin y el aviso de fin de derechos nunca llegaría.
+      if (!reservation.content_rights_expires_at) {
+        const subida = reservation.content_uploaded_at ? new Date(reservation.content_uploaded_at) : now;
+        update.content_uploaded_at = subida.toISOString();
+        update.content_rights_expires_at = new Date(subida.getTime() + NINETY_DAYS_MS).toISOString();
+      }
     }
     if (vues !== null || comptes !== null || interactions !== null) {
       if (vues !== null) update.reach_views = vues;
