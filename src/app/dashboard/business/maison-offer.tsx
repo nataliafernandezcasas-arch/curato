@@ -170,9 +170,11 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const fmtDate = (d: string) => new Date(d + "T00:00:00").toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric" });
 
   return (
-    <div className="max-w-[820px] mx-auto space-y-14 pb-8">
+    <div className="max-w-[820px] mx-auto space-y-6 pb-8">
+      {/* Cada bloque de la oferta, en su burbuja de cristal: se lee como una
+          tarjeta de la app sobre la flor del fondo, y no como texto suelto. */}
       {/* Availability */}
-      <section>
+      <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerAvailability}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerAvailabilityHint}</p>
         <div className="space-y-2">
@@ -212,7 +214,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Blocked dates */}
-      <section>
+      <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerBlocked}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerBlockedHint}</p>
         <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -239,7 +241,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Services */}
-      <section>
+      <section className="caja-cristal p-5 sm:p-6">
         <div className="flex items-baseline justify-between mb-1">
           <p className={labelCls}>{t.offerServices}</p>
           <button onClick={addService} className="inline-flex items-center gap-1.5 text-accent hover:text-text-primary font-serif text-[12px] tracking-wider uppercase transition-colors">
@@ -262,7 +264,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       </section>
 
       {/* Menu / brochure */}
-      <section>
+      <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerMenu}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerMenuHint}</p>
         <div className="flex flex-wrap gap-3 items-center">
