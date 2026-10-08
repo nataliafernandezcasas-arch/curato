@@ -42,9 +42,8 @@ export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr" | 
     { href: at("demandes"), label: t.tabDemandes, active: current === "demandes", contador: "demandes" },
     { href: at("visitors"), label: t.tabVisitors, active: current === "visitors" },
     { href: at("profile"), label: t.tabProfile, active: current === "profile" },
-    // El QR de sala: se abre de pie y con prisa, así que va el primero del menú.
-    { href: "/dashboard/business/qr", label: t.navQrScan, active: current === "qr" },
-    // Quién viene, cuándo y cuántos: lo que la sala mira antes del servicio.
+    // Quién viene, cuándo y cuántos: lo que la sala mira antes del servicio. El
+    // escáner del código vive ahí, con cada visita, y no en el menú.
     { href: "/dashboard/business/calendrier", label: t.navCalendar, active: current === "calendrier" },
     { href: at("roster"), label: t.tabRoster, active: current === "roster" },
     { href: at("directory"), label: t.tabDirectory, active: current === "directory" },
