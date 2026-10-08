@@ -3,7 +3,7 @@ import { generateKeyPairSync, verify } from "node:crypto";
 import { AVISOS } from "./avisos";
 
 /**
- * La firma de Apple y el texto de los cuatro avisos.
+ * La firma de Apple y el texto de los seis avisos.
  *
  * La firma es lo único de este rincón que no se puede comprobar mirando: si el
  * JWT sale mal, APNs contesta 403 y no dice más. Aquí se firma con una clave de
@@ -50,16 +50,18 @@ describe("el JWT de APNs", () => {
   });
 });
 
-describe("los cuatro avisos", () => {
-  const cuatro = [
+describe("los seis avisos", () => {
+  const todos = [
     AVISOS.visitaConfirmada("Maison Marceau", "jeudi 22 octobre à 19:30", "r1"),
     AVISOS.visitaRechazada("Maison Lauriston", "le jeudi 22 octobre", "r2"),
     AVISOS.seisHoras("Maison Marceau", 6, "r3"),
     AVISOS.nuevaDemanda("Tereza Kovač", "jeudi 22 octobre à 19:30", "r4"),
+    AVISOS.derechosSieteDias("Tereza Kovač", "mercredi 21 janvier", "r5"),
+    AVISOS.derechosFin("Tereza Kovač", "r5"),
   ];
 
   it("dicen la cosa, no la app", () => {
-    for (const aviso of cuatro) {
+    for (const aviso of todos) {
       expect(aviso.titulo).not.toMatch(/notification|Curato/i);
       expect(aviso.cuerpo).not.toMatch(/notification/i);
       // Lo que cabe en una pantalla apagada sin quedar cortado a la mitad.
@@ -69,15 +71,23 @@ describe("los cuatro avisos", () => {
   });
 
   it("cada uno abre una pantalla de dentro, y solo de dentro", () => {
-    for (const aviso of cuatro) {
+    for (const aviso of todos) {
       expect(aviso.ruta.startsWith("/dashboard/")).toBe(true);
       expect(aviso.agrupar!.length).toBeLessThanOrEqual(64);
     }
   });
 
   it("el aviso confirmado dice dónde y cuándo; el rechazo, lo que no se ha perdido", () => {
-    expect(cuatro[0].cuerpo).toBe("Maison Marceau vous attend jeudi 22 octobre à 19:30.");
-    expect(cuatro[1].cuerpo).toContain("Votre crédit est intact");
-    expect(cuatro[2].titulo).toBe("Il vous reste six heures");
+    expect(todos[0].cuerpo).toBe("Maison Marceau vous attend jeudi 22 octobre à 19:30.");
+    expect(todos[1].cuerpo).toContain("Votre crédit est intact");
+    expect(todos[2].titulo).toBe("Il vous reste six heures");
+  });
+
+  it("el fin de la exclusividad informa y no pide borrar", () => {
+    expect(todos[4].cuerpo).toContain("mercredi 21 janvier");
+    for (const aviso of todos.slice(4)) {
+      expect(aviso.cuerpo).not.toMatch(/supprim|effac/i);
+      expect(aviso.ruta).toBe("/dashboard/business?section=visitors");
+    }
   });
 });

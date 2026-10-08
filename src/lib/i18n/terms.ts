@@ -74,7 +74,7 @@ const fr: TermsContent = {
   pageTitle: "Conditions générales d'utilisation",
   eyebrow: "Curato · Conditions",
   lastUpdatedLabel: "Dernière mise à jour",
-  lastUpdated: "10 septembre 2026",
+  lastUpdated: "8 octobre 2026",
   draftNoticeTitle: "Document de travail",
   draftNoticeBody:
     "Les présentes conditions sont un projet en cours de finalisation. Elles seront mises à jour à l'issue de l'immatriculation de Curato Collective SAS et de leur revue par un conseil juridique français. Les mentions [entre crochets] sont des champs en attente.",
@@ -395,7 +395,7 @@ const fr: TermsContent = {
       title: "20. Droits sur le Contenu (Maison)",
       blocks: [
         "Pour chaque Visite réalisée, le Créateur concède à la Maison visitée une licence d'utilisation sur le Contenu produit à l'occasion de cette Visite, dans les conditions suivantes :",
-        "**Période d'exclusivité : 90 jours à compter de la date de publication du Contenu par le Créateur.**",
+        "**Période d'exclusivité : 90 jours à compter du dépôt du Contenu sur Curato par le Créateur.**",
         "Durant cette période de 90 jours, la licence est :",
         {
           list: [
@@ -561,7 +561,7 @@ const en: TermsContent = {
   pageTitle: "Terms and Conditions",
   eyebrow: "Curato · Terms",
   lastUpdatedLabel: "Last updated",
-  lastUpdated: "September 10, 2026",
+  lastUpdated: "October 8, 2026",
   draftNoticeTitle: "Working draft",
   draftNoticeBody:
     "These terms are a draft pending finalisation. They will be updated once Curato Collective SAS is registered and after review by a French legal counsel. Fields in [brackets] are placeholders. The French version is the legally binding one.",
@@ -877,7 +877,7 @@ const en: TermsContent = {
       title: "20. Rights over the Content (House)",
       blocks: [
         "For each Visit performed, the Creator grants the visited House a licence to use the Content produced on the occasion of that Visit, under the following conditions:",
-        "**Exclusivity period: 90 days from the date of publication of the Content by the Creator.**",
+        "**Exclusivity period: 90 days from the upload of the Content to Curato by the Creator.**",
         "During this 90-day period, the licence is:",
         {
           list: [
@@ -1041,7 +1041,7 @@ const es: TermsContent = {
   pageTitle: "Condiciones Generales de Uso",
   eyebrow: "Curato · Condiciones",
   lastUpdatedLabel: "Última actualización",
-  lastUpdated: "10 de septiembre de 2026",
+  lastUpdated: "8 de octubre de 2026",
   draftNoticeTitle: "Borrador",
   draftNoticeBody:
     "Estas condiciones son un borrador pendiente de finalización. Se actualizarán una vez constituida Curato Collective SAS y tras la revisión por un abogado francés. Los campos entre [corchetes] son marcadores. La versión francesa es la jurídicamente vinculante.",
@@ -1357,7 +1357,7 @@ const es: TermsContent = {
       title: "20. Derechos sobre el Contenido (Maison)",
       blocks: [
         "Por cada Visita realizada, el Creador otorga a la Maison visitada una licencia de uso sobre el Contenido producido con ocasión de esa Visita, en las siguientes condiciones:",
-        "**Periodo de exclusividad: 90 días desde la fecha de publicación del Contenido por el Creador.**",
+        "**Periodo de exclusividad: 90 días desde la subida del Contenido a Curato por el Creador.**",
         "Durante este periodo de 90 días, la licencia es:",
         {
           list: [
