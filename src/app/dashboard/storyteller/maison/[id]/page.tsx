@@ -14,6 +14,7 @@ import { Row } from "@/components/member/row";
 import { ButtonLink } from "@/components/member/button";
 import { Gallery } from "@/components/member/gallery";
 import { Viewer } from "@/components/member/viewer";
+import { Carta } from "@/components/member/carta";
 
 type MaisonService = { name: string; description: string; price: string };
 type MaisonAvail = {
@@ -28,9 +29,9 @@ type MaisonAvail = {
 // La oferta de la casa en su ficha. Solo se veía en la pantalla de reserva, así
 // que nadie sabía qué ofrecía una casa antes de empezar a pedir mesa.
 const OFERTA = {
-  fr: { title: "L'offre", spend: "à dépenser librement sur la carte, par visite", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
-  en: { title: "The offer", spend: "to spend freely on the menu, per visit", menu: "Menu / brochure", file: (n: number) => `Document ${n}` },
-  es: { title: "La oferta", spend: "para gastar libremente en la carta, por visita", menu: "Carta / folleto", file: (n: number) => `Documento ${n}` },
+  fr: { title: "L'offre", spend: "à dépenser librement sur la carte, par visite", menu: "Menu / brochure" },
+  en: { title: "The offer", spend: "to spend freely on the menu, per visit", menu: "Menu / brochure" },
+  es: { title: "La oferta", spend: "para gastar libremente en la carta, por visita", menu: "Carta / folleto" },
 };
 
 type Maison = {
@@ -239,17 +240,9 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                     {oferta.menuUrls.length > 0 && (
                       <div className="mt-fila">
                         <p className="text-capitale uppercase tracking-capitale text-text-secondary">{OFERTA[lang].menu}</p>
-                        {oferta.menuUrls.map((url, i) => (
-                          <a
-                            key={url}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-bloque flex min-h-11 items-center text-legende text-accent underline underline-offset-4 transition-colors hover:text-text-primary"
-                          >
-                            {OFERTA[lang].file(i + 1)}
-                          </a>
-                        ))}
+                        <div className="mt-bloque">
+                          <Carta urls={oferta.menuUrls} lang={lang} />
+                        </div>
                       </div>
                     )}
                   </div>

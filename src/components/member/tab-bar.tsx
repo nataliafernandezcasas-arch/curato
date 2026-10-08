@@ -67,11 +67,23 @@ export function TabBar({ links }: { links: NavLink[] }) {
           >
             {/* La activa es una píldora de cristal; la palabra sola ya no
                 basta para decir dónde estás. */}
-            <span className={`pestana text-balance ${l.active ? "pestana-activa" : ""}`}>{l.label}</span>
+            <span className={`pestana text-balance ${l.active ? "pestana-activa" : ""}`}>
+              {l.label}
+              {!!l.cifra && <Cifra n={l.cifra} />}
+            </span>
           </Link>
         ))}
       </div>
     </nav>
+  );
+}
+
+/** Cuántas cosas esperan en un destino: las demandas por responder. */
+export function Cifra({ n }: { n: number }) {
+  return (
+    <span className="ml-1.5 inline-flex h-[18px] min-w-[18px] translate-y-[-1px] items-center justify-center rounded-full bg-accent px-1 align-middle font-sans text-[11px] font-medium not-italic leading-none tracking-normal tabular-nums text-surface">
+      {n > 99 ? "99+" : n}
+    </span>
   );
 }
 

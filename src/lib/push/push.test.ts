@@ -50,12 +50,24 @@ describe("el JWT de APNs", () => {
   });
 });
 
+describe("la cifra del icono", () => {
+  it("la nueva demanda lleva cuántas esperan respuesta", () => {
+    expect(AVISOS.nuevaDemanda("Tereza Kovač", "jeudi", "r4", 3).insignia).toBe(3);
+  });
+
+  it("la puesta al día no tiene texto: solo cambia el número, sin sonar", () => {
+    const aviso = AVISOS.insignia(0);
+    expect(aviso.titulo).toBe("");
+    expect(aviso.insignia).toBe(0);
+  });
+});
+
 describe("los seis avisos", () => {
   const todos = [
     AVISOS.visitaConfirmada("Maison Marceau", "jeudi 22 octobre à 19:30", "r1"),
     AVISOS.visitaRechazada("Maison Lauriston", "le jeudi 22 octobre", "r2"),
     AVISOS.seisHoras("Maison Marceau", 6, "r3"),
-    AVISOS.nuevaDemanda("Tereza Kovač", "jeudi 22 octobre à 19:30", "r4"),
+    AVISOS.nuevaDemanda("Tereza Kovač", "jeudi 22 octobre à 19:30", "r4", 2),
     AVISOS.derechosSieteDias("Tereza Kovač", "mercredi 21 janvier", "r5"),
     AVISOS.derechosFin("Tereza Kovač", "r5"),
   ];

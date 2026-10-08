@@ -2,7 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { enviarAPNs, type Aviso } from "./apns";
 
 /**
- * Los seis avisos, y ninguno más.
+ * Los seis avisos, y ninguno más (más el que solo cambia la cifra del icono).
  *
  * El diseño es explícito: visita confirmada, visita rechazada, quedan seis
  * horas para publicar y, para la casa, nueva demanda y el fin de su
@@ -46,11 +46,22 @@ export const AVISOS = {
     agrupar: `stories-${id}`,
   }),
 
-  nuevaDemanda: (storyteller: string, cuando: string, id: string): Aviso => ({
+  // Lleva la cifra de demandas por responder, que se ve en el icono de la app.
+  nuevaDemanda: (storyteller: string, cuando: string, id: string, pendientes: number): Aviso => ({
     titulo: "Une nouvelle demande",
     cuerpo: `${storyteller} demande une table ${cuando}.`,
     ruta: DEMANDES,
     agrupar: `demande-${id}`,
+    insignia: pendientes,
+  }),
+
+  // Sin texto: solo pone al día la cifra del icono cuando la casa contesta o
+  // una demanda caduca. No suena ni aparece en la pantalla.
+  insignia: (pendientes: number): Aviso => ({
+    titulo: "",
+    cuerpo: "",
+    ruta: DEMANDES,
+    insignia: pendientes,
   }),
 
   // Informan, no piden borrar: tras los 90 días la casa conserva una licencia

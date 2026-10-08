@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { googleCalendarUrl, buildIcs } from "@/lib/calendar";
@@ -6,6 +6,7 @@ import { sendReservationConfirmed, sendReservationDeclined } from "@/lib/emails"
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { avisar, AVISOS } from "@/lib/push/avisos";
+import { pendientesDe } from "@/lib/pendientes";
 
 /**
  * Las visitas que cuentan para el mínimo del mes: las terminadas y los
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient();
     const { data: maison } = await admin
       .from("comercios")
-      .select("id, name, address, photos")
+      .select("id, name, address, photos, email, owner_id")
       .or(filtroDeUsuario(user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
@@ -173,6 +174,15 @@ export async function POST(request: NextRequest) {
     if (new Date(r.slot_start) < new Date()) {
       return NextResponse.json({ error: "Cette demande a expiré.", expired: true }, { status: 409 });
     }
+
+    // Al contestar, baja la cifra del icono del teléfono de la casa. Va al
+    // final, cuando la respuesta ya salió: se cuenta con la demanda resuelta.
+    after(async () =>
+      avisar(
+        { ownerId: maison.owner_id ?? null, email: maison.email ?? null },
+        AVISOS.insignia(await pendientesDe(admin, maison.id))
+      )
+    );
 
     const { data: creator } = await admin
       .from("creators")

@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import jsQR from "jsqr";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { StateMark } from "@/components/member/state-mark";
-import { Button } from "@/components/member/button";
+import { Button, ButtonLink } from "@/components/member/button";
 import { codigoDelQR, mostrarCodigo, normalizarCodigo } from "@/lib/check-in";
 
 type Visita = { name: string; handle: string | null; portrait: string | null; slotStart: string; partySize: number };
@@ -125,7 +125,10 @@ const TEXTOS = {
  * Antes de registrar se enseña la cara de quien llega: un código se puede
  * reenviar, una cara no.
  */
-export default function MaisonScanner() {
+export default function MaisonScanner({ searchParams }: { searchParams: Promise<{ visite?: string }> }) {
+  const { visite } = use(searchParams);
+  // Se vuelve a la visita desde la que se abrió o, si no, al calendario.
+  const volver = visite ? `/dashboard/business/calendrier/${encodeURIComponent(visite)}` : "/dashboard/business/calendrier";
   const { lang } = useLang();
   const t = TEXTOS[lang] ?? TEXTOS.fr;
   const [estado, setEstado] = useState<Estado>({ paso: "escaneando" });
@@ -257,7 +260,7 @@ export default function MaisonScanner() {
       >
         <div className="flex min-h-[52px] items-center">
           <Link
-            href="/dashboard/business?section=demandes"
+            href={volver}
             className="text-capitale uppercase tracking-capitale transition-colors duration-200 ease-curato"
             style={{ color: CHAMPAGNE }}
           >
@@ -357,7 +360,7 @@ export default function MaisonScanner() {
             <StateMark tono="cumplido" capital={t.doneCap} className="mb-rango">
               {t.done(estado.visita.name.split(" ")[0])}
             </StateMark>
-            <Button onClick={otraVez}>{t.again}</Button>
+            {visite ? <ButtonLink href={volver}>{t.back}</ButtonLink> : <Button onClick={otraVez}>{t.again}</Button>}
           </>
         )}
 

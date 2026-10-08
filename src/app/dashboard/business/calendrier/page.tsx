@@ -9,6 +9,10 @@ import { Rise } from "@/components/member/motion";
 import { Section } from "@/components/member/section";
 import { Retrato } from "@/components/member/retrato";
 import { PullToRefresh } from "@/components/member/pull-to-refresh";
+import { CaretRight } from "@phosphor-icons/react";
+import Link from "next/link";
+import { EnlacesDeCalendario } from "./enlaces";
+import { ButtonLink } from "@/components/member/button";
 
 type Visita = {
   id: string;
@@ -35,7 +39,7 @@ const TEXTOS: Record<
     party: (n: number) => string;
     nights: (n: number) => string;
     arrived: string;
-    add: string;
+    scan: string;
   }
 > = {
   fr: {
@@ -48,7 +52,7 @@ const TEXTOS: Record<
     party: (n) => (n > 1 ? `${n} personnes` : "1 personne"),
     nights: (n) => (n > 1 ? `${n} nuits` : "1 nuit"),
     arrived: "Arrivée enregistrée",
-    add: "Ajouter à mon calendrier",
+    scan: "Scanner une arrivée",
   },
   en: {
     kicker: "Who's coming",
@@ -60,7 +64,7 @@ const TEXTOS: Record<
     party: (n) => (n > 1 ? `${n} people` : "1 person"),
     nights: (n) => (n > 1 ? `${n} nights` : "1 night"),
     arrived: "Arrival recorded",
-    add: "Add to my calendar",
+    scan: "Scan an arrival",
   },
   es: {
     kicker: "Quién viene",
@@ -72,7 +76,7 @@ const TEXTOS: Record<
     party: (n) => (n > 1 ? `${n} personas` : "1 persona"),
     nights: (n) => (n > 1 ? `${n} noches` : "1 noche"),
     arrived: "Llegada registrada",
-    add: "Añadir a mi calendario",
+    scan: "Escanear una llegada",
   },
 };
 
@@ -88,7 +92,8 @@ const diaDeParis = (iso: string | Date) =>
  * Es una agenda y no una cuadrícula de mes: en un teléfono, una cuadrícula
  * enseña puntos y obliga a tocar cada día; una lista por días se lee de un
  * vistazo antes del servicio. Cada visita se puede apuntar en el calendario
- * del teléfono, una a una.
+ * del teléfono, una a una. Cada visita se abre: el perfil de quien viene y,
+ * el día de la visita, el escáner de su código.
  */
 export default function CalendrierMaison() {
   const { lang } = useLang();
@@ -144,7 +149,12 @@ export default function CalendrierMaison() {
           <Rise>
             <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
             <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary">{tb.navCalendar}</h1>
-            <p className="mt-bloque mb-seccion max-w-[46ch] text-legende text-text-secondary">{t.lead}</p>
+            <p className="mt-bloque max-w-[46ch] text-legende text-text-secondary">{t.lead}</p>
+            {/* Para quien llega sin buscar su visita en la lista: el escáner
+                encuentra la visita por el código. */}
+            <div className="mt-fila mb-seccion">
+              <ButtonLink href="/dashboard/business/qr">{t.scan}</ButtonLink>
+            </div>
           </Rise>
 
           {fallo && !visitas ? (
@@ -161,50 +171,42 @@ export default function CalendrierMaison() {
             [...porDia.entries()].map(([dia, lista], i) => (
               <Rise key={dia} index={i}>
                 <Section title={tituloDia(dia, lista[0].slotStart)}>
-                  <div className="space-y-rango">
+                  <div className="space-y-fila">
                     {lista.map((v) => (
-                      <div key={v.id} className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-fila">
-                        <span className="pt-etiqueta text-sous-titre tabular-nums text-accent">
-                          {new Date(v.slotStart).toLocaleTimeString(lang, {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            timeZone: "Europe/Paris",
-                          })}
-                        </span>
-                        <div className="min-w-0">
+                      // Cada visita es una burbuja: arriba se toca para abrir
+                      // la visita y el perfil; abajo, apuntarla en el teléfono.
+                      <div key={v.id} className="caja-cristal px-5 pt-4 pb-2 sm:px-6">
+                        <Link href={`/dashboard/business/calendrier/${v.id}`} className="group block">
                           <div className="flex items-center gap-fila">
                             <Retrato src={v.portrait} nombre={v.storyteller} />
-                            <div className="min-w-0">
-                              <p className="truncate text-corps text-text-primary">{v.storyteller}</p>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-corps text-text-primary transition-colors group-hover:text-accent">
+                                {v.storyteller}
+                              </p>
                               <p className="text-legende text-text-secondary">
-                                {v.handle && <>@{v.handle.replace(/^@/, "")} · </>}
+                                <span className="tabular-nums text-accent">
+                                  {new Date(v.slotStart).toLocaleTimeString(lang, {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    timeZone: "Europe/Paris",
+                                  })}
+                                </span>
+                                {" · "}
                                 {t.party(v.partySize)}
                                 {v.nights ? ` · ${t.nights(v.nights)}` : ""}
                               </p>
+                              {v.handle && (
+                                <p className="truncate text-legende text-text-muted">@{v.handle.replace(/^@/, "")}</p>
+                              )}
                             </div>
+                            <CaretRight size={16} className="shrink-0 text-text-muted transition-colors group-hover:text-accent" />
                           </div>
                           {v.note && <p className="mt-bloque text-legende italic text-text-secondary">« {v.note} »</p>}
                           {v.arrived && (
                             <p className="mt-bloque text-capitale uppercase tracking-capitale text-sauge-vif">{t.arrived}</p>
                           )}
-                          <div className="mt-bloque flex flex-wrap items-center gap-x-rango">
-                            <span className="text-capitale uppercase tracking-capitale text-text-muted">{t.add}</span>
-                            {[
-                              { href: v.calendar.google, label: "Google" },
-                              { href: v.calendar.ics, label: "Apple" },
-                            ].map((enlace) => (
-                              <a
-                                key={enlace.label}
-                                href={enlace.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex min-h-11 items-center text-legende text-accent underline underline-offset-4 transition-colors hover:text-text-primary"
-                              >
-                                {enlace.label}
-                              </a>
-                            ))}
-                          </div>
-                        </div>
+                        </Link>
+                        <EnlacesDeCalendario calendar={v.calendar} lang={lang} className="mt-bloque border-t border-border pt-1" />
                       </div>
                     ))}
                   </div>

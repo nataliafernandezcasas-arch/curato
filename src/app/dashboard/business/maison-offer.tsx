@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
-import { Plus, X, FilePdf } from "@phosphor-icons/react";
+import { Plus } from "@phosphor-icons/react";
+import { Carta } from "@/components/member/carta";
 import { Button } from "@/components/member/button";
 import { Toast, useToast } from "@/components/member/toast";
 import { Lang } from "@/lib/i18n/translations";
@@ -306,16 +307,8 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerMenu}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerMenuHint}</p>
-        <div className="flex flex-wrap gap-3 items-center">
-          {menuUrls.map((url) => (
-            <div key={url} className="relative inline-flex items-center gap-2 rounded-full border border-border pl-4 pr-9 py-2.5">
-              <FilePdf size={16} className="text-accent" />
-              <a href={url} target="_blank" rel="noopener noreferrer" className="font-serif text-[13px] text-text-secondary hover:text-accent transition-colors">
-                {url.split("/").pop()?.slice(-16) || t.offerMenu}
-              </a>
-              <button onClick={() => removeMenu(url)} className="absolute top-1/2 right-3 -translate-y-1/2 text-text-muted hover:text-copper-vif" aria-label={t.offerRemove}><X size={13} /></button>
-            </div>
-          ))}
+        <Carta urls={menuUrls} lang={lang} onRemove={removeMenu} removeLabel={t.offerRemove} />
+        <div className={`flex flex-wrap gap-3 items-center${menuUrls.length > 0 ? " mt-fila" : ""}`}>
           <FilePicker
             onFiles={uploadMenu}
             accept="application/pdf,image/*"
