@@ -5,6 +5,7 @@ import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMe
 import { signPortraits } from "@/lib/creator-portrait";
 import { subjectLabel } from "@/lib/photo-subjects";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { seguidoresCreibles } from "@/lib/storyteller-dossier";
 
 
 // Roster of signed storytellers, visible to a logged-in maison: name, handle,
@@ -115,7 +116,8 @@ export async function GET() {
         name: (c.full_name as string | null) || (c.handle ? `@${c.handle}` : "—"),
         handle: (c.handle as string | null) ?? null,
         // Prefer the live Phyllo count when we have one; otherwise the survey figure.
-        followers: (c.followers_count as number | null) ?? (c.followers as number | null) ?? null,
+        // La misma regla que el dossier: con Phyllo en pruebas, la del admin.
+        followers: seguidoresCreibles((c.followers_count as number | null) ?? null, (c.followers as number | null) ?? null),
         content: contentByCreator.get(c.id) ?? [],
         igConnected: Boolean(c.instagram_connected),
         // engagement_rate is stored as a fraction (0.05 = 5%); expose the %.

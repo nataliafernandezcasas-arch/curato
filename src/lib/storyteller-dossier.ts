@@ -84,12 +84,26 @@ async function phylloExtra(phylloAccountId: string): Promise<PhylloExtra | null>
 }
 
 /**
- * La cifra de seguidores que se enseña. La de Phyllo, salvo que sea mucho
- * menor que la que la persona declaró en su candidatura: Phyllo en pruebas
- * devuelve a veces 2 o 85 seguidores para una cuenta de decenas de miles. Es
- * la misma regla que aplica la sincronización al guardarla.
+ * Phyllo en pruebas (Staging): mientras Curato no tenga el plan de producción,
+ * sus cifras no son las de la cuenta real (85 seguidores para una de 71 000).
  */
-export function seguidoresCreibles(dePhyllo: number | null, declarados: number | null): number | null {
+export function phylloDePrueba(url = process.env.PHYLLO_API_URL): boolean {
+  return !url || /staging|sandbox/i.test(url);
+}
+
+/**
+ * La cifra de seguidores que se enseña.
+ *
+ * Con Phyllo en pruebas manda la del admin (la ficha del storyteller, campo
+ * «Abonnés»). Con Phyllo de verdad, la suya, salvo que sea mucho menor que la
+ * del admin: es la misma regla que aplica la sincronización al guardarla.
+ */
+export function seguidoresCreibles(
+  dePhyllo: number | null,
+  declarados: number | null,
+  deprueba = phylloDePrueba()
+): number | null {
+  if (deprueba && declarados) return declarados;
   if (dePhyllo == null) return declarados ?? null;
   if (declarados && dePhyllo < declarados * 0.3) return declarados;
   return dePhyllo;
