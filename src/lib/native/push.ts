@@ -15,6 +15,29 @@
 import { getCapacitor, type PluginListenerHandle, type PushNotificationEvent } from "./bridge";
 
 const RECUERDO = "curato-push-token";
+// La persona apagó los avisos con el interruptor de Réglages. El permiso de
+// iOS sigue dado (eso solo se quita en los ajustes del iPhone), así que lo que
+// se apaga es el registro: el aparato se retira y no se vuelve a registrar al
+// arrancar hasta que lo encienda otra vez.
+const APAGADOS = "curato-avisos-apagados";
+
+/** Si la persona apagó los avisos en este aparato. */
+export function avisosApagados(): boolean {
+  try {
+    return localStorage.getItem(APAGADOS) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function marcarApagados(apagados: boolean) {
+  try {
+    if (apagados) localStorage.setItem(APAGADOS, "1");
+    else localStorage.removeItem(APAGADOS);
+  } catch {
+    /* sin almacenamiento, se queda como diga el registro */
+  }
+}
 
 /** Guarda el token para poder retirarlo al cerrar sesión. */
 function recordar(token: string | null) {
@@ -92,6 +115,7 @@ export async function syncPushRegistration(): Promise<void> {
   const push = getCapacitor()?.Plugins?.PushNotifications;
   if (!push) return;
 
+  if (avisosApagados()) return;
   try {
     const { receive } = await push.checkPermissions();
     if (receive === "granted") await push.register();
@@ -126,11 +150,25 @@ export async function enablePushNotifications(): Promise<boolean> {
       current.receive === "granted" ? current : await push.requestPermissions();
 
     if (receive !== "granted") return false;
+    marcarApagados(false);
     await push.register();
     return true;
   } catch (err) {
     console.warn("[curato] enabling push failed:", err);
     return false;
+  }
+}
+
+/** El interruptor apagado: retira este aparato y no lo vuelve a registrar. */
+export async function apagarAvisos(): Promise<void> {
+  marcarApagados(true);
+  await olvidarEsteAparato();
+  // Y Apple deja de entregarle avisos, aunque el servidor tuviera un token
+  // que este aparato no llegó a recordar.
+  try {
+    await getCapacitor()?.Plugins?.PushNotifications?.unregister?.();
+  } catch {
+    /* sin unregister, basta con haber retirado el token */
   }
 }
 
