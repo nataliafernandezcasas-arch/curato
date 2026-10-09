@@ -1,5 +1,6 @@
 "use client";
 
+import { Medio } from "@/components/member/medio";
 import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import DashboardNav from "../dashboard-nav";
@@ -423,7 +424,7 @@ function MaisonDashboard() {
                   {v.photos.map((url, i) => (
                     // eslint-disable-next-line @next/next/no-img-element
                     <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-xl bg-surface-raised">
-                      <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                      <Medio url={url} className="hover:scale-105 transition-transform duration-500" />
                     </a>
                   ))}
                 </div>

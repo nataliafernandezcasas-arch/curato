@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { esVideo } from "@/lib/medio";
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdmin } from "@/lib/admin/auth";
@@ -259,7 +260,7 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
             {visitPhotos.map((url, i) => (
               // eslint-disable-next-line @next/next/no-img-element
               <a key={`v-${i}`} href={url} target="_blank" rel="noopener noreferrer" className="group aspect-square bg-white/5 overflow-hidden block">
-                {/\.(mp4|mov|webm)$/i.test(url) ? (
+                {esVideo(url) ? (
                   <video src={url} className="w-full h-full object-cover" muted playsInline />
                 ) : (
                   <img src={url} alt="" className="w-full h-full object-cover group-hover:opacity-80 transition-opacity" />

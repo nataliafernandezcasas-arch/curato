@@ -1,5 +1,7 @@
 "use client";
 
+import { Medio } from "@/components/member/medio";
+import { VIDEO_MAX_S } from "@/lib/medio";
 import { useState, useEffect, useRef } from "react";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
@@ -13,23 +15,45 @@ import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { createClient } from "@/lib/supabase/client";
 
-const ERROR_SUBIDA: Record<Lang, Record<"fallo" | "pronto" | "peso", string>> = {
+const ERROR_SUBIDA: Record<Lang, Record<"fallo" | "pronto" | "peso" | "largo", string>> = {
   fr: {
-    fallo: "Les photos ne se sont pas envoyées. Vérifiez la connexion et réessayez.",
+    fallo: "L'envoi n'a pas abouti. Vérifiez la connexion et réessayez.",
     pronto: "Vous pourrez ajouter les photos après l'heure de la visite.",
-    peso: "Une photo dépasse 25 Mo.",
+    peso: "Un fichier est trop lourd : 25 Mo par photo, 200 Mo par vidéo.",
+    largo: `Une vidéo dure plus de ${VIDEO_MAX_S} secondes. Raccourcissez-la avant de l'ajouter.`,
   },
   en: {
-    fallo: "The photos didn't upload. Check your connection and try again.",
+    fallo: "The upload didn't go through. Check your connection and try again.",
     pronto: "You can add the photos after the time of the visit.",
-    peso: "One photo is over 25 MB.",
+    peso: "A file is too large: 25 MB per photo, 200 MB per video.",
+    largo: `A video is longer than ${VIDEO_MAX_S} seconds. Trim it before adding it.`,
   },
   es: {
-    fallo: "Las fotos no se enviaron. Revisa la conexión y vuelve a intentarlo.",
+    fallo: "No se pudo enviar. Revisa la conexión y vuelve a intentarlo.",
     pronto: "Podrás añadir las fotos después de la hora de la visita.",
-    peso: "Una foto pasa de 25 MB.",
+    peso: "Un archivo pesa demasiado: 25 MB por foto, 200 MB por vídeo.",
+    largo: `Un vídeo dura más de ${VIDEO_MAX_S} segundos. Recórtalo antes de añadirlo.`,
   },
 };
+
+/** Cuánto dura un vídeo elegido, leyendo solo su cabecera. */
+function duracion(file: File): Promise<number> {
+  return new Promise((listo) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.onloadedmetadata = () => {
+      URL.revokeObjectURL(url);
+      listo(v.duration);
+    };
+    // Si el teléfono no sabe leerlo, no se bloquea: el servidor limita el peso.
+    v.onerror = () => {
+      URL.revokeObjectURL(url);
+      listo(0);
+    };
+    v.src = url;
+  });
+}
 
 type Reach = { views: number | null; accounts: number | null; interactions: number | null };
 
@@ -138,7 +162,7 @@ function VisitCard({
   // El único error es el de las fotos que faltan: se guarda el hecho, no el
   // texto, para que siga al idioma.
   // Qué falló, para decirlo: antes una subida fallida no decía nada.
-  const [error, setError] = useState<false | "min" | "fallo" | "pronto" | "peso">(false);
+  const [error, setError] = useState<false | "min" | "fallo" | "pronto" | "peso" | "largo">(false);
   const [vues, setVues] = useState("");
   const [comptes, setComptes] = useState("");
   const [interactions, setInteractions] = useState("");
@@ -191,6 +215,13 @@ function VisitCard({
       setError("min");
       return;
     }
+    // Los vídeos, de 30 segundos como mucho (migración 047).
+    for (const f of lista) {
+      if (f.type.startsWith("video/") && (await duracion(f)) > VIDEO_MAX_S + 0.5) {
+        setError("largo");
+        return;
+      }
+    }
     setBusy(true);
     setError(false);
     try {
@@ -242,7 +273,7 @@ function VisitCard({
       ref={fileRef}
       id={`fotos-${visit.id}`}
       type="file"
-      accept="image/*"
+      accept="image/*,video/*"
       multiple
       className="absolute h-px w-px overflow-hidden opacity-0"
       style={{ clip: "rect(0 0 0 0)" }}
@@ -259,7 +290,7 @@ function VisitCard({
           {visit.photos.map((url, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-surface-raised">
-              <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              <Medio url={url} className="hover:scale-105 transition-transform duration-500" />
             </a>
           ))}
         </div>
