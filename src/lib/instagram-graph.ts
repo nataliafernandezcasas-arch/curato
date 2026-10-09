@@ -6,6 +6,12 @@
  * publicaciones. Es gratis y el storyteller no tiene que conectar nada. Una
  * cuenta personal no se puede leer: Instagram no la expone.
  *
+ * La app de Meta («Curato», caso de uso de Instagram con Facebook Login)
+ * necesita los permisos instagram_basic, instagram_manage_insights,
+ * pages_show_list, pages_read_engagement y business_management. Sin
+ * instagram_manage_insights, Instagram responde «(#10) Application does not
+ * have permission for this action» aunque los demás estén.
+ *
  * Hacen falta dos variables en Vercel:
  *   META_IG_USER_ID      el id de la cuenta de Instagram de Curato;
  *   META_ACCESS_TOKEN    un token de página (no caduca si se saca de un token
