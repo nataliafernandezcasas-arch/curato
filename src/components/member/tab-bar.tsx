@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useAnimate, useReducedMotion } from "framer-motion";
 import type { NavLink } from "@/app/dashboard/dashboard-nav";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
@@ -27,6 +28,16 @@ const SIN_CONEXION: Record<Lang, string> = { fr: "Hors ligne", en: "Offline", es
  */
 export const MAX_DESTINOS = 3;
 
+// Dónde estaba la píldora en la pantalla anterior. Cada pantalla monta su
+// propia barra; sin esto la píldora aparecería ya en su sitio, sin viajar.
+let ultimoActivo: number | null = null;
+
+// Lo que dura el viaje de la píldora, y cuánto crece por el camino: como la
+// barra de pestañas de iOS, una lente de cristal que se hincha al moverse y
+// vuelve a su tamaño al llegar (Natalia, 2026-10-09).
+const VIAJE = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const };
+const LENTE = [1, 1.16, 1];
+
 export function TabBar({ links }: { links: NavLink[] }) {
   const [offline, setOffline] = useState(false);
   const { lang } = useLang();
@@ -45,6 +56,48 @@ export function TabBar({ links }: { links: NavLink[] }) {
   }, []);
 
   const destinos = links.slice(0, MAX_DESTINOS);
+  const activo = destinos.findIndex((l) => l.active);
+  const reduce = useReducedMotion();
+  const caja = useRef<HTMLDivElement>(null);
+  const etiquetas = useRef<(HTMLSpanElement | null)[]>([]);
+  const [pildora, animar] = useAnimate<HTMLSpanElement>();
+
+  // El hueco de una pestaña dentro de la barra.
+  const hueco = (i: number) => {
+    const e = etiquetas.current[i];
+    return e ? { x: e.offsetLeft, y: e.offsetTop, width: e.offsetWidth, height: e.offsetHeight } : null;
+  };
+
+  // Lleva la píldora a una pestaña: de golpe, o viajando y creciendo.
+  const llevar = (i: number, viajando: boolean) => {
+    const h = hueco(i);
+    if (!h || !pildora.current) return;
+    if (!viajando || reduce) {
+      void animar(pildora.current, { ...h, scale: 1, opacity: 1 }, { duration: 0 });
+      return;
+    }
+    void animar(pildora.current, { ...h, scale: LENTE, opacity: 1 }, VIAJE);
+  };
+
+  // Al montar: la píldora sale de donde estaba en la pantalla anterior y viaja
+  // hasta la pestaña de esta.
+  useLayoutEffect(() => {
+    if (activo < 0) return;
+    const desde = ultimoActivo;
+    ultimoActivo = activo;
+    if (desde !== null && desde !== activo && desde < destinos.length) {
+      llevar(desde, false);
+      requestAnimationFrame(() => llevar(activo, true));
+    } else {
+      llevar(activo, false);
+    }
+    const alCambiar = () => llevar(activo, false);
+    window.addEventListener("resize", alCambiar);
+    return () => window.removeEventListener("resize", alCambiar);
+    // llevar solo depende de lo que ya está en la lista.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activo, destinos.length]);
+
   if (destinos.length === 0) return null;
 
   return (
@@ -57,17 +110,32 @@ export function TabBar({ links }: { links: NavLink[] }) {
           {SIN_CONEXION[lang]}
         </p>
       )}
-      <div className="flex items-stretch justify-around">
-        {destinos.map((l) => (
+      <div ref={caja} className="relative flex items-stretch justify-around">
+        {/* La píldora de cristal: una sola, que viaja de pestaña en pestaña. */}
+        {activo >= 0 && (
+          <span
+            ref={pildora}
+            aria-hidden
+            className="pestana pestana-activa pointer-events-none absolute left-0 top-0 !p-0"
+            style={{ opacity: 0 }}
+          />
+        )}
+        {destinos.map((l, i) => (
           <Link
             key={l.href}
             href={l.href}
             aria-current={l.active ? "page" : undefined}
+            // Al tocar, la píldora sale ya hacia aquí, sin esperar a la página.
+            onClick={() => i !== activo && llevar(i, true)}
             className="flex min-h-14 flex-1 items-center justify-center px-1 py-bloque text-center text-capitale uppercase tracking-capitale"
           >
-            {/* La activa es una píldora de cristal; la palabra sola ya no
-                basta para decir dónde estás. */}
-            <span className={`pestana text-balance ${l.active ? "pestana-activa" : ""}`}>
+            <span
+              ref={(e) => {
+                etiquetas.current[i] = e;
+              }}
+              className={`pestana relative z-10 text-balance !border-transparent !bg-transparent ${l.active ? "!text-[#F5EFE4]" : ""}`}
+              style={{ backdropFilter: "none", WebkitBackdropFilter: "none" }}
+            >
               {l.label}
               {!!l.cifra && <Cifra n={l.cifra} />}
             </span>

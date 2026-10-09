@@ -203,7 +203,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                     {catLabelText}
                   </span>
                 )}
-                <h1 className="font-serif text-[34px] font-light text-text-primary leading-tight mt-2 mb-1">
+                <h1 className="font-titulo text-[34px] font-light text-text-primary leading-tight mt-2 mb-1">
                   {maison.name}
                 </h1>
                 {maison.arrondissement && (

@@ -266,7 +266,7 @@ function MaisonDashboard() {
                       </div>
                       <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="min-w-0 break-words text-sous-titre text-text-primary">{c.name}</h3>
+                        <h3 className="min-w-0 break-words font-titulo text-[21px] text-text-primary">{c.name}</h3>
                         {c.igConnected && (
                           <span
                             title={t.igVerified}
@@ -399,7 +399,7 @@ function MaisonDashboard() {
                     </div>
                     <div className="p-5">
                       <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-accent mb-1">{placeOf(m)}</p>
-                      <h3 className="font-serif text-[18px] font-light text-text-primary">{m.name}</h3>
+                      <h3 className="font-titulo text-[18px] font-light text-text-primary">{m.name}</h3>
                     </div>
                   </button>
                 )
@@ -473,7 +473,7 @@ function MaisonDashboard() {
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-charcoal-deep/10 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
                 <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/70 mb-1">{placeOf(selected)}</p>
-                <h3 className="font-serif text-[26px] font-light tracking-[0.12em] uppercase text-white leading-none">{selected.name}</h3>
+                <h3 className="font-titulo text-[26px] font-light tracking-[0.12em] uppercase text-white leading-none">{selected.name}</h3>
               </div>
             </div>
             <div className="p-6 space-y-6">

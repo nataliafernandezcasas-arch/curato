@@ -244,7 +244,7 @@ export default function MaisonScanner({ searchParams }: { searchParams: Promise<
         )}
       </div>
       <div className="min-w-0">
-        <p className="text-sous-titre">{v.name}</p>
+        <p className="font-titulo text-[22px]">{v.name}</p>
         {v.handle && <p className="text-legende" style={{ color: CHAMPAGNE }}>@{v.handle.replace(/^@/, "")}</p>}
         <p className="mt-bloque text-legende tabular-nums">
           {t.today} · {hora(v.slotStart)} · {t.party(v.partySize)}
@@ -259,7 +259,7 @@ export default function MaisonScanner({ searchParams }: { searchParams: Promise<
       {/* El mismo fondo que la pantalla del código del storyteller. */}
       <FlorDeFondo />
       <div
-        className="relative mx-auto flex min-h-full max-w-[420px] flex-col px-10 pb-seccion"
+        className="relative mx-auto flex min-h-full max-w-[420px] flex-col px-pagina pb-seccion"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="flex min-h-[52px] items-center">

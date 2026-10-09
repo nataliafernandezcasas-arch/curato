@@ -14,7 +14,29 @@ import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Tabs } from "@/components/member/tabs";
 import { filtroDeUsuario } from "@/lib/identidad";
-import { TarjetaCasa } from "@/components/member/tarjeta-casa";
+import { TarjetaCasa, esNueva, etiquetaDeCategoria } from "@/components/member/tarjeta-casa";
+import { MagnifyingGlass } from "@phosphor-icons/react";
+import Link from "next/link";
+import type { Lang } from "@/lib/i18n/translations";
+
+// El buscador y la fila de las nuevas.
+const BUSCAR: Record<Lang, { placeholder: string; nuevas: string; nada: (q: string) => string }> = {
+  fr: {
+    placeholder: "Rechercher une maison",
+    nuevas: "Nouvelles adresses",
+    nada: (q) => `Aucune maison ne correspond à « ${q} ». Proposez-la : nous la contactons.`,
+  },
+  en: {
+    placeholder: "Search for a house",
+    nuevas: "New addresses",
+    nada: (q) => `No house matches "${q}". Suggest it: we'll get in touch with them.`,
+  },
+  es: {
+    placeholder: "Buscar una casa",
+    nuevas: "Nuevas direcciones",
+    nada: (q) => `Ninguna casa coincide con «${q}». Proponla: nos pondremos en contacto.`,
+  },
+};
 
 // A maison = a signed venue from `comercios` (is_reservable = true).
 type Maison = {
@@ -185,10 +207,24 @@ export default function InfluencerDashboard() {
     loadMaisons();
   }, []);
 
-  const filteredMaisons =
-    catFilter === "all"
-      ? maisons
-      : maisons.filter((m) => slugOf(m) === catFilter);
+  // El buscador: por nombre, distrito, dirección o descripción, sin acentos
+  // ni mayúsculas.
+  const [busqueda, setBusqueda] = useState("");
+  const plano = (x: string | null | undefined) =>
+    (x ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const termino = plano(busqueda.trim());
+  const filteredMaisons = maisons
+    .filter((m) => catFilter === "all" || slugOf(m) === catFilter)
+    .filter(
+      (m) =>
+        !termino ||
+        [m.name, m.arrondissement, m.address, m.description, m.description_en, m.description_es].some((campo) =>
+          plano(campo).includes(termino)
+        )
+    );
+  // Las nuevas, deslizándose de lado antes de la lista (sin búsqueda en curso).
+  const nuevas = maisons.filter((m) => esNueva(m.signed_at)).slice(0, 10);
+  const tb = BUSCAR[lang] ?? BUSCAR.fr;
 
 
   const monthlyCredit = profile?.monthly_credit_cop ?? 0;
@@ -291,6 +327,54 @@ export default function InfluencerDashboard() {
           </div>
         ) : (
           <>
+            {/* Buscar una casa por su nombre. */}
+            <div className="relative mb-fila">
+              <MagnifyingGlass
+                size={16}
+                aria-hidden
+                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
+              />
+              <input
+                type="search"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder={tb.placeholder}
+                aria-label={tb.placeholder}
+                className="campo-cristal !pl-11 font-serif text-[15px] font-light"
+              />
+            </div>
+
+            {/* Las nuevas, en una fila que se desliza de lado. */}
+            {!termino && !maisonsLoading && nuevas.length > 0 && (
+              <section className="mb-seccion">
+                <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{tb.nuevas}</p>
+                <div className="-mx-pagina flex snap-x gap-fila overflow-x-auto px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {nuevas.map((m) => (
+                    <Link
+                      key={m.id}
+                      href={`/dashboard/storyteller/maison/${m.id}`}
+                      className="caja-cristal group w-[230px] shrink-0 snap-start overflow-hidden !p-0"
+                    >
+                      {m.photos?.[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={m.photos[0]} alt="" className="aspect-[4/3] w-full object-cover" />
+                      ) : (
+                        <div className="aspect-[4/3] w-full bg-surface-raised" />
+                      )}
+                      <div className="p-4">
+                        <p className="truncate font-titulo text-[18px] text-text-primary transition-colors group-hover:text-accent">{m.name}</p>
+                        <p className="mt-etiqueta text-legende tabular-nums text-text-secondary">
+                          {m.offer_eur ? <span className="text-accent">{m.offer_eur.toLocaleString(lang)} €</span> : null}
+                          {m.offer_eur && etiquetaDeCategoria(m.category_id, lang) ? " · " : ""}
+                          {etiquetaDeCategoria(m.category_id, lang)}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {/* Las categorías envuelven a dos líneas. La activa se marca en
                 champagne: sin fondo, sin subrayado y sin recuadro. */}
             <div className="mb-rango">
@@ -316,10 +400,13 @@ export default function InfluencerDashboard() {
                 </div>
               ) : filteredMaisons.length === 0 ? (
                 <div className="py-respiro text-center">
-                  <p className="text-corps text-text-secondary">{t.emptyTitle}</p>
-                  <p className="mt-bloque text-legende text-text-muted">{t.emptySubtitle}</p>
+                  {/* Si la casa buscada no está, se puede pedir: así sabemos a
+                      qué casas escribir, porque a los storytellers les
+                      interesan. */}
+                  <p className="text-corps text-text-secondary">{termino ? tb.nada(busqueda.trim()) : t.emptyTitle}</p>
+                  {!termino && <p className="mt-bloque text-legende text-text-muted">{t.emptySubtitle}</p>}
                   <div className="mx-auto mt-seccion max-w-[460px]">
-                    <SuggestVenue />
+                    <SuggestVenue key={busqueda.trim()} inicial={busqueda.trim()} />
                   </div>
                 </div>
               ) : (

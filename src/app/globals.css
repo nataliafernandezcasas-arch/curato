@@ -47,7 +47,17 @@
   --color-cream-muted: rgba(42, 32, 28, 0.42);
   --color-cream-border: rgba(42, 32, 28, 0.12);
 
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  /* Dos fuentes (Natalia, 2026-10-09). El texto, los botones, las etiquetas
+     y las cifras van en la fuente del sistema: San Francisco en el iPhone y el
+     Mac, como las apps de Apple (no se puede alojar: la licencia de Apple
+     solo permite usarla en sus aparatos, así que se pide al sistema). Los
+     títulos y los nombres de las casas y los storytellers siguen en
+     Cormorant Garamond, que es la voz de Curato.
+
+     --font-serif se llama así por historia: 600 sitios usan la clase
+     font-serif para el texto, y cambiarla aquí los cambia todos a la vez. */
+  --font-serif: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-titulo: 'Cormorant Garamond', Georgia, serif;
 
   /* ── Cinco peldaños tipográficos, de los doce tamaños que había ────────────
      Titre uno por pantalla. Sous-titre para un nombre o una cifra. Corps para
@@ -81,10 +91,9 @@
   --spacing-etiqueta: 4px;
   --spacing-bloque: 8px;
   --spacing-fila: 16px;
-  /* El margen de cada pantalla. 32 px son medio centímetro en un iPhone:
-     Natalia lo pidió como regla para todo texto de la app (2026-10-09).
-     Antes 20 px, que dejaba el texto pegado al borde. */
-  --spacing-pagina: 32px;
+  /* El margen de cada pantalla, el mismo en todas: 22 px son 0,35 cm en un
+     iPhone (Natalia, 2026-10-09). Medio centímetro (32 px) se quedó ancho. */
+  --spacing-pagina: 22px;
   --spacing-rango: 32px;
   --spacing-seccion: 48px;
   --spacing-respiro: 72px;
@@ -128,7 +137,7 @@ html { scroll-behavior: smooth; }
 body {
   background: var(--papel);
   color: var(--tinta);
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -454,5 +463,13 @@ html[data-native] .barra-cabecera {
   .fondo-flor-velo {
     background: #14100E;
     opacity: var(--velo, 0.8);
+  }
+}
+
+/* Los títulos de cada pantalla, en Cormorant aunque lleven también la clase
+   del texto (font-serif): el título es la voz de Curato. */
+@layer utilities {
+  .text-titre {
+    font-family: var(--font-titulo) !important;
   }
 }
