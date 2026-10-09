@@ -29,11 +29,12 @@ const ERRORES: Record<Lang, Record<ErrorCode, string>> = {
   },
 };
 
-export default function SuggestVenue() {
+export default function SuggestVenue({ inicial = "" }: { inicial?: string }) {
   const { lang } = useLang();
   const t = translations[lang].dashboard;
 
-  const [venue, setVenue] = useState("");
+  // Desde el buscador de Adresses llega con lo que se buscó ya escrito.
+  const [venue, setVenue] = useState(inicial);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
