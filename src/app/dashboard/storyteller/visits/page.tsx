@@ -11,6 +11,25 @@ import { PullToRefresh } from "@/components/member/pull-to-refresh";
 import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
+import { createClient } from "@/lib/supabase/client";
+
+const ERROR_SUBIDA: Record<Lang, Record<"fallo" | "pronto" | "peso", string>> = {
+  fr: {
+    fallo: "Les photos ne se sont pas envoyées. Vérifiez la connexion et réessayez.",
+    pronto: "Vous pourrez ajouter les photos après l'heure de la visite.",
+    peso: "Une photo dépasse 25 Mo.",
+  },
+  en: {
+    fallo: "The photos didn't upload. Check your connection and try again.",
+    pronto: "You can add the photos after the time of the visit.",
+    peso: "One photo is over 25 MB.",
+  },
+  es: {
+    fallo: "Las fotos no se enviaron. Revisa la conexión y vuelve a intentarlo.",
+    pronto: "Podrás añadir las fotos después de la hora de la visita.",
+    peso: "Una foto pasa de 25 MB.",
+  },
+};
 
 type Reach = { views: number | null; accounts: number | null; interactions: number | null };
 
@@ -118,7 +137,8 @@ function VisitCard({
   const [busy, setBusy] = useState(false);
   // El único error es el de las fotos que faltan: se guarda el hecho, no el
   // texto, para que siga al idioma.
-  const [error, setError] = useState(false);
+  // Qué falló, para decirlo: antes una subida fallida no decía nada.
+  const [error, setError] = useState<false | "min" | "fallo" | "pronto" | "peso">(false);
   const [vues, setVues] = useState("");
   const [comptes, setComptes] = useState("");
   const [interactions, setInteractions] = useState("");
@@ -159,22 +179,56 @@ function VisitCard({
       })
     : null;
 
+  // Las fotos van directas del teléfono al almacenamiento, con un permiso
+  // firmado por foto. Antes pasaban por el servidor, y Vercel corta cualquier
+  // petición de más de 4,5 MB: dos fotos de iPhone ya no llegaban.
   async function upload(files: FileList | null) {
     if (!files || files.length === 0) return;
+    const lista = Array.from(files);
+    if (fileRef.current) fileRef.current.value = "";
     // At least 2 photos required to log a visit (only on the first upload).
-    if (visit.photos.length === 0 && files.length < 2) {
-      setError(true);
-      if (fileRef.current) fileRef.current.value = "";
+    if (visit.photos.length === 0 && lista.length < 2) {
+      setError("min");
       return;
     }
     setBusy(true);
     setError(false);
-    const form = new FormData();
-    form.append("reservationId", visit.id);
-    Array.from(files).forEach((f) => form.append("files", f));
     try {
-      const res = await fetch("/api/reservations/visit", { method: "POST", body: form });
-      if (res.ok) onChanged();
+      const pedir = await fetch("/api/reservations/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reservationId: visit.id,
+          subir: lista.map((f) => ({ type: f.type || "image/jpeg", size: f.size })),
+        }),
+      });
+      const d = await pedir.json().catch(() => ({}));
+      if (!pedir.ok) {
+        setError(d.error === "size" ? "peso" : pedir.status === 409 ? "pronto" : "fallo");
+        return;
+      }
+      const almacen = createClient().storage.from("content-proofs");
+      const subidas: string[] = [];
+      for (let i = 0; i < lista.length; i++) {
+        const { path, token } = d.permisos[i] as { path: string; token: string };
+        const { error: e } = await almacen.uploadToSignedUrl(path, token, lista[i], {
+          contentType: lista[i].type || "image/jpeg",
+        });
+        if (!e) subidas.push(path);
+      }
+      if (subidas.length === 0 || (visit.photos.length === 0 && subidas.length < 2)) {
+        setError("fallo");
+        return;
+      }
+      const fin = await fetch("/api/reservations/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reservationId: visit.id, paths: subidas }),
+      });
+      if (fin.ok) onChanged();
+      else setError("fallo");
+    } catch {
+      setError("fallo");
     } finally {
       setBusy(false);
     }
@@ -231,7 +285,7 @@ function VisitCard({
               >
                 {busy ? t.sending : t.addMore}
               </label>
-              {error && <p className="text-legende text-copper-vif">{t.minPhotos}</p>}
+              {error && <p className="text-legende text-copper-vif">{error === "min" ? t.minPhotos : ERROR_SUBIDA[lang][error]}</p>}
             </div>
           )}
 
@@ -362,7 +416,7 @@ function VisitCard({
             {busy ? t.sending : t.markVisited}
           </LabelButton>
           <p className="mt-bloque text-legende text-text-secondary">{t.minPhotos}</p>
-          {error && <p className="mt-bloque text-legende text-copper-vif">{t.minPhotos}</p>}
+          {error && <p className="mt-bloque text-legende text-copper-vif">{error === "min" ? t.minPhotos : ERROR_SUBIDA[lang][error]}</p>}
         </div>
       )}
     </div>
