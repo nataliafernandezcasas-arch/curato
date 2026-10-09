@@ -1,5 +1,6 @@
 "use client";
 
+import { Valoracion } from "./valoracion";
 import { Medio } from "@/components/member/medio";
 import { VIDEO_MAX_S } from "@/lib/medio";
 import { TarjetaCasa, type CasaTarjeta } from "@/components/member/tarjeta-casa";
@@ -77,6 +78,8 @@ type Visit = {
   lateCancel?: boolean;
   mustConfirm?: boolean;
   canCancel?: boolean;
+  canRate?: boolean;
+  rating?: { estrellas: number | null; nota: string } | null;
 };
 
 type Credito = { mensual: number; usado: number; restante: number };
@@ -437,6 +440,8 @@ function VisitCard({
             </div>
           )}
         </div>
+
+        {visit.canRate && <Valoracion id={visit.id} inicial={visit.rating ?? null} lang={lang} />}
       </div>
     );
   }
@@ -541,6 +546,9 @@ function VisitCard({
           {error && <p className="mt-bloque text-legende text-copper-vif">{error === "min" ? t.minPhotos : ERROR_SUBIDA[lang][error]}</p>}
         </div>
       )}
+
+      {/* Ya pasó: cómo fue, de 1 a 5 estrellas. */}
+      {visit.canRate && <Valoracion id={visit.id} inicial={visit.rating ?? null} lang={lang} />}
     </div>
   );
 }

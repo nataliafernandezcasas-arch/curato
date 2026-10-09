@@ -69,6 +69,14 @@ export async function GET() {
     const storiesDe = new Map(
       sinPorStory ? [] : (porStory ?? []).map((x) => [x.id as string, (x.reach_stories as CifrasStory[] | null) ?? []])
     );
+    // La valoración de la visita (migración 049), aparte y tolerante.
+    const { data: valoraciones, error: sinValoracion } = await admin
+      .from("reservations")
+      .select("id, rating, rating_note")
+      .eq("creator_id", creator.id);
+    const valoracionDe = new Map(
+      sinValoracion ? [] : (valoraciones ?? []).map((x) => [x.id as string, { estrellas: (x.rating as number | null) ?? null, nota: (x.rating_note as string | null) ?? "" }])
+    );
     // El crédito del mes en curso: cuánto tiene y cuánto le queda.
     const credito = await creditoDelMes(admin, creator.id as string, mesDeParis(new Date()));
     const venueName = new Map((venues ?? []).map((v) => [v.id, v.name as string]));
@@ -111,6 +119,11 @@ export async function GET() {
               asistencia_confirmada_at: asistencia?.asistencia_confirmada_at ?? null,
             }),
           canCancel: (r.status === "confirmed" || r.status === "pending_review") && futura,
+          // Valorar la visita: cuando ya ha pasado y se hizo (no cancelada ni
+          // ausente), y la migración está aplicada.
+          canRate:
+            !sinValoracion && !futura && (r.status === "confirmed" || r.status === "completed"),
+          rating: valoracionDe.get(r.id as string) ?? null,
           slotStart: r.slot_start as string,
           status: r.status as string,
           // Hoy es el día de la visita: es cuando hay código que enseñar.
