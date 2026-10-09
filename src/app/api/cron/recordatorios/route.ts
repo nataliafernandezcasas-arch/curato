@@ -4,6 +4,7 @@ import { sendAvisoDerechos, sendAvisoStoriesManquantes, sendRecordatorioSeisHora
 import { avisar, AVISOS } from "@/lib/push/avisos";
 import { OLVIDO_H, PLAZO_H, AVISO_ANTES_H, esCorreoDePrueba, horasQueQuedan, queToca } from "@/lib/recordatorios";
 import { AVISO_ANTES_D, OLVIDO_D, queTocaDerechos } from "@/lib/derechos";
+import { avisosAntesDeLaVisita } from "@/lib/avisos-antes";
 
 // Donde llega el aviso de las stories que no llegaron.
 const BUZON_CURATO = "hello@curatocollective.com";
@@ -230,6 +231,8 @@ export async function GET(request: NextRequest) {
   }
 
   const derechos = await avisosDeDerechos(admin, ahora);
+  // Antes de la visita: confirmar que se va y el código QR (src/lib/avisos-antes.ts).
+  const antes = await avisosAntesDeLaVisita(admin, ahora);
 
-  return NextResponse.json({ revisadas: filas.length, recordatorios, vencidas: vencidas.length, derechos });
+  return NextResponse.json({ revisadas: filas.length, recordatorios, vencidas: vencidas.length, derechos, antes });
 }

@@ -2,12 +2,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { enviarAPNs, type Aviso } from "./apns";
 
 /**
- * Los seis avisos, y ninguno más (más el que solo cambia la cifra del icono).
+ * Los avisos, y ninguno más (más el que solo cambia la cifra del icono).
  *
- * El diseño es explícito: visita confirmada, visita rechazada, quedan seis
- * horas para publicar y, para la casa, nueva demanda y el fin de su
- * exclusividad sobre unas fotos (siete días antes y el mismo día; migración
- * 041). Cada uno abre su pantalla
+ * El diseño es explícito: visita confirmada, visita rechazada, confirmar que
+ * se va (24 h y 6 h antes), el código de la visita (15 min antes), quedan seis
+ * horas para publicar y, para la casa, nueva demanda, visita cancelada y el
+ * fin de su exclusividad sobre unas fotos (siete días antes y el mismo día;
+ * migración 041). Cada uno abre su pantalla
  * y ahí muere. No hay bandeja de entrada: lo pendiente ya vive en À faire y en
  * Demandes, y una bandeja sería un segundo sitio con la misma información.
  *
@@ -44,6 +45,39 @@ export const AVISOS = {
     cuerpo: `Vos deux stories de ${maison} ne sont pas encore dans l'application.`,
     ruta: VISITAS,
     agrupar: `stories-${id}`,
+  }),
+
+  // Confirmar que va (migración 046): 24 h antes a quien reservó con más de
+  // 24 h, y un recordatorio 6 h antes si no contestó. Abren la página de
+  // confirmar, con las reglas del crédito a la vista.
+  confirmarAsistencia: (maison: string, cuando: string, id: string): Aviso => ({
+    titulo: "Vous venez toujours ?",
+    cuerpo: `${maison} vous attend ${cuando}. Confirmez votre venue.`,
+    ruta: `/dashboard/storyteller/visits/${id}/confirmer`,
+    agrupar: `asistencia-${id}`,
+  }),
+
+  recordarAsistencia: (maison: string, cuando: string, id: string): Aviso => ({
+    titulo: "Confirmez votre venue",
+    cuerpo: `${maison}, ${cuando}. La maison attend votre réponse.`,
+    ruta: `/dashboard/storyteller/visits/${id}/confirmer`,
+    agrupar: `asistencia-${id}`,
+  }),
+
+  // Quince minutos antes: abre el código para enseñarlo en sala.
+  codigoDeVisita: (maison: string, id: string): Aviso => ({
+    titulo: "Votre code de visite",
+    cuerpo: `À montrer en arrivant chez ${maison}.`,
+    ruta: `/dashboard/storyteller/visits/${id}/code`,
+    agrupar: `codigo-${id}`,
+  }),
+
+  // A la casa: un storyteller canceló su visita.
+  visitaCancelada: (storyteller: string, cuando: string, id: string): Aviso => ({
+    titulo: "Une visite est annulée",
+    cuerpo: `${storyteller} ne viendra pas ${cuando}.`,
+    ruta: "/dashboard/business/calendrier",
+    agrupar: `visite-${id}`,
   }),
 
   // Lleva la cifra de demandas por responder, que se ve en el icono de la app.

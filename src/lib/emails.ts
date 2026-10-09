@@ -24,6 +24,16 @@ import { EngagementSigne, NouvelleMaison, DemandeRecue, AvisoDerechos, avisoDere
 import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
 import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
 import { SITE } from "@/emails/shell";
+import {
+  CodeDeVisite,
+  ConfirmerVenue,
+  VisiteAnnulee,
+  codeDeVisiteTexto,
+  confirmerVenueTexto,
+  type CodeDeVisiteProps,
+  type ConfirmerVenueProps,
+  type VisiteAnnuleeProps,
+} from "@/emails/asistencia";
 
 const FROM = "Curato <hello@curatocollective.com>";
 
@@ -220,6 +230,24 @@ export async function sendReservationDeclined(opts: {
 
 // ── Stories ──────────────────────────────────────────────────────────────────
 /** A falta de seis horas del plazo, si las stories no han llegado. Una vez. */
+// ── Antes de la visita (migración 046) ─────────────────────────────────────
+export async function sendConfirmerVenue(to: string, p: ConfirmerVenueProps) {
+  const asunto = p.recordatorio
+    ? `Confirmez votre venue chez ${p.maisonName}`
+    : `Vous venez toujours ? ${p.maisonName}, ${p.whenLabel}`;
+  return sendEmail(to, asunto, createElement(ConfirmerVenue, p), { text: confirmerVenueTexto(p) });
+}
+
+export async function sendCodeDeVisite(to: string, p: CodeDeVisiteProps) {
+  return sendEmail(to, `Votre code de visite pour ${p.maisonName}`, createElement(CodeDeVisite, p), {
+    text: codeDeVisiteTexto(p),
+  });
+}
+
+export async function sendVisiteAnnulee(to: string, p: VisiteAnnuleeProps) {
+  return sendEmail(to, `${p.storyteller} a annulé sa visite`, createElement(VisiteAnnulee, p));
+}
+
 export async function sendRecordatorioSeisHoras(opts: {
   to: string;
   firstName: string;

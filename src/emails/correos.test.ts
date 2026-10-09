@@ -6,6 +6,7 @@ import { MaisonValidee } from "./apporteur";
 import { SeisHoras, StoriesManquantes } from "./recordatorios";
 import { CandidatureRecue, MotDePasse } from "./cuenta";
 import { AvisoDerechos } from "./maison";
+import { CodeDeVisite, ConfirmerVenue, VisiteAnnulee } from "./asistencia";
 import {
   sendAccessCode,
   sendAvisoDerechos,
@@ -41,6 +42,28 @@ const CORREOS: [string, ReactElement][] = [
   ["contraseña", createElement(MotDePasse, { resetUrl: "https://curatocollective.com/auth/change-password" })],
   ["derechos, siete días", createElement(AvisoDerechos, { maisonName: "Maison Marceau", storytellerName: "Tereza", expiresLabel: "mercredi 21 janvier", fase: "7d" })],
   ["derechos, fin", createElement(AvisoDerechos, { maisonName: "Maison Marceau", storytellerName: "Tereza", expiresLabel: "mercredi 21 janvier", fase: "fin" })],
+  [
+    "confirmar la asistencia",
+    createElement(ConfirmerVenue, {
+      firstName: "Tereza",
+      maisonName: "Maison Marceau",
+      whenLabel: "jeudi 22 octobre à 19:30",
+      reservaId: "r1",
+    }),
+  ],
+  [
+    "el código de la visita",
+    createElement(CodeDeVisite, {
+      firstName: "Tereza",
+      maisonName: "Maison Marceau",
+      whenLabel: "jeudi 22 octobre à 19:30",
+      address: "18 rue Marceau, Paris 16e",
+      tarjetaUrl: "https://www.curatocollective.com/api/visite/tarjeta?r=r1&f=x",
+      codigo: "K7M 4QX",
+      reservaId: "r1",
+    }),
+  ],
+  ["visita anulada", createElement(VisiteAnnulee, { storyteller: "Tereza Kovač", whenLabel: "jeudi 22 octobre à 19:30" })],
 ];
 
 describe("la cáscara de todos los correos", () => {

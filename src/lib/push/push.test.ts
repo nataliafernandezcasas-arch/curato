@@ -70,6 +70,10 @@ describe("los seis avisos", () => {
     AVISOS.nuevaDemanda("Tereza Kovač", "jeudi 22 octobre à 19:30", "r4", 2),
     AVISOS.derechosSieteDias("Tereza Kovač", "mercredi 21 janvier", "r5"),
     AVISOS.derechosFin("Tereza Kovač", "r5"),
+    AVISOS.confirmarAsistencia("Maison Marceau", "jeudi 22 octobre à 19:30", "r6"),
+    AVISOS.recordarAsistencia("Maison Marceau", "jeudi 22 octobre à 19:30", "r6"),
+    AVISOS.codigoDeVisita("Maison Marceau", "r6"),
+    AVISOS.visitaCancelada("Tereza Kovač", "jeudi 22 octobre à 19:30", "r6"),
   ];
 
   it("dicen la cosa, no la app", () => {
@@ -97,7 +101,7 @@ describe("los seis avisos", () => {
 
   it("el fin de la exclusividad informa y no pide borrar", () => {
     expect(todos[4].cuerpo).toContain("mercredi 21 janvier");
-    for (const aviso of todos.slice(4)) {
+    for (const aviso of todos.slice(4, 6)) {
       expect(aviso.cuerpo).not.toMatch(/supprim|effac/i);
       expect(aviso.ruta).toBe("/dashboard/business?section=visitors");
     }

@@ -1,4 +1,4 @@
-# Cada hora, la tarea que revisa las visitas y manda los avisos de las stories
+# Cada diez minutos, la tarea que revisa las visitas y manda los avisos de las stories
 # (/api/cron/recordatorios), y la que pone Instagram al día (/api/cron/instagram).
 #
 # Va en GitHub Actions y no en Vercel Cron porque el plan gratuito de Vercel
@@ -11,9 +11,11 @@ name: Recordatorios de stories
 
 on:
   schedule:
-    # A los cinco minutos de cada hora, fuera del minuto cero, que es cuando
-    # GitHub va más cargado y más se retrasa.
-    - cron: "5 * * * *"
+    # Cada diez minutos, empezando en el 3 para no caer en los minutos
+    # redondos, que es cuando GitHub va más cargado y más se retrasa. Antes era
+    # cada hora; el aviso con el código QR sale 15 min antes de la visita, y con
+    # una pasada por hora habría llegado tarde.
+    - cron: "3-59/10 * * * *"
   workflow_dispatch: {}
 
 jobs:
