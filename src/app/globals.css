@@ -199,8 +199,16 @@ html[data-native="android"] body {
    se comía el logotipo: una barra sticky se pega al borde del WebView, y ese
    borde está debajo de la franja. */
 html[data-native] .barra-cabecera {
-  margin-top: calc(-1 * var(--safe-top));
   padding-top: var(--safe-top);
+}
+
+/* Antes la cabecera subía con un margen negativo. En el iPhone, una barra
+   sticky con margen negativo se pega arriba contando ese margen: al bajar se
+   quedaba medio fuera de la pantalla y la hora tapaba el logotipo (Natalia,
+   2026-10-09). Ahora, en las pantallas con cabecera, el body no se aparta y la
+   cabecera empieza en el borde por sí sola, sin margen. */
+html[data-native] body:has(.barra-cabecera) {
+  padding-top: 0;
 }
 
 /* ---------------------------------------------------------------------------
