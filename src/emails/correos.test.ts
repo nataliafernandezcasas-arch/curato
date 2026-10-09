@@ -6,7 +6,7 @@ import { MaisonValidee } from "./apporteur";
 import { SeisHoras, StoriesManquantes } from "./recordatorios";
 import { CandidatureRecue, MotDePasse } from "./cuenta";
 import { AvisoDerechos } from "./maison";
-import { CodeDeVisite, ConfirmerVenue, VisiteAnnulee } from "./asistencia";
+import { AbsenceCurato, AbsenceSignalee, CodeDeVisite, ConfirmerVenue, VisiteAnnulee } from "./asistencia";
 import {
   sendAccessCode,
   sendAvisoDerechos,
@@ -64,6 +64,11 @@ const CORREOS: [string, ReactElement][] = [
     }),
   ],
   ["visita anulada", createElement(VisiteAnnulee, { storyteller: "Tereza Kovač", whenLabel: "jeudi 22 octobre à 19:30" })],
+  ["no show al storyteller", createElement(AbsenceSignalee, { firstName: "Tereza", maisonName: "Maison Marceau", whenLabel: "jeudi 22 octobre à 19:30" })],
+  [
+    "no show a Curato",
+    createElement(AbsenceCurato, { storyteller: "Tereza Kovač", maisonName: "Maison Marceau", whenLabel: "jeudi 22 octobre à 19:30", ausencias: 2 }),
+  ],
 ];
 
 describe("la cáscara de todos los correos", () => {

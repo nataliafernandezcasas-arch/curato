@@ -9,7 +9,7 @@ import type { Dossier } from "@/lib/storyteller-dossier";
 import DashboardNav from "../../../dashboard-nav";
 import { MAISON_LINKS } from "../../nav-links";
 import { Rise } from "@/components/member/motion";
-import { ButtonLink } from "@/components/member/button";
+import { Button, ButtonLink } from "@/components/member/button";
 import { DossierInline } from "../../storyteller-dossier";
 import { EnlacesDeCalendario } from "../enlaces";
 
@@ -22,6 +22,8 @@ type Visita = {
   note: string | null;
   arrived: boolean;
   today: boolean;
+  noShow?: boolean;
+  canNoShow?: boolean;
   calendar: { google: string; ics: string };
 };
 
@@ -38,6 +40,11 @@ const TEXTOS: Record<
     notYet: string;
     profile: string;
     error: string;
+    noShow: string;
+    noShowNote: string;
+    noShowConfirm: string;
+    noShowKeep: string;
+    noShowDone: string;
   }
 > = {
   fr: {
@@ -51,6 +58,11 @@ const TEXTOS: Record<
     notYet: "Le jour de la visite, vous scannerez ici le code du storyteller pour enregistrer son arrivée.",
     profile: "Son profil",
     error: "Cette visite ne s'est pas chargée. Réessayez dans un instant.",
+    noShow: "Il n'est pas venu",
+    noShowNote: "Le storyteller perd le crédit de la visite et Curato est prévenu. Signalez-le seulement s'il n'est pas venu du tout.",
+    noShowConfirm: "Oui, il n'est pas venu",
+    noShowKeep: "Annuler",
+    noShowDone: "Absence signalée. Curato est prévenu.",
   },
   en: {
     back: "Calendar",
@@ -63,6 +75,11 @@ const TEXTOS: Record<
     notYet: "On the day of the visit, you'll scan the storyteller's code here to record their arrival.",
     profile: "Their profile",
     error: "This visit didn't load. Try again in a moment.",
+    noShow: "They didn't come",
+    noShowNote: "The storyteller loses the credit for the visit and Curato is told. Only report it if they didn't come at all.",
+    noShowConfirm: "Yes, they didn't come",
+    noShowKeep: "Cancel",
+    noShowDone: "Absence reported. Curato has been told.",
   },
   es: {
     back: "Calendario",
@@ -75,6 +92,11 @@ const TEXTOS: Record<
     notYet: "El día de la visita escanearás aquí el código del storyteller para registrar su llegada.",
     profile: "Su perfil",
     error: "Esta visita no se cargó. Vuelve a intentarlo en un momento.",
+    noShow: "No vino",
+    noShowNote: "El storyteller pierde el crédito de la visita y Curato queda avisado. Márcalo solo si no vino en absoluto.",
+    noShowConfirm: "Sí, no vino",
+    noShowKeep: "Cancelar",
+    noShowDone: "Ausencia registrada. Curato está avisado.",
   },
 };
 
@@ -91,6 +113,26 @@ export default function VisitaDeLaCasa({ params }: { params: Promise<{ id: strin
   const td = translations[lang].dashboard;
   const [datos, setDatos] = useState<{ visita: Visita; dossier: Dossier | null } | null>(null);
   const [fallo, setFallo] = useState(false);
+  const [marcando, setMarcando] = useState<"no" | "preguntar" | "enviando">("no");
+  const [errorNoShow, setErrorNoShow] = useState(false);
+
+  // La casa dice que no vino. Se pregunta antes: tiene consecuencias.
+  async function marcarNoShow() {
+    setMarcando("enviando");
+    setErrorNoShow(false);
+    const res = await fetch("/api/maison/no-show", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    }).catch(() => null);
+    if (res?.ok) {
+      setDatos((d) => (d ? { ...d, visita: { ...d.visita, noShow: true, canNoShow: false } } : d));
+      setMarcando("no");
+    } else {
+      setErrorNoShow(true);
+      setMarcando("preguntar");
+    }
+  }
 
   useEffect(() => {
     fetch(`/api/maison/calendrier/${id}`, { cache: "no-store" })
@@ -154,15 +196,52 @@ export default function VisitaDeLaCasa({ params }: { params: Promise<{ id: strin
                 {v.note && <p className="mt-bloque text-legende italic text-text-secondary">« {v.note} »</p>}
 
                 <div className="mt-rango">
-                  {v.arrived ? (
+                  {v.noShow ? (
+                    <p className="text-capitale uppercase tracking-capitale text-copper-vif">{t.noShowDone}</p>
+                  ) : v.arrived ? (
                     <p className="text-capitale uppercase tracking-capitale text-sauge-vif">{t.arrived}</p>
-                  ) : v.today ? (
+                  ) : v.today && !v.canNoShow ? (
                     <>
                       <ButtonLink href={`/dashboard/business/qr?visite=${v.id}`}>{t.scan}</ButtonLink>
                       <p className="mt-fila max-w-[42ch] text-legende text-text-secondary">{t.scanNote}</p>
                     </>
-                  ) : (
+                  ) : v.canNoShow ? null : (
                     <p className="max-w-[42ch] text-legende text-text-secondary">{t.notYet}</p>
+                  )}
+
+                  {/* Pasada media hora sin llegada: escanear (por si llega tarde)
+                      o decir que no vino. */}
+                  {v.canNoShow && !v.noShow && (
+                    <div className="flex flex-col items-start gap-fila">
+                      {v.today && <ButtonLink href={`/dashboard/business/qr?visite=${v.id}`}>{t.scan}</ButtonLink>}
+                      {marcando === "no" ? (
+                        <button
+                          type="button"
+                          onClick={() => setMarcando("preguntar")}
+                          className="min-h-11 text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-copper-vif"
+                        >
+                          {t.noShow}
+                        </button>
+                      ) : (
+                        <div>
+                          <p className="max-w-[42ch] text-legende text-text-primary">{t.noShowNote}</p>
+                          <div className="mt-fila flex flex-wrap items-center gap-fila">
+                            <Button onClick={marcarNoShow} disabled={marcando === "enviando"}>
+                              {t.noShowConfirm}
+                            </Button>
+                            <button
+                              type="button"
+                              onClick={() => setMarcando("no")}
+                              disabled={marcando === "enviando"}
+                              className="min-h-11 text-capitale uppercase tracking-capitale text-text-secondary hover:text-text-primary"
+                            >
+                              {t.noShowKeep}
+                            </button>
+                          </div>
+                          {errorNoShow && <p className="mt-fila text-legende text-copper-vif">{t.error}</p>}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
 

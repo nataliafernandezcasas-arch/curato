@@ -25,6 +25,8 @@ import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
 import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
 import { SITE } from "@/emails/shell";
 import {
+  AbsenceCurato,
+  AbsenceSignalee,
   CodeDeVisite,
   ConfirmerVenue,
   VisiteAnnulee,
@@ -33,6 +35,8 @@ import {
   type CodeDeVisiteProps,
   type ConfirmerVenueProps,
   type VisiteAnnuleeProps,
+  type AbsenceProps,
+  type AbsenceCuratoProps,
 } from "@/emails/asistencia";
 
 const FROM = "Curato <hello@curatocollective.com>";
@@ -246,6 +250,14 @@ export async function sendCodeDeVisite(to: string, p: CodeDeVisiteProps) {
 
 export async function sendVisiteAnnulee(to: string, p: VisiteAnnuleeProps) {
   return sendEmail(to, `${p.storyteller} a annulé sa visite`, createElement(VisiteAnnulee, p));
+}
+
+export async function sendAbsenceSignalee(to: string, p: AbsenceProps) {
+  return sendEmail(to, `Absence signalée chez ${p.maisonName}`, createElement(AbsenceSignalee, p));
+}
+
+export async function sendAbsenceCurato(to: string, p: AbsenceCuratoProps) {
+  return sendEmail(to, `No show · ${p.storyteller} chez ${p.maisonName}`, createElement(AbsenceCurato, p));
 }
 
 export async function sendRecordatorioSeisHoras(opts: {
