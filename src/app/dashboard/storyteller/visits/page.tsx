@@ -2,6 +2,7 @@
 
 import { Medio } from "@/components/member/medio";
 import { VIDEO_MAX_S } from "@/lib/medio";
+import { TarjetaCasa, type CasaTarjeta } from "@/components/member/tarjeta-casa";
 import { useState, useEffect, useRef } from "react";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
@@ -69,6 +70,51 @@ type Visit = {
   photos: string[];
   rightsExpiresAt: string | null;
   reach: Reach | null;
+  casa?: CasaTarjeta | null;
+  cost?: number;
+  lateCancel?: boolean;
+  mustConfirm?: boolean;
+  canCancel?: boolean;
+};
+
+type Credito = { mensual: number; usado: number; restante: number };
+
+// El crédito y lo que cuesta cada visita, y confirmar o cancelar.
+const VISITA: Record<
+  Lang,
+  {
+    credit: string;
+    left: (n: number, de: number) => string;
+    cost: (n: number) => string;
+    lost: string;
+    confirm: string;
+    cancel: string;
+  }
+> = {
+  fr: {
+    credit: "Votre crédit ce mois-ci",
+    left: (n, de) => `${n} € restants sur ${de} €`,
+    cost: (n) => `${n} € de crédit`,
+    lost: "Annulée moins de 24 h avant : crédit perdu",
+    confirm: "Confirmer ma venue",
+    cancel: "Annuler la visite",
+  },
+  en: {
+    credit: "Your credit this month",
+    left: (n, de) => `${n} € left of ${de} €`,
+    cost: (n) => `${n} € of credit`,
+    lost: "Cancelled less than 24 h before: credit lost",
+    confirm: "Confirm I'm coming",
+    cancel: "Cancel the visit",
+  },
+  es: {
+    credit: "Tu crédito este mes",
+    left: (n, de) => `${n} € de ${de} € disponibles`,
+    cost: (n) => `${n} € de crédito`,
+    lost: "Cancelada con menos de 24 h: crédito perdido",
+    confirm: "Confirmar que voy",
+    cancel: "Cancelar la visita",
+  },
 };
 
 // El código de la visita (migración 040): el storyteller lo enseña y la casa
@@ -302,6 +348,10 @@ function VisitCard({
             label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
             value={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
           />
+          {/* Lo que gastó en esta casa. */}
+          {visit.cost ? (
+            <p className="mt-etiqueta text-legende tabular-nums text-text-secondary">{VISITA[lang].cost(visit.cost)}</p>
+          ) : null}
           {rightsLabel && (
             <p className="mt-etiqueta text-legende text-text-muted">
               {t.rightsUntil.replace("{date}", rightsLabel)}
@@ -372,8 +422,15 @@ function VisitCard({
   }
 
   // ── Not yet uploaded: prompt to mark visited + upload ─────────────────────
+  const tv = VISITA[lang] ?? VISITA.fr;
   return (
     <div>
+      {/* La casa, con la misma tarjeta que en Adresses. */}
+      {visit.casa && (
+        <div className="mb-fila">
+          <TarjetaCasa casa={visit.casa} lang={lang} href={`/dashboard/storyteller/maison/${visit.casa.id}`} />
+        </div>
+      )}
       {/* Solo se desliza lo que tiene algo que hacer. Un gesto que revela un
           botón vacío enseña a desconfiar del gesto. */}
       <Envoltura
@@ -383,10 +440,16 @@ function VisitCard({
       >
         <Row
           name
-          label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
+          label={
+            visit.casa ? (
+              <span className="text-corps tabular-nums text-text-primary">{dateLabel}</span>
+            ) : (
+              <span className="text-sous-titre text-text-primary">{visit.maison}</span>
+            )
+          }
           aside={
             <span className="text-legende tabular-nums text-brume">
-              {dateLabel}
+              {!visit.casa && dateLabel}
               {canUpload && visit.photos.length === 0 && horasRestantes(visit.slotStart) !== null && (
                 <span className="ml-fila text-copper-vif">
                   {t.reachCountdown.replace("{h}", String(horasRestantes(visit.slotStart)))}
@@ -401,6 +464,28 @@ function VisitCard({
           }
         />
       </Envoltura>
+
+      {/* Lo que la visita gasta del crédito. */}
+      {visit.cost ? (
+        <p className="mt-bloque text-legende tabular-nums text-text-secondary">
+          {visit.lateCancel ? tv.lost : tv.cost(visit.cost)}
+        </p>
+      ) : null}
+
+      {/* Confirmar que va (se pide 24 h antes) o cancelar: en la misma página,
+          con las reglas del crédito a la vista. */}
+      {visit.mustConfirm ? (
+        <div className="mt-fila">
+          <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/confirmer`}>{tv.confirm}</ButtonLink>
+        </div>
+      ) : visit.canCancel ? (
+        <a
+          href={`/dashboard/storyteller/visits/${visit.id}/confirmer`}
+          className="mt-bloque inline-flex min-h-11 items-center text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-copper-vif"
+        >
+          {tv.cancel}
+        </a>
+      ) : null}
 
       {visit.calendar && (
         <div className="mt-bloque">
@@ -460,6 +545,7 @@ export default function MesVisites() {
   const td = translations[lang].dashboard;
 
   const [visits, setVisits] = useState<Visit[]>([]);
+  const [credito, setCredito] = useState<Credito | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function load() {
@@ -467,6 +553,7 @@ export default function MesVisites() {
       const res = await fetch("/api/reservations/visit");
       const data = await res.json();
       setVisits(data.visits ?? []);
+      setCredito(data.credito ?? null);
     } catch {
       setVisits([]);
     } finally {
@@ -496,6 +583,21 @@ export default function MesVisites() {
             {t.title}
           </h1>
         </Rise>
+
+        {/* Cuánto crédito le queda este mes, antes de las visitas. */}
+        {credito && credito.mensual > 0 && (
+          <Section title={(VISITA[lang] ?? VISITA.fr).credit}>
+            <p className="text-sous-titre tabular-nums text-accent">
+              {(VISITA[lang] ?? VISITA.fr).left(credito.restante, credito.mensual)}
+            </p>
+            <div className="mt-fila h-px bg-border">
+              <div
+                className="h-full bg-accent transition-[width] duration-700 ease-curato"
+                style={{ width: `${Math.min((credito.usado / credito.mensual) * 100, 100)}%` }}
+              />
+            </div>
+          </Section>
+        )}
 
         {loading ? (
           <div className="space-y-fila">

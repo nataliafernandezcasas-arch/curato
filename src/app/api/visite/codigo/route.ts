@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { nuevoCodigoDeVisita, visitaDeHoy } from "@/lib/check-in";
+import { visitaDeHoy } from "@/lib/check-in";
+import { asegurarCodigo } from "@/lib/codigo-visita";
 import { filtroDeUsuario } from "@/lib/identidad";
 
 /**
@@ -48,24 +49,7 @@ export async function GET(request: NextRequest) {
 
     if (!visitaDeHoy([reserva])) return NextResponse.json({ ...base, error: "dia" }, { status: 409 });
 
-    let codigo = reserva.visit_code as string | null;
-    // Dos pestañas abiertas a la vez pueden pedirlo juntas: solo se escribe si
-    // sigue vacío, y si otra ganó se relee el suyo. Un choque con el código de
-    // otra visita es casi imposible, pero se reintenta igual.
-    for (let intento = 0; !codigo && intento < 6; intento++) {
-      const { data: escrito, error } = await admin
-        .from("reservations")
-        .update({ visit_code: nuevoCodigoDeVisita() })
-        .eq("id", reserva.id)
-        .is("visit_code", null)
-        .select("visit_code")
-        .maybeSingle();
-      if (escrito?.visit_code) codigo = escrito.visit_code as string;
-      else if (!error) {
-        const { data: releida } = await admin.from("reservations").select("visit_code").eq("id", reserva.id).maybeSingle();
-        codigo = (releida?.visit_code as string | null) ?? null;
-      }
-    }
+    const codigo = await asegurarCodigo(admin, reserva.id as string, (reserva.visit_code as string | null) ?? null);
     if (!codigo) return NextResponse.json({ error: "save" }, { status: 500 });
 
     return NextResponse.json({ ...base, code: codigo });
