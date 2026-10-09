@@ -15,24 +15,21 @@ import { Section } from "@/components/member/section";
 import { Tabs } from "@/components/member/tabs";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { TarjetaCasa, esNueva, etiquetaDeCategoria } from "@/components/member/tarjeta-casa";
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import { Buscador, SelectorDeCiudad, plano, type Ciudad } from "./buscador";
 import Link from "next/link";
 import type { Lang } from "@/lib/i18n/translations";
 
 // El buscador y la fila de las nuevas.
-const BUSCAR: Record<Lang, { placeholder: string; nuevas: string; nada: (q: string) => string }> = {
+const BUSCAR: Record<Lang, { nuevas: string; nada: (q: string) => string }> = {
   fr: {
-    placeholder: "Rechercher une maison",
     nuevas: "Nouvelles adresses",
     nada: (q) => `Aucune maison ne correspond à « ${q} ». Proposez-la : nous la contactons.`,
   },
   en: {
-    placeholder: "Search for a house",
     nuevas: "New addresses",
     nada: (q) => `No house matches "${q}". Suggest it: we'll get in touch with them.`,
   },
   es: {
-    placeholder: "Buscar una casa",
     nuevas: "Nuevas direcciones",
     nada: (q) => `Ninguna casa coincide con «${q}». Proponla: nos pondremos en contacto.`,
   },
@@ -51,6 +48,7 @@ type Maison = {
   website_url: string | null;
   signed_at: string | null;
   category_id: string | null;
+  city_id?: string | null;
   offer_eur?: number | null;
 };
 
@@ -157,7 +155,7 @@ export default function InfluencerDashboard() {
       const { data, error } = await supabase
         .from("comercios")
         .select(
-          "id, name, arrondissement, address, description, description_en, description_es, photos, website_url, signed_at, category_id"
+          "id, name, arrondissement, address, description, description_en, description_es, photos, website_url, signed_at, category_id, city_id"
         )
         .eq("is_reservable", true)
         .order("signed_at", { ascending: false, nullsFirst: false });
@@ -210,10 +208,22 @@ export default function InfluencerDashboard() {
   // El buscador: por nombre, distrito, dirección o descripción, sin acentos
   // ni mayúsculas.
   const [busqueda, setBusqueda] = useState("");
-  const plano = (x: string | null | undefined) =>
-    (x ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const termino = plano(busqueda.trim());
-  const filteredMaisons = maisons
+  const [ciudad, setCiudad] = useState<string | null>(null);
+  const [ciudades, setCiudades] = useState<Ciudad[]>([]);
+
+  // Las ciudades abiertas (hoy solo París). Una ciudad nueva en `cities`
+  // aparece sola en la píldora.
+  useEffect(() => {
+    (async () => {
+      const { createClient } = await import("@/lib/supabase/client");
+      const { data } = await createClient().from("cities").select("id, name").eq("active", true).order("name");
+      if (data) setCiudades(data as Ciudad[]);
+    })();
+  }, []);
+
+  const enCiudad = maisons.filter((m) => !ciudad || m.city_id === ciudad);
+  const filteredMaisons = enCiudad
     .filter((m) => catFilter === "all" || slugOf(m) === catFilter)
     .filter(
       (m) =>
@@ -223,7 +233,18 @@ export default function InfluencerDashboard() {
         )
     );
   // Las nuevas, deslizándose de lado antes de la lista (sin búsqueda en curso).
-  const nuevas = maisons.filter((m) => esNueva(m.signed_at)).slice(0, 10);
+  const nuevas = enCiudad.filter((m) => esNueva(m.signed_at)).slice(0, 10);
+  // Las sugerencias mientras se escribe: primero las que empiezan por lo
+  // escrito, luego las que lo llevan en el nombre, luego el resto.
+  const sugerencias = termino
+    ? [...filteredMaisons].sort((a, b) => puesto(a.name) - puesto(b.name))
+    : [];
+  function puesto(nombre: string) {
+    const n = plano(nombre);
+    return n.startsWith(termino) || n.includes(` ${termino}`) ? 0 : n.includes(termino) ? 1 : 2;
+  }
+  const nombreCiudad = ciudades.find((c) => c.id === ciudad)?.name;
+  const tituloLista = `${t.selectedAddresses.split(" · ")[0]}${nombreCiudad ? ` · ${nombreCiudad}` : ""}`;
   const tb = BUSCAR[lang] ?? BUSCAR.fr;
 
 
@@ -327,22 +348,15 @@ export default function InfluencerDashboard() {
           </div>
         ) : (
           <>
-            {/* Buscar una casa por su nombre. */}
-            <div className="relative mb-fila">
-              <MagnifyingGlass
-                size={16}
-                aria-hidden
-                className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
-              />
-              <input
-                type="search"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                placeholder={tb.placeholder}
-                aria-label={tb.placeholder}
-                className="campo-cristal !pl-11 font-serif text-[15px] font-light"
-              />
-            </div>
+            {/* Buscar una casa: las sugerencias salen mientras se escribe. */}
+            <Buscador
+              valor={busqueda}
+              onChange={setBusqueda}
+              sugerencias={sugerencias}
+              onProponer={() => document.getElementById("proponer-casa")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              lang={lang}
+            />
+            <SelectorDeCiudad ciudades={ciudades} activa={ciudad} onCambiar={setCiudad} lang={lang} />
 
             {/* Las nuevas, en una fila que se desliza de lado. */}
             {!termino && !maisonsLoading && nuevas.length > 0 && (
@@ -387,7 +401,7 @@ export default function InfluencerDashboard() {
               />
             </div>
 
-            <Section title={t.selectedAddresses}>
+            <Section title={tituloLista}>
               {maisonsLoading ? (
                 <div className="grid grid-cols-1 gap-rango md:grid-cols-2 lg:grid-cols-3">
                   {[1, 2, 3].map((i) => (
@@ -405,7 +419,7 @@ export default function InfluencerDashboard() {
                       interesan. */}
                   <p className="text-corps text-text-secondary">{termino ? tb.nada(busqueda.trim()) : t.emptyTitle}</p>
                   {!termino && <p className="mt-bloque text-legende text-text-muted">{t.emptySubtitle}</p>}
-                  <div className="mx-auto mt-seccion max-w-[460px]">
+                  <div id="proponer-casa" className="mx-auto mt-seccion max-w-[460px]">
                     <SuggestVenue key={busqueda.trim()} inicial={busqueda.trim()} />
                   </div>
                 </div>
