@@ -359,13 +359,32 @@ function VisitCard({
   // ── Visited: feed-style large photos, place + date below ──────────────────
   if (visit.photos.length > 0) {
     return (
-      <div>
+      // Cada visita en su burbuja de cristal, como los demás bloques.
+      <div className="caja-cristal p-5">
+        {/* La casa y la fecha arriba, antes de las fotos. */}
+        <div className="mb-fila">
+          <Row
+            name
+            label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
+            value={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
+          />
+          {/* Lo que gastó en esta casa. */}
+          {visit.cost ? (
+            <p className="mt-bloque text-sous-titre tabular-nums text-accent">{VISITA[lang].cost(visit.cost)}</p>
+          ) : null}
+          {rightsLabel && (
+            <p className="mt-etiqueta text-legende text-text-muted">
+              {t.rightsUntil.replace("{date}", rightsLabel)}
+            </p>
+          )}
+        </div>
+
         {/* Cada story con sus cifras debajo: son dos stories (o más), y cada
             una tiene su portée en Instagram. */}
         <div className="grid grid-cols-2 gap-x-fila gap-y-rango">
           {(visit.media ?? visit.photos.map((url) => ({ url, path: url }))).map((m, i) => (
             <div key={m.path}>
-              <a href={m.url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-surface-raised">
+              <a href={m.url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden rounded-[10px] bg-surface-raised">
                 <Medio url={m.url} className="hover:scale-105 transition-transform duration-500" />
               </a>
               <p className="mt-bloque text-capitale uppercase tracking-capitale text-accent">
@@ -404,22 +423,7 @@ function VisitCard({
           {guardado && !visit.pending && <p className="mt-bloque text-legende text-sauge-vif">{PORTEE[lang].saved}</p>}
         </div>
 
-        {/* Caption: place + date */}
         <div className="mt-fila">
-          <Row
-            name
-            label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
-            value={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
-          />
-          {/* Lo que gastó en esta casa. */}
-          {visit.cost ? (
-            <p className="mt-bloque text-sous-titre tabular-nums text-accent">{VISITA[lang].cost(visit.cost)}</p>
-          ) : null}
-          {rightsLabel && (
-            <p className="mt-etiqueta text-legende text-text-muted">
-              {t.rightsUntil.replace("{date}", rightsLabel)}
-            </p>
-          )}
           {canUpload && (
             <div className="mt-fila">
               {fileInput}
@@ -432,7 +436,6 @@ function VisitCard({
               {error && <p className="text-legende text-copper-vif">{error === "min" ? t.minPhotos : ERROR_SUBIDA[lang][error]}</p>}
             </div>
           )}
-
         </div>
       </div>
     );
@@ -441,7 +444,7 @@ function VisitCard({
   // ── Not yet uploaded: prompt to mark visited + upload ─────────────────────
   const tv = VISITA[lang] ?? VISITA.fr;
   return (
-    <div>
+    <div className="caja-cristal p-5">
       {/* La casa, con la misma tarjeta que en Adresses. */}
       {visit.casa && (
         <div className="mb-fila">
