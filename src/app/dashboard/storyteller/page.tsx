@@ -362,7 +362,7 @@ export default function InfluencerDashboard() {
             {!termino && !maisonsLoading && nuevas.length > 0 && (
               <section className="mb-seccion">
                 <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{tb.nuevas}</p>
-                <div className="-mx-pagina flex snap-x gap-fila overflow-x-auto px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="-mx-pagina flex snap-x gap-fila overflow-x-auto overscroll-x-contain px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {nuevas.map((m) => (
                     <Link
                       key={m.id}

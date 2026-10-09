@@ -323,7 +323,7 @@ function Cuerpo({
         {conPortafolio && (
           <Section title={t.style}>
             {conIg ? (
-              <div className="-mx-pagina flex snap-x gap-bloque overflow-x-auto px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="-mx-pagina flex snap-x gap-bloque overflow-x-auto overscroll-x-contain px-pagina pb-bloque [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {fotos.map((url, i) => (
                   <button
                     key={i}
