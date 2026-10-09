@@ -108,7 +108,7 @@ const VISITA: Record<
   Lang,
   {
     credit: string;
-    left: (n: number, de: number) => string;
+    left: (n: number) => string;
     cost: (n: number) => string;
     lost: string;
     confirm: string;
@@ -116,24 +116,24 @@ const VISITA: Record<
   }
 > = {
   fr: {
-    credit: "Votre crédit ce mois-ci",
-    left: (n, de) => `${n} € restants sur ${de} €`,
+    credit: "Crédit restant ce mois-ci",
+    left: (n) => `${n} €`,
     cost: (n) => `${n} € de crédit`,
     lost: "Annulée moins de 24 h avant : crédit perdu",
     confirm: "Confirmer ma venue",
     cancel: "Annuler la visite",
   },
   en: {
-    credit: "Your credit this month",
-    left: (n, de) => `${n} € left of ${de} €`,
+    credit: "Credit left this month",
+    left: (n) => `${n} €`,
     cost: (n) => `${n} € of credit`,
     lost: "Cancelled less than 24 h before: credit lost",
     confirm: "Confirm I'm coming",
     cancel: "Cancel the visit",
   },
   es: {
-    credit: "Tu crédito este mes",
-    left: (n, de) => `${n} € de ${de} € disponibles`,
+    credit: "Crédito que te queda este mes",
+    left: (n) => `${n} €`,
     cost: (n) => `${n} € de crédito`,
     lost: "Cancelada con menos de 24 h: crédito perdido",
     confirm: "Confirmar que voy",
@@ -590,18 +590,12 @@ export default function MesVisites() {
           </h1>
         </Rise>
 
-        {/* Cuánto crédito le queda este mes, antes de las visitas. */}
+        {/* Solo lo que le queda este mes: es lo que decide la próxima visita. */}
         {credito && credito.mensual > 0 && (
           <Section title={(VISITA[lang] ?? VISITA.fr).credit}>
-            <p className="text-sous-titre tabular-nums text-accent">
-              {(VISITA[lang] ?? VISITA.fr).left(credito.restante, credito.mensual)}
+            <p className="text-[34px] font-light leading-none tabular-nums text-accent">
+              {(VISITA[lang] ?? VISITA.fr).left(credito.restante)}
             </p>
-            <div className="mt-fila h-px bg-border">
-              <div
-                className="h-full bg-accent transition-[width] duration-700 ease-curato"
-                style={{ width: `${Math.min((credito.usado / credito.mensual) * 100, 100)}%` }}
-              />
-            </div>
           </Section>
         )}
 
