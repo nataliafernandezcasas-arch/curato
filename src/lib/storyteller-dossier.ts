@@ -2,6 +2,8 @@ import type { createAdminClient } from "@/lib/supabase/admin";
 import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMetrics } from "@/lib/phyllo/client";
 import { firmarFotos, fotosElegidas, signPortraits } from "@/lib/creator-portrait";
 import { SUBJECT_QUESTION } from "@/lib/photo-subjects";
+import { firmarRecientes, type PublicacionGuardada } from "@/lib/instagram-recientes";
+import { graphConfigurado } from "@/lib/instagram-graph";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -81,6 +83,37 @@ async function phylloExtra(phylloAccountId: string): Promise<PhylloExtra | null>
   }
 }
 
+/**
+ * Phyllo en pruebas (Staging): mientras Curato no tenga el plan de producción,
+ * sus cifras no son las de la cuenta real (85 seguidores para una de 71 000).
+ */
+export function phylloDePrueba(url = process.env.PHYLLO_API_URL): boolean {
+  return !url || /staging|sandbox/i.test(url);
+}
+
+/**
+ * La cifra de seguidores que se enseña.
+ *
+ * Primero la de Instagram, que la tarea de cada hora lee con la API oficial.
+ * Si no hay (cuenta personal, o la API sin configurar):
+ * Con Phyllo en pruebas manda la del admin (la ficha del storyteller, campo
+ * «Abonnés»). Con Phyllo de verdad, la suya, salvo que sea mucho menor que la
+ * del admin: es la misma regla que aplica la sincronización al guardarla.
+ */
+export function seguidoresCreibles(
+  dePhyllo: number | null,
+  declarados: number | null,
+  deprueba = phylloDePrueba(),
+  deInstagram: number | null = null
+): number | null {
+  // La de Instagram, leída cada día por la API oficial, manda sobre todas.
+  if (deInstagram != null) return deInstagram;
+  if (deprueba && declarados) return declarados;
+  if (dePhyllo == null) return declarados ?? null;
+  if (declarados && dePhyllo < declarados * 0.3) return declarados;
+  return dePhyllo;
+}
+
 /** Los dossiers de varios storytellers a la vez, para no hacer una ronda por persona. */
 export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise<Map<string, Dossier>> {
   const out = new Map<string, Dossier>();
@@ -112,10 +145,27 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
     Promise.all(
       rows.map(async (c) => {
         if (!c.instagram_connected || !c.phyllo_account_id) return [c.id as string, null] as const;
+        // Con la API de Instagram, las cifras y las fotos ya están guardadas:
+        // no se espera a Phyllo al abrir un perfil.
+        if (graphConfigurado()) return [c.id as string, null] as const;
         return [c.id as string, await withTimeout(phylloExtra(c.phyllo_account_id as string), PHYLLO_TIMEOUT_MS)] as const;
       })
     ),
   ]);
+
+  // Lo que la tarea de cada hora guarda de Instagram (migración 045): las
+  // últimas publicaciones y los seguidores. Aparte y tolerante: sin las
+  // columnas, se usa lo que Phyllo devuelva en directo, si llega.
+  const guardadas = new Map<string, { posts: PublicacionGuardada[]; followers: number | null }>();
+  const conInstagram = await admin.from("creators").select("id, instagram_posts, instagram_followers").in("id", ids);
+  if (!conInstagram.error) {
+    for (const r of conInstagram.data ?? []) {
+      guardadas.set(r.id as string, {
+        posts: Array.isArray(r.instagram_posts) ? (r.instagram_posts as PublicacionGuardada[]) : [],
+        followers: (r.instagram_followers as number | null) ?? null,
+      });
+    }
+  }
 
   const categoriesById = new Map<string, string[]>();
   for (const r of survey.data ?? []) {
@@ -160,6 +210,9 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
       // El retrato propio (16b) vive en un bucket privado: se firma cada vez
       // que se enseña. Si falla, la casa ve la foto de Instagram.
       const [retrato] = portraits[0] ? await signPortraits(admin, [portraits[0]]) : [null];
+      // Las guardadas primero: no caducan y no dependen de que Phyllo llegue a tiempo.
+      const propias = guardadas.get(id)?.posts ?? [];
+      const recientes = propias.length ? await firmarRecientes(admin, propias) : (x?.recentPosts ?? []);
 
       out.set(id, {
         id,
@@ -173,15 +226,20 @@ export async function buildDossiers(admin: Admin, creatorIds: string[]): Promise
           visits: club?.visits ?? 0,
           avgReach: club && club.reachCount > 0 ? Math.round(club.reachSum / club.reachCount) : null,
         },
-        audience: connected
+        audience: connected || guardadas.get(id)?.followers != null
           ? {
-              followers: x?.followers ?? (c.followers_count as number | null) ?? (c.followers as number | null) ?? null,
+              followers: seguidoresCreibles(
+                x?.followers ?? (c.followers_count as number | null) ?? null,
+                c.followers as number | null,
+                phylloDePrueba(),
+                guardadas.get(id)?.followers ?? null
+              ),
               avgReach: x?.avgReach ?? null,
               // engagement_rate se guarda como fracción (0.05 = 5 %).
               engagement: x?.engagement ?? (er != null ? Math.round(er * 1000) / 10 : null),
             }
           : null,
-        recentPosts: x?.recentPosts ?? [],
+        recentPosts: recientes,
       });
     })
   );

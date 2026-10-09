@@ -39,6 +39,22 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
   const { data: hiddenRow } = await supabase.from("creators").select("hidden_from_roster").eq("id", creator.id).maybeSingle();
   const hiddenFromRoster = Boolean(hiddenRow?.hidden_from_roster);
 
+  // Instagram au jour le jour (migration 045), lu à part : sans les colonnes,
+  // la fiche s'affiche comme avant.
+  const { data: igRow, error: igSansColonnes } = await supabase
+    .from("creators")
+    .select("instagram_followers, instagram_synced_at, instagram_error")
+    .eq("id", creator.id)
+    .maybeSingle();
+  const ig = igSansColonnes ? null : (igRow as { instagram_followers: number | null; instagram_synced_at: string | null; instagram_error: string | null } | null);
+  const IG_ERREUR: Record<string, string> = {
+    personal: "Compte personnel ou introuvable : Instagram ne donne pas ses chiffres. Le chiffre saisi à la main reste affiché.",
+    "no-existe": "Ce @ n'existe pas sur Instagram. Vérifiez-le.",
+    limite: "Limite de l'API Instagram atteinte : nouvel essai dans l'heure.",
+    token: "Le jeton Meta n'est plus valide (META_ACCESS_TOKEN dans Vercel).",
+    otro: "Instagram n'a pas répondu : nouvel essai demain.",
+  };
+
   // Reservations (the places they visited) + venue names, fetched separately to
   // avoid embed ambiguity.
   const { data: reservations } = await supabase
@@ -138,11 +154,26 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
             </div>
           </div>
           <div className="text-right">
-            {creator.followers != null && creator.followers > 0 && (
+            {ig?.instagram_followers != null ? (
+              // Ce que voient les maisons : le chiffre d'Instagram, mis à jour chaque jour.
               <div className="mb-4">
-                <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">Abonnés</p>
-                <p className="font-serif text-2xl font-light text-white">{fmtK(creator.followers)}</p>
+                <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">Abonnés · Instagram</p>
+                <p className="font-serif text-2xl font-light text-white">{fmtK(ig.instagram_followers)}</p>
+                {ig.instagram_synced_at && (
+                  <p className="font-serif text-[11px] text-white/30 mt-0.5">mis à jour le {fmtDate(ig.instagram_synced_at)}</p>
+                )}
               </div>
+            ) : (
+              creator.followers != null &&
+              creator.followers > 0 && (
+                <div className="mb-4">
+                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">Abonnés</p>
+                  <p className="font-serif text-2xl font-light text-white">{fmtK(creator.followers)}</p>
+                </div>
+              )
+            )}
+            {ig?.instagram_error && (
+              <p className="mb-4 max-w-[260px] font-serif text-[11px] text-copper-vif">{IG_ERREUR[ig.instagram_error] ?? IG_ERREUR.otro}</p>
             )}
             <div>
               <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">Crédit disponible</p>

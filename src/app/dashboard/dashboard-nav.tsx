@@ -105,6 +105,12 @@ export default function DashboardNav({
 
   return (
     <>
+    {/* Con el menú abierto, tocar fuera lo cierra. Va fuera de la barra: su
+        desenfoque encerraría un `fixed` dentro de ella. Es transparente y
+        queda debajo de la barra (z-40), así que el menú sigue tocándose. */}
+    {open && (
+      <div aria-hidden className="fixed inset-0 z-30 sm:hidden" onClick={() => setOpen(false)} />
+    )}
     <nav className={`barra-cabecera sticky top-0 z-40 ${open ? "barra-abierta" : ""}`}>
       <div
         className="mx-auto flex h-14 w-full items-center justify-between px-5"

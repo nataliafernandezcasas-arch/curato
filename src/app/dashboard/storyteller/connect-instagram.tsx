@@ -7,7 +7,10 @@ import { translations } from "@/lib/i18n/translations";
 import { Button } from "@/components/member/button";
 
 const SDK_SRC = "https://cdn.getphyllo.com/connect/v2/phyllo-connect.js";
-const PHYLLO_ENV = "staging"; // must match the Phyllo account environment (Staging)
+// Tiene que coincidir con el entorno de las claves de Phyllo (PHYLLO_API_URL).
+// Staging devuelve cifras de prueba, no las de la cuenta real: para producción,
+// NEXT_PUBLIC_PHYLLO_ENV=production en Vercel. Antes estaba fijo en "staging".
+const PHYLLO_ENV = process.env.NEXT_PUBLIC_PHYLLO_ENV || "staging";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PhylloConnect = any;

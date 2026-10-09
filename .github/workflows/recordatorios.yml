@@ -1,5 +1,5 @@
 # Cada hora, la tarea que revisa las visitas y manda los avisos de las stories
-# (/api/cron/recordatorios).
+# (/api/cron/recordatorios), y la que pone Instagram al día (/api/cron/instagram).
 #
 # Va en GitHub Actions y no en Vercel Cron porque el plan gratuito de Vercel
 # solo permite una tarea al día. Hace falta el mismo secreto en dos sitios:
@@ -35,3 +35,15 @@ jobs:
           curl --fail-with-body --silent --show-error --max-time 120 \
             -H "Authorization: Bearer ${TOKEN}" \
             https://www.curatocollective.com/api/cron/recordatorios
+
+      # Y, con el mismo secreto, Instagram al día: los seguidores y las últimas
+      # publicaciones de los storytellers (/api/cron/instagram). Si falla, no
+      # tumba los recordatorios, que ya han salido en el paso anterior.
+      - name: Instagram al día
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          TOKEN="$(printf '%s' "$CRON_SECRET" | tr -d '[:space:]')"
+          curl --fail-with-body --silent --show-error --max-time 90 \
+            -H "Authorization: Bearer ${TOKEN}" \
+            https://www.curatocollective.com/api/cron/instagram
