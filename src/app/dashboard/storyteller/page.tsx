@@ -29,6 +29,7 @@ type Maison = {
   website_url: string | null;
   signed_at: string | null;
   category_id: string | null;
+  offer_eur?: number | null;
 };
 
 // Canonical category UUIDs are fixed in migration 009 — map them directly to
@@ -168,6 +169,16 @@ export default function InfluencerDashboard() {
       // doscientos caracteres de descripción, los dos requisitos que su propia
       // pantalla le pide. Sin esto, firmar la hacía visible con la ficha a
       // medio hacer, y lo primero que veía un storyteller era un hueco.
+      // La oferta de cada casa (migración 043), en una consulta aparte y
+      // tolerante: sin la columna, las tarjetas enseñan el distrito.
+      const ofertas = await supabase
+        .from("comercios")
+        .select("id, offer_eur")
+        .in("id", visibles.map((m) => m.id));
+      if (!ofertas.error) {
+        const ofertaDe = new Map((ofertas.data ?? []).map((o) => [o.id as string, (o.offer_eur as number | null) ?? null]));
+        visibles = visibles.map((m) => ({ ...m, offer_eur: ofertaDe.get(m.id) ?? null }));
+      }
       setMaisons(visibles.filter((m) => (m.photos?.length ?? 0) >= MIN_FOTOS && (m.description ?? "").trim().length >= MIN_DESCRIPCION));
       setMaisonsLoading(false);
     }

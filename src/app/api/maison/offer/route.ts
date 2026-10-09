@@ -90,25 +90,38 @@ export async function PATCH(request: NextRequest) {
         }))
         .slice(0, 40);
     }
-    if (Object.keys(update).length) await admin.from("comercios").update(update).eq("id", m.id);
-    // La agenda va aparte: si la migración 044 aún no está, lo demás se guarda
-    // y la pantalla lo dice.
+    // Se guarda todo lo que se pueda y se dice lo que no. Antes, si fallaba
+    // la agenda, la ruta se paraba ahí y la oferta no se guardaba, sin que la
+    // pantalla dijera nada: la casa creía tener 200 € y seguía sin oferta.
+    const errores: string[] = [];
+    if (Object.keys(update).length) {
+      const { error } = await admin.from("comercios").update(update).eq("id", m.id);
+      if (error) errores.push("horarios");
+    }
+    // La agenda va aparte: si la migración 044 aún no está, lo demás se guarda.
     if (body.agenda && typeof body.agenda === "object") {
       const agenda = agendaDe(body.agenda, m.category_id as string | null);
       const { error } = await admin.from("comercios").update({ agenda }).eq("id", m.id);
-      if (error) return NextResponse.json({ error: "agenda" }, { status: 500 });
+      if (error) errores.push("agenda");
     }
     // El importe va aparte: si la migración 043 aún no está, lo demás se guarda.
+    let rango: { min: number; max: number } | null = null;
     if ("offerEur" in body) {
-      const rango = rangoDe(m.category_id as string | null);
+      const r = rangoDe(m.category_id as string | null);
       const n = Number(body.offerEur);
-      if (body.offerEur !== null && !enRango(n, rango)) {
-        return NextResponse.json({ error: "range", ...rango }, { status: 400 });
+      if (body.offerEur !== null && !enRango(n, r)) {
+        errores.push("range");
+        rango = r;
+      } else {
+        const offer_eur = body.offerEur === null ? null : n;
+        const { error } = await admin.from("comercios").update({ offer_eur }).eq("id", m.id);
+        if (error) {
+          console.error("[curato] oferta no guardada:", error.message);
+          errores.push("offer");
+        }
       }
-      const offer_eur = body.offerEur === null ? null : n;
-      const { error } = await admin.from("comercios").update({ offer_eur }).eq("id", m.id);
-      if (error) return NextResponse.json({ error: "offer" }, { status: 500 });
     }
+    if (errores.length) return NextResponse.json({ error: errores[0], errores, ...(rango ?? {}) }, { status: 400 });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });

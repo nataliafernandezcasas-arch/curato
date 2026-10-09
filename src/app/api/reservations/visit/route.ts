@@ -50,7 +50,7 @@ export async function GET() {
     // Lo de la casa que enseña su tarjeta, la misma que en Adresses.
     const { data: venues } = await admin
       .from("comercios")
-      .select("id, name, address, arrondissement, description, description_en, description_es, photos, signed_at, category_id")
+      .select("id, name, address, arrondissement, description, description_en, description_es, photos, signed_at, category_id, offer_eur")
       .in("id", venueIds);
     const casaDe = new Map((venues ?? []).map((v) => [v.id as string, v as CasaTarjeta]));
     // La asistencia (migración 046), aparte y tolerante.

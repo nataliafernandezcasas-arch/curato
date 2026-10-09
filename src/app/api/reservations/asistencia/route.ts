@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     const { admin, r } = res;
     const { data: casa } = await admin
       .from("comercios")
-      .select("id, name, address, arrondissement, description, description_en, description_es, photos, signed_at, category_id")
+      .select("id, name, address, arrondissement, description, description_en, description_es, photos, signed_at, category_id, offer_eur")
       .eq("id", r.venue_id)
       .maybeSingle();
     const futura = new Date(r.slot_start).getTime() > Date.now();
