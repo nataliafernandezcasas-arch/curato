@@ -1,5 +1,6 @@
 "use client";
 
+import { Plegable } from "./plegable";
 import { useEffect, useState } from "react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
@@ -40,10 +41,7 @@ export function AvisosDelTelefono({ espacio }: { espacio: "storyteller" | "maiso
   }
 
   return (
-    <section className="mb-seccion">
-      <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">
-        {t.settingsNotifications}
-      </p>
+    <Plegable titulo={t.settingsNotifications}>
       <p className="mb-fila max-w-prose text-legende text-text-secondary">
         {espacio === "maison" ? t.settingsNotificationsMaison : t.settingsNotificationsStoryteller}
       </p>
@@ -56,6 +54,6 @@ export function AvisosDelTelefono({ espacio }: { espacio: "storyteller" | "maiso
           {t.settingsNotificationsOn}
         </Button>
       )}
-    </section>
+    </Plegable>
   );
 }

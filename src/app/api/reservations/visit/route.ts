@@ -8,6 +8,16 @@ import { enlaceIcs } from "@/lib/calendar-enlaces";
 
 const BUCKET = "content-proofs";
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+// Una foto de iPhone pesa de 2 a 8 MB; un HEIC convertido, algo más. Un vídeo
+// de 30 s (lo más que se admite, migración 047) puede pasar de 100 MB en 4K.
+const FOTO_MAX_BYTES = 25 * 1024 * 1024;
+const VIDEO_MAX_BYTES = 200 * 1024 * 1024;
+const EXT_VIDEO: Record<string, string> = {
+  "video/mp4": "mp4",
+  "video/quicktime": "mov",
+  "video/x-m4v": "m4v",
+  "video/webm": "webm",
+};
 
 // List the signed-in creator's reservations with maison names + signed photo
 // URLs (generated server-side because the content bucket is private).
@@ -103,14 +113,32 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Non authentifié." }, { status: 401 });
 
-    const form = await request.formData();
-    const reservationId = form.get("reservationId") as string | null;
-    const files = form.getAll("files") as File[];
+    // Dos formas de llegar. La de siempre (FormData con las fotos dentro) solo
+    // sirve ya para la portée sin fotos: Vercel corta cualquier petición de
+    // más de 4,5 MB, y dos fotos de iPhone la superan, así que la subida fallaba.
+    // Las fotos van ahora directas del teléfono al almacenamiento, en JSON:
+    //   1. { reservationId, subir: [{ type, size }] } → un permiso por foto;
+    //   2. el navegador sube cada foto con su permiso;
+    //   3. { reservationId, paths: [...] } → se registran en la visita.
+    const esJson = (request.headers.get("content-type") ?? "").includes("application/json");
+    const json = esJson
+      ? ((await request.json().catch(() => ({}))) as {
+          reservationId?: string;
+          subir?: { type?: string; size?: number }[];
+          paths?: unknown;
+          reachViews?: unknown;
+          reachAccounts?: unknown;
+          reachInteractions?: unknown;
+        })
+      : null;
+    const form = esJson ? null : await request.formData();
+    const reservationId = (json ? json.reservationId : (form!.get("reservationId") as string | null)) ?? null;
+    const files = form ? (form.getAll("files") as File[]) : [];
     // La portée: se archivaban capturas y no se guardaba ni una cifra, así que
     // no había forma de decirle a una maison a cuánta gente llegó.
-    const cifra = (campo: string) => {
-      const raw = form.get(campo);
-      if (raw === null || raw === "") return null;
+    const cifra = (campo: "reachViews" | "reachAccounts" | "reachInteractions") => {
+      const raw = json ? json[campo] : form!.get(campo);
+      if (raw === null || raw === undefined || raw === "") return null;
       const n = Number(String(raw).replace(/\s/g, ""));
       return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
     };
@@ -154,15 +182,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Cette visite n'a pas encore eu lieu." }, { status: 409 });
     }
 
+    const carpeta = `reservations/${reservationId}/`;
+
+    // Paso 1 de la subida directa: un permiso firmado por foto.
+    if (json && Array.isArray(json.subir)) {
+      const permisos: { path: string; token: string }[] = [];
+      for (const f of json.subir.slice(0, 20)) {
+        const tipo = (f.type ?? "").toLowerCase();
+        const video = EXT_VIDEO[tipo];
+        if (!tipo.startsWith("image/") && !video) return NextResponse.json({ error: "format" }, { status: 415 });
+        if (!f.size || f.size > (video ? VIDEO_MAX_BYTES : FOTO_MAX_BYTES)) {
+          return NextResponse.json({ error: "size" }, { status: 413 });
+        }
+        // La extensión dice después si es foto o vídeo (src/lib/medio.ts).
+        const ext = video ?? (tipo.split("/")[1]?.replace("jpeg", "jpg").replace(/[^a-z0-9]/g, "") || "jpg");
+        const path = `${carpeta}${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { data, error } = await admin.storage.from(BUCKET).createSignedUploadUrl(path);
+        if (error || !data) {
+          console.error("Visit photo signed URL error:", error);
+          return NextResponse.json({ error: "upload" }, { status: 500 });
+        }
+        permisos.push({ path: data.path, token: data.token });
+      }
+      return NextResponse.json({ permisos });
+    }
+
+    // Paso 3: las ya subidas. Solo rutas de la carpeta de esta visita: llegan
+    // del navegador.
+    const subidas = json && Array.isArray(json.paths)
+      ? (json.paths as unknown[]).filter((p): p is string => typeof p === "string" && p.startsWith(carpeta) && !p.includes(".."))
+      : [];
+
     // At least 2 photos are required on the first upload (logging the visit).
     const existing: string[] = reservation.content_photo_paths ?? [];
     const incoming = files.filter((f) => f && typeof f.arrayBuffer === "function");
-    if (existing.length === 0 && incoming.length < 2) {
+    const conFotos = incoming.length + subidas.length;
+    if (existing.length === 0 && conFotos < 2) {
       return NextResponse.json({ error: "Au moins 2 photos sont requises." }, { status: 400 });
     }
 
     // Upload provided photos.
-    const newPaths: string[] = [];
+    const newPaths: string[] = [...subidas];
     for (const file of incoming) {
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const path = `reservations/${reservationId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;

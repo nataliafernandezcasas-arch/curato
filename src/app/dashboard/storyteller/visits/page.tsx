@@ -1,5 +1,7 @@
 "use client";
 
+import { Medio } from "@/components/member/medio";
+import { VIDEO_MAX_S } from "@/lib/medio";
 import { useState, useEffect, useRef } from "react";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
@@ -11,6 +13,47 @@ import { PullToRefresh } from "@/components/member/pull-to-refresh";
 import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
+import { createClient } from "@/lib/supabase/client";
+
+const ERROR_SUBIDA: Record<Lang, Record<"fallo" | "pronto" | "peso" | "largo", string>> = {
+  fr: {
+    fallo: "L'envoi n'a pas abouti. Vérifiez la connexion et réessayez.",
+    pronto: "Vous pourrez ajouter les photos après l'heure de la visite.",
+    peso: "Un fichier est trop lourd : 25 Mo par photo, 200 Mo par vidéo.",
+    largo: `Une vidéo dure plus de ${VIDEO_MAX_S} secondes. Raccourcissez-la avant de l'ajouter.`,
+  },
+  en: {
+    fallo: "The upload didn't go through. Check your connection and try again.",
+    pronto: "You can add the photos after the time of the visit.",
+    peso: "A file is too large: 25 MB per photo, 200 MB per video.",
+    largo: `A video is longer than ${VIDEO_MAX_S} seconds. Trim it before adding it.`,
+  },
+  es: {
+    fallo: "No se pudo enviar. Revisa la conexión y vuelve a intentarlo.",
+    pronto: "Podrás añadir las fotos después de la hora de la visita.",
+    peso: "Un archivo pesa demasiado: 25 MB por foto, 200 MB por vídeo.",
+    largo: `Un vídeo dura más de ${VIDEO_MAX_S} segundos. Recórtalo antes de añadirlo.`,
+  },
+};
+
+/** Cuánto dura un vídeo elegido, leyendo solo su cabecera. */
+function duracion(file: File): Promise<number> {
+  return new Promise((listo) => {
+    const url = URL.createObjectURL(file);
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.onloadedmetadata = () => {
+      URL.revokeObjectURL(url);
+      listo(v.duration);
+    };
+    // Si el teléfono no sabe leerlo, no se bloquea: el servidor limita el peso.
+    v.onerror = () => {
+      URL.revokeObjectURL(url);
+      listo(0);
+    };
+    v.src = url;
+  });
+}
 
 type Reach = { views: number | null; accounts: number | null; interactions: number | null };
 
@@ -118,7 +161,8 @@ function VisitCard({
   const [busy, setBusy] = useState(false);
   // El único error es el de las fotos que faltan: se guarda el hecho, no el
   // texto, para que siga al idioma.
-  const [error, setError] = useState(false);
+  // Qué falló, para decirlo: antes una subida fallida no decía nada.
+  const [error, setError] = useState<false | "min" | "fallo" | "pronto" | "peso" | "largo">(false);
   const [vues, setVues] = useState("");
   const [comptes, setComptes] = useState("");
   const [interactions, setInteractions] = useState("");
@@ -159,22 +203,63 @@ function VisitCard({
       })
     : null;
 
+  // Las fotos van directas del teléfono al almacenamiento, con un permiso
+  // firmado por foto. Antes pasaban por el servidor, y Vercel corta cualquier
+  // petición de más de 4,5 MB: dos fotos de iPhone ya no llegaban.
   async function upload(files: FileList | null) {
     if (!files || files.length === 0) return;
+    const lista = Array.from(files);
+    if (fileRef.current) fileRef.current.value = "";
     // At least 2 photos required to log a visit (only on the first upload).
-    if (visit.photos.length === 0 && files.length < 2) {
-      setError(true);
-      if (fileRef.current) fileRef.current.value = "";
+    if (visit.photos.length === 0 && lista.length < 2) {
+      setError("min");
       return;
+    }
+    // Los vídeos, de 30 segundos como mucho (migración 047).
+    for (const f of lista) {
+      if (f.type.startsWith("video/") && (await duracion(f)) > VIDEO_MAX_S + 0.5) {
+        setError("largo");
+        return;
+      }
     }
     setBusy(true);
     setError(false);
-    const form = new FormData();
-    form.append("reservationId", visit.id);
-    Array.from(files).forEach((f) => form.append("files", f));
     try {
-      const res = await fetch("/api/reservations/visit", { method: "POST", body: form });
-      if (res.ok) onChanged();
+      const pedir = await fetch("/api/reservations/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reservationId: visit.id,
+          subir: lista.map((f) => ({ type: f.type || "image/jpeg", size: f.size })),
+        }),
+      });
+      const d = await pedir.json().catch(() => ({}));
+      if (!pedir.ok) {
+        setError(d.error === "size" ? "peso" : pedir.status === 409 ? "pronto" : "fallo");
+        return;
+      }
+      const almacen = createClient().storage.from("content-proofs");
+      const subidas: string[] = [];
+      for (let i = 0; i < lista.length; i++) {
+        const { path, token } = d.permisos[i] as { path: string; token: string };
+        const { error: e } = await almacen.uploadToSignedUrl(path, token, lista[i], {
+          contentType: lista[i].type || "image/jpeg",
+        });
+        if (!e) subidas.push(path);
+      }
+      if (subidas.length === 0 || (visit.photos.length === 0 && subidas.length < 2)) {
+        setError("fallo");
+        return;
+      }
+      const fin = await fetch("/api/reservations/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reservationId: visit.id, paths: subidas }),
+      });
+      if (fin.ok) onChanged();
+      else setError("fallo");
+    } catch {
+      setError("fallo");
     } finally {
       setBusy(false);
     }
@@ -188,7 +273,7 @@ function VisitCard({
       ref={fileRef}
       id={`fotos-${visit.id}`}
       type="file"
-      accept="image/*"
+      accept="image/*,video/*"
       multiple
       className="absolute h-px w-px overflow-hidden opacity-0"
       style={{ clip: "rect(0 0 0 0)" }}
@@ -205,7 +290,7 @@ function VisitCard({
           {visit.photos.map((url, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-surface-raised">
-              <img src={url} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              <Medio url={url} className="hover:scale-105 transition-transform duration-500" />
             </a>
           ))}
         </div>
@@ -231,7 +316,7 @@ function VisitCard({
               >
                 {busy ? t.sending : t.addMore}
               </label>
-              {error && <p className="text-legende text-copper-vif">{t.minPhotos}</p>}
+              {error && <p className="text-legende text-copper-vif">{error === "min" ? t.minPhotos : ERROR_SUBIDA[lang][error]}</p>}
             </div>
           )}
 
@@ -362,7 +447,7 @@ function VisitCard({
             {busy ? t.sending : t.markVisited}
           </LabelButton>
           <p className="mt-bloque text-legende text-text-secondary">{t.minPhotos}</p>
-          {error && <p className="mt-bloque text-legende text-copper-vif">{t.minPhotos}</p>}
+          {error && <p className="mt-bloque text-legende text-copper-vif">{error === "min" ? t.minPhotos : ERROR_SUBIDA[lang][error]}</p>}
         </div>
       )}
     </div>

@@ -12,6 +12,7 @@ import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
 import { AvisosDelTelefono } from "@/components/member/avisos-telefono";
 import { BorrarCuenta } from "@/components/member/borrar-cuenta";
+import { Plegable } from "@/components/member/plegable";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -61,10 +62,10 @@ export default function MaisonReglagesPage() {
         {/* Apparence (claro u oscuro) vuelve con la piel nueva: son tres
             opciones en filas de 44 px, no los dos interruptores de antes. */}
 
-        <section className="mb-12">
-          <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">
-            {t.settingsLanguage}
-          </p>
+        {/* Cada apartado se abre con su flecha: cerrados, se ve de un vistazo
+            qué hay en Réglages. */}
+        <div className="border-t border-border">
+        <Plegable titulo={t.settingsLanguage}>
           <div>
             {LANGS.map(({ key, label, name }) => (
               <button
@@ -85,12 +86,11 @@ export default function MaisonReglagesPage() {
               </button>
             ))}
           </div>
-        </section>
+        </Plegable>
 
         {/* La cuenta, que no se decía en ninguna parte. */}
         {email && (
-          <section className="mb-seccion">
-            <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{t.settingsAccount}</p>
+          <Plegable titulo={t.settingsAccount}>
             <Row
               label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.settingsEmail}</span>}
               value={<span className="break-all text-legende text-text-primary">{email}</span>}
@@ -98,20 +98,21 @@ export default function MaisonReglagesPage() {
             <div className="mt-fila">
               <ButtonLink href="/auth/change-password">{t.settingsChangePassword}</ButtonLink>
             </div>
-          </section>
+          </Plegable>
         )}
 
         <AvisosDelTelefono espacio="maison" />
 
-        <section>
+        <BorrarCuenta />
+        </div>
+
+        <section className="mt-seccion">
           {/* Salir es un botón con su caja, no un enlace gris con un icono.
               Y sin diálogo de confirmación: quien lo pulsa sabe lo que hace. */}
           <Button onClick={signOut} disabled={busy}>
             {t.signOut}
           </Button>
         </section>
-
-        <BorrarCuenta />
       </div>
     </div>
   );
