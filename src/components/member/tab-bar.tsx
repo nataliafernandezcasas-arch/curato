@@ -127,13 +127,15 @@ export function TabBar({ links }: { links: NavLink[] }) {
             aria-current={l.active ? "page" : undefined}
             // Al tocar, la píldora sale ya hacia aquí, sin esperar a la página.
             onClick={() => i !== activo && llevar(i, true)}
-            className="flex min-h-14 flex-1 items-center justify-center px-1 py-bloque text-center text-capitale uppercase tracking-capitale"
+            // En una sola línea: con San Francisco y el espaciado ancho de las
+            // capitales, «MES VISITES» saltaba a dos y la segunda se cortaba.
+            className="flex min-h-14 min-w-0 flex-1 items-center justify-center px-1 py-bloque text-center text-capitale uppercase tracking-[0.14em] whitespace-nowrap"
           >
             <span
               ref={(e) => {
                 etiquetas.current[i] = e;
               }}
-              className={`pestana relative z-10 text-balance !border-transparent !bg-transparent ${l.active ? "!text-[#F5EFE4]" : ""}`}
+              className={`pestana relative z-10 !px-3 !border-transparent !bg-transparent ${l.active ? "!text-[#F5EFE4]" : ""}`}
               style={{ backdropFilter: "none", WebkitBackdropFilter: "none" }}
             >
               {l.label}
