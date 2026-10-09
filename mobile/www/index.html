@@ -160,6 +160,13 @@
         // Reconnecting is the actual fix, so act on it without making the user
         // hunt for the button. Only fires when the WebView regains the network.
         window.addEventListener("online", retry);
+
+        // Sin red, la pantalla de carga de las flores se quita aquí, para que
+        // se vea este aviso y no se quede esperando a una web que no llega.
+        try {
+          var splash = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen;
+          if (splash) splash.hide({ fadeOutDuration: 300 });
+        } catch (e) {}
       })();
     </script>
   </body>

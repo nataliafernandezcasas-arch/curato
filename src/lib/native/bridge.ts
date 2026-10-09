@@ -18,6 +18,11 @@ export interface StatusBarPlugin {
   setStyle(options: { style: "DARK" | "LIGHT" | "DEFAULT" }): Promise<void>;
 }
 
+/** La pantalla de carga con las flores, la de LaunchScreen.storyboard. */
+export interface SplashScreenPlugin {
+  hide(options?: { fadeOutDuration?: number }): Promise<void>;
+}
+
 export interface PluginListenerHandle {
   remove: () => void;
 }
@@ -80,6 +85,7 @@ interface CapacitorGlobal {
   getPlatform?: () => string;
   Plugins?: {
     StatusBar?: StatusBarPlugin;
+    SplashScreen?: SplashScreenPlugin;
     App?: AppPlugin;
     PushNotifications?: PushNotificationsPlugin;
   };
