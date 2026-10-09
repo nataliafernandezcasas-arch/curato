@@ -5,6 +5,9 @@ import { filtroDeUsuario } from "@/lib/identidad";
 import { visitaDeHoy } from "@/lib/check-in";
 import { eventoDeVisita, googleCalendarUrl } from "@/lib/calendar";
 import { enlaceIcs } from "@/lib/calendar-enlaces";
+import { creditoDelMes, mesDeParis } from "@/lib/credito";
+import { asistenciaConfirmada } from "@/lib/asistencia";
+import type { CasaTarjeta } from "@/components/member/tarjeta-casa";
 
 const BUCKET = "content-proofs";
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
@@ -37,13 +40,28 @@ export async function GET() {
 
     const { data: reservations } = await admin
       .from("reservations")
-      .select("id, venue_id, slot_start, slot_end, nights, party_size, status, visited_at, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at")
+      .select("id, venue_id, slot_start, slot_end, nights, party_size, status, visited_at, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at, credits_cost, created_at")
       .eq("creator_id", creator.id)
       .order("slot_start", { ascending: false });
 
     const rows = reservations ?? [];
     const venueIds = [...new Set(rows.map((r) => r.venue_id))];
-    const { data: venues } = await admin.from("comercios").select("id, name, address").in("id", venueIds);
+    // Lo de la casa que enseña su tarjeta, la misma que en Adresses.
+    const { data: venues } = await admin
+      .from("comercios")
+      .select("id, name, address, arrondissement, description, description_en, description_es, photos, signed_at, category_id")
+      .in("id", venueIds);
+    const casaDe = new Map((venues ?? []).map((v) => [v.id as string, v as CasaTarjeta]));
+    // La asistencia (migración 046), aparte y tolerante.
+    const { data: asistencias, error: sinAsistencia } = await admin
+      .from("reservations")
+      .select("id, asistencia_confirmada_at, cancelada_tarde")
+      .eq("creator_id", creator.id);
+    const asistenciaDe = new Map(
+      sinAsistencia ? [] : (asistencias ?? []).map((a) => [a.id as string, a as { asistencia_confirmada_at: string | null; cancelada_tarde: boolean | null }])
+    );
+    // El crédito del mes en curso: cuánto tiene y cuánto le queda.
+    const credito = await creditoDelMes(admin, creator.id as string, mesDeParis(new Date()));
     const venueName = new Map((venues ?? []).map((v) => [v.id, v.name as string]));
     const venueAddress = new Map((venues ?? []).map((v) => [v.id, (v.address as string | null) ?? null]));
     const ahora = Date.now();
@@ -56,9 +74,28 @@ export async function GET() {
           const { data } = await admin.storage.from(BUCKET).createSignedUrl(p, 3600);
           if (data?.signedUrl) photos.push(data.signedUrl);
         }
+        const asistencia = asistenciaDe.get(r.id as string);
+        const futura = new Date(r.slot_start as string).getTime() > ahora;
         return {
           id: r.id as string,
           maison: venueName.get(r.venue_id) ?? "—",
+          casa: casaDe.get(r.venue_id) ?? null,
+          // Lo que la visita gasta del crédito (la oferta de la casa).
+          cost: (r.credits_cost as number | null) ?? 0,
+          // Una cancelada tarde gasta su crédito igual.
+          lateCancel: Boolean(asistencia?.cancelada_tarde),
+          // Confirmar que va: solo una visita aceptada, futura y reservada con
+          // más de 24 h que aún no se confirmó.
+          mustConfirm:
+            !sinAsistencia &&
+            r.status === "confirmed" &&
+            futura &&
+            !asistenciaConfirmada({
+              slot_start: r.slot_start as string,
+              created_at: r.created_at as string,
+              asistencia_confirmada_at: asistencia?.asistencia_confirmada_at ?? null,
+            }),
+          canCancel: (r.status === "confirmed" || r.status === "pending_review") && futura,
           slotStart: r.slot_start as string,
           status: r.status as string,
           // Hoy es el día de la visita: es cuando hay código que enseñar.
@@ -98,7 +135,7 @@ export async function GET() {
       })
     );
 
-    return NextResponse.json({ visits });
+    return NextResponse.json({ visits, credito });
   } catch (err) {
     console.error("my-visits error:", err);
     return NextResponse.json({ error: "Erreur." }, { status: 500 });

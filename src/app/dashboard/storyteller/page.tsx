@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import RoleSwitch from "../role-switch";
 import DashboardNav from "../dashboard-nav";
 import { STORYTELLER_LINKS } from "./nav-links";
@@ -10,12 +9,12 @@ import { translations } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import ConnectInstagram from "./connect-instagram";
 import SuggestVenue from "./suggest-venue";
-import { Rise, Photo } from "@/components/member/motion";
+import { Rise } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Tabs } from "@/components/member/tabs";
 import { filtroDeUsuario } from "@/lib/identidad";
-import { pickLang } from "@/lib/i18n/pick-lang";
+import { TarjetaCasa } from "@/components/member/tarjeta-casa";
 
 // A maison = a signed venue from `comercios` (is_reservable = true).
 type Maison = {
@@ -41,13 +40,6 @@ const CATEGORY_BY_ID: Record<string, string> = {
   "00000000-0000-0000-0000-0000000ca703": "wellness",
   "00000000-0000-0000-0000-0000000ca704": "belleza",
 };
-
-const SLUG_LABEL_KEY = {
-  gastronomia: "catGastronomy",
-  hoteles: "catHotels",
-  wellness: "catWellness",
-  belleza: "catBeauty",
-} as const;
 
 function slugOf(maison: Maison): string | null {
   return maison.category_id ? CATEGORY_BY_ID[maison.category_id] ?? null : null;
@@ -77,13 +69,6 @@ const FILTERS = [
 const MIN_FOTOS = 5;
 const MIN_DESCRIPCION = 200;
 
-// A maison is flagged "Nouveau" if it was signed within the last 45 days.
-function isNew(signedAt: string | null): boolean {
-  if (!signedAt) return false;
-  const signed = new Date(signedAt).getTime();
-  return Date.now() - signed < 45 * 24 * 60 * 60 * 1000;
-}
-
 export default function InfluencerDashboard() {
   const { lang } = useLang();
   const t = translations[lang].dashboard;
@@ -108,12 +93,6 @@ export default function InfluencerDashboard() {
     year: "numeric",
     timeZone: "Europe/Paris",
   });
-
-  function catLabel(slug: string | null): string {
-    if (!slug) return "";
-    const key = SLUG_LABEL_KEY[slug as keyof typeof SLUG_LABEL_KEY];
-    return key ? t[key] : "";
-  }
 
   useEffect(() => {
     async function loadProfile() {
@@ -335,64 +314,9 @@ export default function InfluencerDashboard() {
               ) : (
                 <div className="grid grid-cols-1 gap-rango md:grid-cols-2 lg:grid-cols-3">
                   {filteredMaisons.map((maison, i) => {
-                    const label = catLabel(slugOf(maison));
                     return (
                       <Rise key={maison.id} index={i}>
-                        <Link
-                          href={`/dashboard/storyteller/maison/${maison.id}`}
-                          className="group block"
-                        >
-                          {maison.photos?.[0] ? (
-                            <Photo
-                              src={maison.photos[0]}
-                              alt={maison.name}
-                              className="aspect-[4/3] bg-surface-raised"
-                            />
-                          ) : (
-                            <div className="flex aspect-[4/3] items-center justify-center bg-surface-raised">
-                              <p className="text-capitale uppercase tracking-capitale text-text-muted">{label}</p>
-                            </div>
-                          )}
-
-                          <div className="mt-fila">
-                            <Row
-                              name
-                              label={
-                                <h3 className="text-sous-titre text-text-primary transition-colors group-hover:text-accent">
-                                  {maison.name}
-                                </h3>
-                              }
-                              value={
-                                maison.arrondissement ? (
-                                  <span className="text-capitale uppercase tracking-capitale text-brume">
-                                    Paris {maison.arrondissement}
-                                  </span>
-                                ) : undefined
-                              }
-                            />
-
-                            <p className="mt-etiqueta text-legende text-text-secondary">
-                              {label}
-                              {isNew(maison.signed_at) && (
-                                <span className="ml-fila text-capitale uppercase tracking-capitale text-accent">
-                                  {t.badgeNew}
-                                </span>
-                              )}
-                            </p>
-
-                            {/* La descripción en el idioma del storyteller; si la casa no
-                                la ha traducido, la francesa. */}
-                            {maison.description && (
-                              <p className="mt-bloque line-clamp-3 text-corps text-text-secondary">
-                                {pickLang({ fr: maison.description, en: maison.description_en, es: maison.description_es }, lang)}
-                              </p>
-                            )}
-
-                            {maison.address && (
-                              <p className="mt-bloque text-legende text-text-muted">{maison.address}</p>
-                            )}
-                          </div>
-                        </Link>
+                        <TarjetaCasa casa={maison} lang={lang} href={`/dashboard/storyteller/maison/${maison.id}`} />
                       </Rise>
                     );
                   })}
