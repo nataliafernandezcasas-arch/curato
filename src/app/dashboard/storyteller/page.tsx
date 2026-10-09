@@ -362,7 +362,7 @@ export default function InfluencerDashboard() {
                         <div className="aspect-[4/3] w-full bg-surface-raised" />
                       )}
                       <div className="p-4">
-                        <p className="truncate text-corps text-text-primary transition-colors group-hover:text-accent">{m.name}</p>
+                        <p className="truncate font-titulo text-[18px] text-text-primary transition-colors group-hover:text-accent">{m.name}</p>
                         <p className="mt-etiqueta text-legende tabular-nums text-text-secondary">
                           {m.offer_eur ? <span className="text-accent">{m.offer_eur.toLocaleString(lang)} €</span> : null}
                           {m.offer_eur && etiquetaDeCategoria(m.category_id, lang) ? " · " : ""}

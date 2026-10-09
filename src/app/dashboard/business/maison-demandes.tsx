@@ -428,7 +428,7 @@ export default function MaisonDemandes() {
                       >
                         {dia(r.slotStart, lang, false)} · {r.nights ? t.nights(r.nights) : hora(r.slotStart, lang)}
                       </span>
-                      <span className="break-words text-sous-titre text-text-primary">{nombre(r)}</span>
+                      <span className="break-words font-titulo text-[21px] text-text-primary">{nombre(r)}</span>
                       {cifras && <span className="text-legende text-text-secondary">{cifras}</span>}
                       <span className="text-legende text-sauge-vif">
                         {d && d.club.visits > 0
@@ -467,7 +467,7 @@ export default function MaisonDemandes() {
           <div className="space-y-fila">
             {cerradas.map((r) => (
               <div key={r.id}>
-                <p className="break-words text-sous-titre text-text-primary">{nombre(r)}</p>
+                <p className="break-words font-titulo text-[21px] text-text-primary">{nombre(r)}</p>
                 <p className="mt-etiqueta max-w-[46ch] text-legende text-text-secondary">
                   {t.expired(dia(r.slotStart, lang, false))}
                 </p>

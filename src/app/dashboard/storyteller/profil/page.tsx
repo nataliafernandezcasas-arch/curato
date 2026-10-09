@@ -218,7 +218,7 @@ export default function ProfilPage() {
                 <Rise key={v.id} index={i}>
                   <Row
                     name
-                    label={<span className="text-corps text-text-primary">{v.maison}</span>}
+                    label={<span className="font-titulo text-[18px] text-text-primary">{v.maison}</span>}
                     aside={
                       v.reach?.accounts != null ? (
                         <span className="text-legende tabular-nums text-text-muted">

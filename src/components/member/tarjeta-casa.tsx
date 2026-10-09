@@ -73,7 +73,7 @@ export function TarjetaCasa({ casa, lang, href }: { casa: CasaTarjeta; lang: Lan
         <Row
           name
           label={
-            <h3 className="text-sous-titre text-text-primary transition-colors group-hover:text-accent">{casa.name}</h3>
+            <h3 className="font-titulo text-[21px] text-text-primary transition-colors group-hover:text-accent">{casa.name}</h3>
           }
           value={
             // A la derecha, lo que ofrece la casa: es lo que decide. Sin oferta,

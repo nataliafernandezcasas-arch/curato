@@ -180,7 +180,7 @@ export default function CalendrierMaison() {
                           <div className="flex items-center gap-fila">
                             <Retrato src={v.portrait} nombre={v.storyteller} />
                             <div className="min-w-0 flex-1">
-                              <p className="truncate text-corps text-text-primary transition-colors group-hover:text-accent">
+                              <p className="truncate font-titulo text-[18px] text-text-primary transition-colors group-hover:text-accent">
                                 {v.storyteller}
                               </p>
                               <p className="text-legende text-text-secondary">

@@ -365,7 +365,7 @@ function VisitCard({
         <div className="mb-fila">
           <Row
             name
-            label={<span className="text-sous-titre text-text-primary">{visit.maison}</span>}
+            label={<span className="font-titulo text-[21px] text-text-primary">{visit.maison}</span>}
             value={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
           />
           {/* Lo que gastó en esta casa. */}
@@ -456,7 +456,7 @@ function VisitCard({
       {visit.casa ? (
         <p className="text-corps tabular-nums text-text-primary first-letter:uppercase">{dateLabel}</p>
       ) : (
-        <p className="text-sous-titre text-text-primary">{visit.maison}</p>
+        <p className="font-titulo text-[21px] text-text-primary">{visit.maison}</p>
       )}
       <p className={`mt-etiqueta text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
         {visit.casa ? t[statusKey] : `${dateLabel} · ${t[statusKey]}`}
