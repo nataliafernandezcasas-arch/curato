@@ -113,7 +113,7 @@ export default function DashboardNav({
     )}
     <nav className={`barra-cabecera sticky top-0 z-40 ${open ? "barra-abierta" : ""}`}>
       <div
-        className="mx-auto flex h-14 w-full items-center justify-between px-5"
+        className="mx-auto flex h-14 w-full items-center justify-between px-pagina"
         style={{ maxWidth }}
       >
         <div className="flex min-w-0 items-center gap-4 sm:gap-6">

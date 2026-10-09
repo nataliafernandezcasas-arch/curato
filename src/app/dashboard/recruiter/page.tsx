@@ -222,7 +222,7 @@ export default function RecruiterDashboard() {
   const firstName = (data?.recruiter.full_name || "").split(" ")[0];
 
   return (
-    <main className="min-h-[100dvh] max-w-[1120px] mx-auto px-6 md:px-8 py-10">
+    <main className="min-h-[100dvh] max-w-[1120px] mx-auto px-pagina md:px-8 py-10">
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <Link href="/dashboard">
@@ -341,7 +341,9 @@ export default function RecruiterDashboard() {
         </form>
       </section>
 
-      <BorrarCuenta />
+      <div className="mt-seccion border-t border-border">
+        <BorrarCuenta />
+      </div>
     </main>
   );
 }

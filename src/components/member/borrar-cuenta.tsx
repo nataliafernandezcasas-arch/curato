@@ -1,5 +1,6 @@
 "use client";
 
+import { Plegable } from "./plegable";
 import { useState } from "react";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -84,8 +85,7 @@ export function BorrarCuenta() {
   }
 
   return (
-    <section className="mt-seccion">
-      <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{t.title}</p>
+    <Plegable titulo={t.title}>
       <p className="mb-fila max-w-prose text-legende text-text-secondary">
         {t.body}{" "}
         <Link href="/privacidad" className="underline underline-offset-4 hover:text-text-primary">
@@ -115,6 +115,6 @@ export function BorrarCuenta() {
       )}
 
       {error && <p className="mt-fila max-w-prose text-legende text-text-primary">{t.error}</p>}
-    </section>
+    </Plegable>
   );
 }

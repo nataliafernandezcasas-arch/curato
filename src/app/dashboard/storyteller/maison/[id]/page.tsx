@@ -139,7 +139,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
         settingsLabel={td.navSettings}
       />
 
-      <div className="max-w-[1000px] mx-auto px-5 py-10">
+      <div className="max-w-[1000px] mx-auto px-pagina py-10">
         <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-text-secondary hover:text-accent transition-colors mb-8">
           <ArrowLeft size={14} />
           {t.backToAll}
