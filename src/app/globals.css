@@ -141,6 +141,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Los campos a 16 px como mínimo: por debajo, el iPhone amplía la página al
+   tocarlos. Fuera de las capas, para que gane a los tamaños de Tailwind. */
+input, textarea, select {
+  font-size: max(16px, 1em);
+}
+
 /* La página solo se mueve en vertical. Si algo se pasa de ancho (una fila
    deslizable, una sombra, una palabra larga), se recorta en vez de dejar
    arrastrar la pantalla de lado. «clip» y no «hidden»: hidden convertiría el
