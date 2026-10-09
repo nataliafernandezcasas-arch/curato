@@ -9,6 +9,7 @@ import { isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { creditoDelMes, mesDeParis } from "@/lib/credito";
 import { rangoDe } from "@/lib/oferta";
+import { bloqueaReservas, VALIDACION_DESDE, type CifrasStory } from "@/lib/validacion";
 
 
 // Creates a reservation REQUEST (status = pending_review). Its credits_cost
@@ -49,6 +50,33 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
     if (!creator) {
       return NextResponse.json({ error: "Profil créateur introuvable." }, { status: 404 });
+    }
+
+    // Una visita pasada sin todas sus stories y sus cifras bloquea la siguiente
+    // (src/lib/validacion.ts): así las cifras llegan siempre. Sin la migración
+    // 048 no se puede saber y no se bloquea.
+    const { data: entregas, error: sinEntregas } = await admin
+      .from("reservations")
+      .select("id, status, slot_start, content_photo_paths, reach_stories")
+      .eq("creator_id", creator.id)
+      .in("status", ["confirmed", "completed"])
+      .gte("slot_start", VALIDACION_DESDE)
+      .lte("slot_start", new Date().toISOString());
+    const sinEntregar = sinEntregas
+      ? undefined
+      : (entregas ?? []).find((r) =>
+          bloqueaReservas({
+            status: r.status as string,
+            slot_start: r.slot_start as string,
+            content_photo_paths: (r.content_photo_paths as string[] | null) ?? [],
+            reach_stories: (r.reach_stories as CifrasStory[] | null) ?? null,
+          })
+        );
+    if (sinEntregar) {
+      return NextResponse.json(
+        { code: "pendiente", error: "Complétez d'abord votre dernière visite." },
+        { status: 409 }
+      );
     }
 
     // 3. Validate the venue is a live, reservable maison.

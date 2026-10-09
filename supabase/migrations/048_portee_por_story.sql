@@ -1,0 +1,12 @@
+-- 048: la portée de cada story.
+--
+-- Una visita entrega dos stories (o más), y cada una tiene sus cifras en
+-- Instagram. Antes se declaraba una sola portée por visita. Ahora cada story
+-- (cada captura subida, por su ruta en content-proofs) lleva las suyas:
+--   [{ "path": "...", "views": 1200, "accounts": 900, "interactions": 40 }]
+-- Las columnas reach_views / reach_accounts / reach_interactions siguen
+-- guardando la suma, que es lo que lee el informe de la casa.
+--
+-- Una visita no queda validada hasta que todas sus stories tienen sus tres
+-- cifras; mientras tanto, el storyteller no puede pedir otra visita.
+ALTER TABLE reservations ADD COLUMN IF NOT EXISTS reach_stories JSONB;
