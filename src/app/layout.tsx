@@ -59,7 +59,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full antialiased">
         <NativeShell />
         <TemaSync />
-        <LanguageProvider>{children}</LanguageProvider>
+        {/* La página solo se mueve en vertical. El recorte va en esta caja y no
+            solo en html y body: en el iPhone, WebKit deja arrastrar la pantalla
+            de lado aunque html y body lleven overflow-x, porque el de la raíz
+            pasa a la ventana y la ventana se sigue pudiendo desplazar. En una
+            caja normal el recorte es de verdad. «clip» y no «hidden», para que
+            las barras sticky sigan pegándose; las fixed no se ven afectadas. */}
+        <div className="min-h-full overflow-x-clip">
+          <LanguageProvider>{children}</LanguageProvider>
+        </div>
       </body>
     </html>
   );
