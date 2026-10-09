@@ -12,10 +12,9 @@ import SuggestVenue from "./suggest-venue";
 import { Rise } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
-import { Tabs } from "@/components/member/tabs";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { TarjetaCasa, esNueva, etiquetaDeCategoria } from "@/components/member/tarjeta-casa";
-import { Buscador, SelectorDeCiudad, plano, type Ciudad } from "./buscador";
+import { Buscador, SelectorDeCategoria, SelectorDeCiudad, plano, type Ciudad } from "./buscador";
 import Link from "next/link";
 import type { Lang } from "@/lib/i18n/translations";
 
@@ -356,7 +355,17 @@ export default function InfluencerDashboard() {
               onProponer={() => document.getElementById("proponer-casa")?.scrollIntoView({ behavior: "smooth", block: "center" })}
               lang={lang}
             />
-            <SelectorDeCiudad ciudades={ciudades} activa={ciudad} onCambiar={setCiudad} lang={lang} />
+            {/* La ciudad y, solo si se quiere, la categoría: dos píldoras en
+                vez de una fila de botones. */}
+            <div className="mb-rango flex flex-wrap gap-bloque">
+              <SelectorDeCiudad ciudades={ciudades} activa={ciudad} onCambiar={setCiudad} lang={lang} />
+              <SelectorDeCategoria
+                categorias={FILTERS.map((f) => ({ id: f.slug === "all" ? null : f.slug, name: t[f.key] }))}
+                activa={catFilter === "all" ? null : catFilter}
+                onCambiar={(id) => setCatFilter(id ?? "all")}
+                lang={lang}
+              />
+            </div>
 
             {/* Las nuevas, en una fila que se desliza de lado. */}
             {!termino && !maisonsLoading && nuevas.length > 0 && (
@@ -388,18 +397,6 @@ export default function InfluencerDashboard() {
                 </div>
               </section>
             )}
-
-            {/* Las categorías envuelven a dos líneas. La activa se marca en
-                champagne: sin fondo, sin subrayado y sin recuadro. */}
-            <div className="mb-rango">
-              <Tabs
-                tabs={FILTERS.map((f) => ({
-                  label: t[f.key],
-                  active: catFilter === f.slug,
-                  onClick: () => setCatFilter(f.slug),
-                }))}
-              />
-            </div>
 
             <Section title={tituloLista}>
               {maisonsLoading ? (

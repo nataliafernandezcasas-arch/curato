@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CaretDown, Check, MagnifyingGlass, MapPin, X } from "@phosphor-icons/react";
+import { CaretDown, Check, MagnifyingGlass, MapPin, SlidersHorizontal, X } from "@phosphor-icons/react";
 import type { Lang } from "@/lib/i18n/translations";
 import { etiquetaDeCategoria } from "@/components/member/tarjeta-casa";
 
@@ -198,9 +198,70 @@ export function SelectorDeCiudad({
   lang: Lang;
 }) {
   const t = TEXTOS[lang] ?? TEXTOS.fr;
+  return (
+    <Desplegable
+      icono={<MapPin size={16} aria-hidden />}
+      nombre={t.ciudad}
+      opciones={[{ id: null, name: t.todas }, ...ciudades]}
+      activa={activa}
+      onCambiar={onCambiar}
+    />
+  );
+}
+
+/**
+ * Filtrar por categoría, solo si se quiere: un botón «Filtrer» en vez de cinco
+ * botones siempre a la vista (Natalia, 2026-10-09). Con un filtro puesto, el
+ * botón dice cuál.
+ */
+export function SelectorDeCategoria({
+  categorias,
+  activa,
+  onCambiar,
+  lang,
+}: {
+  /** La primera es «todas», con id null. */
+  categorias: Array<{ id: string | null; name: string }>;
+  activa: string | null;
+  onCambiar: (id: string | null) => void;
+  lang: Lang;
+}) {
+  const t = FILTRO[lang] ?? FILTRO.fr;
+  return (
+    <Desplegable
+      icono={<SlidersHorizontal size={16} aria-hidden />}
+      nombre={t}
+      etiquetaVacia={t}
+      opciones={categorias}
+      activa={activa}
+      onCambiar={onCambiar}
+    />
+  );
+}
+
+const FILTRO: Record<Lang, string> = { fr: "Filtrer", en: "Filter", es: "Filtrar" };
+
+/** Una píldora que abre una lista corta; se elige una opción y se cierra. */
+function Desplegable({
+  icono,
+  nombre,
+  etiquetaVacia,
+  opciones,
+  activa,
+  onCambiar,
+}: {
+  icono: React.ReactNode;
+  nombre: string;
+  /** Lo que dice la píldora sin nada elegido; si no, el nombre de la primera opción. */
+  etiquetaVacia?: string;
+  opciones: Array<{ id: string | null; name: string }>;
+  activa: string | null;
+  onCambiar: (id: string | null) => void;
+}) {
   const [abierto, setAbierto] = useState(false);
   const caja = useRef<HTMLDivElement>(null);
-  const nombre = ciudades.find((c) => c.id === activa)?.name ?? t.todas;
+  const elegida = opciones.find((c) => c.id === activa && c.id !== null);
+  const etiqueta = elegida?.name ?? etiquetaVacia ?? opciones[0]?.name ?? nombre;
 
   // Tocar fuera cierra.
   useEffect(() => {
@@ -212,21 +273,19 @@ export function SelectorDeCiudad({
     return () => document.removeEventListener("pointerdown", fuera);
   }, [abierto]);
 
-  const opciones: Array<{ id: string | null; name: string }> = [{ id: null, name: t.todas }, ...ciudades];
-
   return (
-    <div ref={caja} className="relative mb-fila inline-block">
+    <div ref={caja} className="relative inline-block">
       <button
         type="button"
         onClick={() => setAbierto((a) => !a)}
         aria-haspopup="listbox"
         aria-expanded={abierto}
-        aria-label={`${t.ciudad} : ${nombre}`}
+        aria-label={`${nombre} : ${etiqueta}`}
+        aria-current={elegida ? "page" : undefined}
         className="filtro-cristal inline-flex items-center gap-2 text-capitale uppercase tracking-capitale"
-        aria-current={activa ? "page" : undefined}
       >
-        <MapPin size={16} aria-hidden />
-        {nombre}
+        {icono}
+        {etiqueta}
         <CaretDown size={12} aria-hidden className={`transition-transform ${abierto ? "rotate-180" : ""}`} />
       </button>
 
