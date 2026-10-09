@@ -24,8 +24,19 @@ export default async function AdminReservationsPage() {
     .order("created_at", { ascending: false });
 
   const reservations = rows ?? [];
-  const creatorIds = [...new Set(reservations.map((r) => r.creator_id))];
-  const venueIds = [...new Set(reservations.map((r) => r.venue_id))];
+
+  // Las valoraciones de las visitas (migración 049), aparte y tolerante: sin
+  // la columna, la sección no sale.
+  const { data: rated } = await admin
+    .from("reservations")
+    .select("id, slot_start, creator_id, venue_id, rating, rating_note, rated_at")
+    .not("rating", "is", null)
+    .order("rated_at", { ascending: false })
+    .limit(50);
+  const valoradas = rated ?? [];
+
+  const creatorIds = [...new Set([...reservations, ...valoradas].map((r) => r.creator_id))];
+  const venueIds = [...new Set([...reservations, ...valoradas].map((r) => r.venue_id))];
 
   const [{ data: creators }, { data: venues }] = await Promise.all([
     admin.from("creators").select("id, full_name, handle").in("id", creatorIds),
@@ -56,6 +67,32 @@ export default async function AdminReservationsPage() {
         Réservations
       </h1>
       <ReservationsAdmin items={items} />
+
+      {valoradas.length > 0 && (
+        <section className="mt-16">
+          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">
+            Avis des storytellers
+          </p>
+          <ul className="space-y-4">
+            {valoradas.map((r) => (
+              <li key={r.id as string} className="border border-white/10 rounded-[14px] p-5">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-serif text-[16px] text-white">
+                    {venueMap.get(r.venue_id)?.name ?? "Maison"}
+                    <span className="text-white/50"> · {creatorMap.get(r.creator_id)?.full_name ?? "Créateur"}</span>
+                  </p>
+                  <p className="text-[18px] tracking-[0.15em] text-champagne" aria-label={`${r.rating} / 5`}>
+                    {"★".repeat(r.rating as number)}
+                    <span className="text-white/20">{"★".repeat(5 - (r.rating as number))}</span>
+                  </p>
+                </div>
+                <p className="mt-1 text-[12px] text-white/50">{whenLabel(r.slot_start as string)}</p>
+                {r.rating_note && <p className="mt-3 text-[14px] text-white/80 whitespace-pre-line">{r.rating_note as string}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

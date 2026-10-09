@@ -48,6 +48,14 @@ export default function NativeShell() {
 
     const cap = getCapacitor();
 
+    // La pantalla de carga se queda hasta aquí: la página ya está montada. Dos
+    // fotogramas más, para que se vea pintada y no un fondo vacío debajo.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        cap?.Plugins?.SplashScreen?.hide({ fadeOutDuration: 300 }).catch(() => {});
+      })
+    );
+
     // Engancha una escucha venga como venga, promesa u objeto, y apunta cómo
     // soltarla. Aquí es donde estaba el fallo que dejaba la app en blanco: un
     // .then sobre algo que en iOS no es una promesa lanza, y la excepción salía

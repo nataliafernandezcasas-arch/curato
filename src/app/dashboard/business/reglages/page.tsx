@@ -13,6 +13,7 @@ import { Row } from "@/components/member/row";
 import { AvisosDelTelefono } from "@/components/member/avisos-telefono";
 import { BorrarCuenta } from "@/components/member/borrar-cuenta";
 import { Plegable } from "@/components/member/plegable";
+import { Ayuda } from "@/components/member/ayuda";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -102,6 +103,8 @@ export default function MaisonReglagesPage() {
         )}
 
         <AvisosDelTelefono espacio="maison" />
+
+        <Ayuda />
 
         <BorrarCuenta />
         </div>

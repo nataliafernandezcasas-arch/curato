@@ -54,6 +54,19 @@ const config: CapacitorConfig = {
     contentInset: "never",
   },
   plugins: {
+    // La pantalla de carga: las flores con el logotipo (Splash en
+    // Assets.xcassets, generada desde assets/splash.png). Es la misma imagen
+    // que LaunchScreen.storyboard, así que se enlaza sin parpadeo, y se queda
+    // mientras la web carga: native-shell.tsx la quita en cuanto la página se
+    // pinta. Los 10 segundos son el tope por si eso no llega nunca (sin red,
+    // la página de error también la quita al cargar).
+    SplashScreen: {
+      launchShowDuration: 10000,
+      launchAutoHide: true,
+      launchFadeOutDuration: 300,
+      backgroundColor: "#000000",
+      showSpinner: false,
+    },
     PushNotifications: {
       // How a notification behaves while the app is in the foreground.
       presentationOptions: ["badge", "sound", "alert"],
