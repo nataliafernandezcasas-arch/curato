@@ -259,7 +259,7 @@ export default function MaisonScanner({ searchParams }: { searchParams: Promise<
       {/* El mismo fondo que la pantalla del código del storyteller. */}
       <FlorDeFondo />
       <div
-        className="relative mx-auto flex min-h-full max-w-[420px] flex-col px-10 pb-seccion"
+        className="relative mx-auto flex min-h-full max-w-[420px] flex-col px-pagina pb-seccion"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
         <div className="flex min-h-[52px] items-center">

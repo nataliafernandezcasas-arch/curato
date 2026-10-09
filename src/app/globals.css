@@ -81,10 +81,9 @@
   --spacing-etiqueta: 4px;
   --spacing-bloque: 8px;
   --spacing-fila: 16px;
-  /* El margen de cada pantalla. 32 px son medio centímetro en un iPhone:
-     Natalia lo pidió como regla para todo texto de la app (2026-10-09).
-     Antes 20 px, que dejaba el texto pegado al borde. */
-  --spacing-pagina: 32px;
+  /* El margen de cada pantalla, el mismo en todas: 22 px son 0,35 cm en un
+     iPhone (Natalia, 2026-10-09). Medio centímetro (32 px) se quedó ancho. */
+  --spacing-pagina: 22px;
   --spacing-rango: 32px;
   --spacing-seccion: 48px;
   --spacing-respiro: 72px;
