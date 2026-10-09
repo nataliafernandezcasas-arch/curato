@@ -114,3 +114,44 @@ export function VisiteAnnulee(p: VisiteAnnuleeProps) {
     </Shell>
   );
 }
+
+// ── Absence signalée (storyteller) ─────────────────────────────────────────
+// Lo que dijo la casa, lo que significa para el crédito, y cómo decir que es
+// un error: responder al correo, que llega a Curato.
+export type AbsenceProps = { firstName: string; maisonName: string; whenLabel: string };
+
+export function AbsenceSignalee(p: AbsenceProps) {
+  return (
+    <Shell preview={`${p.maisonName} indique que vous n'êtes pas venu ${p.whenLabel}.`}>
+      <Capital color={COLOR.copper}>Absence signalée</Capital>
+      <Titre>{p.maisonName} ne vous a pas vu{p.firstName ? `, ${p.firstName}` : ""}.</Titre>
+      <Corps>
+        La maison indique que vous n&apos;êtes pas venu à votre visite du {p.whenLabel}. Le crédit de cette visite est perdu.
+      </Corps>
+      <Corps>
+        Si c&apos;est une erreur, répondez simplement à ce message : nous vérifions avec la maison. Une absence sans prévenir
+        peut entraîner la suspension de votre accès à Curato.
+      </Corps>
+    </Shell>
+  );
+}
+
+// ── Absence signalée (Curato) ──────────────────────────────────────────────
+// A Operations: decide si se suspende al storyteller. Lleva cuántas ausencias
+// suma, que es lo que decide.
+export type AbsenceCuratoProps = { storyteller: string; maisonName: string; whenLabel: string; ausencias: number };
+
+export function AbsenceCurato(p: AbsenceCuratoProps) {
+  return (
+    <Shell preview={`${p.storyteller} n'est pas venu chez ${p.maisonName}.`}>
+      <Capital color={COLOR.copper}>No show</Capital>
+      <Titre>{p.storyteller} n&apos;est pas venu.</Titre>
+      <Corps>
+        {p.maisonName} signale une absence à la visite du {p.whenLabel}. C&apos;est l&apos;absence numéro {p.ausencias} de ce
+        storyteller.
+      </Corps>
+      <Corps>À vous de décider s&apos;il faut suspendre son accès.</Corps>
+      <Enlace href={`${SITE}/admin/reservations`}>Voir les réservations</Enlace>
+    </Shell>
+  );
+}

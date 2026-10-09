@@ -118,14 +118,22 @@ const TEXTOS: Record<
  * de 24 h antes, el recordatorio de 6 h y Mes visites. Las reglas del crédito
  * y de la suspensión se leen antes del botón, no después en un diálogo.
  */
-export default function ConfirmarVisita({ params }: { params: Promise<{ id: string }> }) {
+export default function ConfirmarVisita({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ annuler?: string }>;
+}) {
   const { id } = use(params);
+  // Desde el botón «Annuler» de Mes visites se llega ya al paso de anular.
+  const { annuler } = use(searchParams);
   const { lang } = useLang();
   const t = TEXTOS[lang] ?? TEXTOS.fr;
   const td = translations[lang].dashboard;
   const [datos, setDatos] = useState<Datos | null>(null);
   const [fallo, setFallo] = useState(false);
-  const [paso, setPaso] = useState<"inicio" | "anular" | "anulada" | "anuladaTarde">("inicio");
+  const [paso, setPaso] = useState<"inicio" | "anular" | "anulada" | "anuladaTarde">(annuler ? "anular" : "inicio");
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(false);
 
@@ -194,8 +202,8 @@ export default function ConfirmarVisita({ params }: { params: Promise<{ id: stri
             <p className="mt-fila text-corps text-text-primary first-letter:uppercase">{fecha}</p>
             <p className="text-legende text-text-secondary">
               {t.party(datos.partySize)}
-              {datos.cost ? ` · ${t.cost(datos.cost)}` : ""}
             </p>
+            {datos.cost ? <p className="mt-fila text-sous-titre tabular-nums text-accent">{t.cost(datos.cost)}</p> : null}
 
             {paso === "anulada" || paso === "anuladaTarde" ? (
               <p className="mt-rango text-corps text-text-primary">{paso === "anulada" ? t.cancelled : t.cancelledLate}</p>
@@ -219,18 +227,14 @@ export default function ConfirmarVisita({ params }: { params: Promise<{ id: stri
                       (datos.confirmed ? (
                         <p className="text-corps text-sauge-vif">{t.coming}</p>
                       ) : (
-                        <Button onClick={() => enviar("confirmar")} disabled={enviando}>
+                        <Button onClick={() => enviar("confirmar")} disabled={enviando} className="text-sauge-vif">
                           {t.come}
                         </Button>
                       ))}
                     {datos.canCancel && (
-                      <button
-                        type="button"
-                        onClick={() => setPaso("anular")}
-                        className="min-h-11 text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-copper-vif"
-                      >
+                      <Button onClick={() => setPaso("anular")} className="text-rouge-vif">
                         {t.cancel}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 ) : (
@@ -239,14 +243,14 @@ export default function ConfirmarVisita({ params }: { params: Promise<{ id: stri
                       {datos.lateIfCancel ? t.cancelLate(datos.cost) : t.cancelFree}
                     </p>
                     <div className="mt-fila flex flex-wrap items-center gap-fila">
-                      <Button onClick={() => enviar("cancelar")} disabled={enviando}>
+                      <Button onClick={() => enviar("cancelar")} disabled={enviando} className="text-rouge-vif">
                         {t.cancelConfirm}
                       </Button>
                       <button
                         type="button"
                         onClick={() => setPaso("inicio")}
                         disabled={enviando}
-                        className="min-h-11 text-capitale uppercase tracking-capitale text-text-secondary hover:text-text-primary"
+                        className="min-h-11 text-capitale uppercase tracking-capitale text-sauge-vif hover:text-text-primary"
                       >
                         {t.keep}
                       </button>

@@ -18,6 +18,8 @@ export type CasaTarjeta = {
   photos: string[] | null;
   signed_at: string | null;
   category_id: string | null;
+  /** La oferta por visita, en euros (migración 043). */
+  offer_eur?: number | null;
 };
 
 // Las categorías canónicas de la migración 009.
@@ -74,7 +76,11 @@ export function TarjetaCasa({ casa, lang, href }: { casa: CasaTarjeta; lang: Lan
             <h3 className="text-sous-titre text-text-primary transition-colors group-hover:text-accent">{casa.name}</h3>
           }
           value={
-            casa.arrondissement ? (
+            // A la derecha, lo que ofrece la casa: es lo que decide. Sin oferta,
+            // el distrito, como antes.
+            casa.offer_eur ? (
+              <span className="text-sous-titre tabular-nums text-accent">{casa.offer_eur.toLocaleString(lang)} €</span>
+            ) : casa.arrondissement ? (
               <span className="text-capitale uppercase tracking-capitale text-brume">Paris {casa.arrondissement}</span>
             ) : undefined
           }
@@ -82,6 +88,7 @@ export function TarjetaCasa({ casa, lang, href }: { casa: CasaTarjeta; lang: Lan
 
         <p className="mt-etiqueta text-legende text-text-secondary">
           {label}
+          {casa.offer_eur && casa.arrondissement ? ` · Paris ${casa.arrondissement}` : ""}
           {esNueva(casa.signed_at) && (
             <span className="ml-fila text-capitale uppercase tracking-capitale text-accent">{t.badgeNew}</span>
           )}

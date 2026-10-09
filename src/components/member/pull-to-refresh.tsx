@@ -6,19 +6,25 @@ import { useLang } from "@/lib/i18n/LanguageContext";
 /**
  * Tirar para actualizar.
  *
- * Sin botón de recargar y sin rueda girando. El gesto es el que ya hace todo el
- * mundo sin pensarlo, y la cabecera aparece con él y se va sola.
+ * Sin botón de recargar. El gesto es el que ya hace todo el mundo sin
+ * pensarlo, y la cabecera aparece con él y se va sola. En vez de texto, un
+ * círculo en champagne (Natalia, 2026-10-09): se va cerrando mientras se tira,
+ * gira mientras actualiza y se va cuando termina.
  *
  * Solo actúa cuando la página está arriba del todo: si no, tirar hacia abajo es
  * scroll normal y secuestrarlo sería insufrible.
  */
 const TIRON = 64;
 
+// Solo para lectores de pantalla: lo que se ve es el círculo.
 const TEXTOS = {
-  fr: { tirar: "Tirer", soltar: "Relâcher pour actualiser", listo: "À jour" },
-  en: { tirar: "Pull", soltar: "Release to refresh", listo: "Up to date" },
-  es: { tirar: "Tira", soltar: "Suelta para actualizar", listo: "Al día" },
+  fr: { trabajando: "Actualisation…", listo: "À jour" },
+  en: { trabajando: "Refreshing…", listo: "Up to date" },
+  es: { trabajando: "Actualizando…", listo: "Al día" },
 };
+
+const RADIO = 10;
+const VUELTA = 2 * Math.PI * RADIO;
 
 export function PullToRefresh({ onRefresh, children }: { onRefresh: () => Promise<void> | void; children: React.ReactNode }) {
   const { lang } = useLang();
@@ -30,7 +36,7 @@ export function PullToRefresh({ onRefresh, children }: { onRefresh: () => Promis
 
   useEffect(() => {
     if (estado !== "listo") return;
-    const id = setTimeout(() => setEstado("reposo"), 1600);
+    const id = setTimeout(() => setEstado("reposo"), 300);
     return () => clearTimeout(id);
   }, [estado]);
 
@@ -61,22 +67,41 @@ export function PullToRefresh({ onRefresh, children }: { onRefresh: () => Promis
     }
   }
 
-  const etiqueta =
-    estado === "listo" ? t.listo : estado === "trabajando" ? t.soltar : tirado >= TIRON ? t.soltar : t.tirar;
+  // Cuánto del círculo se ha dibujado: lleno al llegar al tirón que actualiza.
+  const avance = estado === "reposo" ? Math.min(tirado / TIRON, 1) : estado === "trabajando" ? 0.75 : 1;
 
   return (
     <div onTouchStart={empezar} onTouchMove={seguir} onTouchEnd={terminar}>
       <div
-        className="overflow-hidden text-center transition-[height] duration-200 ease-curato"
-        style={{ height: estado === "reposo" && tirado === 0 ? 0 : Math.max(tirado, estado === "reposo" ? 0 : 32) }}
+        className="flex items-center justify-center overflow-hidden transition-[height] duration-200 ease-curato"
+        style={{ height: estado === "reposo" && tirado === 0 ? 0 : Math.max(tirado, estado === "reposo" ? 0 : 48) }}
+        role="status"
+        aria-live="polite"
       >
-        <span
-          className={`text-capitale uppercase tracking-capitale ${
-            estado === "listo" ? "text-sauge-vif" : "text-text-muted"
-          }`}
+        <svg
+          width="26"
+          height="26"
+          viewBox="0 0 26 26"
+          aria-hidden
+          className={estado === "trabajando" ? "animate-spin [animation-duration:0.9s]" : ""}
+          style={{ opacity: estado === "reposo" ? Math.min(tirado / (TIRON * 0.5), 1) : 1 }}
         >
-          {etiqueta}
-        </span>
+          <circle cx="13" cy="13" r={RADIO} fill="none" stroke="currentColor" strokeWidth="1" className="text-border" />
+          <circle
+            cx="13"
+            cy="13"
+            r={RADIO}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            className="text-accent"
+            strokeDasharray={VUELTA}
+            strokeDashoffset={VUELTA * (1 - avance)}
+            transform="rotate(-90 13 13)"
+          />
+        </svg>
+        <span className="sr-only">{estado === "trabajando" ? t.trabajando : estado === "listo" ? t.listo : ""}</span>
       </div>
       {children}
     </div>

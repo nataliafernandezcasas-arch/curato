@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import { visitaDeHoy } from "@/lib/check-in";
+import { puedeMarcarNoShow } from "@/lib/asistencia";
 import { eventoDeVisita, googleCalendarUrl } from "@/lib/calendar";
 import { enlaceIcs } from "@/lib/calendar-enlaces";
 
@@ -36,7 +37,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
       .select("id, creator_id, slot_start, slot_end, nights, party_size, status, visited_at, special_requests")
       .eq("id", id)
       .eq("venue_id", maison.id)
-      .in("status", ["confirmed", "completed"])
+      .in("status", ["confirmed", "completed", "no_show"])
       .maybeSingle();
     if (!r) return NextResponse.json({ error: "visita" }, { status: 404 });
 
@@ -53,6 +54,9 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
         partySize,
         note: r.special_requests ?? null,
         arrived: Boolean(r.visited_at),
+        // La casa dijo que no vino, o puede decirlo ya (src/lib/asistencia.ts).
+        noShow: r.status === "no_show",
+        canNoShow: puedeMarcarNoShow(r),
         // Hoy es el día de la visita (o una de sus noches): se puede escanear.
         today: Boolean(visitaDeHoy([r])),
         calendar: {

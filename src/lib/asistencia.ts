@@ -70,3 +70,22 @@ export function avisosQueTocan(r: ReservaAntes, ahora: Date = new Date()): Aviso
 export function cancelacionTardia(r: { status: string; slot_start: string }, ahora: Date = new Date()): boolean {
   return r.status === "confirmed" && new Date(r.slot_start).getTime() - ahora.getTime() < CANCELAR_GRATIS_H * HORA;
 }
+
+/** La casa puede decir que no vino desde media hora después de la hora... */
+export const NO_SHOW_DESDE_MIN = 30;
+/** ...y hasta tres días después: más tarde ya no se puede comprobar. */
+export const NO_SHOW_HASTA_H = 72;
+
+/**
+ * ¿Puede la casa marcar esta visita como no show? Solo una visita aceptada,
+ * sin llegada registrada, a partir de media hora después de su hora (se
+ * puede llegar tarde) y durante tres días.
+ */
+export function puedeMarcarNoShow(
+  r: { status: string; slot_start: string; visited_at: string | null },
+  ahora: Date = new Date()
+): boolean {
+  if (r.status !== "confirmed" || r.visited_at) return false;
+  const pasado = ahora.getTime() - new Date(r.slot_start).getTime();
+  return pasado >= NO_SHOW_DESDE_MIN * MIN && pasado <= NO_SHOW_HASTA_H * HORA;
+}

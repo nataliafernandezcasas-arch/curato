@@ -137,6 +137,21 @@ const AGENDA: Record<Lang, {
   },
 };
 
+const NO_GUARDADO: Record<Lang, { offer: string; otro: string }> = {
+  fr: {
+    offer: "Votre offre n'a pas été enregistrée. Réessayez dans un instant.",
+    otro: "Tout n'a pas été enregistré. Réessayez dans un instant.",
+  },
+  en: {
+    offer: "Your offer wasn't saved. Try again in a moment.",
+    otro: "Not everything was saved. Try again in a moment.",
+  },
+  es: {
+    offer: "Tu oferta no se guardó. Vuelve a intentarlo en un momento.",
+    otro: "No se guardó todo. Vuelve a intentarlo en un momento.",
+  },
+};
+
 export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [availability, setAvailability] = useState<Window[]>([]);
   const [agenda, setAgenda] = useState<Agenda>({ modo: "horaires", llegadas: [0, 1, 2, 3, 4, 5, 6], minNoches: 1, maxNoches: 3 });
@@ -232,8 +247,17 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         }),
       });
       // La confirmación llega como aviso, encima de la barra, y se va sola en 4 s.
+      // Si algo no se guardó, se dice qué: antes una oferta rechazada pasaba en
+      // silencio y la casa creía tenerla puesta.
       if (res.ok) mostrar(t.offerSaved);
-      else if ((await res.json().catch(() => ({}))).error === "agenda") mostrar(AGENDA[lang].notSaved);
+      else {
+        const d = (await res.json().catch(() => ({}))) as { errores?: string[]; min?: number; max?: number };
+        const errores = d.errores ?? ["offer"];
+        if (errores.includes("range") && d.min != null && d.max != null) mostrar(OFERTA[lang].outOfRange(d.min, d.max));
+        else if (errores.includes("offer")) mostrar(NO_GUARDADO[lang].offer);
+        else if (errores.includes("agenda")) mostrar(AGENDA[lang].notSaved);
+        else mostrar(NO_GUARDADO[lang].otro);
+      }
     } finally {
       setSaving(false);
     }

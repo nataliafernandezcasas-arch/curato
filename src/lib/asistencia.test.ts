@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { asistenciaConfirmada, avisosQueTocan, cancelacionTardia, pideConfirmacion, type ReservaAntes } from "./asistencia";
+import { asistenciaConfirmada, avisosQueTocan, cancelacionTardia, pideConfirmacion, puedeMarcarNoShow, type ReservaAntes } from "./asistencia";
 
 const H = 3600 * 1000;
 const visita = new Date("2026-10-20T19:00:00Z");
@@ -68,5 +68,25 @@ describe("cancelar", () => {
   });
   it("una demanda que la casa aún no aceptó se cancela gratis", () => {
     expect(cancelacionTardia(base({ status: "pending_review" }), antes(2))).toBe(false);
+  });
+});
+
+describe("el no show", () => {
+  const r = { status: "confirmed", slot_start: visita.toISOString(), visited_at: null };
+  const despues = (min: number) => new Date(visita.getTime() + min * 60 * 1000);
+
+  it("se puede marcar desde media hora después de la hora, no antes", () => {
+    expect(puedeMarcarNoShow(r, despues(10))).toBe(false);
+    expect(puedeMarcarNoShow(r, despues(31))).toBe(true);
+  });
+
+  it("y hasta tres días después", () => {
+    expect(puedeMarcarNoShow(r, despues(71 * 60))).toBe(true);
+    expect(puedeMarcarNoShow(r, despues(73 * 60))).toBe(false);
+  });
+
+  it("no si la llegada se registró, ni si la visita no estaba aceptada", () => {
+    expect(puedeMarcarNoShow({ ...r, visited_at: "x" }, despues(60))).toBe(false);
+    expect(puedeMarcarNoShow({ ...r, status: "cancelled" }, despues(60))).toBe(false);
   });
 });

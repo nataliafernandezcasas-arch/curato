@@ -74,6 +74,7 @@ describe("los seis avisos", () => {
     AVISOS.recordarAsistencia("Maison Marceau", "jeudi 22 octobre à 19:30", "r6"),
     AVISOS.codigoDeVisita("Maison Marceau", "r6"),
     AVISOS.visitaCancelada("Tereza Kovač", "jeudi 22 octobre à 19:30", "r6"),
+    AVISOS.noShow("Maison Marceau", "r6"),
   ];
 
   it("dicen la cosa, no la app", () => {

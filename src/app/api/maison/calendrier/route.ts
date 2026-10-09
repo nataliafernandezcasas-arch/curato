@@ -5,6 +5,7 @@ import { filtroDeUsuario } from "@/lib/identidad";
 import { retratoDeCada } from "@/lib/creator-portrait";
 import { eventoDeVisita, googleCalendarUrl } from "@/lib/calendar";
 import { enlaceIcs } from "@/lib/calendar-enlaces";
+import { NO_SHOW_HASTA_H, puedeMarcarNoShow } from "@/lib/asistencia";
 
 // Lo que enseña el calendario: desde hoy hasta dentro de noventa días.
 const DIAS_ADELANTE = 90;
@@ -32,7 +33,9 @@ export async function GET() {
     if (!maison) return NextResponse.json({ error: "maison" }, { status: 403 });
 
     // Desde el principio de hoy, para que la visita de esta mañana siga a la vista.
-    const desde = new Date(Date.now() - 24 * 3600000);
+    // Tres días atrás: una visita pasada sin llegada registrada sigue a la
+    // vista mientras la casa puede decir que no vino (src/lib/asistencia.ts).
+    const desde = new Date(Date.now() - NO_SHOW_HASTA_H * 3600000);
     const hasta = new Date(Date.now() + DIAS_ADELANTE * 24 * 3600000);
     const { data: reservas } = await admin
       .from("reservations")
@@ -43,7 +46,11 @@ export async function GET() {
       .lte("slot_start", hasta.toISOString())
       .order("slot_start", { ascending: true });
 
-    const filas = reservas ?? [];
+    // Lo de hace más de un día, solo si aún se puede marcar como no show.
+    const ayer = Date.now() - 24 * 3600000;
+    const filas = (reservas ?? []).filter(
+      (r) => new Date(r.slot_start as string).getTime() >= ayer || puedeMarcarNoShow(r)
+    );
     const ids = [...new Set(filas.map((r) => r.creator_id))];
     const { data: creadores } = ids.length
       ? await admin.from("creators").select("id, full_name, handle, portrait_urls").in("id", ids)

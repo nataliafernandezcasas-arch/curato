@@ -11,7 +11,6 @@ import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Button, ButtonLink, LabelButton } from "@/components/member/button";
 import { PullToRefresh } from "@/components/member/pull-to-refresh";
-import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { createClient } from "@/lib/supabase/client";
@@ -70,6 +69,9 @@ type Visit = {
   photos: string[];
   rightsExpiresAt: string | null;
   reach: Reach | null;
+  media?: { url: string; path: string }[];
+  stories?: { path: string; views: number | null; accounts: number | null; interactions: number | null }[];
+  pending?: boolean;
   casa?: CasaTarjeta | null;
   cost?: number;
   lateCancel?: boolean;
@@ -78,6 +80,28 @@ type Visit = {
 };
 
 type Credito = { mensual: number; usado: number; restante: number };
+
+// La portée de cada story, y si la visita ya está validada.
+const PORTEE: Record<Lang, { story: (n: number) => string; pending: string; done: string; saved: string }> = {
+  fr: {
+    story: (n) => `Story ${n}`,
+    pending: "Ajoutez les chiffres de chaque story : tant qu'ils manquent, la visite n'est pas validée et vous ne pouvez pas réserver d'autre maison.",
+    done: "Visite validée.",
+    saved: "Chiffres enregistrés.",
+  },
+  en: {
+    story: (n) => `Story ${n}`,
+    pending: "Add the figures for each story: until they're all in, the visit isn't validated and you can't book another house.",
+    done: "Visit validated.",
+    saved: "Figures saved.",
+  },
+  es: {
+    story: (n) => `Story ${n}`,
+    pending: "Añade las cifras de cada story: mientras falten, la visita no queda validada y no puedes reservar otra casa.",
+    done: "Visita validada.",
+    saved: "Cifras guardadas.",
+  },
+};
 
 // El crédito y lo que cuesta cada visita, y confirmar o cancelar.
 const VISITA: Record<
@@ -166,30 +190,12 @@ const STATUS_TONE: Record<StatusKey, string> = {
 
 /** Se ordena por lo que toca hacer, no por fecha. */
 function groupOf(v: Visit): "todo" | "upcoming" | "past" {
-  if (v.photos.length > 0) return "past";
+  // Con fotos pero sin todas las cifras sigue por hacer: bloquea las reservas.
+  if (v.photos.length > 0) return v.pending ? "todo" : "past";
   if (v.status === "declined" || v.status === "cancelled" || v.status === "no_show") return "past";
   const yaPasó = new Date(v.slotStart).getTime() < Date.now();
   if (!yaPasó) return "upcoming";
   return v.status === "confirmed" || v.status === "completed" ? "todo" : "upcoming";
-}
-
-function Envoltura({
-  deslizable,
-  action,
-  onAction,
-  children,
-}: {
-  deslizable: boolean;
-  action: string;
-  onAction: () => void;
-  children: React.ReactNode;
-}) {
-  if (!deslizable) return <>{children}</>;
-  return (
-    <SwipeAction action={action} onAction={onAction}>
-      {children}
-    </SwipeAction>
-  );
 }
 
 function VisitCard({
@@ -209,23 +215,46 @@ function VisitCard({
   // texto, para que siga al idioma.
   // Qué falló, para decirlo: antes una subida fallida no decía nada.
   const [error, setError] = useState<false | "min" | "fallo" | "pronto" | "peso" | "largo">(false);
-  const [vues, setVues] = useState("");
-  const [comptes, setComptes] = useState("");
-  const [interactions, setInteractions] = useState("");
+  // Las cifras de cada story (migración 048), por la ruta de su captura.
+  type Cifras = { views: string; accounts: string; interactions: string };
+  const [cifras, setCifras] = useState<Record<string, Cifras>>(() =>
+    Object.fromEntries(
+      (visit.stories ?? []).map((c) => [
+        c.path,
+        {
+          views: c.views == null ? "" : String(c.views),
+          accounts: c.accounts == null ? "" : String(c.accounts),
+          interactions: c.interactions == null ? "" : String(c.interactions),
+        },
+      ])
+    )
+  );
   const [guardando, setGuardando] = useState(false);
+  const [guardado, setGuardado] = useState(false);
+  const cifrasDe = (path: string): Cifras => cifras[path] ?? { views: "", accounts: "", interactions: "" };
+  const completas = (visit.media ?? []).every((m) => {
+    const c = cifrasDe(m.path);
+    return c.views !== "" && c.accounts !== "" && c.interactions !== "";
+  });
 
-  // Las cifras se envían solas, sin fotos: quien ya subió las capturas puede
-  // volver un día después a poner la portée, que es cuando Instagram la tiene.
+  // Se guardan todas a la vez. Se puede volver más tarde a completarlas: la
+  // portée de una story se ve en Instagram al cabo de unas horas.
   async function guardarPortee() {
     setGuardando(true);
-    const form = new FormData();
-    form.append("reservationId", visit.id);
-    if (vues) form.append("reachViews", vues);
-    if (comptes) form.append("reachAccounts", comptes);
-    if (interactions) form.append("reachInteractions", interactions);
+    setGuardado(false);
     try {
-      const res = await fetch("/api/reservations/visit", { method: "POST", body: form });
-      if (res.ok) onChanged();
+      const res = await fetch("/api/reservations/visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reservationId: visit.id,
+          stories: (visit.media ?? []).map((m) => ({ path: m.path, ...cifrasDe(m.path) })),
+        }),
+      });
+      if (res.ok) {
+        setGuardado(true);
+        onChanged();
+      }
     } finally {
       setGuardando(false);
     }
@@ -331,14 +360,48 @@ function VisitCard({
   if (visit.photos.length > 0) {
     return (
       <div>
-        {/* Large photos, side by side */}
-        <div className="grid grid-cols-2 gap-1.5">
-          {visit.photos.map((url, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-surface-raised">
-              <Medio url={url} className="hover:scale-105 transition-transform duration-500" />
-            </a>
+        {/* Cada story con sus cifras debajo: son dos stories (o más), y cada
+            una tiene su portée en Instagram. */}
+        <div className="grid grid-cols-2 gap-x-fila gap-y-rango">
+          {(visit.media ?? visit.photos.map((url) => ({ url, path: url }))).map((m, i) => (
+            <div key={m.path}>
+              <a href={m.url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-surface-raised">
+                <Medio url={m.url} className="hover:scale-105 transition-transform duration-500" />
+              </a>
+              <p className="mt-bloque text-capitale uppercase tracking-capitale text-accent">
+                {PORTEE[lang].story(i + 1)}
+              </p>
+              {(["views", "accounts", "interactions"] as const).map((campo) => (
+                <label key={campo} className="mt-bloque block">
+                  <span className="block text-capitale uppercase tracking-capitale text-text-secondary">
+                    {campo === "views" ? t.reachViews : campo === "accounts" ? t.reachAccounts : t.reachInteractions}
+                  </span>
+                  <input
+                    inputMode="numeric"
+                    value={cifrasDe(m.path)[campo]}
+                    onChange={(e) =>
+                      setCifras((x) => ({ ...x, [m.path]: { ...cifrasDe(m.path), [campo]: e.target.value.replace(/\D/g, "") } }))
+                    }
+                    className="w-full min-w-0 border-0 border-b border-border bg-transparent py-etiqueta text-sous-titre tabular-nums text-text-primary transition-colors duration-200 ease-curato outline-none focus:border-accent"
+                  />
+                </label>
+              ))}
+            </div>
           ))}
+        </div>
+
+        {/* Hasta tener todas las cifras, la visita no queda validada y no se
+            puede pedir otra (src/lib/validacion.ts). */}
+        <div className="mt-fila">
+          <p className={`text-legende ${visit.pending ? "text-copper-vif" : "text-sauge-vif"}`}>
+            {visit.pending ? PORTEE[lang].pending : PORTEE[lang].done}
+          </p>
+          <div className="mt-fila">
+            <Button onClick={guardarPortee} disabled={guardando || !completas}>
+              {guardando ? t.sending : t.reachSave}
+            </Button>
+          </div>
+          {guardado && !visit.pending && <p className="mt-bloque text-legende text-sauge-vif">{PORTEE[lang].saved}</p>}
         </div>
 
         {/* Caption: place + date */}
@@ -350,7 +413,7 @@ function VisitCard({
           />
           {/* Lo que gastó en esta casa. */}
           {visit.cost ? (
-            <p className="mt-etiqueta text-legende tabular-nums text-text-secondary">{VISITA[lang].cost(visit.cost)}</p>
+            <p className="mt-bloque text-sous-titre tabular-nums text-accent">{VISITA[lang].cost(visit.cost)}</p>
           ) : null}
           {rightsLabel && (
             <p className="mt-etiqueta text-legende text-text-muted">
@@ -370,52 +433,6 @@ function VisitCard({
             </div>
           )}
 
-          {/* La portée. Es el dato del que vive el informe de la maison, y
-              hasta ahora no se guardaba en ninguna parte. */}
-          {visit.reach ? (
-            <div className="mt-rango">
-              <p className="mb-bloque text-capitale uppercase tracking-capitale text-sauge-vif">
-                {t.reachDeclared}
-              </p>
-              <Row
-                label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.reachAccounts}</span>}
-                value={<span className="text-sous-titre tabular-nums text-text-primary">{visit.reach.accounts ?? "—"}</span>}
-              />
-              <Row
-                label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.reachViews}</span>}
-                value={<span className="text-sous-titre tabular-nums text-text-primary">{visit.reach.views ?? "—"}</span>}
-              />
-            </div>
-          ) : (
-            <div className="mt-rango">
-              <p className="text-capitale uppercase tracking-capitale text-accent">{t.reachTitle}</p>
-              <p className="mt-bloque mb-fila max-w-[46ch] text-legende text-text-secondary">{t.reachHint}</p>
-              <div className="grid grid-cols-3 gap-fila">
-                {[
-                  { etiqueta: t.reachViews, valor: vues, set: setVues },
-                  { etiqueta: t.reachAccounts, valor: comptes, set: setComptes },
-                  { etiqueta: t.reachInteractions, valor: interactions, set: setInteractions },
-                ].map((campo) => (
-                  <div key={campo.etiqueta}>
-                    <label className="mb-bloque block text-capitale uppercase tracking-capitale text-text-secondary">
-                      {campo.etiqueta}
-                    </label>
-                    <input
-                      inputMode="numeric"
-                      value={campo.valor}
-                      onChange={(e) => campo.set(e.target.value.replace(/\D/g, ""))}
-                      className="w-full min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-champ tabular-nums text-text-primary transition-colors duration-200 ease-curato outline-none focus:border-accent"
-                    />
-                  </div>
-                ))}
-              </div>
-              <div className="mt-fila">
-                <Button onClick={guardarPortee} disabled={guardando || !comptes}>
-                  {guardando ? t.sending : t.reachSave}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -431,61 +448,47 @@ function VisitCard({
           <TarjetaCasa casa={visit.casa} lang={lang} href={`/dashboard/storyteller/maison/${visit.casa.id}`} />
         </div>
       )}
-      {/* Solo se desliza lo que tiene algo que hacer. Un gesto que revela un
-          botón vacío enseña a desconfiar del gesto. */}
-      <Envoltura
-        deslizable={canUpload}
-        action={t.swipeDeclare}
-        onAction={() => fileRef.current?.click()}
-      >
-        <Row
-          name
-          label={
-            visit.casa ? (
-              <span className="text-corps tabular-nums text-text-primary">{dateLabel}</span>
-            ) : (
-              <span className="text-sous-titre text-text-primary">{visit.maison}</span>
-            )
-          }
-          aside={
-            <span className="text-legende tabular-nums text-brume">
-              {!visit.casa && dateLabel}
-              {canUpload && visit.photos.length === 0 && horasRestantes(visit.slotStart) !== null && (
-                <span className="ml-fila text-copper-vif">
-                  {t.reachCountdown.replace("{h}", String(horasRestantes(visit.slotStart)))}
-                </span>
-              )}
-            </span>
-          }
-          value={
-            <span className={`text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
-              {t[statusKey]}
-            </span>
-          }
-        />
-      </Envoltura>
+      {/* La fecha y el estado, cada uno con su sitio. Antes era una fila que se
+          deslizaba: el cuadro oscuro de la acción asomaba y el texto se cortaba. */}
+      {visit.casa ? (
+        <p className="text-corps tabular-nums text-text-primary first-letter:uppercase">{dateLabel}</p>
+      ) : (
+        <p className="text-sous-titre text-text-primary">{visit.maison}</p>
+      )}
+      <p className={`mt-etiqueta text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
+        {visit.casa ? t[statusKey] : `${dateLabel} · ${t[statusKey]}`}
+      </p>
+      {canUpload && visit.photos.length === 0 && horasRestantes(visit.slotStart) !== null && (
+        <p className="mt-bloque text-legende tabular-nums text-copper-vif">
+          {t.reachCountdown.replace("{h}", String(horasRestantes(visit.slotStart)))}
+        </p>
+      )}
 
-      {/* Lo que la visita gasta del crédito. */}
+      {/* Lo que la visita gasta del crédito, bien visible. */}
       {visit.cost ? (
-        <p className="mt-bloque text-legende tabular-nums text-text-secondary">
+        <p
+          className={`mt-fila tabular-nums ${visit.lateCancel ? "text-legende text-rouge-vif" : "text-sous-titre text-accent"}`}
+        >
           {visit.lateCancel ? tv.lost : tv.cost(visit.cost)}
         </p>
       ) : null}
 
-      {/* Confirmar que va (se pide 24 h antes) o cancelar: en la misma página,
-          con las reglas del crédito a la vista. */}
-      {visit.mustConfirm ? (
-        <div className="mt-fila">
-          <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/confirmer`}>{tv.confirm}</ButtonLink>
+      {/* Confirmar (verde) o anular (rojo). Los dos llevan a la página que
+          enseña las reglas del crédito antes de decidir. */}
+      {(visit.mustConfirm || visit.canCancel) && (
+        <div className="mt-fila flex flex-wrap gap-fila">
+          {visit.mustConfirm && (
+            <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/confirmer`} className="text-sauge-vif">
+              {tv.confirm}
+            </ButtonLink>
+          )}
+          {visit.canCancel && (
+            <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/confirmer?annuler=1`} className="text-rouge-vif">
+              {tv.cancel}
+            </ButtonLink>
+          )}
         </div>
-      ) : visit.canCancel ? (
-        <a
-          href={`/dashboard/storyteller/visits/${visit.id}/confirmer`}
-          className="mt-bloque inline-flex min-h-11 items-center text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-copper-vif"
-        >
-          {tv.cancel}
-        </a>
-      ) : null}
+      )}
 
       {visit.calendar && (
         <div className="mt-bloque">

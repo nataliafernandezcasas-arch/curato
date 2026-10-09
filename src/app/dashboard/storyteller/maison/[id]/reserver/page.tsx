@@ -84,6 +84,8 @@ const TEXTOS = {
     taken: "Ce créneau vient d'être demandé. Choisissez-en un autre.",
     refused: "La maison n'accepte pas ce créneau. Choisissez-en un autre.",
     creditCap: "Crédit insuffisant",
+    pendingCap: "Visite à compléter",
+    pending: "Ajoutez d'abord les stories et les chiffres de votre dernière visite dans Mes visites. Vous pourrez ensuite réserver.",
     credit: (n: number) => `Il vous reste ${n} € de crédit ce mois-ci, moins que l'offre de la maison. Choisissez un autre mois ou une autre adresse.`,
     closedMonth: "Aucun jour libre ce mois-ci.",
     prev: "Mois précédent",
@@ -125,6 +127,8 @@ const TEXTOS = {
     taken: "Someone has just requested this slot. Choose another one.",
     refused: "The house doesn't accept this slot. Choose another one.",
     creditCap: "Not enough credit",
+    pendingCap: "Visit to complete",
+    pending: "First add the stories and figures from your last visit in My visits. You can book again after that.",
     credit: (n: number) => `You have ${n} € of credit left this month, less than the house's offer. Choose another month or another address.`,
     closedMonth: "No free days this month.",
     prev: "Previous month",
@@ -166,6 +170,8 @@ const TEXTOS = {
     taken: "Alguien acaba de pedir esta franja. Elige otra.",
     refused: "La maison no acepta esta franja. Elige otra.",
     creditCap: "Crédito insuficiente",
+    pendingCap: "Visita por completar",
+    pending: "Primero añade las stories y las cifras de tu última visita en Mis visitas. Después podrás reservar.",
     credit: (n: number) => `Te quedan ${n} € de crédito este mes, menos que la oferta de la maison. Elige otro mes u otra dirección.`,
     closedMonth: "Ningún día libre este mes.",
     prev: "Mes anterior",
@@ -281,7 +287,7 @@ function Reserver({ id }: { id: string }) {
   const [enviando, setEnviando] = useState(false);
   // El aviso se guarda por su tipo, no por su texto: si cambia el idioma,
   // cambia con él.
-  const [aviso, setAviso] = useState<"tomada" | "rechazada" | "caida" | "credito" | null>(null);
+  const [aviso, setAviso] = useState<"tomada" | "rechazada" | "caida" | "credito" | "pendiente" | null>(null);
   const [creditoRestante, setCreditoRestante] = useState(0);
   const [hecho, setHecho] = useState(false);
   const notaId = useId();
@@ -439,6 +445,11 @@ function Reserver({ id }: { id: string }) {
       if (res.status === 409) {
         const body = await res.json().catch(() => ({}));
         // El código de la ruta, no su texto: el texto puede cambiar de idioma.
+        // Una visita pasada sin sus stories y sus cifras (src/lib/validacion.ts).
+        if (body.code === "pendiente") {
+          setAviso("pendiente");
+          return;
+        }
         if (body.code === "credit") {
           // La franja vale; lo que no llega es el crédito del mes.
           setCreditoRestante(Number(body.restante) || 0);
@@ -706,7 +717,15 @@ function Reserver({ id }: { id: string }) {
             {aviso && (
               <StateMark
                 tono={aviso === "caida" ? "caido" : "plazo"}
-                capital={aviso === "tomada" ? t.takenCap : aviso === "credito" ? t.creditCap : t.failCap}
+                capital={
+                  aviso === "tomada"
+                    ? t.takenCap
+                    : aviso === "credito"
+                      ? t.creditCap
+                      : aviso === "pendiente"
+                        ? t.pendingCap
+                        : t.failCap
+                }
                 className="mb-seccion"
               >
                 {aviso === "tomada"
@@ -715,7 +734,9 @@ function Reserver({ id }: { id: string }) {
                     ? t.refused
                     : aviso === "credito"
                       ? t.credit(creditoRestante)
-                      : t.fail}
+                      : aviso === "pendiente"
+                        ? t.pending
+                        : t.fail}
               </StateMark>
             )}
           </>

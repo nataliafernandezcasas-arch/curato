@@ -216,11 +216,11 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   </p>
                 )}
 
-                {oferta && (oferta.eur || oferta.services.length > 0 || oferta.menuUrls.length > 0) && (
+                {oferta && (oferta.eur || oferta.menuUrls.length > 0) && (
                   <div className="mb-8">
                     <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-accent mb-3">{OFERTA[lang].title}</p>
-                    {/* El importe que la casa ofrece; si aún no lo ha puesto, sus
-                        servicios de antes. */}
+                    {/* El importe que la casa ofrece. La lista de servicios con
+                        precio de antes ya no se enseña: no es lo que se gasta. */}
                     {oferta.eur ? (
                       <p className="text-corps text-text-secondary">
                         <span className="mr-2 text-titre tabular-nums text-text-primary">
@@ -229,14 +229,6 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                         {OFERTA[lang].spend}
                       </p>
                     ) : null}
-                    {!oferta.eur && oferta.services.map((s, i) => (
-                      <Row
-                        key={i}
-                        label={<span className="text-corps text-text-primary">{s.name}</span>}
-                        aside={s.description?.trim() ? <span className="text-legende text-text-secondary">{s.description}</span> : undefined}
-                        value={s.price?.trim() ? <span className="text-legende tabular-nums text-text-primary">{s.price}</span> : undefined}
-                      />
-                    ))}
                     {oferta.menuUrls.length > 0 && (
                       <div className="mt-fila">
                         <p className="text-capitale uppercase tracking-capitale text-text-secondary">{OFERTA[lang].menu}</p>

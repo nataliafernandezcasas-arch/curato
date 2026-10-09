@@ -7,6 +7,7 @@ import { eventoDeVisita, googleCalendarUrl } from "@/lib/calendar";
 import { enlaceIcs } from "@/lib/calendar-enlaces";
 import { creditoDelMes, mesDeParis } from "@/lib/credito";
 import { asistenciaConfirmada } from "@/lib/asistencia";
+import { bloqueaReservas, sumarCifras, type CifrasStory } from "@/lib/validacion";
 import type { CasaTarjeta } from "@/components/member/tarjeta-casa";
 
 const BUCKET = "content-proofs";
@@ -49,7 +50,7 @@ export async function GET() {
     // Lo de la casa que enseña su tarjeta, la misma que en Adresses.
     const { data: venues } = await admin
       .from("comercios")
-      .select("id, name, address, arrondissement, description, description_en, description_es, photos, signed_at, category_id")
+      .select("id, name, address, arrondissement, description, description_en, description_es, photos, signed_at, category_id, offer_eur")
       .in("id", venueIds);
     const casaDe = new Map((venues ?? []).map((v) => [v.id as string, v as CasaTarjeta]));
     // La asistencia (migración 046), aparte y tolerante.
@@ -59,6 +60,14 @@ export async function GET() {
       .eq("creator_id", creator.id);
     const asistenciaDe = new Map(
       sinAsistencia ? [] : (asistencias ?? []).map((a) => [a.id as string, a as { asistencia_confirmada_at: string | null; cancelada_tarde: boolean | null }])
+    );
+    // La portée de cada story (migración 048), aparte y tolerante.
+    const { data: porStory, error: sinPorStory } = await admin
+      .from("reservations")
+      .select("id, reach_stories")
+      .eq("creator_id", creator.id);
+    const storiesDe = new Map(
+      sinPorStory ? [] : (porStory ?? []).map((x) => [x.id as string, (x.reach_stories as CifrasStory[] | null) ?? []])
     );
     // El crédito del mes en curso: cuánto tiene y cuánto le queda.
     const credito = await creditoDelMes(admin, creator.id as string, mesDeParis(new Date()));
@@ -70,10 +79,16 @@ export async function GET() {
       rows.map(async (r) => {
         const paths: string[] = r.content_photo_paths ?? [];
         const photos: string[] = [];
+        // Cada foto con su ruta: las cifras de cada story se guardan por ruta.
+        const media: { url: string; path: string }[] = [];
         for (const p of paths) {
           const { data } = await admin.storage.from(BUCKET).createSignedUrl(p, 3600);
-          if (data?.signedUrl) photos.push(data.signedUrl);
+          if (data?.signedUrl) {
+            photos.push(data.signedUrl);
+            media.push({ url: data.signedUrl, path: p });
+          }
         }
+        const stories = storiesDe.get(r.id as string) ?? [];
         const asistencia = asistenciaDe.get(r.id as string);
         const futura = new Date(r.slot_start as string).getTime() > ahora;
         return {
@@ -123,6 +138,16 @@ export async function GET() {
                 }
               : null,
           photos,
+          media,
+          stories,
+          // Entregada: todas sus stories con sus tres cifras. Sin la migración
+          // 048 no se puede saber, y no se bloquea a nadie.
+          pending: !sinPorStory && bloqueaReservas({
+            status: r.status as string,
+            slot_start: r.slot_start as string,
+            content_photo_paths: paths,
+            reach_stories: stories,
+          }),
           rightsExpiresAt: (r.content_rights_expires_at as string | null) ?? null,
           reach: r.reach_declared_at
             ? {
@@ -166,6 +191,7 @@ export async function POST(request: NextRequest) {
           reachViews?: unknown;
           reachAccounts?: unknown;
           reachInteractions?: unknown;
+          stories?: unknown;
         })
       : null;
     const form = esJson ? null : await request.formData();
@@ -220,6 +246,40 @@ export async function POST(request: NextRequest) {
     }
 
     const carpeta = `reservations/${reservationId}/`;
+
+    // La portée de cada story (migración 048): las tres cifras de cada
+    // captura subida. Se guardan las de cada una y, en las columnas de
+    // siempre, la suma, que es lo que lee el informe de la casa.
+    if (json && Array.isArray(json.stories)) {
+      const subidas: string[] = reservation.content_photo_paths ?? [];
+      const num = (v: unknown) => {
+        if (v === null || v === undefined || v === "") return null;
+        const n = Number(String(v).replace(/\s/g, ""));
+        return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+      };
+      const stories: CifrasStory[] = (json.stories as Record<string, unknown>[])
+        .filter((x) => typeof x?.path === "string" && subidas.includes(x.path as string))
+        .map((x) => ({
+          path: x.path as string,
+          views: num(x.views),
+          accounts: num(x.accounts),
+          interactions: num(x.interactions),
+        }));
+      const total = sumarCifras(stories);
+      const { error: e } = await admin
+        .from("reservations")
+        .update({
+          reach_stories: stories,
+          reach_views: total.views,
+          reach_accounts: total.accounts,
+          reach_interactions: total.interactions,
+          reach_source: "manual",
+          reach_declared_at: new Date().toISOString(),
+        })
+        .eq("id", reservationId);
+      if (e) return NextResponse.json({ error: "save" }, { status: 500 });
+      return NextResponse.json({ ok: true });
+    }
 
     // Paso 1 de la subida directa: un permiso firmado por foto.
     if (json && Array.isArray(json.subir)) {

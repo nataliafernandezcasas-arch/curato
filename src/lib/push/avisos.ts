@@ -72,6 +72,14 @@ export const AVISOS = {
     agrupar: `codigo-${id}`,
   }),
 
+  // Al storyteller: la casa dice que no vino. El crédito se pierde.
+  noShow: (maison: string, id: string): Aviso => ({
+    titulo: "Absence signalée",
+    cuerpo: `${maison} indique que vous n'êtes pas venu. Le crédit de la visite est perdu.`,
+    ruta: VISITAS,
+    agrupar: `visite-${id}`,
+  }),
+
   // A la casa: un storyteller canceló su visita.
   visitaCancelada: (storyteller: string, cuando: string, id: string): Aviso => ({
     titulo: "Une visite est annulée",
