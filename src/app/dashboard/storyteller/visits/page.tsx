@@ -371,6 +371,8 @@ function VisitCard({
             label={<span className="font-titulo text-[21px] text-text-primary">{visit.maison}</span>}
             value={<span className="text-legende tabular-nums text-brume">{dateLabel}</span>}
           />
+          {/* Validada: debajo de la fecha, donde se ve sin bajar. */}
+          {!visit.pending && <p className="mt-etiqueta text-right text-legende text-sauge-vif">{PORTEE[lang].done}</p>}
           {/* Lo que gastó en esta casa. */}
           {visit.cost ? (
             <p className="mt-bloque text-sous-titre tabular-nums text-accent">{VISITA[lang].cost(visit.cost)}</p>
@@ -404,7 +406,7 @@ function VisitCard({
                     onChange={(e) =>
                       setCifras((x) => ({ ...x, [m.path]: { ...cifrasDe(m.path), [campo]: e.target.value.replace(/\D/g, "") } }))
                     }
-                    className="w-full min-w-0 border-0 border-b border-border bg-transparent py-etiqueta text-sous-titre tabular-nums text-text-primary transition-colors duration-200 ease-curato outline-none focus:border-accent"
+                    className="w-full min-w-0 border-0 border-b border-border bg-transparent py-etiqueta text-[17px] tabular-nums text-text-primary transition-colors duration-200 ease-curato outline-none focus:border-accent"
                   />
                 </label>
               ))}
@@ -415,10 +417,8 @@ function VisitCard({
         {/* Hasta tener todas las cifras, la visita no queda validada y no se
             puede pedir otra (src/lib/validacion.ts). */}
         <div className="mt-fila">
-          <p className={`text-legende ${visit.pending ? "text-copper-vif" : "text-sauge-vif"}`}>
-            {visit.pending ? PORTEE[lang].pending : PORTEE[lang].done}
-          </p>
-          <div className="mt-fila">
+          {visit.pending && <p className="mb-fila text-legende text-copper-vif">{PORTEE[lang].pending}</p>}
+          <div>
             <Button onClick={guardarPortee} disabled={guardando || !completas}>
               {guardando ? t.sending : t.reachSave}
             </Button>
