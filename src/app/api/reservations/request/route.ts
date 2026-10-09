@@ -8,6 +8,7 @@ import { agendaDe, estanciaImposibleDesde } from "@/lib/agenda";
 import { isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { creditoDelMes, mesDeParis } from "@/lib/credito";
+import { rangoDe } from "@/lib/oferta";
 
 
 // Creates a reservation REQUEST (status = pending_review). Its credits_cost
@@ -92,29 +93,16 @@ export async function POST(request: NextRequest) {
 
     // 4. Lo que cuesta la visita: la oferta de la casa en euros (migración 043),
     // que es lo que el storyteller gasta. Una casa que aún no la ha puesto
-    // cuesta lo de su categoría, como antes (los hoteles, por noches).
+    // cuesta lo mínimo de su categoría, también en euros. Antes caía en los
+    // costes por categoría de la tabla category_costs, que eran créditos de
+    // los de antes (2 por visita): una reserva costaba 2 € en vez de 200.
     const { data: conOferta, error: sinOferta } = await admin
       .from("comercios")
       .select("offer_eur")
       .eq("id", venue.id)
       .maybeSingle();
     const ofertaEur = !sinOferta ? ((conOferta as { offer_eur?: number | null } | null)?.offer_eur ?? null) : null;
-    let creditsCost = 0;
-    if (ofertaEur) {
-      creditsCost = ofertaEur;
-    } else if (venue.category_id) {
-      const { data: cost } = await admin
-        .from("category_costs")
-        .select("credits_per_booking, unit")
-        .eq("category_id", venue.category_id)
-        .maybeSingle();
-      if (cost) {
-        creditsCost =
-          cost.unit === "night" && nights && nights > 0
-            ? cost.credits_per_booking * nights
-            : cost.credits_per_booking;
-      }
-    }
+    const creditsCost = ofertaEur || rangoDe(venue.category_id as string | null).min;
 
     // Que le quede crédito en el mes de la visita. Lo pedido y no decidido ya
     // cuenta: si no, se podrían pedir cinco cenas con el crédito de una.

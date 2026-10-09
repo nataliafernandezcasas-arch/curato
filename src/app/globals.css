@@ -39,6 +39,8 @@
   --color-sauge-vif: var(--sauge-vif);
   --color-copper-vif: var(--copper-vif);
   --color-burgundy-vif: var(--burgundy-vif);
+  /* El rojo de «Annuler»: burgundy-vif es un rosa y no se leía como anular. */
+  --color-rouge-vif: var(--rouge-vif);
 
   --color-cream: #F2EDE4;
   --color-cream-text: #2A201C;
@@ -118,6 +120,7 @@
   --sauge-vif: #6FBF8B;
   --copper-vif: #E6A455;
   --burgundy-vif: #F29AA3;
+  --rouge-vif: #EF6F64;
 }
 
 html { scroll-behavior: smooth; }

@@ -11,7 +11,6 @@ import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
 import { Button, ButtonLink, LabelButton } from "@/components/member/button";
 import { PullToRefresh } from "@/components/member/pull-to-refresh";
-import { SwipeAction } from "@/components/member/swipe-action";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { createClient } from "@/lib/supabase/client";
@@ -173,25 +172,6 @@ function groupOf(v: Visit): "todo" | "upcoming" | "past" {
   return v.status === "confirmed" || v.status === "completed" ? "todo" : "upcoming";
 }
 
-function Envoltura({
-  deslizable,
-  action,
-  onAction,
-  children,
-}: {
-  deslizable: boolean;
-  action: string;
-  onAction: () => void;
-  children: React.ReactNode;
-}) {
-  if (!deslizable) return <>{children}</>;
-  return (
-    <SwipeAction action={action} onAction={onAction}>
-      {children}
-    </SwipeAction>
-  );
-}
-
 function VisitCard({
   visit,
   t,
@@ -334,7 +314,6 @@ function VisitCard({
         {/* Large photos, side by side */}
         <div className="grid grid-cols-2 gap-1.5">
           {visit.photos.map((url, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
             <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square overflow-hidden bg-surface-raised">
               <Medio url={url} className="hover:scale-105 transition-transform duration-500" />
             </a>
@@ -431,61 +410,47 @@ function VisitCard({
           <TarjetaCasa casa={visit.casa} lang={lang} href={`/dashboard/storyteller/maison/${visit.casa.id}`} />
         </div>
       )}
-      {/* Solo se desliza lo que tiene algo que hacer. Un gesto que revela un
-          botón vacío enseña a desconfiar del gesto. */}
-      <Envoltura
-        deslizable={canUpload}
-        action={t.swipeDeclare}
-        onAction={() => fileRef.current?.click()}
-      >
-        <Row
-          name
-          label={
-            visit.casa ? (
-              <span className="text-corps tabular-nums text-text-primary">{dateLabel}</span>
-            ) : (
-              <span className="text-sous-titre text-text-primary">{visit.maison}</span>
-            )
-          }
-          aside={
-            <span className="text-legende tabular-nums text-brume">
-              {!visit.casa && dateLabel}
-              {canUpload && visit.photos.length === 0 && horasRestantes(visit.slotStart) !== null && (
-                <span className="ml-fila text-copper-vif">
-                  {t.reachCountdown.replace("{h}", String(horasRestantes(visit.slotStart)))}
-                </span>
-              )}
-            </span>
-          }
-          value={
-            <span className={`text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
-              {t[statusKey]}
-            </span>
-          }
-        />
-      </Envoltura>
+      {/* La fecha y el estado, cada uno con su sitio. Antes era una fila que se
+          deslizaba: el cuadro oscuro de la acción asomaba y el texto se cortaba. */}
+      {visit.casa ? (
+        <p className="text-corps tabular-nums text-text-primary first-letter:uppercase">{dateLabel}</p>
+      ) : (
+        <p className="text-sous-titre text-text-primary">{visit.maison}</p>
+      )}
+      <p className={`mt-etiqueta text-capitale uppercase tracking-capitale ${STATUS_TONE[statusKey]}`}>
+        {visit.casa ? t[statusKey] : `${dateLabel} · ${t[statusKey]}`}
+      </p>
+      {canUpload && visit.photos.length === 0 && horasRestantes(visit.slotStart) !== null && (
+        <p className="mt-bloque text-legende tabular-nums text-copper-vif">
+          {t.reachCountdown.replace("{h}", String(horasRestantes(visit.slotStart)))}
+        </p>
+      )}
 
-      {/* Lo que la visita gasta del crédito. */}
+      {/* Lo que la visita gasta del crédito, bien visible. */}
       {visit.cost ? (
-        <p className="mt-bloque text-legende tabular-nums text-text-secondary">
+        <p
+          className={`mt-fila tabular-nums ${visit.lateCancel ? "text-legende text-rouge-vif" : "text-sous-titre text-accent"}`}
+        >
           {visit.lateCancel ? tv.lost : tv.cost(visit.cost)}
         </p>
       ) : null}
 
-      {/* Confirmar que va (se pide 24 h antes) o cancelar: en la misma página,
-          con las reglas del crédito a la vista. */}
-      {visit.mustConfirm ? (
-        <div className="mt-fila">
-          <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/confirmer`}>{tv.confirm}</ButtonLink>
+      {/* Confirmar (verde) o anular (rojo). Los dos llevan a la página que
+          enseña las reglas del crédito antes de decidir. */}
+      {(visit.mustConfirm || visit.canCancel) && (
+        <div className="mt-fila flex flex-wrap gap-fila">
+          {visit.mustConfirm && (
+            <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/confirmer`} className="text-sauge-vif">
+              {tv.confirm}
+            </ButtonLink>
+          )}
+          {visit.canCancel && (
+            <ButtonLink href={`/dashboard/storyteller/visits/${visit.id}/confirmer?annuler=1`} className="text-rouge-vif">
+              {tv.cancel}
+            </ButtonLink>
+          )}
         </div>
-      ) : visit.canCancel ? (
-        <a
-          href={`/dashboard/storyteller/visits/${visit.id}/confirmer`}
-          className="mt-bloque inline-flex min-h-11 items-center text-capitale uppercase tracking-capitale text-text-muted transition-colors hover:text-copper-vif"
-        >
-          {tv.cancel}
-        </a>
-      ) : null}
+      )}
 
       {visit.calendar && (
         <div className="mt-bloque">
