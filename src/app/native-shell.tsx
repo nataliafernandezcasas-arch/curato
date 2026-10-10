@@ -49,10 +49,13 @@ export default function NativeShell() {
     const cap = getCapacitor();
 
     // La pantalla de carga se queda hasta aquí: la página ya está montada. Dos
-    // fotogramas más, para que se vea pintada y no un fondo vacío debajo.
+    // fotogramas más, para que se vea pintada y no un fondo vacío debajo. Se
+    // desvanece despacio, casi un segundo, y deja ver la página por debajo
+    // (Natalia, 2026-10-10). En la entrada da igual: debajo está la intro, que
+    // empieza siendo la misma imagen.
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
-        cap?.Plugins?.SplashScreen?.hide({ fadeOutDuration: 300 }).catch(() => {});
+        cap?.Plugins?.SplashScreen?.hide({ fadeOutDuration: 900 }).catch(() => {});
       })
     );
 
