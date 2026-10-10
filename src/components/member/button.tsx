@@ -53,22 +53,17 @@ type Common = {
 };
 
 /**
- * Por dónde enseña cada botón la foto de las flores. Son recortes elegidos a
- * ojo, todos con una flor dentro (la foto es negra en buena parte). Cada texto
- * cae siempre en el mismo, así el mismo botón sale siempre igual y dos botones
- * distintos casi nunca coinciden.
+ * Por dónde enseña cada botón la foto de las flores: cualquier sitio, así
+ * unos enseñan una flor entera, otros un borde y otros casi solo el negro
+ * (Natalia, 2026-10-10). Sale del texto del botón y no del azar de cada
+ * pintada: el mismo botón queda siempre igual, en el servidor y en el teléfono.
  */
-const RECORTES: Array<[string, string]> = [
-  ["70%", "15%"], ["100%", "15%"], ["0%", "35%"], ["70%", "35%"], ["100%", "35%"], ["0%", "55%"],
-  ["70%", "55%"], ["100%", "55%"], ["0%", "75%"], ["70%", "75%"], ["100%", "75%"],
-];
-
 function recorte(children: React.ReactNode): React.CSSProperties {
   const texto = typeof children === "string" || typeof children === "number" ? String(children) : "";
   let h = 2166136261;
   for (let i = 0; i < texto.length; i++) h = Math.imul(h ^ texto.charCodeAt(i), 16777619);
-  const [x, y] = RECORTES[(h >>> 0) % RECORTES.length];
-  return { ["--recorte-x" as string]: x, ["--recorte-y" as string]: y };
+  h >>>= 0;
+  return { ["--recorte-x" as string]: `${h % 101}%`, ["--recorte-y" as string]: `${(h >>> 8) % 101}%` };
 }
 
 function clases(pulsado: boolean, full?: boolean, extra?: string) {
