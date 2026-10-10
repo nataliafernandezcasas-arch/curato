@@ -76,7 +76,9 @@
 
   /* El valor de un campo. Por debajo de 16px el WebView de iOS hace zoom al
      enfocar, y ese zoom es el origen del desplazamiento horizontal. */
-  --text-champ: 17px;
+  /* Lo que se escribe en un campo: nunca más grande que los títulos ni que el
+     texto que lo explica (Natalia, 2026-10-10). */
+  --text-champ: 14px;
   --text-champ--line-height: 1.4;
 
   /* Tres interletrados y no diez. Los de 0.4em y 0.5em bajan a capitale. */

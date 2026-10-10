@@ -77,7 +77,13 @@ export function AuthShell({
   );
 
   return (
-    <div className="relative flex min-h-[100dvh] items-center justify-center px-pagina">
+    // Alta como la pantalla menos la franja de la hora: en la app el body ya
+    // se aparta esa franja, y con 100dvh enteros la página sobraba y se podía
+    // subir, y FR · EN · ES acababa debajo de la hora.
+    <div
+      className="relative flex items-center justify-center px-pagina"
+      style={{ minHeight: "calc(100dvh - var(--safe-top, 0px))" }}
+    >
       {conIntro && (
         <IntroDeEntrada
           destino={logo}

@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { SignOut } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/client";
 import { olvidarEsteAparato } from "@/lib/native/push";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import DashboardNav from "../../dashboard-nav";
 import { MAISON_LINKS } from "../nav-links";
-import { Button, ButtonLink } from "@/components/member/button";
+import { ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
 import { AvisosDelTelefono } from "@/components/member/avisos-telefono";
 import { BorrarCuenta } from "@/components/member/borrar-cuenta";
@@ -110,11 +111,18 @@ export default function MaisonReglagesPage() {
         </div>
 
         <section className="mt-seccion">
-          {/* Salir es un botón con su caja, no un enlace gris con un icono.
-              Y sin diálogo de confirmación: quien lo pulsa sabe lo que hace. */}
-          <Button onClick={signOut} disabled={busy}>
+          {/* Salir: el icono de la puerta y la palabra, sin caja (Natalia,
+              2026-10-10). Sin diálogo de confirmación: quien lo pulsa sabe lo
+              que hace. */}
+          <button
+            type="button"
+            onClick={signOut}
+            disabled={busy}
+            className="inline-flex min-h-11 items-center gap-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent disabled:opacity-45"
+          >
+            <SignOut size={18} aria-hidden />
             {t.signOut}
-          </Button>
+          </button>
         </section>
       </div>
     </div>
