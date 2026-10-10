@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { SignOut } from "@phosphor-icons/react";
 import RoleSwitch from "../role-switch";
 import { useLang } from "@/lib/i18n/LanguageContext";
-import { BorrarCuenta } from "@/components/member/borrar-cuenta";
+import DashboardNav from "../dashboard-nav";
 import type { Lang } from "@/lib/i18n/translations";
 import { Button } from "@/components/member/button";
 
@@ -140,7 +138,6 @@ const STATUS_STYLE: Record<Prospect["effectiveStatus"], { dot: string; text: str
   signed: { dot: "#6FA372", text: "text-[#9CC79E]", key: "stSigned" },
 };
 
-const LANGS: Lang[] = ["fr", "en", "es"];
 
 function eur(n: number, lang: Lang): string {
   if (lang === "en") return "€" + n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -149,7 +146,7 @@ function eur(n: number, lang: Lang): string {
 }
 
 export default function RecruiterDashboard() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const t = T[lang];
 
   const [data, setData] = useState<Data | null>(null);
@@ -209,12 +206,6 @@ export default function RecruiterDashboard() {
     setIbanMsg(res.ok ? "msgIbanSaved" : "msgIbanError");
   }
 
-  async function signOut() {
-    const { createClient } = await import("@/lib/supabase/client");
-    await createClient().auth.signOut();
-    window.location.href = "/auth/sign-in";
-  }
-
   const inputClass =
     "campo-cristal font-serif text-[14px] font-light";
   const labelClass = "block font-serif text-[10px] tracking-[0.3em] uppercase text-white/35 mb-2";
@@ -222,33 +213,15 @@ export default function RecruiterDashboard() {
   const firstName = (data?.recruiter.full_name || "").split(" ")[0];
 
   return (
-    <main className="min-h-[100dvh] max-w-[1120px] mx-auto px-pagina md:px-8 py-10">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-10">
-        <Link href="/dashboard">
-          <img src="/logo-curato-simple.png" alt="curato" style={{ height: "13px", width: "auto", display: "block" }} />
-        </Link>
-        <div className="flex items-center gap-6">
-          <RoleSwitch current="recruiter" />
-          <div className="flex items-center gap-2.5">
-            {LANGS.map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className={`font-serif text-[11px] tracking-[0.2em] uppercase transition-colors ${
-                  lang === l ? "text-champagne" : "text-white/40 hover:text-white/70"
-                }`}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-          <button onClick={signOut} className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-white/40 hover:text-white transition-colors">
-            <SignOut size={14} weight="thin" /> {t.signOut}
-          </button>
-        </div>
-      </div>
-
+    <div className="min-h-[100dvh]">
+    {/* La misma cabecera que en los otros espacios: el logotipo abre el menú,
+        con los espacios y Réglages (idioma, cuenta, ayuda, salir). */}
+    <DashboardNav
+      roleSwitch={<RoleSwitch current="recruiter" />}
+      settingsHref="/dashboard/recruiter/reglages"
+      maxWidth="1120px"
+    />
+    <main className="max-w-[1120px] mx-auto px-pagina md:px-8 py-seccion">
       <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">{t.eyebrow}</p>
       <h1 className="font-serif text-3xl font-light tracking-wide text-white mb-2">
         {t.hello}{firstName ? `, ${firstName}` : ""}.
@@ -341,9 +314,7 @@ export default function RecruiterDashboard() {
         </form>
       </section>
 
-      <div className="mt-seccion border-t border-border">
-        <BorrarCuenta />
-      </div>
     </main>
+    </div>
   );
 }

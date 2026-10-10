@@ -52,6 +52,20 @@ type Common = {
   className?: string;
 };
 
+/**
+ * Por dónde enseña cada botón la foto de las flores: cualquier sitio, así
+ * unos enseñan una flor entera, otros un borde y otros casi solo el negro
+ * (Natalia, 2026-10-10). Sale del texto del botón y no del azar de cada
+ * pintada: el mismo botón queda siempre igual, en el servidor y en el teléfono.
+ */
+function recorte(children: React.ReactNode): React.CSSProperties {
+  const texto = typeof children === "string" || typeof children === "number" ? String(children) : "";
+  let h = 2166136261;
+  for (let i = 0; i < texto.length; i++) h = Math.imul(h ^ texto.charCodeAt(i), 16777619);
+  h >>>= 0;
+  return { ["--recorte-x" as string]: `${h % 101}%`, ["--recorte-y" as string]: `${(h >>> 8) % 101}%` };
+}
+
 function clases(pulsado: boolean, full?: boolean, extra?: string) {
   return ["boton-cristal", pulsado && "pulsado", full && "w-full", extra].filter(Boolean).join(" ");
 }
@@ -73,7 +87,7 @@ export function Button({
 }: Common & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { pulsado, eventos } = usePulsado();
   return (
-    <button {...eventos} {...button} className={clases(pulsado, full, className)}>
+    <button {...eventos} {...button} className={clases(pulsado, full, className)} style={{ ...recorte(children), ...button.style }}>
       <Contenido>{children}</Contenido>
     </button>
   );
@@ -87,7 +101,7 @@ export function ButtonLink({
 }: Common & { href: string }) {
   const { pulsado, eventos } = usePulsado();
   return (
-    <Link href={href} {...eventos} className={clases(pulsado, full, className)}>
+    <Link href={href} {...eventos} className={clases(pulsado, full, className)} style={recorte(children)}>
       <Contenido>{children}</Contenido>
     </Link>
   );
@@ -112,6 +126,7 @@ export function LabelButton({
       {...eventos}
       aria-disabled={disabled || undefined}
       className={clases(pulsado, full, className)}
+      style={recorte(children)}
     >
       <Contenido>{children}</Contenido>
     </label>

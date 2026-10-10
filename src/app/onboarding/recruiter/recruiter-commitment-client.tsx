@@ -171,7 +171,7 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
   }
 
   const inputClass =
-    "campo-cristal font-serif text-[16px] tracking-wide";
+    "campo-cristal font-serif text-[14px] tracking-wide";
   const labelClass = "block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3";
 
   return (

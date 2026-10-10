@@ -101,7 +101,7 @@ export function Buscador({
         aria-label={t.placeholder}
         aria-expanded={mostrar}
         aria-controls="sugerencias-de-casas"
-        className="campo-cristal !pl-11 !pr-11 font-serif text-[15px] font-light [&::-webkit-search-cancel-button]:hidden"
+        className="campo-cristal !pl-11 !pr-11 font-serif text-[14px] font-light [&::-webkit-search-cancel-button]:hidden"
       />
       {valor && (
         <button
