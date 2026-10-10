@@ -88,6 +88,7 @@ export default function SignInPage() {
 
   return (
     <AuthShell
+      intro
       title={mode === "reset" ? t.resetTitle : t.title}
       subtitle={mode === "reset" ? t.resetSubtitle : t.subtitle}
       footer={
