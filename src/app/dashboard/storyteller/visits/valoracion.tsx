@@ -109,7 +109,7 @@ export function Valoracion({
             maxLength={2000}
             placeholder={t.nota}
             aria-label={t.nota}
-            className="campo-cristal mt-fila resize-none text-[15px]"
+            className="campo-cristal mt-fila resize-none text-[14px]"
           />
           {(!enviada || cambiada) && (
             <div className="mt-fila">

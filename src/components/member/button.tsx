@@ -52,6 +52,25 @@ type Common = {
   className?: string;
 };
 
+/**
+ * Por dónde enseña cada botón la foto de las flores. Son recortes elegidos a
+ * ojo, todos con una flor dentro (la foto es negra en buena parte). Cada texto
+ * cae siempre en el mismo, así el mismo botón sale siempre igual y dos botones
+ * distintos casi nunca coinciden.
+ */
+const RECORTES: Array<[string, string]> = [
+  ["70%", "15%"], ["100%", "15%"], ["0%", "35%"], ["70%", "35%"], ["100%", "35%"], ["0%", "55%"],
+  ["70%", "55%"], ["100%", "55%"], ["0%", "75%"], ["70%", "75%"], ["100%", "75%"],
+];
+
+function recorte(children: React.ReactNode): React.CSSProperties {
+  const texto = typeof children === "string" || typeof children === "number" ? String(children) : "";
+  let h = 2166136261;
+  for (let i = 0; i < texto.length; i++) h = Math.imul(h ^ texto.charCodeAt(i), 16777619);
+  const [x, y] = RECORTES[(h >>> 0) % RECORTES.length];
+  return { ["--recorte-x" as string]: x, ["--recorte-y" as string]: y };
+}
+
 function clases(pulsado: boolean, full?: boolean, extra?: string) {
   return ["boton-cristal", pulsado && "pulsado", full && "w-full", extra].filter(Boolean).join(" ");
 }
@@ -73,7 +92,7 @@ export function Button({
 }: Common & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { pulsado, eventos } = usePulsado();
   return (
-    <button {...eventos} {...button} className={clases(pulsado, full, className)}>
+    <button {...eventos} {...button} className={clases(pulsado, full, className)} style={{ ...recorte(children), ...button.style }}>
       <Contenido>{children}</Contenido>
     </button>
   );
@@ -87,7 +106,7 @@ export function ButtonLink({
 }: Common & { href: string }) {
   const { pulsado, eventos } = usePulsado();
   return (
-    <Link href={href} {...eventos} className={clases(pulsado, full, className)}>
+    <Link href={href} {...eventos} className={clases(pulsado, full, className)} style={recorte(children)}>
       <Contenido>{children}</Contenido>
     </Link>
   );
@@ -112,6 +131,7 @@ export function LabelButton({
       {...eventos}
       aria-disabled={disabled || undefined}
       className={clases(pulsado, full, className)}
+      style={recorte(children)}
     >
       <Contenido>{children}</Contenido>
     </label>
