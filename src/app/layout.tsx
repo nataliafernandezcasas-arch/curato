@@ -35,10 +35,17 @@ export const metadata: Metadata = {
 // `viewportFit: "cover"` lets the page paint under the notch and the home
 // indicator, which is what makes env(safe-area-inset-*) report real values.
 // The [data-native] rules in globals.css then pad the content back out. We
-// leave pinch-zoom alone on purpose, capping it would hurt accessibility.
+//
+// Sin zoom (Natalia, 2026-10-09). Al tocar un campo con letra de menos de 16 px,
+// el iPhone ampliaba la página él solo y no la devolvía: desde ahí la pantalla
+// se arrastraba de lado, la cabecera y la barra de abajo se movían y los
+// márgenes parecían otros. Una app no se amplía; el tamaño de la letra lo pone
+// el ajuste de texto del iPhone, que sí se respeta.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
   // Un solo negro. La cáscara nativa pintaba #1A1A1A detrás de una página
   // #1E1E1E, y el segundo negro asomaba en los rebotes del scroll.

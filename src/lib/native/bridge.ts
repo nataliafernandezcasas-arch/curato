@@ -66,6 +66,8 @@ export interface PushNotificationsPlugin {
   checkPermissions(): Promise<{ receive: PushPermission }>;
   requestPermissions(): Promise<{ receive: PushPermission }>;
   register(): Promise<void>;
+  /** Deja de recibir avisos en este aparato (lo contrario de register). */
+  unregister?(): Promise<void>;
   addListener(
     event: "registration",
     handler: (token: { value: string }) => void
