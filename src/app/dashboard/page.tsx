@@ -117,5 +117,10 @@ export default async function DashboardPage() {
     redirect("/dashboard/recruiter");
   }
 
+  // 4. Solo administradora (una cuenta de admin_users sin ficha de miembro,
+  // como natalia.fernandez@curatocollective.com): al admin.
+  const { data: esAdmin } = await admin.from("admin_users").select("user_id").eq("user_id", user.id).maybeSingle();
+  if (esAdmin) redirect("/admin");
+
   redirect("/auth/sign-in?error=not_approved");
 }
