@@ -259,6 +259,7 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
               followers: creator.followers ?? null,
               monthly_credit_cop: creator.monthly_credit_cop ?? null,
               stage: creator.stage ?? "active",
+              own_bio: paso?.own_bio ?? "",
             }}
           />
           <CreatorRosterToggle email={creator.email as string} initial={hiddenFromRoster} />

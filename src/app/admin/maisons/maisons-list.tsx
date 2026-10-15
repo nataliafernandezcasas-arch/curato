@@ -93,7 +93,7 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
             <div key={m.id} className="border border-white/10 bg-black/40 p-6">
               <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
-                  <p className="font-serif text-[18px] font-light text-white">{m.name || "—"}</p>
+                  <a href={`/admin/maisons/${m.id}`} className="font-serif text-[18px] font-light text-white underline-offset-4 hover:text-champagne hover:underline">{m.name || "—"}</a>
                   <p className="font-serif text-[13px] text-white/65 mt-1">
                     {m.email || ""}
                     {m.place ? ` · ${m.place}` : ""}

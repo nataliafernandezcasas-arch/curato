@@ -8,6 +8,7 @@ type Initial = {
   followers: number | null;
   monthly_credit_cop: number | null;
   stage: string;
+  own_bio?: string;
 };
 
 // Inline editor for a creator, used on the admin detail page. Saves via the
@@ -18,6 +19,7 @@ export default function CreatorEditForm({ email, initial }: { email: string; ini
   const [handle, setHandle] = useState(initial.handle ?? "");
   const [followers, setFollowers] = useState(initial.followers?.toString() ?? "");
   const [credit, setCredit] = useState(initial.monthly_credit_cop?.toString() ?? "");
+  const [bio, setBio] = useState(initial.own_bio ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,6 +36,7 @@ export default function CreatorEditForm({ email, initial }: { email: string; ini
           handle,
           followers: followers === "" ? null : Number(followers),
           monthly_credit_cop: credit === "" ? null : Number(credit),
+          own_bio: bio,
         }),
       });
       if (!res.ok) {
@@ -93,6 +96,10 @@ export default function CreatorEditForm({ email, initial }: { email: string; ini
         <div>
           <label className={label}>Budget mensuel (€)</label>
           <input className={field} value={credit} onChange={(e) => setCredit(e.target.value)} inputMode="numeric" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className={label}>Phrase du profil (ce que lisent les maisons)</label>
+          <textarea className={`${field} resize-none`} rows={3} maxLength={240} value={bio} onChange={(e) => setBio(e.target.value)} />
         </div>
       </div>
 
