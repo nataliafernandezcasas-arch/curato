@@ -6,6 +6,9 @@ import { isAdmin } from "@/lib/admin/auth";
 import { getPhylloAccounts, getPhylloProfile, getPhylloContents, summarizeMetrics } from "@/lib/phyllo/client";
 import CreatorEditForm from "./edit-form";
 import CreatorRosterToggle from "./roster-toggle";
+import { buildDossiers } from "@/lib/storyteller-dossier";
+import { DossierInline } from "@/app/dashboard/business/storyteller-dossier";
+import AccionesDeCuenta from "../../acciones-de-cuenta";
 
 export const dynamic = "force-dynamic";
 
@@ -104,6 +107,62 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
     .join("")
     .toUpperCase();
   const visitPhotos = res.flatMap((r) => (r.content_photo_paths as string[] | null) ?? []).filter((u) => typeof u === "string" && /^https?:\/\//.test(u));
+
+  // ── Lo que pidió Natalia (2026-10-15): el perfil tal como lo ve una casa,
+  // en qué punto está de la entrada, qué tiene conectado y su encuesta. Cada
+  // consulta va aparte y tolerante: una columna que falte no tumba la ficha.
+  const [dossiers, pasos, guiaRow, avisos, respuestas, preguntas, valoraciones] = await Promise.all([
+    buildDossiers(supabase, [creator.id]).catch(() => new Map()),
+    supabase.from("creators").select("welcome_completed_at, onboarding_survey_completed_at, owner_id, portrait_urls, own_bio, created_at").eq("id", creator.id).maybeSingle(),
+    supabase.from("creators").select("guia_completada_at").eq("id", creator.id).maybeSingle(),
+    supabase.from("creators").select("owner_id").eq("id", creator.id).maybeSingle().then(async ({ data }) =>
+      data?.owner_id ? supabase.from("device_tokens").select("platform", { count: "exact" }).eq("user_id", data.owner_id) : { count: 0 }
+    ),
+    supabase.from("creator_survey_responses").select("question_slug, answer, answered_at").eq("creator_id", creator.id),
+    supabase.from("survey_questions").select("slug, position, question_text_fr, question_text_es, options").order("position"),
+    supabase.from("reservations").select("rating, rating_note").eq("creator_id", creator.id).not("rating", "is", null),
+  ]);
+  const dossier = (dossiers as Map<string, import("@/lib/storyteller-dossier").Dossier>).get(creator.id) ?? null;
+  const paso = pasos.data as {
+    welcome_completed_at: string | null;
+    onboarding_survey_completed_at: string | null;
+    owner_id: string | null;
+    portrait_urls: string[] | null;
+    own_bio: string | null;
+    created_at: string | null;
+  } | null;
+  const guia = guiaRow.error ? undefined : ((guiaRow.data as { guia_completada_at: string | null } | null)?.guia_completada_at ?? null);
+  const telefonos = (avisos as { count: number | null }).count ?? 0;
+  type Opcion = { value: string; label_fr?: string; label_es?: string };
+  const preguntaDe = new Map(
+    ((preguntas.data ?? []) as { slug: string; position: number; question_text_fr: string | null; question_text_es: string; options: Opcion[] | null }[]).map((q) => [q.slug, q])
+  );
+  const encuesta = ((respuestas.data ?? []) as { question_slug: string; answer: unknown }[])
+    .map((r) => {
+      const q = preguntaDe.get(r.question_slug);
+      const opciones = new Map((q?.options ?? []).map((o) => [o.value, o.label_fr ?? o.label_es ?? o.value]));
+      const valores = Array.isArray(r.answer) ? r.answer : [r.answer];
+      return {
+        orden: q?.position ?? 999,
+        pregunta: q?.question_text_fr ?? q?.question_text_es ?? r.question_slug,
+        respuesta: valores.map((v) => opciones.get(String(v)) ?? (typeof v === "object" ? JSON.stringify(v) : String(v))).join(" · "),
+      };
+    })
+    .sort((a, b) => a.orden - b.orden);
+  const notas = ((valoraciones.data ?? []) as { rating: number }[]).map((v) => v.rating);
+  const media = notas.length ? (notas.reduce((a, b) => a + b, 0) / notas.length).toFixed(1) : null;
+  const casasVisitadas = new Set(res.filter((r) => r.status === "completed").map((r) => r.venue_id)).size;
+  const storiesSubidas = res.reduce((n, r) => n + (((r.content_photo_paths as string[] | null) ?? []).length), 0);
+  const etapas: { label: string; hecho: boolean; detalle?: string }[] = [
+    { label: "Compte créé (première connexion)", hecho: Boolean(paso?.owner_id) },
+    { label: "Bienvenue et CGU acceptées", hecho: Boolean(paso?.welcome_completed_at), detalle: fmtDate(paso?.welcome_completed_at ?? null) },
+    { label: "Questionnaire", hecho: Boolean(paso?.onboarding_survey_completed_at), detalle: fmtDate(paso?.onboarding_survey_completed_at ?? null) },
+    ...(guia === undefined ? [] : [{ label: "Guide de l'app", hecho: Boolean(guia), detalle: fmtDate(guia) }]),
+    { label: "Instagram connecté", hecho: creator.instagram_connected === true, detalle: fmtDate(creator.phyllo_connected_at ?? null) },
+    { label: "Photos de profil", hecho: (paso?.portrait_urls?.length ?? 0) > 0 },
+    { label: "Phrase de profil", hecho: Boolean(paso?.own_bio?.trim()) },
+    { label: "Notifications du téléphone", hecho: telefonos > 0, detalle: telefonos > 0 ? `${telefonos} appareil${telefonos > 1 ? "s" : ""}` : undefined },
+  ];
 
   const igConnected = creator.instagram_connected === true;
   const phylloFollowers = creator.followers_count ?? null;
@@ -207,10 +266,13 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-px bg-white/10 mb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-white/10 mb-10">
         {[
           { label: "Réservations", value: totalVisits },
           { label: "Complétées", value: completedVisits },
+          { label: "Maisons visitées", value: casasVisitadas },
+          { label: "Stories envoyées", value: storiesSubidas },
+          { label: "Note moyenne donnée", value: media ? `${media} ★` : "—" },
           { label: "Crédits dépensés", value: `€${usedCredit}` },
         ].map((s) => (
           <div key={s.label} className="bg-white/5 px-6 py-5">
@@ -218,6 +280,46 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
             <p className="font-serif text-2xl font-light text-white">{s.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Où en est-elle : chaque étape de l'entrée, faite ou pas. */}
+      <div className="border border-white/10 bg-white/5 p-6 md:p-8 mb-10">
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Parcours et connexions</p>
+        <ul className="divide-y divide-white/8">
+          {etapas.map((e) => (
+            <li key={e.label} className="flex items-center justify-between gap-4 py-3">
+              <span className="font-serif text-[14px] text-white/80">{e.label}</span>
+              <span className={`font-serif text-[12px] ${e.hecho ? "text-emerald-400" : "text-white/35"}`}>
+                {e.hecho ? `✓ ${e.detalle && e.detalle !== "—" ? e.detalle : "Fait"}` : "Pas encore"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Le profil tel que l'ouvre une maison. */}
+      {dossier && (
+        <div className="mb-10">
+          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Profil · ce que voient les maisons</p>
+          <DossierInline dossier={dossier} lang="fr" />
+        </div>
+      )}
+
+      {/* Ses réponses au questionnaire. */}
+      <div className="border border-white/10 bg-white/5 p-6 md:p-8 mb-10">
+        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Questionnaire</p>
+        {encuesta.length === 0 ? (
+          <p className="font-serif text-[14px] text-white/35">Pas encore répondu.</p>
+        ) : (
+          <dl className="space-y-4">
+            {encuesta.map((r) => (
+              <div key={r.pregunta}>
+                <dt className="font-serif text-[12px] text-white/45">{r.pregunta}</dt>
+                <dd className="mt-1 font-serif text-[14px] text-white">{r.respuesta || "—"}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </div>
 
       {/* Instagram · Phyllo */}
@@ -304,6 +406,9 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
           </div>
         )}
       </div>
+
+      {/* Réinitialiser ou supprimer le compte. */}
+      <AccionesDeCuenta tipo="storyteller" id={creator.id as string} nombre={(creator.full_name as string | null) ?? (creator.email as string)} />
     </main>
   );
 }
