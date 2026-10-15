@@ -255,7 +255,7 @@ export default function DashboardNav({
                     key={l.href}
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className={`flex min-h-11 items-center text-sous-titre transition-colors duration-200 ease-curato ${
+                    className={`flex min-h-11 items-center text-capitale uppercase tracking-capitale transition-colors duration-200 ease-curato ${
                       l.active ? "text-accent" : "text-text-secondary hover:text-accent"
                     }`}
                   >
@@ -269,9 +269,9 @@ export default function DashboardNav({
                   <Link
                     href="/admin"
                     onClick={() => setOpen(false)}
-                    className="flex min-h-11 items-center gap-2 text-sous-titre text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
+                    className="flex min-h-11 items-center gap-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
                   >
-                    <ShieldCheck size={15} />
+                    <ShieldCheck size={13} />
                     Admin
                   </Link>
                 )}
@@ -280,9 +280,9 @@ export default function DashboardNav({
                   <Link
                     href={settingsHref}
                     onClick={() => setOpen(false)}
-                    className="flex min-h-11 items-center gap-2 text-sous-titre text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
+                    className="flex min-h-11 items-center gap-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
                   >
-                    <Gear size={15} />
+                    <Gear size={13} />
                     {settingsLabel}
                   </Link>
                 )}
