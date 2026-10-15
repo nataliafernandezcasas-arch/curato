@@ -19,6 +19,7 @@ import { Carta } from "@/components/member/carta";
 
 type MaisonService = { name: string; description: string; price: string };
 type MaisonAvail = {
+  agenda?: { modo: "horaires" | "dates"; llegadas: number[]; minNoches: number; maxNoches: number };
   availability: AvailWindow[];
   blocked: { date: string }[];
   taken: string[];
@@ -78,6 +79,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const [maison, setMaison] = useState<Maison | null>(null);
   const [loading, setLoading] = useState(true);
   const [oferta, setOferta] = useState<{ services: MaisonService[]; menuUrls: string[]; eur: number | null } | null>(null);
+  const [horario, setHorario] = useState<Pick<MaisonAvail, "agenda" | "availability"> | null>(null);
 
   const router = useRouter();
   const [preview, setPreview] = useState(false);
@@ -121,9 +123,11 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   useEffect(() => {
     fetch(`/api/maison/${id}/availability`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: MaisonAvail | null) =>
-        d && setOferta({ services: (d.services ?? []).filter((s) => s.name?.trim()), menuUrls: d.menuUrls ?? [], eur: d.offerEur ?? null })
-      )
+      .then((d: MaisonAvail | null) => {
+        if (!d) return;
+        setOferta({ services: (d.services ?? []).filter((s) => s.name?.trim()), menuUrls: d.menuUrls ?? [], eur: d.offerEur ?? null });
+        setHorario({ agenda: d.agenda, availability: d.availability ?? [] });
+      })
       .catch(() => {});
   }, [id]);
 
@@ -274,6 +278,9 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                   </div>
                 )}
 
+                {/* Cuándo se puede ir: antes solo se veía al pedir la visita. */}
+                {horario && <Horarios horario={horario} lang={lang} />}
+
                 {/* Map */}
                 {maison.address && (
                   <div className="mb-8">
@@ -332,6 +339,73 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
         )}
       </div>
 
+    </div>
+  );
+}
+
+const HORARIOS: Record<Lang, { titulo: string; cerrado: string; llegadas: string; noches: (a: number, b: number) => string; dias: string[] }> = {
+  fr: {
+    titulo: "Horaires",
+    cerrado: "Fermé",
+    llegadas: "Arrivées possibles",
+    noches: (a, b) => (a === b ? `${a} nuit${a > 1 ? "s" : ""}` : `De ${a} à ${b} nuits`),
+    dias: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+  },
+  en: {
+    titulo: "Opening hours",
+    cerrado: "Closed",
+    llegadas: "Possible arrivals",
+    noches: (a, b) => (a === b ? `${a} night${a > 1 ? "s" : ""}` : `${a} to ${b} nights`),
+    dias: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  },
+  es: {
+    titulo: "Horarios",
+    cerrado: "Cerrado",
+    llegadas: "Llegadas posibles",
+    noches: (a, b) => (a === b ? `${a} noche${a > 1 ? "s" : ""}` : `De ${a} a ${b} noches`),
+    dias: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+  },
+};
+// La semana empieza el lunes.
+const ORDEN = [1, 2, 3, 4, 5, 6, 0];
+
+/** Los horarios de la casa: cada día con sus franjas, o, un hotel, sus llegadas y noches. */
+function Horarios({ horario, lang }: { horario: Pick<MaisonAvail, "agenda" | "availability">; lang: Lang }) {
+  const t = HORARIOS[lang] ?? HORARIOS.fr;
+  const fila = "flex items-baseline justify-between gap-fila border-b border-border py-bloque last:border-0";
+  if (horario.agenda?.modo === "dates") {
+    const a = horario.agenda;
+    return (
+      <div className="mb-8">
+        <p className="mb-3 font-serif text-[11px] uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
+        <div className={fila}>
+          <span className="text-legende text-text-secondary">{t.llegadas}</span>
+          <span className="text-right text-legende text-text-primary">{ORDEN.filter((d) => a.llegadas.includes(d)).map((d) => t.dias[d]).join(", ")}</span>
+        </div>
+        <div className={fila}>
+          <span className="text-legende text-text-secondary">{t.noches(a.minNoches, a.maxNoches)}</span>
+        </div>
+      </div>
+    );
+  }
+  if (horario.availability.length === 0) return null;
+  return (
+    <div className="mb-8">
+      <p className="mb-3 font-serif text-[11px] uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
+      {ORDEN.map((d) => {
+        const franjas = horario.availability
+          .filter((w) => w.day === d)
+          .sort((x, y) => x.start.localeCompare(y.start))
+          .map((w) => `${w.start}–${w.end}`);
+        return (
+          <div key={d} className={fila}>
+            <span className="text-legende text-text-secondary">{t.dias[d]}</span>
+            <span className={`text-right text-legende tabular-nums ${franjas.length ? "text-text-primary" : "text-text-muted"}`}>
+              {franjas.length ? franjas.join(" · ") : t.cerrado}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
