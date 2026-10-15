@@ -79,6 +79,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const [instagram, setInstagram] = useState("");
   const [name, setName] = useState("");
   const [arrondissement, setArrondissement] = useState<string | null>(null);
+  const [address, setAddress] = useState("");
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -111,6 +112,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         setName(d.name ?? "");
         setMaisonId(d.id ?? null);
         setArrondissement(d.arrondissement ?? null);
+        setAddress(d.address ?? "");
         setCategoryId(d.categoryId ?? null);
         const propia = suya === "en" ? d.descriptionEn ?? "" : suya === "es" ? d.descriptionEs ?? "" : desc;
         if (p.length < MIN_PHOTOS || propia.trim().length < MIN_DESC) setEditing(true);
@@ -200,7 +202,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
       const res = await fetch("/api/maison/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description, descriptionEn, descriptionEs, descriptionLang: fuente, traducir, website, instagram }),
+        body: JSON.stringify({ description, descriptionEn, descriptionEs, descriptionLang: fuente, traducir, website, instagram, address }),
       });
       const d = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -345,6 +347,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             {[
               { done: photosOk, label: t.gsStepPhotos.replace("{n}", String(photos.length)) },
               { done: descOk, label: t.gsStepDesc.replace("{n}", String(descLen)) },
+              { done: Boolean(address.trim()), label: DIRECCION[lang].paso },
             ].map((s, i) => (
               <div key={i} className="flex min-h-11 items-center gap-fila">
                 <span
@@ -503,6 +506,19 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
           </p>
         </div>
 
+        {/* La dirección: la ve el storyteller, con el mapa, y de ella sale el distrito. */}
+        <div>
+          <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-3">{DIRECCION[lang].label}</label>
+          <input
+            type="text"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder={DIRECCION[lang].ejemplo}
+            autoComplete="street-address"
+            className={`w-full ${inputCls}`}
+          />
+        </div>
+
         {/* Links */}
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
@@ -556,3 +572,9 @@ function EnlaceVistaPrevia({ id, label }: { id: string; label: string }) {
     </Link>
   );
 }
+
+const DIRECCION: Record<Lang, { label: string; ejemplo: string; paso: string }> = {
+  fr: { label: "Adresse", ejemplo: "12 rue de la Roquette, 75011 Paris", paso: "Indiquez votre adresse" },
+  en: { label: "Address", ejemplo: "12 rue de la Roquette, 75011 Paris", paso: "Add your address" },
+  es: { label: "Dirección", ejemplo: "12 rue de la Roquette, 75011 París", paso: "Indica tu dirección" },
+};

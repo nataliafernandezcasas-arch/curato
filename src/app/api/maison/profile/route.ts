@@ -100,6 +100,18 @@ export async function PATCH(request: NextRequest) {
       update.contact_instagram = (body.instagram || "").trim().slice(0, 100) || null;
     }
 
+    // La dirección (no se pedía, y la ficha salía sin dirección ni mapa). El
+    // distrito sale del código postal: 75011 → 11e, 75001 → 1er, 75116 → 16e.
+    if (typeof body.address === "string") {
+      const direccion = body.address.trim().slice(0, 300);
+      update.address = direccion || null;
+      const cp = direccion.match(/\b750(\d\d)\b/) ?? direccion.match(/\b751(16)\b/);
+      if (cp) {
+        const n = Number(cp[1]);
+        if (n >= 1 && n <= 20) update.arrondissement = n === 1 ? "1er" : `${n}e`;
+      }
+    }
+
     // Reorder: only permute existing photos, never inject new URLs.
     let photos: string[] | undefined;
     if (Array.isArray(body.photos)) {
