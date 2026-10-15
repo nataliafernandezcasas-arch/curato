@@ -60,6 +60,8 @@ export default function AdminNavClient() {
       items: [
         { href: "/admin/nuevo", label: t.navNewMember },
         { href: "/admin/qr", label: t.navQR },
+        // De vuelta a la app, para quien entra desde el teléfono.
+        { href: "/dashboard", label: "← Retour à l'app" },
       ],
     },
   ];

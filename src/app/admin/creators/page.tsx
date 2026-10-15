@@ -54,9 +54,13 @@ export default async function AdminCreatorsPage() {
       <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-3">
         {list.length} créateurs
       </p>
-      <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white mb-10">
-        Créateurs
-      </h1>
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white">Créateurs</h1>
+        {/* Créer un profil : le formulaire de « Nouveau membre ». */}
+        <Link href="/admin/nuevo" className="border border-champagne/40 px-4 py-2.5 font-serif text-[11px] uppercase tracking-[0.2em] text-champagne transition-colors hover:bg-champagne/10">
+          + Nouveau
+        </Link>
+      </div>
 
       {list.length === 0 ? (
         <div className="text-center py-20 border border-white/10">

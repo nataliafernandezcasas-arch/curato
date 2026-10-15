@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import MaisonsList, { MaisonItem } from "./maisons-list";
 
@@ -86,7 +87,13 @@ export default async function AdminMaisonsPage() {
       <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-3">
         {maisons.length} maisons · {signedCount} signées · {connectedCount} connectées
       </p>
-      <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white mb-10">Maisons</h1>
+      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white">Maisons</h1>
+        {/* Créer un profil : le formulaire de « Nouveau membre ». */}
+        <Link href="/admin/nuevo" className="border border-champagne/40 px-4 py-2.5 font-serif text-[11px] uppercase tracking-[0.2em] text-champagne transition-colors hover:bg-champagne/10">
+          + Nouveau
+        </Link>
+      </div>
 
       <MaisonsList maisons={maisons} />
     </div>
