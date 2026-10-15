@@ -1,5 +1,6 @@
 "use client";
 
+import { Laminas } from "@/components/member/laminas";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/member/button";
@@ -66,7 +67,7 @@ export default function WelcomeClient() {
           the scroll. ES still shows the FR slides (Canva translation
           pending). Pointer-events-none on the wrapper so it never blocks
           the underlying scroll/click; the buttons themselves opt back in. */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2 pointer-events-none">
+      <div className="fixed right-4 z-50 flex items-center gap-2 pointer-events-none" style={{ top: "calc(env(safe-area-inset-top, 0px) + 16px)" }}>
         {LANG_OPTIONS.map(({ key, label }) => (
           <button
             key={key}
@@ -84,19 +85,8 @@ export default function WelcomeClient() {
       </div>
 
       {/* Stacked slides — full bleed, no gaps */}
-      <section aria-label={welcomeLabels.dossierLabel}>
-        {welcomeSlides.map((slide, i) => (
-          <img
-            key={slide.src}
-            src={slide.src}
-            alt={slide.alt}
-            // First slide eagerly loaded so the page lands ready;
-            // the rest are lazy so we don't hammer the network on load.
-            loading={i === 0 ? "eager" : "lazy"}
-            className="block w-full h-auto"
-          />
-        ))}
-      </section>
+      {/* Cada página se abre a pantalla completa para ampliarla. */}
+      <Laminas laminas={welcomeSlides} label={welcomeLabels.dossierLabel} />
 
       {/* Acceptance block — lives in the same scroll, separated by a
           dark band so the storyteller knows they've reached the action. */}

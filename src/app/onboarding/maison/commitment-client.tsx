@@ -1,5 +1,6 @@
 "use client";
 
+import { Laminas } from "@/components/member/laminas";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/member/button";
@@ -57,7 +58,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
   return (
     <div className="min-h-[100dvh] bg-charcoal-deep text-white">
       {/* Language switcher */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+      <div className="fixed right-4 z-50 flex items-center gap-2" style={{ top: "calc(env(safe-area-inset-top, 0px) + 16px)" }}>
         {LANG_OPTIONS.map(({ key, label }) => (
           <button
             key={key}
@@ -74,12 +75,8 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
       </div>
 
       {/* Presentation dossier — stacked full-bleed pages */}
-      <section aria-label={l.dossierEyebrow}>
-        {dossierSlides.map((src, i) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img key={src} src={src} alt="" loading={i === 0 ? "eager" : "lazy"} className="block w-full h-auto" />
-        ))}
-      </section>
+      {/* Cada página se abre a pantalla completa para ampliarla. */}
+      <Laminas laminas={dossierSlides.map((src) => ({ src }))} label={l.dossierEyebrow} />
 
       {/* Download the dossier */}
       <div className="py-seccion text-center">
