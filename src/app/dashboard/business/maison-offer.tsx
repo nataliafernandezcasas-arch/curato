@@ -25,17 +25,17 @@ const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // JS getDay(): Mon..Sun
 const ERROR_MENU: Record<Lang, Record<"format" | "size" | "upload", string>> = {
   fr: {
     format: "Ce format n'est pas accepté : PDF, JPEG, PNG ou WEBP.",
-    size: "Ce fichier dépasse 20 Mo.",
+    size: "Ce fichier dépasse 50 Mo.",
     upload: "L'envoi n'a pas abouti. Réessayez dans un instant.",
   },
   en: {
     format: "This format isn't accepted: PDF, JPEG, PNG or WEBP.",
-    size: "This file is over 20 MB.",
+    size: "This file is over 50 MB.",
     upload: "The upload didn't go through. Try again in a moment.",
   },
   es: {
     format: "Este formato no se acepta: PDF, JPEG, PNG o WEBP.",
-    size: "Este archivo pasa de 20 MB.",
+    size: "Este archivo pasa de 50 MB.",
     upload: "No se pudo subir. Vuelve a intentarlo en un momento.",
   },
 };
