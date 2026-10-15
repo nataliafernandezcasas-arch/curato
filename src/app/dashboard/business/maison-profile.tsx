@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
-import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check, CaretLeft, CaretRight } from "@phosphor-icons/react";
+import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check, CaretLeft, CaretRight, Clock, WarningCircle } from "@phosphor-icons/react";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
 import { Button } from "@/components/member/button";
@@ -314,10 +314,10 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
     return (
       <div className="max-w-[1100px] mx-auto">
         {traduciendo && (
-          <p className="mb-6 border-l-2 border-accent pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].pending}</p>
+          <AvisoEnLinea tono="plazo" texto={TRAD[lang].pending} className="mb-6" />
         )}
         {traduccionFallida && (
-          <p className="mb-6 border-l-2 border-copper-vif pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].failed}</p>
+          <AvisoEnLinea tono="caido" texto={TRAD[lang].failed} className="mb-6" />
         )}
         <div className="flex justify-end gap-2 mb-6">
           {maisonId && <EnlaceVistaPrevia id={maisonId} label={t.profilePreview} />}
@@ -573,7 +573,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         </div>
 
         {errorGuardar && (
-          <p className="border-l-2 border-copper-vif pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].saveError}</p>
+          <AvisoEnLinea tono="caido" texto={TRAD[lang].saveError} />
         )}
         <div className="flex items-center gap-5 pt-2">
           <Button onClick={save} disabled={!canSave}>
@@ -622,3 +622,16 @@ const DIRECCION: Record<Lang, { label: string; ejemplo: string; paso: string }> 
   en: { label: "Address", ejemplo: "12 rue de la Roquette, 75011 Paris", paso: "Add your address" },
   es: { label: "Dirección", ejemplo: "12 rue de la Roquette, 75011 París", paso: "Indica tu dirección" },
 };
+
+/** Un aviso fijo en la página, con la misma forma que el que aparece y se va (toast.tsx). */
+function AvisoEnLinea({ tono, texto, className = "" }: { tono: "plazo" | "caido"; texto: string; className?: string }) {
+  const Icono = tono === "plazo" ? Clock : WarningCircle;
+  return (
+    <div className={`caja-cristal flex items-center gap-3 !bg-[#1a1a1a]/90 px-4 py-3 ${className}`}>
+      <span aria-hidden className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${tono === "plazo" ? "bg-copper-vif/20" : "bg-burgundy-vif/25"}`}>
+        <Icono size={18} weight="bold" className="text-copper-vif" />
+      </span>
+      <p className="text-legende text-text-primary">{texto}</p>
+    </div>
+  );
+}

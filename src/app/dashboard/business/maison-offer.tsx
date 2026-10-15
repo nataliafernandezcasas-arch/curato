@@ -249,14 +249,14 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       // La confirmación llega como aviso, encima de la barra, y se va sola en 4 s.
       // Si algo no se guardó, se dice qué: antes una oferta rechazada pasaba en
       // silencio y la casa creía tenerla puesta.
-      if (res.ok) mostrar(t.offerSaved);
+      if (res.ok) mostrar(t.offerSaved, "cumplido", false, VISTO[lang]);
       else {
         const d = (await res.json().catch(() => ({}))) as { errores?: string[]; min?: number; max?: number };
         const errores = d.errores ?? ["offer"];
-        if (errores.includes("range") && d.min != null && d.max != null) mostrar(OFERTA[lang].outOfRange(d.min, d.max));
-        else if (errores.includes("offer")) mostrar(NO_GUARDADO[lang].offer);
-        else if (errores.includes("agenda")) mostrar(AGENDA[lang].notSaved);
-        else mostrar(NO_GUARDADO[lang].otro);
+        if (errores.includes("range") && d.min != null && d.max != null) mostrar(OFERTA[lang].outOfRange(d.min, d.max), "caido");
+        else if (errores.includes("offer")) mostrar(NO_GUARDADO[lang].offer, "caido");
+        else if (errores.includes("agenda")) mostrar(AGENDA[lang].notSaved, "caido");
+        else mostrar(NO_GUARDADO[lang].otro, "caido");
       }
     } finally {
       setSaving(false);
@@ -526,3 +526,10 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
     </div>
   );
 }
+
+// La línea de debajo del «Enregistré»: qué significa haber guardado.
+const VISTO: Record<Lang, string> = {
+  fr: "Les storytellers voient déjà vos changements.",
+  en: "Storytellers already see your changes.",
+  es: "Los storytellers ya ven tus cambios.",
+};
