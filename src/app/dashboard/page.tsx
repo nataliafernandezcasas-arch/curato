@@ -44,6 +44,16 @@ export default async function DashboardPage() {
     if (!creator.onboarding_survey_completed_at) {
       redirect("/onboarding/survey");
     }
+    // Y el recorrido de la app: cómo se usa, Instagram y el perfil. Consulta
+    // aparte y tolerante: sin la migración 050, nadie se queda atascado.
+    const { data: guia, error: sinGuia } = await admin
+      .from("creators")
+      .select("guia_completada_at")
+      .eq("id", creator.id)
+      .maybeSingle();
+    if (!sinGuia && guia && !guia.guia_completada_at) {
+      redirect("/onboarding/guia");
+    }
     redirect("/dashboard/storyteller");
   }
 

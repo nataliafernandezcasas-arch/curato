@@ -133,8 +133,9 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
       return;
     }
     setDone(true);
-    // Brief celebratory pause, then off to the feed.
-    setTimeout(() => router.push("/dashboard/storyteller"), 1500);
+    // Una pausa para celebrarlo, y al recorrido de la app (/dashboard decide:
+    // la guía si falta, si no las direcciones).
+    setTimeout(() => router.push("/dashboard"), 1500);
   }
 
   // ── Done screen
