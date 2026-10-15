@@ -23,7 +23,8 @@ const TP = {
     seenNote: "Votre profil tel qu'une maison l'ouvre. Ce que vous modifiez, elles le voient aussitôt.",
     edit: "Modifier mon profil",
     unavailable: "Votre profil ne s'est pas chargé. Réessayez dans un instant.",
-    saved: "Enregistré. C'est ce que voient maintenant les maisons.",
+    saved: "Enregistré",
+    savedDetail: "C'est ce que voient maintenant les maisons.",
     figures: "Vos chiffres",
     reachAccounts: "Comptes atteints",
     reachViews: "Vues",
@@ -35,7 +36,8 @@ const TP = {
     seenNote: "Your profile as a house opens it. Whatever you change, they see straight away.",
     edit: "Edit my profile",
     unavailable: "Your profile didn't load. Try again in a moment.",
-    saved: "Saved. This is what houses now see.",
+    saved: "Saved",
+    savedDetail: "This is what houses now see.",
     figures: "Your figures",
     reachAccounts: "Accounts reached",
     reachViews: "Views",
@@ -47,7 +49,8 @@ const TP = {
     seenNote: "Tu perfil tal como lo abre una maison. Lo que cambies, lo ven al momento.",
     edit: "Editar mi perfil",
     unavailable: "Tu perfil no se cargó. Vuelve a intentarlo en un momento.",
-    saved: "Guardado. Es lo que ven ahora las maisons.",
+    saved: "Guardado",
+    savedDetail: "Es lo que ven ahora las maisons.",
     figures: "Tus cifras",
     reachAccounts: "Cuentas alcanzadas",
     reachViews: "Vistas",
@@ -258,7 +261,7 @@ export default function ProfilPage() {
           onSaved={() => {
             setEditando(false);
             cargarPerfil();
-            mostrar(tp.saved);
+            mostrar(tp.saved, "cumplido", false, tp.savedDetail);
           }}
         />
       )}
