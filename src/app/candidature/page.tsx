@@ -117,7 +117,7 @@ export default function CandidaturePage() {
       <div className="min-h-[100dvh] relative flex items-center justify-center px-5">
         <div className="absolute inset-0">
           <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-charcoal-deep/85 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-charcoal-deep/75 backdrop-blur-sm" />
         </div>
         <motion.div {...fade()} className="relative z-10 text-center max-w-md">
           <Link href="/" className="inline-block mb-12">
@@ -138,7 +138,7 @@ export default function CandidaturePage() {
     <div className="min-h-[100dvh] relative flex items-center justify-center px-5 py-20">
       <div className="absolute inset-0">
         <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-charcoal-deep/85 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-charcoal-deep/75 backdrop-blur-sm" />
       </div>
 
       <div className="relative z-10 w-full max-w-[520px]">
