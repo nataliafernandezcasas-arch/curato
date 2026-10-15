@@ -30,6 +30,8 @@ const TRAD: Record<Lang, {
   hint: string;
   auto: string;
   failed: string;
+  pending: string;
+  saveError: string;
   names: Record<"fr" | "en" | "es", string>;
 }> = {
   fr: {
@@ -37,6 +39,8 @@ const TRAD: Record<Lang, {
     hint: "Écrivez dans votre langue : les deux autres se traduisent à l'enregistrement. Vous pouvez ensuite les retoucher.",
     auto: "Traduit automatiquement depuis votre texte. Vous pouvez le retoucher.",
     failed: "Enregistré, mais la traduction n'a pas abouti. Réessayez plus tard, ou complétez les autres langues à la main.",
+    pending: "Enregistré. Les traductions arrivent dans quelques secondes.",
+    saveError: "L'enregistrement n'a pas abouti. Votre texte est toujours là : réessayez.",
     names: { fr: "Français", en: "English", es: "Español" },
   },
   en: {
@@ -44,6 +48,8 @@ const TRAD: Record<Lang, {
     hint: "Write in your language: the other two are translated when you save. You can then fine-tune them.",
     auto: "Translated automatically from your text. You can fine-tune it.",
     failed: "Saved, but the translation didn't go through. Try again later, or fill in the other languages by hand.",
+    pending: "Saved. The translations will arrive in a few seconds.",
+    saveError: "Saving didn't go through. Your text is still here: try again.",
     names: { fr: "Français", en: "English", es: "Español" },
   },
   es: {
@@ -51,6 +57,8 @@ const TRAD: Record<Lang, {
     hint: "Escribe en tu idioma: los otros dos se traducen al guardar. Después puedes retocarlos.",
     auto: "Traducido automáticamente de tu texto. Puedes retocarlo.",
     failed: "Guardado, pero la traducción no salió. Vuelve a intentarlo más tarde o completa los otros idiomas a mano.",
+    pending: "Guardado. Las traducciones llegan en unos segundos.",
+    saveError: "No se pudo guardar. Tu texto sigue aquí: vuelve a intentarlo.",
     names: { fr: "Français", en: "English", es: "Español" },
   },
 };
@@ -75,6 +83,8 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   const inicial = useRef<Record<"fr" | "en" | "es", string>>({ fr: "", en: "", es: "" });
   const tocadas = useRef<Set<"fr" | "en" | "es">>(new Set());
   const [traduccionFallida, setTraduccionFallida] = useState(false);
+  const [traduciendo, setTraduciendo] = useState(false);
+  const [errorGuardar, setErrorGuardar] = useState(false);
   const [website, setWebsite] = useState("");
   const [instagram, setInstagram] = useState("");
   const [name, setName] = useState("");
@@ -188,9 +198,31 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
     persistOrder(next);
   }
 
+  // Pregunta por las traducciones cada pocos segundos, un medio minuto como mucho.
+  async function esperarTraducciones(antes: { fr: string; en: string; es: string }) {
+    setTraduciendo(true);
+    for (let i = 0; i < 8; i++) {
+      await new Promise((r) => setTimeout(r, 4000));
+      const d = await fetch("/api/maison/profile", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      if (!d) continue;
+      const en = d.descriptionEn ?? "";
+      const es = d.descriptionEs ?? "";
+      if (en !== antes.en || es !== antes.es) {
+        setDescriptionEn(en);
+        setDescriptionEs(es);
+        inicial.current = { fr: d.description ?? antes.fr, en, es };
+        setTraduciendo(false);
+        return;
+      }
+    }
+    setTraduciendo(false);
+    setTraduccionFallida(true);
+  }
+
   async function save() {
     setSaving(true);
     setTraduccionFallida(false);
+    setErrorGuardar(false);
     const textos = { fr: description, en: descriptionEn, es: descriptionEs };
     // Se traduce lo que está vacío y, si la casa cambió su propio texto, lo que
     // no retocó a mano en esta edición.
@@ -212,9 +244,15 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         setDescriptionEs(guardado.es);
         inicial.current = guardado;
         tocadas.current = new Set();
-        setTraduccionFallida(Boolean(d.traduccionFallida));
+        setErrorGuardar(false);
         setEditing(false);
+        // Las traducciones se hacen después de guardar: se piden en un rato.
+        if (Array.isArray(d.traduciendo) && d.traduciendo.length) void esperarTraducciones(guardado);
+      } else {
+        setErrorGuardar(true);
       }
+    } catch {
+      setErrorGuardar(true);
     } finally {
       setSaving(false);
     }
@@ -275,6 +313,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   if (!editing) {
     return (
       <div className="max-w-[1100px] mx-auto">
+        {traduciendo && (
+          <p className="mb-6 border-l-2 border-accent pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].pending}</p>
+        )}
         {traduccionFallida && (
           <p className="mb-6 border-l-2 border-copper-vif pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].failed}</p>
         )}
@@ -531,6 +572,9 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
           </div>
         </div>
 
+        {errorGuardar && (
+          <p className="border-l-2 border-copper-vif pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].saveError}</p>
+        )}
         <div className="flex items-center gap-5 pt-2">
           <Button onClick={save} disabled={!canSave}>
             {saving ? t.profileSaving : t.profileSave}

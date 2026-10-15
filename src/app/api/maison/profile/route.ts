@@ -1,10 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDe } from "@/lib/identidad";
 import { traducirDescripcion, type Idioma } from "@/lib/traducir";
 
 const IDIOMAS: Idioma[] = ["fr", "en", "es"];
+
+// La traducción corre después de responder, pero dentro de la misma función.
+export const maxDuration = 60;
 const COLUMNA: Record<Idioma, "description" | "description_en" | "description_es"> = {
   fr: "description",
   en: "description_en",
@@ -77,24 +80,24 @@ export async function PATCH(request: NextRequest) {
 
     const update: Record<string, unknown> = {};
 
-    let traducidas: Partial<Record<Idioma, string>> | null = {};
+    // Lo que la casa escribió se guarda ya; las traducciones llegan después.
+    // Antes se traducía antes de guardar: si Claude tardaba, la petición se
+    // cortaba y no se guardaba nada, y la descripción «se borraba» (Natalia,
+    // 2026-10-15).
     let fuente: Idioma | null = null;
+    let pedidos: Idioma[] = [];
+    let textoFuente = "";
     if ("description" in body || "website" in body || "instagram" in body) {
       const textos: Record<Idioma, string> = {
         fr: (body.description || "").slice(0, 2000),
         en: (body.descriptionEn || "").slice(0, 2000),
         es: (body.descriptionEs || "").slice(0, 2000),
       };
-      // La casa escribe en un idioma; los que la pantalla pide traducir (los que
-      // están vacíos, o los que no retocó cuando cambió su texto) los pone Claude.
       fuente = IDIOMAS.includes(body.descriptionLang) ? (body.descriptionLang as Idioma) : "fr";
-      const pedidos = Array.isArray(body.traducir)
+      pedidos = Array.isArray(body.traducir)
         ? (body.traducir as unknown[]).filter((l): l is Idioma => IDIOMAS.includes(l as Idioma) && l !== fuente)
         : [];
-      if (pedidos.length) {
-        traducidas = await traducirDescripcion(textos[fuente], fuente, pedidos);
-        for (const [l, t] of Object.entries(traducidas ?? {})) textos[l as Idioma] = t.slice(0, 2000);
-      }
+      textoFuente = textos[fuente];
       for (const l of IDIOMAS) update[COLUMNA[l]] = l === "fr" ? textos.fr : textos[l] || null;
       update.website_url = (body.website || "").trim().slice(0, 300) || null;
       update.contact_instagram = (body.instagram || "").trim().slice(0, 100) || null;
@@ -124,20 +127,36 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (Object.keys(update).length) {
-      await admin.from("comercios").update(update).eq("id", maison.id);
+      const { error } = await admin.from("comercios").update(update).eq("id", maison.id);
+      if (error) {
+        console.error("Profile PATCH update error:", error);
+        return NextResponse.json({ error: "save" }, { status: 500 });
+      }
       // Aparte, por si la migración 042 aún no está: sin la columna, lo demás
       // ya se guardó.
       if (fuente) await admin.from("comercios").update({ description_lang: fuente }).eq("id", maison.id);
     }
+    // Las traducciones, después de responder: la casa no espera a Claude.
+    if (fuente && pedidos.length && textoFuente.trim()) {
+      const desde = fuente;
+      const id = maison.id;
+      after(async () => {
+        const traducidas = await traducirDescripcion(textoFuente, desde, pedidos);
+        if (!traducidas) return;
+        const cambios: Record<string, string> = {};
+        for (const [l, t] of Object.entries(traducidas)) cambios[COLUMNA[l as Idioma]] = t.slice(0, 2000);
+        if (Object.keys(cambios).length) await admin.from("comercios").update(cambios).eq("id", id);
+      });
+    }
+
     return NextResponse.json({
       ok: true,
       photos,
-      // Lo que quedó guardado, traducciones incluidas, para que la pantalla lo enseñe.
       description: update.description,
       descriptionEn: update.description_en ?? "",
       descriptionEs: update.description_es ?? "",
-      // null si se pidió traducir y no se pudo: la pantalla lo dice.
-      traduccionFallida: traducidas === null,
+      // Los idiomas que se están traduciendo: la pantalla los pide en un rato.
+      traduciendo: fuente && textoFuente.trim() ? pedidos : [],
     });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
