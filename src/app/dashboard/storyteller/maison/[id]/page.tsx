@@ -4,10 +4,11 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import DashboardNav from "../../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../../nav-links";
+import { MAISON_LINKS } from "../../../business/nav-links";
 import { MapPin, ArrowLeft, GlobeSimple, X, CheckCircle } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/lib/i18n/LanguageContext";
-import { translations } from "@/lib/i18n/translations";
+import { translations, type Lang } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import { parisParts, AvailWindow } from "@/lib/availability";
 import { Row } from "@/components/member/row";
@@ -66,6 +67,12 @@ const CATEGORY: Record<string, { slug: keyof typeof SLUG_LABEL_KEY; unit: string
   "00000000-0000-0000-0000-0000000ca704": { slug: "belleza", unit: "booking" },
 };
 
+const APERCU: Record<Lang, { volver: string; nota: string }> = {
+  fr: { volver: "Ma maison", nota: "Aperçu : votre fiche telle que la voit un storyteller. Les modifications se font dans Ma maison." },
+  en: { volver: "My house", nota: "Preview: your page as a storyteller sees it. Make changes in My house." },
+  es: { volver: "Mi casa", nota: "Vista previa: tu ficha tal como la ve un storyteller. Los cambios se hacen en Mi casa." },
+};
+
 export default function MaisonProfile({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [maison, setMaison] = useState<Maison | null>(null);
@@ -74,13 +81,18 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
   const router = useRouter();
   const [preview, setPreview] = useState(false);
+  // ?apercu=1: la casa mirando su propia ficha (Ma maison → Aperçu). Se ve
+  // igual que la ve un storyteller, aunque aún no esté publicada, y sin poder
+  // reservar.
+  const [apercu, setApercu] = useState(false);
   const [visor, setVisor] = useState<number | null>(null);
 
   // A "?slot=" param (from a proposed-créneaux email) pre-fills + opens the form.
   // "?preview=1" and the native app both bypass the pre-launch gate.
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
-    setPreview(canBypassLaunchGate());
+    setPreview(canBypassLaunchGate() || sp.get("apercu") === "1");
+    setApercu(sp.get("apercu") === "1");
     // Un "?slot=" viene de un correo con créneaux propuestos: ahora lleva
     // directo a la pantalla de reserva con ese día ya elegido.
     const slot = sp.get("slot");
@@ -91,12 +103,15 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
     async function load() {
       const { createClient } = await import("@/lib/supabase/client");
       const supabase = createClient();
-      const { data } = await supabase
+      // En vista previa, también una casa sin publicar: la política de
+      // comercios deja a la dueña leer la suya (owner_id = auth.uid()).
+      const enVistaPrevia = new URLSearchParams(window.location.search).get("apercu") === "1";
+      let consulta = supabase
         .from("comercios")
         .select("id, name, arrondissement, address, description, description_en, description_es, photos, website_url, category_id")
-        .eq("id", id)
-        .eq("is_reservable", true)
-        .maybeSingle();
+        .eq("id", id);
+      if (!enVistaPrevia) consulta = consulta.eq("is_reservable", true);
+      const { data } = await consulta.maybeSingle();
       setMaison((data as Maison) ?? null);
       setLoading(false);
     }
@@ -133,17 +148,36 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   return (
     <div className="min-h-[100dvh] bg-surface">
       {/* Nav */}
-      <DashboardNav
-        links={STORYTELLER_LINKS(td, "addresses")}
-        settingsHref="/dashboard/storyteller/reglages"
-        settingsLabel={td.navSettings}
-      />
+      {apercu ? (
+        <DashboardNav
+          eyebrow="Maison"
+          links={MAISON_LINKS(translations[lang].business, "profile")}
+          settingsHref="/dashboard/business/reglages"
+          settingsLabel={td.navSettings}
+        />
+      ) : (
+        <DashboardNav
+          links={STORYTELLER_LINKS(td, "addresses")}
+          settingsHref="/dashboard/storyteller/reglages"
+          settingsLabel={td.navSettings}
+        />
+      )}
 
       <div className="max-w-[1000px] mx-auto px-pagina py-10">
-        <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-text-secondary hover:text-accent transition-colors mb-8">
-          <ArrowLeft size={14} />
-          {t.backToAll}
-        </Link>
+        {apercu ? (
+          <div className="mb-8">
+            <Link href="/dashboard/business" className="inline-flex min-h-11 items-center gap-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors hover:text-accent">
+              <ArrowLeft size={14} />
+              {APERCU[lang].volver}
+            </Link>
+            <p className="caja-cristal mt-fila px-5 py-4 text-legende text-text-secondary">{APERCU[lang].nota}</p>
+          </div>
+        ) : (
+          <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-text-secondary hover:text-accent transition-colors mb-8">
+            <ArrowLeft size={14} />
+            {t.backToAll}
+          </Link>
+        )}
 
         {gated ? (
           <div className="py-respiro text-center">
@@ -282,9 +316,14 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                     />
                   )}
 
-                  <ButtonLink href={`/dashboard/storyteller/maison/${maison.id}/reserver`} full>
-                    {t.requestReservation}
-                  </ButtonLink>
+                  {apercu ? (
+                    // En la vista previa el botón se ve, pero no reserva.
+                    <span className="boton-cristal pointer-events-none w-full opacity-60">{t.requestReservation}</span>
+                  ) : (
+                    <ButtonLink href={`/dashboard/storyteller/maison/${maison.id}/reserver`} full>
+                      {t.requestReservation}
+                    </ButtonLink>
+                  )}
                   <p className="text-center text-legende text-text-muted">{t.willBeConfirmed}</p>
                 </div>
               </div>

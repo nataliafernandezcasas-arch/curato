@@ -15,10 +15,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const admin = createAdminClient();
     const { data: venue } = await admin
       .from("comercios")
-      .select("id, category_id, availability, blocked_slots, is_reservable, services, menu_urls")
+      .select("id, category_id, availability, blocked_slots, is_reservable, services, menu_urls, owner_id")
       .eq("id", id)
       .maybeSingle();
-    if (!venue || !venue.is_reservable) return NextResponse.json({ error: "Maison indisponible." }, { status: 404 });
+    // La dueña ve la suya aunque no esté publicada: es la vista previa.
+    if (!venue || (!venue.is_reservable && venue.owner_id !== user.id)) return NextResponse.json({ error: "Maison indisponible." }, { status: 404 });
 
     // Slots already requested/confirmed (so they can't be double-booked).
     const { data: taken } = await admin
