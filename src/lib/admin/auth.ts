@@ -50,6 +50,14 @@ export function nuevaSesion(): { valor: string; maxAge: number } | null {
 }
 
 export async function isAdmin(): Promise<boolean> {
+  if (await sesionDeAdmin()) return true;
+  // O la cuenta de Curato con la que se entra en la app, si está en
+  // admin_users: así se llega al admin desde el teléfono sin la contraseña
+  // aparte (Natalia, 2026-10-15).
+  return esCuentaAdmin();
+}
+
+async function sesionDeAdmin(): Promise<boolean> {
   const clave = secreto();
   if (!clave) return false;
 
@@ -63,4 +71,18 @@ export async function isAdmin(): Promise<boolean> {
 
   const caduca = Number(carga);
   return Number.isFinite(caduca) && caduca > Date.now();
+}
+
+/** Si la sesión de Supabase abierta es de una persona de admin_users. */
+export async function esCuentaAdmin(): Promise<boolean> {
+  try {
+    const { createClient } = await import("@/lib/supabase/server");
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const { data: { user } } = await (await createClient()).auth.getUser();
+    if (!user) return false;
+    const { data } = await createAdminClient().from("admin_users").select("user_id").eq("user_id", user.id).maybeSingle();
+    return Boolean(data);
+  } catch {
+    return false;
+  }
 }

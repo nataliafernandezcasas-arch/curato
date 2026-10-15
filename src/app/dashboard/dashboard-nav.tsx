@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Gear, CaretDown } from "@phosphor-icons/react";
+import { Gear, CaretDown, ShieldCheck } from "@phosphor-icons/react";
 import { TabBar, TabBarSpacer, MAX_DESTINOS, Cifra } from "@/components/member/tab-bar";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -17,6 +17,31 @@ export type NavLink = {
   contador?: "demandes";
   cifra?: number;
 };
+
+/**
+ * Si la cuenta es de admin_users: entonces el menú lleva al admin, también
+ * desde el teléfono. Se recuerda en la pestaña para no preguntarlo en cada
+ * pantalla.
+ */
+let esAdminRecordado: boolean | null = null;
+function useEsAdmin(): boolean {
+  const [admin, setAdmin] = useState(esAdminRecordado ?? false);
+  useEffect(() => {
+    if (esAdminRecordado !== null) return;
+    let vivo = true;
+    fetch("/api/me/roles", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { admin?: boolean } | null) => {
+        esAdminRecordado = Boolean(d?.admin);
+        if (vivo) setAdmin(esAdminRecordado);
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
+  return admin;
+}
 
 /**
  * Las demandas por responder de la casa, para la cifra de la barra. Se vuelve
@@ -90,6 +115,7 @@ export default function DashboardNav({
   const { lang } = useLang();
   const c = COMUN[lang];
   const settingsLabel = settingsLabelProp ?? translations[lang].dashboard.navSettings;
+  const esAdmin = useEsAdmin();
   const demandes = useDemandesPendientes(enlaces.some((l) => l.contador === "demandes"));
   const links = enlaces.map((l) => (l.contador === "demandes" ? { ...l, cifra: demandes } : l));
 
@@ -182,6 +208,15 @@ export default function DashboardNav({
 
         <div className="hidden items-center gap-5 sm:flex">
           {roleSwitch}
+          {esAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-text-secondary transition-colors hover:text-accent"
+            >
+              <ShieldCheck size={14} />
+              Admin
+            </Link>
+          )}
           {settingsHref && (
             <Link
               href={settingsHref}
@@ -229,6 +264,17 @@ export default function DashboardNav({
                 ))}
 
                 {roleSwitch && <div className="flex flex-wrap items-center gap-fila">{roleSwitch}</div>}
+
+                {esAdmin && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setOpen(false)}
+                    className="flex min-h-11 items-center gap-2 text-sous-titre text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
+                  >
+                    <ShieldCheck size={15} />
+                    Admin
+                  </Link>
+                )}
 
                 {settingsHref && (
                   <Link
