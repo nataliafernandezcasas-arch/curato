@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
 import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check, CaretLeft, CaretRight } from "@phosphor-icons/react";
@@ -86,6 +87,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   // Un aviso y no su texto: si cambia el idioma, el aviso cambia con él.
   const [hdRejected, setHdRejected] = useState(false);
   const [preview, setPreview] = useState(false);
+  const [maisonId, setMaisonId] = useState<string | null>(null);
   const dragFrom = useRef<number | null>(null);
   const [dragOver, setDragOver] = useState<number | null>(null);
   const [fileDrag, setFileDrag] = useState(false);
@@ -107,6 +109,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         setWebsite(d.website ?? "");
         setInstagram(d.instagram ?? "");
         setName(d.name ?? "");
+        setMaisonId(d.id ?? null);
         setArrondissement(d.arrondissement ?? null);
         setCategoryId(d.categoryId ?? null);
         const propia = suya === "en" ? d.descriptionEn ?? "" : suya === "es" ? d.descriptionEs ?? "" : desc;
@@ -274,12 +277,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
           <p className="mb-6 border-l-2 border-copper-vif pl-3 font-serif text-[13px] text-text-primary">{TRAD[lang].failed}</p>
         )}
         <div className="flex justify-end gap-2 mb-6">
-          <button
-            onClick={() => setPreview((p) => !p)}
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 border font-serif text-[11px] tracking-[0.2em] uppercase transition-all duration-200 ${preview ? "border-accent text-accent" : "border-border-hover text-text-secondary hover:border-accent hover:text-accent"}`}
-          >
-            <Eye size={15} /> {t.profilePreview}
-          </button>
+          {maisonId && <EnlaceVistaPrevia id={maisonId} label={t.profilePreview} />}
           <button
             onClick={() => setEditing(true)}
             aria-label={t.profileEdit}
@@ -331,6 +329,12 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
   // ── EDIT FORM ─────────────────────────────────────────────────────────────
   return (
     <div className="max-w-[1100px] mx-auto">
+      {/* La vista previa también mientras se configura: así se ve qué falta. */}
+      {maisonId && (
+        <div className="mb-6 flex justify-end">
+          <EnlaceVistaPrevia id={maisonId} label={t.profilePreview} />
+        </div>
+      )}
       {/* Let's get started — guided checklist while the profile is incomplete */}
       {(!photosOk || !descOk) && (
         <div className="mb-seccion">
@@ -535,5 +539,20 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
       </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * La ficha tal como la abre un storyteller: la misma página, en modo vista
+ * previa (?apercu=1). Antes era una maqueta aparte que no se parecía del todo.
+ */
+function EnlaceVistaPrevia({ id, label }: { id: string; label: string }) {
+  return (
+    <Link
+      href={`/dashboard/storyteller/maison/${id}?apercu=1`}
+      className="inline-flex items-center gap-2 rounded-full border border-border-hover px-4 py-2.5 font-serif text-[11px] uppercase tracking-[0.2em] text-text-secondary transition-all duration-200 hover:border-accent hover:text-accent"
+    >
+      <Eye size={15} /> {label}
+    </Link>
   );
 }

@@ -45,6 +45,7 @@ export async function GET() {
     if (!maison) return NextResponse.json({ error: "Accès réservé aux maisons." }, { status: 403 });
 
     return NextResponse.json({
+      id: maison.id,
       name: maison.name,
       description: maison.description ?? "",
       descriptionEn: maison.description_en ?? "",

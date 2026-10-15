@@ -128,14 +128,17 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// Los formatos y el peso que admite el bucket (migración 023): veinte megas.
+// Los formatos y el peso que admite el bucket (migración 051): cincuenta megas,
+// el máximo por archivo del plan gratuito de Supabase.
 const MENU_TIPOS: Record<string, string> = {
   "application/pdf": "pdf",
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
+  "image/heic": "heic",
+  "image/heif": "heif",
 };
-const MENU_MAX_BYTES = 20 * 1024 * 1024;
+const MENU_MAX_BYTES = 50 * 1024 * 1024;
 
 /**
  * La carta o el folleto de la casa, en dos pasos.

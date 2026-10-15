@@ -85,7 +85,9 @@ export default function CandidaturePage() {
       body.set("name", form.name);
       body.set("email", form.email.toLowerCase().trim());
       if (form.instagram) body.set("instagram", form.instagram);
-      if (form.website) body.set("website", form.website);
+      // «kalatra.com» o «www.kalatra.com» valen: se les pone https:// delante.
+      const web = form.website.trim();
+      if (web) body.set("website", /^https?:\/\//i.test(web) ? web : `https://${web}`);
       if (form.message) body.set("message", form.message);
       if (type === "creator") body.set("photo_style", form.photoStyle.trim());
       body.set("age_confirmed", "true");
@@ -117,7 +119,7 @@ export default function CandidaturePage() {
       <div className="min-h-[100dvh] relative flex items-center justify-center px-5">
         <div className="absolute inset-0">
           <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-charcoal-deep/85 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-charcoal-deep/75 backdrop-blur-sm" />
         </div>
         <motion.div {...fade()} className="relative z-10 text-center max-w-md">
           <Link href="/" className="inline-block mb-12">
@@ -138,7 +140,7 @@ export default function CandidaturePage() {
     <div className="min-h-[100dvh] relative flex items-center justify-center px-5 py-20">
       <div className="absolute inset-0">
         <img src="/hero-floral.jpeg" alt="" className="w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-charcoal-deep/85 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-charcoal-deep/75 backdrop-blur-sm" />
       </div>
 
       <div className="relative z-10 w-full max-w-[520px]">
@@ -301,7 +303,12 @@ export default function CandidaturePage() {
               <div>
                 <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.websiteLabel}</label>
                 <input
-                  type="url"
+                  // Texto y no "url": el navegador exige https:// y rechazaba
+                  // «www.kalatra.com». El https:// lo pone el envío.
+                  type="text"
+                  inputMode="url"
+                  autoCapitalize="none"
+                  autoCorrect="off"
                   value={form.website}
                   onChange={(e) => setForm({ ...form, website: e.target.value })}
                   className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"

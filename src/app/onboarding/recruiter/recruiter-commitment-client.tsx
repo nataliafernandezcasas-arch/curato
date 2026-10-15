@@ -1,5 +1,6 @@
 "use client";
 
+import { Laminas } from "@/components/member/laminas";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/member/button";
@@ -177,12 +178,8 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
   return (
     <div className="min-h-[100dvh] bg-charcoal-deep text-white">
       {/* Dossier — stacked full-bleed pages */}
-      <section aria-label={t.dossierLabel}>
-        {SLIDES.map((src, i) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img key={src} src={src} alt="" loading={i === 0 ? "eager" : "lazy"} className="block w-full h-auto" />
-        ))}
-      </section>
+      {/* Cada página se abre a pantalla completa para ampliarla. */}
+      <Laminas laminas={SLIDES.map((src) => ({ src }))} label={t.dossierLabel} />
 
       {/* Download */}
       <div className="py-seccion text-center">
