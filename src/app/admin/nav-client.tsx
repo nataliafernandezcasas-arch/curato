@@ -13,20 +13,17 @@ const LANGS: { key: Lang; label: string }[] = [
   { key: "es", label: "ES" },
 ];
 
-// The Curato signature wordmark: lowercase, wide-tracked, with the strike line
-// that runs past the final letter (per the brandbook).
-function CuratoMark({ className = "" }: { className?: string }) {
-  return (
-    <span className={`relative inline-block font-serif font-light text-champagne ${className}`}>
-      <span className="tracking-[0.38em]">curato</span>
-      <span className="absolute left-[-4%] right-[-12%] top-1/2 h-px bg-champagne/90" />
-    </span>
-  );
-}
+// Lo que no estaba en las traducciones del admin.
+const EXTRA: Record<Lang, { recruiters: string; overview: string; admins: string; volver: string; cerrar: string; lema: string }> = {
+  fr: { recruiters: "Recruiters", overview: "Vue d'ensemble", admins: "Administrateurs", volver: "← Retour à l'app", cerrar: "Fermer", lema: "Paris · Sur invitation" },
+  en: { recruiters: "Recruiters", overview: "Overview", admins: "Administrators", volver: "← Back to the app", cerrar: "Close", lema: "Paris · By invitation" },
+  es: { recruiters: "Recruiters", overview: "Resumen", admins: "Administradores", volver: "← Volver a la app", cerrar: "Cerrar", lema: "París · Con invitación" },
+};
 
 export default function AdminNavClient() {
   const { lang, setLang } = useLang();
   const t = translations[lang].admin;
+  const x = EXTRA[lang] ?? EXTRA.fr;
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -42,14 +39,14 @@ export default function AdminNavClient() {
       items: [
         { href: "/admin/creators", label: t.navCreators },
         { href: "/admin/maisons", label: t.navMaisons },
-        { href: "/admin/recruiters", label: "Recruiters" },
+        { href: "/admin/recruiters", label: x.recruiters },
       ],
     },
     {
       id: "activite",
       label: t.navActivity,
       items: [
-        { href: "/admin/overview", label: "Vue d'ensemble" },
+        { href: "/admin/overview", label: x.overview },
         { href: "/admin", label: t.navCandidatures },
         { href: "/admin/reservations", label: t.navReservations },
         { href: "/admin/suggestions", label: t.navSuggestions },
@@ -61,9 +58,9 @@ export default function AdminNavClient() {
       items: [
         { href: "/admin/nuevo", label: t.navNewMember },
         { href: "/admin/qr", label: t.navQR },
-        { href: "/admin/administradores", label: "Administrateurs" },
+        { href: "/admin/administradores", label: x.admins },
         // De vuelta a la app, para quien entra desde el teléfono.
-        { href: "/dashboard", label: "← Retour à l'app" },
+        { href: "/dashboard", label: x.volver },
       ],
     },
   ];
@@ -147,19 +144,25 @@ export default function AdminNavClient() {
 
           <div className="relative min-h-full flex flex-col">
             {/* Overlay top bar: close + brand signature */}
-            <div className="px-8 md:px-16 pt-9 flex items-center justify-between">
+            {/* Por debajo de la hora y la batería del iPhone. */}
+            <div
+              className="px-8 md:px-16 pt-9 flex items-center justify-between"
+              style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 36px)" }}
+            >
               <button
                 onClick={() => setOpen(false)}
-                aria-label="Fermer"
+                aria-label={x.cerrar}
                 className="group inline-flex items-center gap-3 text-cream/55 hover:text-champagne transition-colors"
               >
                 <span className="relative block h-5 w-5">
                   <span className="absolute top-1/2 left-0 h-px w-5 bg-current rotate-45" />
                   <span className="absolute top-1/2 left-0 h-px w-5 bg-current -rotate-45" />
                 </span>
-                <span className="font-serif text-[11px] tracking-[0.32em] uppercase">Fermer</span>
+                <span className="font-serif text-[11px] tracking-[0.32em] uppercase">{x.cerrar}</span>
               </button>
-              <CuratoMark className="text-[15px]" />
+              {/* El logotipo de verdad, la imagen, no uno dibujado con letras. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-curato-simple.png" alt="curato" style={{ height: "13px", width: "auto", display: "block" }} />
             </div>
 
             {/* Editorial columns */}
@@ -203,8 +206,11 @@ export default function AdminNavClient() {
             </div>
 
             {/* Overlay footer */}
-            <div className="px-8 md:px-16 pb-11 flex items-center justify-between border-t border-champagne/12 pt-6">
-              <span className="font-serif text-[10px] tracking-[0.4em] uppercase text-cream/25">Paris · Sur invitation</span>
+            <div
+              className="px-8 md:px-16 pb-11 flex items-center justify-between gap-4 border-t border-champagne/12 pt-6"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 24px)" }}
+            >
+              <span className="font-serif text-[10px] tracking-[0.4em] uppercase text-cream/25">{x.lema}</span>
               <div className="flex items-center gap-6">
                 {LANGS.map(({ key, label }) => (
                   <button
