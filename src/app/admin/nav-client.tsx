@@ -93,7 +93,7 @@ export default function AdminNavClient() {
     <>
       {/* Slim top bar */}
       <div className="max-w-[1100px] mx-auto w-full flex items-center justify-between">
-        <div className="flex items-center gap-6">
+        <div className="flex min-w-0 items-center gap-4 sm:gap-6">
           <button
             onClick={() => setOpen(true)}
             aria-label="Menu"
@@ -112,7 +112,8 @@ export default function AdminNavClient() {
           <span className="font-serif text-[10px] tracking-[0.35em] uppercase text-cream/30">Admin</span>
         </div>
 
-        <div className="flex items-center gap-5">
+        {/* En el teléfono no caben: idioma y salir están dentro del menú. */}
+        <div className="hidden items-center gap-5 sm:flex">
           {LANGS.map(({ key, label }) => (
             <button
               key={key}
