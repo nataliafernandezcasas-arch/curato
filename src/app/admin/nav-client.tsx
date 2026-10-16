@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { CaretDown } from "@phosphor-icons/react";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 
@@ -94,21 +95,18 @@ export default function AdminNavClient() {
       {/* Slim top bar */}
       <div className="max-w-[1100px] mx-auto w-full flex items-center justify-between">
         <div className="flex min-w-0 items-center gap-4 sm:gap-6">
+          {/* El logotipo abre el menú, como en el resto de la app (Natalia,
+              2026-10-16). Idioma y salir viven dentro del menú. */}
           <button
             onClick={() => setOpen(true)}
             aria-label="Menu"
-            className="group inline-flex items-center gap-3 text-cream/70 hover:text-champagne transition-colors"
+            className="-ml-2 flex min-h-11 items-center gap-2 px-2 text-cream/60 transition-colors hover:text-champagne"
           >
-            <span className="flex flex-col gap-[5px]">
-              <span className="block h-px w-6 bg-current transition-all group-hover:w-7" />
-              <span className="block h-px w-6 bg-current transition-all group-hover:w-4" />
-            </span>
-            <span className="font-serif text-[12px] tracking-[0.32em] uppercase">Menu</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
+            <CaretDown size={11} />
           </button>
           <div className="w-px h-3 bg-champagne/20" />
-          <Link href="/">
-            <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
-          </Link>
           <span className="font-serif text-[10px] tracking-[0.35em] uppercase text-cream/30">Admin</span>
         </div>
 
