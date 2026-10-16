@@ -7,6 +7,7 @@ import { STORYTELLER_LINKS } from "../../nav-links";
 import { MAISON_LINKS } from "../../../business/nav-links";
 import { MapPin, ArrowLeft, GlobeSimple, X, CheckCircle } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
+import { pickLang } from "@/lib/i18n/pick-lang";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
@@ -137,9 +138,9 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const t = translations[lang].maison;
   const cat = maison?.category_id ? CATEGORY[maison.category_id] : null;
   const catLabelText = cat ? td[SLUG_LABEL_KEY[cat.slug]] : "";
-  // Description in the storyteller's language, falling back to French.
+  // La descripción en su idioma; si no, en el que la casa la tenga.
   const desc = maison
-    ? (lang === "en" ? maison.description_en : lang === "es" ? maison.description_es : null) || maison.description
+    ? pickLang({ fr: maison.description, en: maison.description_en, es: maison.description_es }, lang) || null
     : null;
   const gated = isBeforeLaunch() && !preview;
   const launchDateLabel = LAUNCH_AT?.toLocaleDateString(lang, {
