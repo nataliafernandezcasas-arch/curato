@@ -175,6 +175,11 @@ export default function InfluencerDashboard() {
               .from("creators")
               .select("is_test")
               .or(filtroDeUsuario(user))
+              // Si su cuenta y su correo dan dos fichas, basta con que una sea
+              // de prueba; con maybeSingle() dos filas eran un error y se
+              // escondían las casas de prueba.
+              .order("is_test", { ascending: false })
+              .limit(1)
               .maybeSingle()
           : null;
         const soyDePrueba = Boolean(yo && !yo.error && (yo.data as { is_test?: boolean } | null)?.is_test);
