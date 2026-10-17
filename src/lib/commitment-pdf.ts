@@ -1,102 +1,195 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { buildCommitmentPdfGenerated } from "./commitment-pdf-legacy";
 
-// Builds the PDF record of a maison's signed commitment, ready to attach to a
-// Resend email as base64.
+// El PDF del compromiso firmado de una casa, en base64 para adjuntarlo con
+// Resend.
 //
-// French maisons get the designed template (Centaur, floral ground) shipped in
-// assets/engagement-template-fr.pdf. The template is a fixed document: the only
-// things that change per maison are the house name, who signed, and when, so we
-// load it and draw those three on top rather than regenerating the page.
+// Diseño «Nuit florale» (Natalia, 2026-10-17): fondo carbón, las flores claras
+// arriba fundiéndose con el fondo, el logotipo en champán y las seis
+// condiciones en dos columnas, cada una con su etiqueta. Se dibuja entero aquí,
+// así que los tres idiomas salen con el mismo diseño; antes solo el francés
+// tenía la plantilla y el inglés y el español salían en Times.
 //
-// EN and ES have no export of that design yet, so they keep the fully generated
-// layout in commitment-pdf-legacy.ts. Sending a French document to a maison that
-// chose English would be worse than a plainer one in its own language.
+// Las letras son Cormorant Garamond (licencia OFL, se puede incrustar), la de
+// los títulos de la app.
 
-const CHARCOAL = rgb(0.11, 0.102, 0.094); // #1C1A18
-const COPPER = rgb(0.443, 0.267, 0.153); // matches the template's ink
+const CARBON = rgb(0.118, 0.118, 0.118); // #1E1E1E
+const CREMA = rgb(0.949, 0.929, 0.894); // #F2EDE4
+const CHAMPAN = rgb(0.796, 0.718, 0.561); // #CBB78F
 
-// Where the template leaves room. Origin is bottom-left, page is 595.5 x 842.25.
-// `track` is extra letter-spacing in points: the template letterspaces every
-// line, so untracked text reads as pasted on from another document.
-// Calibrated against the 6-term template: "Signé par :" and "Date:" now sit
-// side by side on one line, not stacked.
-const SLOT = {
-  maison: { y: 676, size: 13, track: 1.4 }, // centred, between the wordmark and the intro
-  signatory: { x: 150, y: 187, size: 12, track: 1.1 }, // right of "Signé par :"
-  date: { x: 400, y: 187, size: 12, track: 1.1 }, // right of "Date:"
-};
+const W = 595.28;
+const H = 841.89;
+const M = 69; // margen lateral
+const ANCHO = W - M * 2;
+const HUECO = 25.5; // entre las dos columnas
 
-let templateCache: Buffer | null = null;
+const ASSETS = "src/lib/assets";
 
-async function loadTemplate(): Promise<Buffer> {
-  if (templateCache) return templateCache;
-  // Literal path so Next's output file tracing bundles the asset into the lambda.
-  templateCache = await readFile(
-    path.join(process.cwd(), "src/lib/assets/engagement-template-fr.pdf")
-  );
-  return templateCache;
+const cache = new Map<string, Buffer>();
+async function asset(nombre: string): Promise<Buffer> {
+  const hecho = cache.get(nombre);
+  if (hecho) return hecho;
+  const datos = await readFile(path.join(process.cwd(), ASSETS, nombre));
+  cache.set(nombre, datos);
+  return datos;
 }
 
-export async function buildCommitmentPdf(input: {
+export type CommitmentPdfInput = {
   maisonName: string;
   signatory: string;
   acceptedAtIso: string;
+  /** Lo pequeño en capitales encima del título: «Conditions d'engagement». */
+  eyebrow: string;
   title: string;
   intro: string;
   terms: string[];
+  /** Una por condición: Essai, Abonnement, Durée… */
+  termLabels: string[];
   acceptance: string;
   labels: { signedBy: string; date: string; footer: string };
   lang: string;
-}): Promise<string> {
-  if (!input.lang.startsWith("fr")) return buildCommitmentPdfGenerated(input);
+};
 
-  let doc: PDFDocument;
-  try {
-    doc = await PDFDocument.load(await loadTemplate());
-  } catch {
-    // A missing or unreadable template must never cost the maison its record.
-    return buildCommitmentPdfGenerated(input);
-  }
-
-  const page = doc.getPage(0);
-  const { width } = page.getSize();
-
-  // Times is the closest standard serif to the template's Centaur. It is not a
-  // match. Swap it for the real face once the licence is confirmed to allow
-  // embedding in generated PDFs.
-  const serif = await doc.embedFont(StandardFonts.TimesRoman);
-
-  // pdf-lib has no letter-spacing, so advance glyph by glyph.
-  const trackedWidth = (t: string, size: number, track: number) =>
-    serif.widthOfTextAtSize(t, size) + track * Math.max(t.length - 1, 0);
-
-  const draw = (t: string, x: number, y: number, size: number, track: number, color = CHARCOAL) => {
-    let cx = x;
-    for (const ch of t) {
-      page.drawText(ch, { x: cx, y, size, font: serif, color });
-      cx += serif.widthOfTextAtSize(ch, size) + track;
+/** Corta un texto en líneas que caben en `ancho`. */
+function lineas(texto: string, fuente: PDFFont, tamano: number, ancho: number): string[] {
+  const salida: string[] = [];
+  let actual = "";
+  for (const palabra of texto.split(/\s+/).filter(Boolean)) {
+    const prueba = actual ? `${actual} ${palabra}` : palabra;
+    if (actual && fuente.widthOfTextAtSize(prueba, tamano) > ancho) {
+      salida.push(actual);
+      actual = palabra;
+    } else {
+      actual = prueba;
     }
+  }
+  if (actual) salida.push(actual);
+  return salida;
+}
+
+export async function buildCommitmentPdf(input: CommitmentPdfInput): Promise<string> {
+  const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
+  doc.setTitle(input.title);
+  doc.setAuthor("Curato");
+
+  const [ligera, normal, media, cursiva, flores, logo] = await Promise.all([
+    asset("fonts/CormorantGaramond-Light.ttf").then((b) => doc.embedFont(b, { subset: true })),
+    asset("fonts/CormorantGaramond-Regular.ttf").then((b) => doc.embedFont(b, { subset: true })),
+    asset("fonts/CormorantGaramond-Medium.ttf").then((b) => doc.embedFont(b, { subset: true })),
+    asset("fonts/CormorantGaramond-Italic.ttf").then((b) => doc.embedFont(b, { subset: true })),
+    asset("engagement-flores.jpg").then((b) => doc.embedJpg(b)),
+    asset("logo-curato-champagne.png").then((b) => doc.embedPng(b)),
+  ]);
+
+  const page: PDFPage = doc.addPage([W, H]);
+  page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: CARBON });
+
+  // Las flores, arriba; la imagen ya trae el fundido hacia el carbón.
+  const altoFlores = (W * flores.height) / flores.width;
+  page.drawImage(flores, { x: 0, y: H - altoFlores, width: W, height: altoFlores });
+
+  const anchoLogo = 150;
+  const altoLogo = (anchoLogo * logo.height) / logo.width;
+  page.drawImage(logo, { x: (W - anchoLogo) / 2, y: H - 42 - altoLogo, width: anchoLogo, height: altoLogo });
+
+  // `top` se mide desde arriba, como en el diseño; pdf-lib cuenta desde abajo.
+  const texto = (t: string, x: number, top: number, fuente: PDFFont, tamano: number, color = CREMA, opacity = 1) =>
+    page.drawText(t, { x, y: H - top, size: tamano, font: fuente, color, opacity });
+
+  // Capitales espaciadas: pdf-lib no espacia letras, así que van una a una.
+  const capitales = (t: string, x: number, top: number, tamano: number, color = CHAMPAN, opacity = 1) => {
+    const espacio = tamano * 0.32;
+    let cx = x;
+    for (const ch of t.toUpperCase()) {
+      texto(ch, cx, top, media, tamano, color, opacity);
+      cx += media.widthOfTextAtSize(ch, tamano) + espacio;
+    }
+    return cx - espacio - x;
   };
 
+  let top = 225;
+  capitales(input.eyebrow, M, top, 8.25);
+  top += 38;
+  texto(input.title, M, top, ligera, 34.5);
+  top += 24;
   if (input.maisonName) {
-    const w = trackedWidth(input.maisonName, SLOT.maison.size, SLOT.maison.track);
-    draw(input.maisonName, (width - w) / 2, SLOT.maison.y, SLOT.maison.size, SLOT.maison.track, COPPER);
+    texto(input.maisonName, M, top, cursiva, 16.5, CHAMPAN);
+    top += 26;
+  }
+  for (const l of lineas(input.intro, normal, 12.4, 390)) {
+    texto(l, M, top, normal, 12.4, CREMA, 0.7);
+    top += 18.6;
   }
 
-  if (input.signatory) {
-    draw(input.signatory, SLOT.signatory.x, SLOT.signatory.y, SLOT.signatory.size, SLOT.signatory.track);
+  // Las condiciones, de dos en dos.
+  top += 16;
+  const col = (ANCHO - HUECO) / 2;
+  for (let i = 0; i < input.terms.length; i += 2) {
+    let alto = 0;
+    for (let j = 0; j < 2 && i + j < input.terms.length; j++) {
+      const n = i + j;
+      const x = M + j * (col + HUECO);
+      page.drawLine({
+        start: { x, y: H - top },
+        end: { x: x + col, y: H - top },
+        thickness: 0.6,
+        color: CHAMPAN,
+        opacity: 0.4,
+      });
+      const etiqueta = input.termLabels[n] ? `${String(n + 1).padStart(2, "0")} · ${input.termLabels[n]}` : String(n + 1).padStart(2, "0");
+      capitales(etiqueta, x, top + 19, 8.25);
+      let y = top + 37;
+      for (const l of lineas(input.terms[n], normal, 12.4, col)) {
+        texto(l, x, y, normal, 12.4);
+        y += 18.6;
+      }
+      alto = Math.max(alto, y - top);
+    }
+    top += alto + 12;
   }
 
-  const when = new Date(input.acceptedAtIso).toLocaleDateString(input.lang, {
+  top += 6;
+  for (const l of lineas(input.acceptance, cursiva, 10.1, ANCHO)) {
+    texto(l, M, top, cursiva, 10.1, CREMA, 0.6);
+    top += 15;
+  }
+
+  // La firma y la fecha.
+  top += 26;
+  const fecha = new Date(input.acceptedAtIso).toLocaleDateString(input.lang, {
     day: "numeric",
     month: "long",
     year: "numeric",
     timeZone: "Europe/Paris",
   });
-  draw(when, SLOT.date.x, SLOT.date.y, SLOT.date.size, SLOT.date.track);
+  const firma: Array<[string, string]> = [
+    [input.labels.signedBy, input.signatory],
+    [input.labels.date, fecha],
+  ];
+  firma.forEach(([etiqueta, valor], j) => {
+    const x = M + j * (col + HUECO);
+    capitales(etiqueta, x, top, 8.25);
+    texto(valor, x, top + 25, normal, 14.3);
+    page.drawLine({
+      start: { x, y: H - top - 33 },
+      end: { x: x + col, y: H - top - 33 },
+      thickness: 0.6,
+      color: CHAMPAN,
+      opacity: 0.6,
+    });
+  });
+
+  // El pie, centrado.
+  const anchoPie = (() => {
+    const espacio = 8.25 * 0.32;
+    let w = 0;
+    for (const ch of input.labels.footer.toUpperCase()) w += media.widthOfTextAtSize(ch, 8.25) + espacio;
+    return w - espacio;
+  })();
+  capitales(input.labels.footer, (W - anchoPie) / 2, H - 30, 8.25, CREMA, 0.4);
 
   const bytes = await doc.save();
   return Buffer.from(bytes).toString("base64");
