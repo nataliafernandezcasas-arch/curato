@@ -5,7 +5,7 @@ import { sendReservationRequested, sendMaisonNewRequest } from "@/lib/emails";
 import { avisar, AVISOS } from "@/lib/push/avisos";
 import { pendientesDe } from "@/lib/pendientes";
 import { agendaDe, estanciaImposibleDesde } from "@/lib/agenda";
-import { isOpenSlot } from "@/lib/availability";
+import { demasiadoPronto, isOpenSlot } from "@/lib/availability";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { creditoDelMes, mesDeParis } from "@/lib/credito";
 import { rangoDe } from "@/lib/oferta";
@@ -107,6 +107,9 @@ export async function POST(request: NextRequest) {
         : isOpenSlot(slotStart, venue.availability ?? [], venue.blocked_slots ?? []);
     if (!abierta) {
       return NextResponse.json({ code: "unavailable", error: "Créneau indisponible." }, { status: 409 });
+    }
+    if (demasiadoPronto(slotStart)) {
+      return NextResponse.json({ code: "unavailable", error: "Créneau trop proche." }, { status: 409 });
     }
     const { data: clash } = await admin
       .from("reservations")
