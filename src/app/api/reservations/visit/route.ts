@@ -118,11 +118,12 @@ export async function GET() {
               created_at: r.created_at as string,
               asistencia_confirmada_at: asistencia?.asistencia_confirmada_at ?? null,
             }),
-          canCancel: (r.status === "confirmed" || r.status === "pending_review") && futura,
+          // Una visita que la casa ya registró no se cancela: ya se hizo.
+          canCancel: (r.status === "confirmed" || r.status === "pending_review") && futura && !r.visited_at,
           // Valorar la visita: cuando ya ha pasado y se hizo (no cancelada ni
           // ausente), y la migración está aplicada.
           canRate:
-            !sinValoracion && !futura && (r.status === "confirmed" || r.status === "completed"),
+            !sinValoracion && (!futura || Boolean(r.visited_at)) && (r.status === "confirmed" || r.status === "completed"),
           rating: valoracionDe.get(r.id as string) ?? null,
           slotStart: r.slot_start as string,
           status: r.status as string,
@@ -254,7 +255,10 @@ export async function POST(request: NextRequest) {
     if (reservation.status !== "confirmed" && reservation.status !== "completed") {
       return NextResponse.json({ error: "Cette visite n'est pas confirmée." }, { status: 409 });
     }
-    if (new Date(reservation.slot_start as string).getTime() > Date.now()) {
+    // La hora cuenta, salvo que la casa ya registrara la visita: quien llega
+    // antes de su hora y la casa le escanea el código ya ha venido (Natalia,
+    // 2026-10-17: «visita registrada» y aun así no dejaba subir las fotos).
+    if (new Date(reservation.slot_start as string).getTime() > Date.now() && !reservation.visited_at) {
       return NextResponse.json({ error: "Cette visite n'a pas encore eu lieu." }, { status: 409 });
     }
 

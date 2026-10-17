@@ -54,3 +54,14 @@ export function isOpenSlot(iso: string, availability: AvailWindow[], blocked: Bl
   if (!availability || availability.length === 0) return true;
   return availability.some((w) => w.day === dow && w.start <= hm && hm < w.end);
 }
+
+/**
+ * Lo mínimo que se pide por adelantado. La casa tiene que ver la demanda y
+ * contestar; una pedida para dentro de un minuto caducaba antes de que nadie
+ * la viera (Natalia, 2026-10-17: pidió las 17:00 a las 16:59).
+ */
+export const ANTELACION_MIN_H = 3;
+
+export function demasiadoPronto(iso: string, ahora = Date.now()): boolean {
+  return new Date(iso).getTime() < ahora + ANTELACION_MIN_H * 60 * 60 * 1000;
+}

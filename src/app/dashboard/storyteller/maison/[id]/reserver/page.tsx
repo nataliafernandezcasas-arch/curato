@@ -11,7 +11,7 @@ import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import { createClient } from "@/lib/supabase/client";
 import { canBypassLaunchGate, isBeforeLaunch } from "@/lib/launch";
-import { parisParts, parisToIso, type AvailWindow } from "@/lib/availability";
+import { demasiadoPronto, parisParts, parisToIso, type AvailWindow } from "@/lib/availability";
 import { agendaDe, estanciaImposible, PASO_MINUTOS, type Agenda } from "@/lib/agenda";
 import { Button, ButtonLink } from "@/components/member/button";
 import { Row } from "@/components/member/row";
@@ -352,7 +352,7 @@ function Reserver({ id }: { id: string }) {
       for (let m = sh * 60 + sm; m < eh * 60 + em; m += PASO_MINUTOS) {
         const hm = `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
         const iso = parisToIso(ymd, hm);
-        if (new Date(iso).getTime() <= Date.now()) continue;
+        if (demasiadoPronto(iso)) continue;
         out.push({ hm, iso, libre: !ocupadas.has(`${ymd} ${hm}`) });
       }
     }

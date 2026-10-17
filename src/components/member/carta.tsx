@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
 import type { Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
+import { Laminas } from "@/components/member/laminas";
 
 /**
  * La carta o el folleto de una casa, para leerlo dentro de la app.
@@ -43,15 +44,16 @@ const esPdf = (url: string) => /\.pdf($|\?)/i.test(url);
  * versión «legacy»: la normal usa funciones de JavaScript tan nuevas que el
  * Safari de muchos iPhone todavía no las tiene, y no dibujaba nada.
  */
-async function paginasDePdf(url: string, ancho: number, maximo: number, calidad: number): Promise<string[]> {
+async function paginasDePdf(url: string, ancho: number, maximo: number, calidad: number, detalle = 1.5): Promise<string[]> {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/legacy/build/pdf.worker.min.mjs", import.meta.url).toString();
   const carga = pdfjs.getDocument({ url });
   try {
     const doc = await carga.promise;
     const paginas: string[] = [];
-    // Más resolución que la pantalla: se lee la letra pequeña de una carta.
-    const nitidez = Math.min(window.devicePixelRatio || 1, 2) * 1.5;
+    // Más resolución que la pantalla: se lee la letra pequeña de una carta,
+    // también ampliada con los dedos.
+    const nitidez = Math.min(window.devicePixelRatio || 1, 2) * detalle;
     for (let n = 1; n <= Math.min(doc.numPages, maximo); n++) {
       const pagina = await doc.getPage(n);
       const base = pagina.getViewport({ scale: 1 });
@@ -78,7 +80,7 @@ function Visor({ url, lang, onClose }: { url: string; lang: Lang; onClose: () =>
     if (!esPdf(url)) return;
     let vivo = true;
     const ancho = Math.min(caja.current?.clientWidth ?? window.innerWidth, 900);
-    paginasDePdf(url, ancho, 30, 0.85)
+    paginasDePdf(url, ancho, 30, 0.85, 2.5)
       .then((p) => vivo && setPaginas(p))
       .catch(() => vivo && setFallo(true));
     return () => {
@@ -121,11 +123,11 @@ function Visor({ url, lang, onClose }: { url: string; lang: Lang; onClose: () =>
         ) : !paginas ? (
           <p className="text-corps text-text-secondary">{t.loading}</p>
         ) : (
-          <div className="space-y-fila">
-            {paginas.map((src, i) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img key={i} src={src} alt="" className="w-full rounded-[12px] bg-white" />
-            ))}
+          // Cada página se abre a pantalla completa para ampliarla con dos
+          // dedos (Natalia, 2026-10-17): dentro de la app el navegador no
+          // deja ampliar la página entera.
+          <div className="[&_img]:rounded-[12px] [&_img]:bg-white [&_section>button+button]:mt-fila">
+            <Laminas laminas={paginas.map((src) => ({ src }))} />
           </div>
         )}
       </div>

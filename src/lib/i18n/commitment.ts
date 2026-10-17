@@ -44,6 +44,9 @@ export type CommitmentLabels = {
   dateWord: string;
   pdfFooter: string;
   pdfAcceptance: string; // "{maison}" replaced; states T&C + privacy acceptance
+  pdfEyebrow: string; // en capitales, encima del título del PDF
+  pdfTitle: string;
+  termLabels: string[]; // una por condición, en el PDF
   emailSubject: string;
   emailHeading: string;
   emailIntro: string;
@@ -84,6 +87,9 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     pdfFooter: "Curato · Paris · curatocollective.com",
     pdfAcceptance:
       "En signant, {maison} accepte les conditions d'engagement ci-dessus, ainsi que les Conditions Générales et la Politique de Confidentialité de Curato.",
+    pdfEyebrow: "Conditions d'engagement",
+    pdfTitle: "Votre engagement",
+    termLabels: ["Essai", "Abonnement", "Durée", "Ensuite", "Garantie", "Mesure"],
     emailSubject: "Curato · Votre engagement est signé",
     emailHeading: "Engagement confirmé",
     emailIntro:
@@ -124,6 +130,9 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     pdfFooter: "Curato · Paris · curatocollective.com",
     pdfAcceptance:
       "By signing, {maison} accepts the commitment terms above, as well as Curato's Terms & Conditions and Privacy Policy.",
+    pdfEyebrow: "Terms of commitment",
+    pdfTitle: "Your commitment",
+    termLabels: ["Trial", "Subscription", "Term", "Afterwards", "Guarantee", "Measure"],
     emailSubject: "Curato · Your commitment is signed",
     emailHeading: "Commitment confirmed",
     emailIntro:
@@ -164,6 +173,9 @@ const LABELS: Record<Lang, CommitmentLabels> = {
     pdfFooter: "Curato · Paris · curatocollective.com",
     pdfAcceptance:
       "Al firmar, {maison} acepta las condiciones de compromiso anteriores, así como los Términos y Condiciones y la Política de Privacidad de Curato.",
+    pdfEyebrow: "Condiciones del compromiso",
+    pdfTitle: "Tu compromiso",
+    termLabels: ["Prueba", "Suscripción", "Duración", "Después", "Garantía", "Medida"],
     emailSubject: "Curato · Tu compromiso está firmado",
     emailHeading: "Compromiso confirmado",
     emailIntro:
