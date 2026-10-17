@@ -1,4 +1,4 @@
-import { Bloque, Capital, COLOR, Corps, Enlace, Filas, Nota, Shell, SITE, Titre } from "./shell";
+import { Bloque, Capital, COLOR, Corps, Direccion, Enlace, Filas, Nota, Shell, SITE, Titre } from "./shell";
 
 const PALABRAS = ["", "une", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix"];
 export const personnes = (n: number) => `${PALABRAS[n] ?? n} personne${n > 1 ? "s" : ""}`;
@@ -75,7 +75,11 @@ export function VisiteConfirmee(p: VisiteConfirmeeProps) {
       <Capital color={COLOR.sauge}>C&apos;est confirmé</Capital>
       <Titre mayusculas>{p.maisonName}</Titre>
       <Corps>{detalle}</Corps>
-      {p.address && <Corps color={COLOR.secundaria}>{p.address}</Corps>}
+      {p.address && (
+        <Corps color={COLOR.secundaria}>
+          <Direccion>{p.address}</Direccion>
+        </Corps>
+      )}
       <Bloque etiqueta="Ce que la maison attend">
         <Corps>
           Deux stories dans les 24 heures qui suivent votre visite, avec la maison et Curato mentionnées sur chacune.

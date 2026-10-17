@@ -218,3 +218,19 @@ export function Filas({ filas }: { filas: [string, React.ReactNode][] }) {
     </table>
   );
 }
+
+/**
+ * Una dirección postal. Gmail y el Mail del iPhone la convierten solos en un
+ * enlace azul subrayado, que rompe la página (Natalia, 2026-10-17). Siendo ya
+ * nuestro enlace, a Google Maps, conserva el color del texto.
+ */
+export function Direccion({ children, color = COLOR.secundaria }: { children: string; color?: string }) {
+  return (
+    <a
+      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(children)}`}
+      style={{ color, textDecoration: "none" }}
+    >
+      {children}
+    </a>
+  );
+}
