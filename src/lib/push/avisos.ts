@@ -47,6 +47,15 @@ export const AVISOS = {
     agrupar: `stories-${id}`,
   }),
 
+  // 23 h después de subir las fotos (migración 052): las estadísticas de la
+  // story ya están en Instagram. Abre la visita, donde se ponen las cifras.
+  cifrasDeStories: (maison: string, id: string): Aviso => ({
+    titulo: "Les chiffres de vos stories",
+    cuerpo: `Ajoutez les vues, comptes atteints et interactions de vos stories chez ${maison}. Une capture suffit.`,
+    ruta: `${VISITAS}/${id}`,
+    agrupar: `cifras-${id}`,
+  }),
+
   // Confirmar que va (migración 046): 24 h antes a quien reservó con más de
   // 24 h, y un recordatorio 6 h antes si no contestó. Abren la página de
   // confirmar, con las reglas del crédito a la vista.

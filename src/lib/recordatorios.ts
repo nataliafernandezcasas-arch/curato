@@ -40,3 +40,16 @@ export function horasQueQuedan(slotStart: string, ahora: Date = new Date()): num
 export function esCorreoDePrueba(email: string | null | undefined): boolean {
   return !email || /@[^@]+\.test$/i.test(email.trim());
 }
+
+/** El aviso de las cifras sale estas horas después de subir las fotos. */
+export const AVISO_CIFRAS_H = 23;
+
+/** ¿Toca avisar de las cifras? Una vez, entre las 23 h y el olvido. */
+export function tocaAvisoCifras(
+  r: { content_uploaded_at: string | null; aviso_cifras_at: string | null },
+  ahora: Date = new Date()
+): boolean {
+  if (!r.content_uploaded_at || r.aviso_cifras_at) return false;
+  const pasadas = (ahora.getTime() - new Date(r.content_uploaded_at).getTime()) / HORA;
+  return pasadas >= AVISO_CIFRAS_H && pasadas < OLVIDO_H;
+}

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendAvisoDerechos, sendAvisoStoriesManquantes, sendRecordatorioSeisHoras } from "@/lib/emails";
 import { avisar, AVISOS } from "@/lib/push/avisos";
-import { OLVIDO_H, PLAZO_H, AVISO_ANTES_H, esCorreoDePrueba, horasQueQuedan, queToca } from "@/lib/recordatorios";
+import { AVISO_CIFRAS_H, OLVIDO_H, PLAZO_H, AVISO_ANTES_H, esCorreoDePrueba, horasQueQuedan, queToca, tocaAvisoCifras } from "@/lib/recordatorios";
+import { bloqueaReservas, type CifrasStory } from "@/lib/validacion";
 import { AVISO_ANTES_D, OLVIDO_D, queTocaDerechos } from "@/lib/derechos";
 import { avisosAntesDeLaVisita } from "@/lib/avisos-antes";
 
@@ -26,6 +27,69 @@ function dia(d: Date) {
 }
 
 const DIA_MS = 24 * 3600000;
+
+/**
+ * Al storyteller, 23 horas después de subir las fotos: que ponga las cifras
+ * de sus stories (Natalia, 2026-10-17). Solo si aún faltan. La columna se
+ * escribe antes de enviar, así que nunca salen dos.
+ */
+async function avisosDeCifras(admin: ReturnType<typeof createAdminClient>, ahora: Date): Promise<number> {
+  const { data: reservas, error } = await admin
+    .from("reservations")
+    .select("id, creator_id, venue_id, status, slot_start, content_photo_paths, content_uploaded_at, reach_stories, aviso_cifras_at")
+    .in("status", ["confirmed", "completed"])
+    .is("aviso_cifras_at", null)
+    .gte("content_uploaded_at", new Date(ahora.getTime() - OLVIDO_H * 3600000).toISOString())
+    .lte("content_uploaded_at", new Date(ahora.getTime() - AVISO_CIFRAS_H * 3600000).toISOString());
+  // Sin la migración 052 no se avisa, y lo demás sigue saliendo.
+  if (error) {
+    console.error("Avisos de cifras: no se pudieron leer las reservas:", error.message);
+    return 0;
+  }
+  const filas = (reservas ?? []).filter(
+    (r) =>
+      tocaAvisoCifras(
+        { content_uploaded_at: r.content_uploaded_at as string | null, aviso_cifras_at: r.aviso_cifras_at as string | null },
+        ahora
+      ) &&
+      bloqueaReservas(
+        {
+          status: r.status as string,
+          slot_start: r.slot_start as string,
+          content_photo_paths: (r.content_photo_paths as string[] | null) ?? [],
+          reach_stories: (r.reach_stories as CifrasStory[] | null) ?? [],
+        },
+        ahora
+      )
+  );
+  if (filas.length === 0) return 0;
+
+  const [{ data: creators }, { data: casas }] = await Promise.all([
+    admin.from("creators").select("id, email, owner_id").in("id", [...new Set(filas.map((r) => r.creator_id))]),
+    admin.from("comercios").select("id, name").in("id", [...new Set(filas.map((r) => r.venue_id))]),
+  ]);
+  const creadorDe = new Map((creators ?? []).map((c) => [c.id, c]));
+  const casaDe = new Map((casas ?? []).map((c) => [c.id, c.name as string]));
+
+  let enviados = 0;
+  for (const r of filas) {
+    const { data: reclamada } = await admin
+      .from("reservations")
+      .update({ aviso_cifras_at: ahora.toISOString() })
+      .eq("id", r.id)
+      .is("aviso_cifras_at", null)
+      .select("id")
+      .maybeSingle();
+    const creador = creadorDe.get(r.creator_id);
+    if (!reclamada || !creador) continue;
+    await avisar(
+      { ownerId: (creador.owner_id as string | null) ?? null, email: (creador.email as string | null) ?? null },
+      AVISOS.cifrasDeStories(casaDe.get(r.venue_id) ?? "la maison", r.id as string)
+    );
+    enviados++;
+  }
+  return enviados;
+}
 
 /**
  * Los avisos del fin de la exclusividad, a la casa: siete días antes y el día
@@ -233,6 +297,7 @@ export async function GET(request: NextRequest) {
   const derechos = await avisosDeDerechos(admin, ahora);
   // Antes de la visita: confirmar que se va y el código QR (src/lib/avisos-antes.ts).
   const antes = await avisosAntesDeLaVisita(admin, ahora);
+  const cifras = await avisosDeCifras(admin, ahora);
 
-  return NextResponse.json({ revisadas: filas.length, recordatorios, vencidas: vencidas.length, derechos, antes });
+  return NextResponse.json({ revisadas: filas.length, recordatorios, vencidas: vencidas.length, derechos, antes, cifras });
 }

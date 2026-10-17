@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { esCorreoDePrueba, horasQueQuedan, queToca } from "./recordatorios";
+import { esCorreoDePrueba, horasQueQuedan, queToca, tocaAvisoCifras } from "./recordatorios";
 
 const ahora = new Date("2026-10-23T12:00:00.000Z");
 const visita = (horasPasadas: number, extra: Partial<{ recordatorio_6h_at: string | null; aviso_plazo_at: string | null }> = {}) => ({
@@ -49,5 +49,18 @@ describe("las cuentas de prueba", () => {
     expect(esCorreoDePrueba("apercu@curato.test")).toBe(true);
     expect(esCorreoDePrueba(null)).toBe(true);
     expect(esCorreoDePrueba("tereza@gmail.com")).toBe(false);
+  });
+});
+
+describe("tocaAvisoCifras", () => {
+  const subida = "2026-10-17T15:00:00Z";
+  const a = (h: number) => new Date(Date.parse(subida) + h * 3600000);
+  it("sale a las 23 horas de subir las fotos, no antes", () => {
+    expect(tocaAvisoCifras({ content_uploaded_at: subida, aviso_cifras_at: null }, a(22))).toBe(false);
+    expect(tocaAvisoCifras({ content_uploaded_at: subida, aviso_cifras_at: null }, a(23))).toBe(true);
+  });
+  it("una sola vez, y nunca sin fotos", () => {
+    expect(tocaAvisoCifras({ content_uploaded_at: subida, aviso_cifras_at: a(23).toISOString() }, a(24))).toBe(false);
+    expect(tocaAvisoCifras({ content_uploaded_at: null, aviso_cifras_at: null }, a(24))).toBe(false);
   });
 });
