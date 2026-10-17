@@ -242,20 +242,21 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
         <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-4">
           {t.pageLabel}
         </p>
-        <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-white">
+        <h1 className="font-serif text-[26px] sm:text-4xl font-light tracking-[0.2em] sm:tracking-[0.28em] uppercase text-white break-words">
           {t.pageTitle}
         </h1>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-10">
         {[
           { key: "total", label: t.statTotal, value: counts.all },
           { key: "pending", label: t.statPending, value: counts.pending },
           { key: "approved", label: t.statApproved, value: counts.approved },
         ].map((s) => (
-          <div key={s.key} className="bg-white/8 backdrop-blur-sm border border-white/10 px-8 py-6">
-            <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-champagne/50 mb-2">{s.label}</p>
+          <div key={s.key} className="min-w-0 bg-white/8 backdrop-blur-sm border border-white/10 px-3 py-4 sm:px-8 sm:py-6">
+            {/* En el teléfono, menos espaciado entre letras: «PENDIENTES» se salía de la caja. */}
+            <p className="font-serif text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.35em] uppercase text-champagne/50 mb-2 break-words">{s.label}</p>
             <p className="font-serif text-3xl font-light text-white">{s.value}</p>
           </div>
         ))}
