@@ -88,6 +88,11 @@ const FILTERS = [
 // casa se enseña es su ficha, no su intención.
 const MIN_FOTOS = 5;
 const MIN_DESCRIPCION = 200;
+// La descripción cuenta en cualquier idioma: una casa que la escribe en
+// español deja vacía la francesa hasta que llega la traducción, y si la
+// traducción no llega, la casa no aparecía nunca (Kalatra, 2026-10-16).
+const descripcionMasLarga = (m: { description: string | null; description_en: string | null; description_es: string | null }) =>
+  Math.max(...[m.description, m.description_en, m.description_es].map((d) => (d ?? "").trim().length));
 
 export default function InfluencerDashboard() {
   const { lang } = useLang();
@@ -175,6 +180,11 @@ export default function InfluencerDashboard() {
               .from("creators")
               .select("is_test")
               .or(filtroDeUsuario(user))
+              // Si su cuenta y su correo dan dos fichas, basta con que una sea
+              // de prueba; con maybeSingle() dos filas eran un error y se
+              // escondían las casas de prueba.
+              .order("is_test", { ascending: false })
+              .limit(1)
               .maybeSingle()
           : null;
         const soyDePrueba = Boolean(yo && !yo.error && (yo.data as { is_test?: boolean } | null)?.is_test);
@@ -198,7 +208,7 @@ export default function InfluencerDashboard() {
         const ofertaDe = new Map((ofertas.data ?? []).map((o) => [o.id as string, (o.offer_eur as number | null) ?? null]));
         visibles = visibles.map((m) => ({ ...m, offer_eur: ofertaDe.get(m.id) ?? null }));
       }
-      setMaisons(visibles.filter((m) => (m.photos?.length ?? 0) >= MIN_FOTOS && (m.description ?? "").trim().length >= MIN_DESCRIPCION));
+      setMaisons(visibles.filter((m) => (m.photos?.length ?? 0) >= MIN_FOTOS && descripcionMasLarga(m) >= MIN_DESCRIPCION));
       setMaisonsLoading(false);
     }
     loadMaisons();
