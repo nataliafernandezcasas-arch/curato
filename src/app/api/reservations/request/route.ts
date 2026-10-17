@@ -178,6 +178,7 @@ export async function POST(request: NextRequest) {
     const firstName = (creator.full_name || "").split(" ")[0] || "vous";
     const ps = partySize && partySize > 0 ? partySize : 1;
     try {
+      // Aparte: si falla el correo del storyteller, el de la casa sale igual.
       if (creator.email) {
         await sendReservationRequested({
           to: creator.email,
@@ -185,14 +186,24 @@ export async function POST(request: NextRequest) {
           maisonName: venue.name,
           whenLabel,
           partySize: ps,
-        });
+        }).catch((e) => console.error("Reservation email to creator failed:", e));
       }
       // A la casa, que es quien decide. Antes solo se avisaba al creador y al
       // buzón de Curato, así que la casa se enteraba si abría la app mientras
       // su plazo de cuarenta y ocho horas corría igual.
-      if (venue.email) {
+      // Al correo de la casa y, si no es el mismo, al de la cuenta con la que
+      // entra: una casa sin correo de contacto, o con otro distinto del de su
+      // cuenta, no se enteraba de la demanda (Kalatra, 2026-10-17).
+      const destinos = new Set<string>();
+      if (venue.email) destinos.add((venue.email as string).trim().toLowerCase());
+      if (venue.owner_id) {
+        const { data: cuenta } = await admin.auth.admin.getUserById(venue.owner_id as string).catch(() => ({ data: null }));
+        const suyo = cuenta?.user?.email?.trim().toLowerCase();
+        if (suyo) destinos.add(suyo);
+      }
+      for (const to of destinos) {
         await sendMaisonNewRequest({
-          to: venue.email,
+          to,
           creatorName: creator.full_name || creator.handle || "Un storyteller",
           creatorHandle: creator.handle,
           maisonName: venue.name,
