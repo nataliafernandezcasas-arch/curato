@@ -196,7 +196,8 @@ function groupOf(v: Visit): "todo" | "upcoming" | "past" {
   // Con fotos pero sin todas las cifras sigue por hacer: bloquea las reservas.
   if (v.photos.length > 0) return v.pending ? "todo" : "past";
   if (v.status === "declined" || v.status === "cancelled" || v.status === "no_show") return "past";
-  const yaPasó = new Date(v.slotStart).getTime() < Date.now();
+  // Registrada por la casa cuenta como hecha aunque aún no sea la hora.
+  const yaPasó = new Date(v.slotStart).getTime() < Date.now() || Boolean(v.visitedAt);
   if (!yaPasó) return "upcoming";
   return v.status === "confirmed" || v.status === "completed" ? "todo" : "upcoming";
 }

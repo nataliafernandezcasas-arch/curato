@@ -36,12 +36,13 @@ export async function POST(request: NextRequest) {
     // Solo su reserva, y solo una visita que ya pasó y se hizo.
     const { data: r } = await admin
       .from("reservations")
-      .select("id, slot_start, status")
+      .select("id, slot_start, status, visited_at")
       .eq("id", id)
       .eq("creator_id", creator.id)
       .maybeSingle();
     if (!r) return NextResponse.json({ error: "reserva" }, { status: 404 });
-    if (new Date(r.slot_start as string).getTime() > Date.now() || !["confirmed", "completed"].includes(r.status as string)) {
+    const aunNo = new Date(r.slot_start as string).getTime() > Date.now() && !r.visited_at;
+    if (aunNo || !["confirmed", "completed"].includes(r.status as string)) {
       return NextResponse.json({ error: "pronto" }, { status: 409 });
     }
 
