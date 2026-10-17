@@ -1,5 +1,5 @@
 import { Img } from "@react-email/components";
-import { Capital, COLOR, Corps, Enlace, Nota, Shell, SITE, Titre } from "./shell";
+import { Capital, COLOR, Corps, Direccion, Enlace, Nota, Shell, SITE, Titre } from "./shell";
 
 // Antes de la visita (migración 046): confirmar que se va, el código QR una
 // hora antes, y a la casa, que alguien canceló.
@@ -69,7 +69,8 @@ export function CodeDeVisite(p: CodeDeVisiteProps) {
       <Titre mayusculas>{p.maisonName}</Titre>
       <Corps>
         {p.whenLabel.charAt(0).toUpperCase() + p.whenLabel.slice(1)}
-        {p.address ? ` · ${p.address}` : ""}
+        {p.address ? " · " : ""}
+        {p.address ? <Direccion color={COLOR.tinta}>{p.address}</Direccion> : null}
       </Corps>
       <Img
         src={p.tarjetaUrl}

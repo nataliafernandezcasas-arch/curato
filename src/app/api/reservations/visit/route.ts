@@ -41,7 +41,7 @@ export async function GET() {
 
     const { data: reservations } = await admin
       .from("reservations")
-      .select("id, venue_id, slot_start, slot_end, nights, party_size, status, visited_at, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at, credits_cost, created_at")
+      .select("id, venue_id, slot_start, slot_end, nights, party_size, special_requests, status, visited_at, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions, reach_declared_at, credits_cost, created_at")
       .eq("creator_id", creator.id)
       .order("slot_start", { ascending: false });
 
@@ -131,6 +131,9 @@ export async function GET() {
           today: Boolean(visitaDeHoy([r])),
           visitedAt: (r.visited_at as string | null) ?? null,
           partySize: (r.party_size as number | null) ?? 1,
+          // Lo que escribió al pedir la visita, y las noches de un hotel.
+          note: (r.special_requests as string | null) ?? null,
+          nights: (r.nights as number | null) ?? null,
           // Para apuntarla en su calendario: solo una visita confirmada que
           // todavía no ha pasado.
           calendar:
