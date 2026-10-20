@@ -34,9 +34,17 @@ export default async function AdminReservationsPage() {
     .order("rated_at", { ascending: false })
     .limit(50);
   const valoradas = rated ?? [];
+  // Lo que las casas dicen de cada storyteller (migración 054).
+  const { data: deCasas } = await admin
+    .from("reservations")
+    .select("id, slot_start, creator_id, venue_id, maison_rating, maison_rating_note, maison_rated_at")
+    .not("maison_rating", "is", null)
+    .order("maison_rated_at", { ascending: false })
+    .limit(50);
+  const valoradasPorCasas = deCasas ?? [];
 
-  const creatorIds = [...new Set([...reservations, ...valoradas].map((r) => r.creator_id))];
-  const venueIds = [...new Set([...reservations, ...valoradas].map((r) => r.venue_id))];
+  const creatorIds = [...new Set([...reservations, ...valoradas, ...valoradasPorCasas].map((r) => r.creator_id))];
+  const venueIds = [...new Set([...reservations, ...valoradas, ...valoradasPorCasas].map((r) => r.venue_id))];
 
   const [{ data: creators }, { data: venues }] = await Promise.all([
     admin.from("creators").select("id, full_name, handle").in("id", creatorIds),
@@ -88,6 +96,32 @@ export default async function AdminReservationsPage() {
                 </div>
                 <p className="mt-1 text-legende text-white/50">{whenLabel(r.slot_start as string)}</p>
                 {r.rating_note && <p className="mt-3 text-corps text-white/80 whitespace-pre-line">{r.rating_note as string}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {valoradasPorCasas.length > 0 && (
+        <section className="mt-16">
+          <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/60 mb-6">
+            Avis des maisons
+          </p>
+          <ul className="space-y-4">
+            {valoradasPorCasas.map((r) => (
+              <li key={r.id as string} className="border border-white/10 rounded-[14px] p-5">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-serif text-corps text-white">
+                    {creatorMap.get(r.creator_id)?.full_name ?? "Créateur"}
+                    <span className="text-white/50"> · {venueMap.get(r.venue_id)?.name ?? "Maison"}</span>
+                  </p>
+                  <p className="text-sous-titre tracking-[0.15em] text-champagne" aria-label={`${r.maison_rating} / 5`}>
+                    {"★".repeat(r.maison_rating as number)}
+                    <span className="text-white/20">{"★".repeat(5 - (r.maison_rating as number))}</span>
+                  </p>
+                </div>
+                <p className="mt-1 text-legende text-white/50">{whenLabel(r.slot_start as string)}</p>
+                {r.maison_rating_note && <p className="mt-3 text-corps text-white/80 whitespace-pre-line">{r.maison_rating_note as string}</p>}
               </li>
             ))}
           </ul>

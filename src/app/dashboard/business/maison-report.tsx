@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
 import { Row } from "@/components/member/row";
@@ -72,6 +73,7 @@ const TEXTOS: Record<
     photos: string;
     photosHint: string;
     download: string;
+    rate: string;
   }
 > = {
   fr: {
@@ -99,6 +101,7 @@ const TEXTOS: Record<
     photos: "Vos photos",
     photosHint: "En haute définition, pour vos réseaux, votre site ou votre presse. Elles restent exclusives 90 jours après la visite.",
     download: "Télécharger",
+    rate: "Voir la visite et donner votre avis",
   },
   en: {
     kicker: "Monthly report",
@@ -125,6 +128,7 @@ const TEXTOS: Record<
     photos: "Your photos",
     photosHint: "In high definition, for your social media, website or press. They stay exclusive for 90 days after the visit.",
     download: "Download",
+    rate: "See the visit and leave a review",
   },
   es: {
     kicker: "Informe mensual",
@@ -151,6 +155,7 @@ const TEXTOS: Record<
     photos: "Tus fotos",
     photosHint: "En alta definición, para tus redes, tu web o tu prensa. Son exclusivas durante 90 días tras la visita.",
     download: "Descargar",
+    rate: "Ver la visita y dar tu opinión",
   },
 };
 
@@ -311,6 +316,12 @@ export default function MaisonReport() {
                 {s.rightsExpiresAt && s.photos.length > 0 && (
                   <p className="mt-fila text-legende text-sauge-vif">{t.exclusiveUntil(fecha(s.rightsExpiresAt))}</p>
                 )}
+                <Link
+                  href={`/dashboard/business/calendrier/${s.id}`}
+                  className="mt-bloque inline-flex min-h-11 items-center text-legende text-accent underline underline-offset-4"
+                >
+                  {t.rate}
+                </Link>
               </div>
             ))}
           </div>

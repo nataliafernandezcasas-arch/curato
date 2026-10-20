@@ -42,16 +42,23 @@ const TEXTOS: Record<
  * Después de la visita, el storyteller la valora: de 1 a 5 estrellas y, si
  * quiere, unas líneas. Lo lee Curato, no la casa. Se puede cambiar después.
  */
+export type TextosValoracion = (typeof TEXTOS)["fr"];
+
 export function Valoracion({
   id,
   inicial,
   lang,
+  endpoint = "/api/reservations/valoracion",
+  textos,
 }: {
   id: string;
   inicial: { estrellas: number | null; nota: string } | null;
   lang: Lang;
+  /** La casa valora por otra ruta, con sus propios textos. */
+  endpoint?: string;
+  textos?: Partial<Record<Lang, Partial<TextosValoracion>>>;
 }) {
-  const t = TEXTOS[lang] ?? TEXTOS.fr;
+  const t = { ...(TEXTOS[lang] ?? TEXTOS.fr), ...(textos?.[lang] ?? {}) };
   const [estrellas, setEstrellas] = useState(inicial?.estrellas ?? 0);
   const [nota, setNota] = useState(inicial?.nota ?? "");
   const [enviada, setEnviada] = useState(Boolean(inicial?.estrellas));
@@ -62,7 +69,7 @@ export function Valoracion({
   async function enviar() {
     setEnviando(true);
     setFallo(false);
-    const res = await fetch("/api/reservations/valoracion", {
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, estrellas, nota }),
