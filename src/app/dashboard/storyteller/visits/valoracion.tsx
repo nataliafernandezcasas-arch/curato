@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "@phosphor-icons/react";
+import { Star } from "@/components/member/iconos";
 import type { Lang } from "@/lib/i18n/translations";
 import { Button } from "@/components/member/button";
 

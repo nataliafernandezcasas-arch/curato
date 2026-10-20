@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
-import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check, CaretLeft, CaretRight, Clock, WarningCircle } from "@phosphor-icons/react";
+import { Plus, X, GlobeSimple, InstagramLogo, PencilSimple, DotsSixVertical, Eye, MapPin, Check, CaretLeft, CaretRight, Clock, WarningCircle } from "@/components/member/iconos";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
 import { Button } from "@/components/member/button";

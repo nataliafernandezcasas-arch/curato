@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkle } from "@phosphor-icons/react";
+import { ArrowLeft, Sparkle } from "@/components/member/iconos";
 import { Button } from "@/components/member/button";
 import { Choice } from "@/components/member/choice";
 import { useLang } from "@/lib/i18n/LanguageContext";

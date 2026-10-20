@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle } from "@phosphor-icons/react";
+import { CheckCircle } from "@/components/member/iconos";
 
 const PROFILES = [
   { value: "creator", label: "Créateur · Creator" },

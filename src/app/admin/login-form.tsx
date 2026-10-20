@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeSlash } from "@phosphor-icons/react";
+import { Eye, EyeSlash } from "@/components/member/iconos";
 
 export default function AdminLoginForm() {
   const [pass, setPass] = useState("");

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeft } from "@/components/member/iconos";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { COMUN } from "@/lib/i18n/comun";

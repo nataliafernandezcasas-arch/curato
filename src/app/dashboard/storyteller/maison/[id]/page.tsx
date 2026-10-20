@@ -5,7 +5,7 @@ import Link from "next/link";
 import DashboardNav from "../../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../../nav-links";
 import { MAISON_LINKS } from "../../../business/nav-links";
-import { MapPin, ArrowLeft, GlobeSimple, X, CheckCircle } from "@phosphor-icons/react";
+import { MapPin, ArrowLeft, GlobeSimple, X, CheckCircle } from "@/components/member/iconos";
 import { useRouter } from "next/navigation";
 import { pickLang } from "@/lib/i18n/pick-lang";
 import { useLang } from "@/lib/i18n/LanguageContext";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle } from "@phosphor-icons/react";
+import { CheckCircle } from "@/components/member/iconos";
 
 type MemberType = "creator" | "maison" | "recruiter";
 

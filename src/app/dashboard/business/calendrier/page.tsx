@@ -9,7 +9,7 @@ import { Rise } from "@/components/member/motion";
 import { Section } from "@/components/member/section";
 import { Retrato } from "@/components/member/retrato";
 import { PullToRefresh } from "@/components/member/pull-to-refresh";
-import { CaretRight } from "@phosphor-icons/react";
+import { CaretRight } from "@/components/member/iconos";
 import Link from "next/link";
 import { EnlacesDeCalendario } from "./enlaces";
 import { ButtonLink } from "@/components/member/button";

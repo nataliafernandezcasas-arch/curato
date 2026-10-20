@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PencilSimple, Check, X } from "@phosphor-icons/react";
+import { PencilSimple, Check, X } from "@/components/member/iconos";
 
 export default function CreditEditor({ email, initialCredit }: { email: string; initialCredit: number }) {
   const [editing, setEditing] = useState(false);

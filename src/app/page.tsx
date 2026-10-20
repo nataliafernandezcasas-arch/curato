@@ -5,7 +5,7 @@ import Nav from "@/components/layout/nav";
 import Footer from "@/components/layout/footer";
 import { motion } from "framer-motion";
 import { ParallaxImage, MouseParallaxImage, RevealLine } from "@/components/home/motion";
-import { ArrowRight } from "@phosphor-icons/react";
+import { ArrowRight } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 

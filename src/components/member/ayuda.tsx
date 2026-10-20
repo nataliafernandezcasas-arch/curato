@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CaretRight, EnvelopeSimple, Question } from "@phosphor-icons/react";
+import { CaretRight, EnvelopeSimple, Question } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
 import { Plegable } from "./plegable";

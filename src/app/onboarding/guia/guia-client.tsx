@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { CalendarCheck, Camera, MagnifyingGlass, QrCode, type Icon } from "@phosphor-icons/react";
+import { CalendarCheck, Camera, MagnifyingGlass, QrCode, type Icon } from "@/components/member/iconos";
 import FloralBackdrop from "@/app/dashboard/floral-backdrop";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";

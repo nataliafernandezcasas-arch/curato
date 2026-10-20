@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, MapPin } from "@phosphor-icons/react";
+import { ArrowLeft, MapPin } from "@/components/member/iconos";
 import DashboardNav from "../../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../../nav-links";
 import { Gallery } from "@/components/member/gallery";

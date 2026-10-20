@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash, PencilSimple, Check, X } from "@phosphor-icons/react";
+import { Trash, PencilSimple, Check, X } from "@/components/member/iconos";
 
 type App = { id: string; type: string; status: string; name: string };
 

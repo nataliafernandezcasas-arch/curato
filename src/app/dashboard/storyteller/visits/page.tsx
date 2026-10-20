@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CaretRight } from "@phosphor-icons/react";
+import { CaretRight } from "@/components/member/iconos";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
 import { Rise } from "@/components/member/motion";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle, InstagramLogo } from "@phosphor-icons/react";
+import { CheckCircle, InstagramLogo } from "@/components/member/iconos";
 import { Button } from "@/components/member/button";
 import { abrirPhyllo } from "@/lib/phyllo/connect";
 import type { Lang } from "@/lib/i18n/translations";

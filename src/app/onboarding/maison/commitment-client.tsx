@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/member/button";
 import { useRouter } from "next/navigation";
-import { DownloadSimple } from "@phosphor-icons/react";
+import { DownloadSimple } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { getCommitmentLabels, getMaisonDossierSlides, getMaisonDossierPdf, getMaisonDossierFilename } from "@/lib/i18n/commitment";
 import { signCommitment } from "./actions";

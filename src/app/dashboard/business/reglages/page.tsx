@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SignOut } from "@phosphor-icons/react";
+import { SignOut } from "@/components/member/iconos";
 import { createClient } from "@/lib/supabase/client";
 import { olvidarEsteAparato } from "@/lib/native/push";
 import { useLang } from "@/lib/i18n/LanguageContext";

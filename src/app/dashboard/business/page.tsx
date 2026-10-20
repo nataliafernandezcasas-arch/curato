@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import DashboardNav from "../dashboard-nav";
 import { Row } from "@/components/member/row";
 import { MAISON_LINKS, isMaisonSection, type MaisonSection } from "./nav-links";
-import { GlobeSimple, InstagramLogo, MapPin, X } from "@phosphor-icons/react";
+import { GlobeSimple, InstagramLogo, MapPin, X } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";

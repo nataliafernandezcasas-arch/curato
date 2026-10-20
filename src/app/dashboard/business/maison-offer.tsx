@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
-import { Check, Plus } from "@phosphor-icons/react";
+import { Check, Plus } from "@/components/member/iconos";
 import { Carta } from "@/components/member/carta";
 import { Button } from "@/components/member/button";
 import { Toast, useToast } from "@/components/member/toast";

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CaretDown, Check, MagnifyingGlass, MapPin, SlidersHorizontal, X } from "@phosphor-icons/react";
+import { CaretDown, Check, MagnifyingGlass, MapPin, SlidersHorizontal, X } from "@/components/member/iconos";
 import type { Lang } from "@/lib/i18n/translations";
 import { etiquetaDeCategoria } from "@/components/member/tarjeta-casa";
 
