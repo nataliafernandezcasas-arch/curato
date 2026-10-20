@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft, CaretLeft, CaretRight, MagnifyingGlassPlus } from "@phosphor-icons/react";
+import { ArrowLeft, CaretLeft, CaretRight, MagnifyingGlassPlus } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
 

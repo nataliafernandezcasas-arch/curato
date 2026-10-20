@@ -119,7 +119,7 @@ export function AuthShell({
                 {wordmark}
               </Link>
             )}
-            <h1 className="font-titulo text-[20px] uppercase tracking-titre text-text-primary">{title}</h1>
+            <h1 className="font-titulo text-sous-titre uppercase tracking-titre text-text-primary">{title}</h1>
             {subtitle && (
               <p className="mt-bloque text-corps text-text-secondary">{subtitle}</p>
             )}

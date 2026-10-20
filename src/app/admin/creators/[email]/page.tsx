@@ -171,7 +171,7 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
 
   return (
     <main className="max-w-[900px] mx-auto px-5 py-14">
-      <Link href="/admin/creators" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
+      <Link href="/admin/creators" className="inline-flex items-center gap-2 font-serif text-capitale tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
         ← Créateurs
       </Link>
 
@@ -185,20 +185,20 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={phylloAvatar} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="font-serif text-[20px] text-champagne/60">{initials}</span>
+                <span className="font-serif text-sous-titre text-champagne/60">{initials}</span>
               )}
             </div>
             <div>
-              <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-3">
+              <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-3">
                 Créateur · Curato{creator.stage === "archived" ? " · Archivé" : ""}
               </p>
-              <h1 className="font-serif text-3xl font-light tracking-[0.25em] uppercase text-white mb-2">{creator.full_name || "—"}</h1>
+              <h1 className="font-serif text-grande font-light tracking-[0.25em] uppercase text-white mb-2">{creator.full_name || "—"}</h1>
               {creator.handle && (
-                <a href={`https://instagram.com/${creator.handle}`} target="_blank" rel="noopener noreferrer" className="font-serif text-[14px] text-champagne/60 hover:text-champagne transition-colors">
+                <a href={`https://instagram.com/${creator.handle}`} target="_blank" rel="noopener noreferrer" className="font-serif text-corps text-champagne/60 hover:text-champagne transition-colors">
                   @{creator.handle}
                 </a>
               )}
-              <p className="font-serif text-[13px] text-white/30 mt-1">{creator.email}</p>
+              <p className="font-serif text-legende text-white/30 mt-1">{creator.email}</p>
 
               {/* 3 latest posts */}
               {phylloPosts.length > 0 && (
@@ -217,28 +217,28 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
             {ig?.instagram_followers != null ? (
               // Ce que voient les maisons : le chiffre d'Instagram, mis à jour chaque jour.
               <div className="mb-4">
-                <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">Abonnés · Instagram</p>
-                <p className="font-serif text-2xl font-light text-white">{fmtK(ig.instagram_followers)}</p>
+                <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/25 mb-1">Abonnés · Instagram</p>
+                <p className="font-serif text-grande font-light text-white">{fmtK(ig.instagram_followers)}</p>
                 {ig.instagram_synced_at && (
-                  <p className="font-serif text-[11px] text-white/30 mt-0.5">mis à jour le {fmtDate(ig.instagram_synced_at)}</p>
+                  <p className="font-serif text-capitale text-white/30 mt-0.5">mis à jour le {fmtDate(ig.instagram_synced_at)}</p>
                 )}
               </div>
             ) : (
               creator.followers != null &&
               creator.followers > 0 && (
                 <div className="mb-4">
-                  <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">Abonnés</p>
-                  <p className="font-serif text-2xl font-light text-white">{fmtK(creator.followers)}</p>
+                  <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/25 mb-1">Abonnés</p>
+                  <p className="font-serif text-grande font-light text-white">{fmtK(creator.followers)}</p>
                 </div>
               )
             )}
             {ig?.instagram_error && (
-              <p className="mb-4 max-w-[260px] font-serif text-[11px] text-copper-vif">{IG_ERREUR[ig.instagram_error] ?? IG_ERREUR.otro}</p>
+              <p className="mb-4 max-w-[260px] font-serif text-capitale text-copper-vif">{IG_ERREUR[ig.instagram_error] ?? IG_ERREUR.otro}</p>
             )}
             <div>
-              <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-1">Crédit disponible</p>
-              <p className="font-serif text-2xl font-light text-champagne">€{remaining}</p>
-              <p className="font-serif text-[11px] text-white/30 mt-0.5">de €{monthlyCredit} par mois</p>
+              <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/25 mb-1">Crédit disponible</p>
+              <p className="font-serif text-grande font-light text-champagne">€{remaining}</p>
+              <p className="font-serif text-capitale text-white/30 mt-0.5">de €{monthlyCredit} par mois</p>
             </div>
           </div>
         </div>
@@ -248,7 +248,7 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
             <div className="h-full bg-champagne/50 transition-all duration-700" style={{ width: `${usedPercent}%` }} />
           </div>
         )}
-        <p className="font-serif text-[11px] text-white/25 mb-2">€{usedCredit} dépensés ce mois</p>
+        <p className="font-serif text-capitale text-white/25 mb-2">€{usedCredit} dépensés ce mois</p>
 
         <div className="flex items-center gap-3 flex-wrap">
           <CreatorEditForm
@@ -277,20 +277,20 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
           { label: "Crédits dépensés", value: `€${usedCredit}` },
         ].map((s) => (
           <div key={s.label} className="bg-white/5 px-6 py-5">
-            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">{s.label}</p>
-            <p className="font-serif text-2xl font-light text-white">{s.value}</p>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-2">{s.label}</p>
+            <p className="font-serif text-grande font-light text-white">{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Où en est-elle : chaque étape de l'entrée, faite ou pas. */}
       <div className="border border-white/10 bg-white/5 p-6 md:p-8 mb-10">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Parcours et connexions</p>
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/40 mb-5">Parcours et connexions</p>
         <ul className="divide-y divide-white/8">
           {etapas.map((e) => (
             <li key={e.label} className="flex items-center justify-between gap-4 py-3">
-              <span className="font-serif text-[14px] text-white/80">{e.label}</span>
-              <span className={`font-serif text-[12px] ${e.hecho ? "text-emerald-400" : "text-white/35"}`}>
+              <span className="font-serif text-corps text-white/80">{e.label}</span>
+              <span className={`font-serif text-legende ${e.hecho ? "text-emerald-400" : "text-white/35"}`}>
                 {e.hecho ? `✓ ${e.detalle && e.detalle !== "—" ? e.detalle : "Fait"}` : "Pas encore"}
               </span>
             </li>
@@ -301,22 +301,22 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
       {/* Le profil tel que l'ouvre une maison. */}
       {dossier && (
         <div className="mb-10">
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Profil · ce que voient les maisons</p>
+          <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/40 mb-5">Profil · ce que voient les maisons</p>
           <DossierInline dossier={dossier} lang="fr" />
         </div>
       )}
 
       {/* Ses réponses au questionnaire. */}
       <div className="border border-white/10 bg-white/5 p-6 md:p-8 mb-10">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Questionnaire</p>
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/40 mb-5">Questionnaire</p>
         {encuesta.length === 0 ? (
-          <p className="font-serif text-[14px] text-white/35">Pas encore répondu.</p>
+          <p className="font-serif text-corps text-white/35">Pas encore répondu.</p>
         ) : (
           <dl className="space-y-4">
             {encuesta.map((r) => (
               <div key={r.pregunta}>
-                <dt className="font-serif text-[12px] text-white/45">{r.pregunta}</dt>
-                <dd className="mt-1 font-serif text-[14px] text-white">{r.respuesta || "—"}</dd>
+                <dt className="font-serif text-legende text-white/45">{r.pregunta}</dt>
+                <dd className="mt-1 font-serif text-corps text-white">{r.respuesta || "—"}</dd>
               </div>
             ))}
           </dl>
@@ -325,26 +325,26 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
 
       {/* Instagram · Phyllo */}
       <div className="border border-white/10 bg-white/5 p-6 md:p-8 mb-10">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-5">Instagram · Phyllo</p>
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/40 mb-5">Instagram · Phyllo</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
-            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">État</p>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-2">État</p>
             {igConnected ? (
               <>
-                <p className="font-serif text-[15px] font-light text-champagne">Connecté</p>
-                {connectedDate && <p className="font-serif text-[12px] text-white/30 mt-0.5">{connectedDate}</p>}
+                <p className="font-serif text-corps font-light text-champagne">Connecté</p>
+                {connectedDate && <p className="font-serif text-legende text-white/30 mt-0.5">{connectedDate}</p>}
               </>
             ) : (
-              <p className="font-serif text-[15px] font-light text-white/40">Non connecté</p>
+              <p className="font-serif text-corps font-light text-white/40">Non connecté</p>
             )}
           </div>
           <div>
-            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">Engagement</p>
-            <p className="font-serif text-[15px] font-light text-white">{engagementPct != null ? `${engagementPct}%` : <span className="text-white/40">—</span>}</p>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-2">Engagement</p>
+            <p className="font-serif text-corps font-light text-white">{engagementPct != null ? `${engagementPct}%` : <span className="text-white/40">—</span>}</p>
           </div>
           <div>
-            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">Abonnés (Phyllo)</p>
-            <p className="font-serif text-[15px] font-light text-white">{phylloFollowers != null ? fmtK(phylloFollowers) : <span className="text-white/40">N/D</span>}</p>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-2">Abonnés (Phyllo)</p>
+            <p className="font-serif text-corps font-light text-white">{phylloFollowers != null ? fmtK(phylloFollowers) : <span className="text-white/40">N/D</span>}</p>
           </div>
         </div>
       </div>
@@ -352,7 +352,7 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
       {/* Posted images */}
       {(phylloPosts.length > 0 || visitPhotos.length > 0) && (
         <div className="mb-12">
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-6">Publications récentes</p>
+          <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/40 mb-6">Publications récentes</p>
           <div className="grid grid-cols-3 md:grid-cols-4 gap-1">
             {phylloPosts.map((p, i) => (
               // eslint-disable-next-line @next/next/no-img-element
@@ -376,12 +376,12 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
 
       {/* Reservations (places visited) */}
       <div>
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/40 mb-6">
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/40 mb-6">
           Réservations {totalVisits > 0 && `(${totalVisits})`}
         </p>
         {totalVisits === 0 ? (
           <div className="border border-white/8 py-16 text-center">
-            <p className="font-serif text-[15px] font-light text-white/30">Aucune réservation pour le moment.</p>
+            <p className="font-serif text-corps font-light text-white/30">Aucune réservation pour le moment.</p>
           </div>
         ) : (
           <div className="divide-y divide-white/8">
@@ -391,15 +391,15 @@ export default async function CreatorAdminProfile({ params }: { params: Promise<
               return (
                 <div key={r.id} className="py-6 flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <span className={`font-serif text-[10px] tracking-[0.2em] uppercase border px-2.5 py-1 ${s.color}`}>{s.label}</span>
-                    <h3 className="font-serif text-[17px] font-light text-white mt-2">{v?.name || "—"}</h3>
-                    <p className="font-serif text-[13px] text-white/40 mt-0.5">
+                    <span className={`font-serif text-capitale tracking-[0.2em] uppercase border px-2.5 py-1 ${s.color}`}>{s.label}</span>
+                    <h3 className="font-serif text-sous-titre font-light text-white mt-2">{v?.name || "—"}</h3>
+                    <p className="font-serif text-legende text-white/40 mt-0.5">
                       {[v?.arrondissement ? `Paris ${v.arrondissement}` : null, v?.address].filter(Boolean).join(" · ")}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    {r.credits_cost > 0 && <p className="font-serif text-lg font-light text-champagne">€{r.credits_cost}</p>}
-                    <p className="font-serif text-[12px] text-white/30 mt-1">{fmtDate(r.slot_start)}</p>
+                    {r.credits_cost > 0 && <p className="font-serif text-sous-titre font-light text-champagne">€{r.credits_cost}</p>}
+                    <p className="font-serif text-legende text-white/30 mt-1">{fmtDate(r.slot_start)}</p>
                   </div>
                 </div>
               );

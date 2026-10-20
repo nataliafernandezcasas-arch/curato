@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { List, X } from "@phosphor-icons/react";
+import { List, X } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 
@@ -45,7 +45,7 @@ export default function Nav() {
             <Link
               key={l.href}
               href={l.href}
-              className={`font-serif text-[14px] font-light px-4 py-1.5 tracking-wider transition-all duration-300 ${
+              className={`font-serif text-corps font-light px-4 py-1.5 tracking-wider transition-all duration-300 ${
                 path === l.href ? "text-champagne" : "text-white/90 hover:text-champagne"
               }`}
             >
@@ -56,13 +56,13 @@ export default function Nav() {
           {/* Language toggle */}
           <button
             onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
-            className="font-serif text-[12px] font-light tracking-widest text-white/75 hover:text-champagne transition-colors mr-3"
+            className="font-serif text-legende font-light tracking-widest text-white/75 hover:text-champagne transition-colors mr-3"
           >
             {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
           </button>
           <Link
             href="/auth/sign-in"
-            className="font-serif text-[13px] font-light tracking-widest text-charcoal-deep bg-champagne px-5 py-1.5 hover:bg-copper transition-all duration-300"
+            className="font-serif text-legende font-light tracking-widest text-charcoal-deep bg-champagne px-5 py-1.5 hover:bg-copper transition-all duration-300"
           >
             {t.access}
           </Link>
@@ -72,7 +72,7 @@ export default function Nav() {
         <div className="flex md:hidden items-center gap-3">
           <button
             onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
-            className="font-serif text-[12px] font-light tracking-widest text-white/75 hover:text-champagne transition-colors"
+            className="font-serif text-legende font-light tracking-widest text-white/75 hover:text-champagne transition-colors"
           >
             {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
           </button>
@@ -90,7 +90,7 @@ export default function Nav() {
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className={`block font-serif text-[18px] font-light py-2 tracking-wider transition-all ${
+              className={`block font-serif text-sous-titre font-light py-2 tracking-wider transition-all ${
                 path === l.href ? "text-champagne" : "text-white/90"
               }`}
             >
@@ -101,7 +101,7 @@ export default function Nav() {
             <Link
               href="/auth/sign-in"
               onClick={() => setOpen(false)}
-              className="inline-block font-serif text-[13px] tracking-widest text-charcoal-deep bg-champagne px-6 py-2 hover:bg-copper transition-all duration-300"
+              className="inline-block font-serif text-legende tracking-widest text-charcoal-deep bg-champagne px-6 py-2 hover:bg-copper transition-all duration-300"
             >
               {t.access}
             </Link>

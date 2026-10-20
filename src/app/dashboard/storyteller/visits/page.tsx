@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CaretRight } from "@phosphor-icons/react";
+import { CaretRight } from "@/components/member/iconos";
 import DashboardNav from "../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../nav-links";
 import { Rise } from "@/components/member/motion";
@@ -51,7 +51,7 @@ function ResumenVisita({ visit, t, lang }: { visit: Visit; t: Record<string, str
         <div className="h-20 w-20 shrink-0 rounded-[12px] bg-surface-raised" />
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate font-titulo text-[21px] leading-tight text-text-primary">{visit.maison}</p>
+        <p className="truncate font-titulo text-sous-titre leading-tight text-text-primary">{visit.maison}</p>
         <p className="mt-etiqueta truncate text-legende tabular-nums text-text-secondary first-letter:uppercase">
           {fecha} · {hora} · {CALENDARIO[lang].party(visit.partySize ?? 1)}
         </p>
@@ -103,7 +103,7 @@ export default function MesVisites() {
       <div className="mx-auto max-w-[920px] px-pagina py-seccion">
         <Rise>
           <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
-          <h1 className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+          <h1 className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-text-primary md:text-grande">
             {t.title}
           </h1>
         </Rise>
@@ -111,7 +111,7 @@ export default function MesVisites() {
         {/* Solo lo que le queda este mes: es lo que decide la próxima visita. */}
         {credito && credito.mensual > 0 && (
           <Section title={(VISITA[lang] ?? VISITA.fr).credit}>
-            <p className="text-[34px] font-light leading-none tabular-nums text-accent">
+            <p className="text-cifra font-light leading-none tabular-nums text-accent">
               {(VISITA[lang] ?? VISITA.fr).left(credito.restante)}
             </p>
           </Section>

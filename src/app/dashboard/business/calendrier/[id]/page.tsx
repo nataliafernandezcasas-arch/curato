@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeft } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import type { Dossier } from "@/lib/storyteller-dossier";
@@ -185,7 +185,7 @@ export default function VisitaDeLaCasa({ params }: { params: Promise<{ id: strin
             <Rise>
               <div className="caja-cristal mt-rango p-5 sm:p-6">
                 <p className="text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>
-                <h1 className="mt-bloque font-titulo text-[22px] text-text-primary">{v.storyteller}</h1>
+                <h1 className="mt-bloque font-titulo text-sous-titre text-text-primary">{v.storyteller}</h1>
                 <p className="mt-bloque text-corps first-letter:uppercase text-text-primary">
                   {fecha} · <span className="tabular-nums">{hora}</span>
                 </p>

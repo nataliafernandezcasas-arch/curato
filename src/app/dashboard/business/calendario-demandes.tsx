@@ -117,7 +117,7 @@ export function CalendarioDemandes({
 
       <div className="grid grid-cols-7 gap-y-1 text-center">
         {cabecera.map((d, i) => (
-          <span key={i} className="pb-bloque text-[11px] uppercase text-text-muted">{d}</span>
+          <span key={i} className="pb-bloque text-capitale uppercase text-text-muted">{d}</span>
         ))}
         {Array.from({ length: hueco }, (_, i) => (
           <span key={`h${i}`} />

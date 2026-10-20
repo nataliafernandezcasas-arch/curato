@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/member/button";
 import { useRouter } from "next/navigation";
-import { DownloadSimple } from "@phosphor-icons/react";
+import { DownloadSimple } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { getCommitmentLabels, getMaisonDossierSlides, getMaisonDossierPdf, getMaisonDossierFilename } from "@/lib/i18n/commitment";
 import { signCommitment } from "./actions";
@@ -99,7 +99,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
         </div>
         <div className="max-w-[640px] mx-auto px-5 py-24 md:py-28">
         <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{l.eyebrow}</p>
-        <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+        <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-grande">
           {l.title}
         </h1>
         {maisonName && (
@@ -141,7 +141,7 @@ export default function CommitmentClient({ maisonName }: { maisonName: string })
               onChange={(e) => setAccepted(e.target.checked)}
               className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
             />
-            <span className="font-serif text-[14px] md:text-[15px] font-light text-white/75 leading-relaxed tracking-wide group-hover:text-white transition-colors">
+            <span className="font-serif text-corps md:text-corps font-light text-white/75 leading-relaxed tracking-wide group-hover:text-white transition-colors">
               {l.acceptLabel.replace("{maison}", maisonName || "Curato")}{" "}
               <Link href="/condiciones" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-champagne/90 hover:text-champagne underline underline-offset-2">
                 {l.termsLink}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle } from "@phosphor-icons/react";
+import { CheckCircle } from "@/components/member/iconos";
 
 type MemberType = "creator" | "maison" | "recruiter";
 
@@ -63,44 +63,44 @@ export default function AdminNuevoPage() {
     setError("");
   }
 
-  const inputClass = "w-full font-serif text-[14px] font-light text-white bg-white/5 border border-white/15 px-4 py-3 focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-white/20";
-  const labelClass = "block font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2";
+  const inputClass = "w-full font-serif text-corps font-light text-white bg-white/5 border border-white/15 px-4 py-3 focus:outline-none focus:border-champagne/50 transition-colors placeholder:text-white/20";
+  const labelClass = "block font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-2";
 
   if (success) {
     return (
       <main className="max-w-[520px] mx-auto px-5 py-14">
-        <Link href="/admin" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
+        <Link href="/admin" className="inline-flex items-center gap-2 font-serif text-capitale tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
           ← Admin
         </Link>
 
         <div className="border border-emerald-400/20 bg-emerald-400/5 p-8">
           <div className="flex items-center gap-3 mb-6">
             <CheckCircle size={20} weight="fill" className="text-emerald-400 shrink-0" />
-            <p className="font-serif text-[13px] tracking-[0.2em] uppercase text-emerald-300">
+            <p className="font-serif text-legende tracking-[0.2em] uppercase text-emerald-300">
               Membre créé
             </p>
           </div>
 
-          <p className="font-serif text-[14px] font-light text-white/60 leading-relaxed mb-8">
+          <p className="font-serif text-corps font-light text-white/60 leading-relaxed mb-8">
             Un email de bienvenue avec les identifiants a été envoyé à{" "}
             <span className="text-champagne">{success.email}</span>.
           </p>
 
           {success.tempPassword ? (
             <div className="border border-white/10 bg-white/5 p-6 mb-8">
-              <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/25 mb-4">
+              <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/25 mb-4">
                 Mot de passe temporaire
               </p>
-              <p className="font-serif text-[22px] font-light text-champagne tracking-widest">
+              <p className="font-serif text-sous-titre font-light text-champagne tracking-widest">
                 {success.tempPassword}
               </p>
-              <p className="font-serif text-[11px] text-white/25 mt-3">
+              <p className="font-serif text-capitale text-white/25 mt-3">
                 Le membre devra le changer à la première connexion.
               </p>
             </div>
           ) : (
             <div className="border border-white/10 bg-white/5 p-6 mb-8">
-              <p className="font-serif text-[13px] font-light text-white/60 leading-relaxed">
+              <p className="font-serif text-legende font-light text-white/60 leading-relaxed">
                 Ce compte existait déjà : le membre garde son mot de passe habituel et retrouve ses espaces via le lien « Espaces » de son tableau de bord.
               </p>
             </div>
@@ -109,13 +109,13 @@ export default function AdminNuevoPage() {
           <div className="flex items-center gap-4">
             <button
               onClick={reset}
-              className="font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300"
+              className="font-serif text-legende tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300"
             >
               Nouveau membre
             </button>
             <Link
               href="/admin"
-              className="font-serif text-[12px] tracking-widest uppercase text-white/40 hover:text-white transition-colors"
+              className="font-serif text-legende tracking-widest uppercase text-white/40 hover:text-white transition-colors"
             >
               Retour
             </Link>
@@ -127,15 +127,15 @@ export default function AdminNuevoPage() {
 
   return (
     <main className="max-w-[520px] mx-auto px-5 py-14">
-      <Link href="/admin" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
+      <Link href="/admin" className="inline-flex items-center gap-2 font-serif text-capitale tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
         ← Admin
       </Link>
 
       <div className="mb-10">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-4">
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-4">
           Curato · Admin · Nouveau membre
         </p>
-        <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-white">
+        <h1 className="font-serif text-cifra font-light tracking-[0.28em] uppercase text-white">
           Créer un compte
         </h1>
       </div>
@@ -151,7 +151,7 @@ export default function AdminNuevoPage() {
                 key={t}
                 type="button"
                 onClick={() => setType(t)}
-                className={`py-3.5 font-serif text-[12px] tracking-[0.2em] uppercase transition-all duration-200 ${
+                className={`py-3.5 font-serif text-legende tracking-[0.2em] uppercase transition-all duration-200 ${
                   type === t
                     ? "bg-champagne text-charcoal-deep"
                     : "bg-white/5 text-white/40 hover:text-white/70"
@@ -198,7 +198,7 @@ export default function AdminNuevoPage() {
             <div>
               <label className={labelClass}>Handle Instagram *</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-serif text-[14px] text-white/25">@</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-serif text-corps text-white/25">@</span>
                 <input
                   type="text"
                   required
@@ -225,7 +225,7 @@ export default function AdminNuevoPage() {
               <div>
                 <label className={labelClass}>Crédit mensuel (€)</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-serif text-[14px] text-white/25">€</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-serif text-corps text-white/25">€</span>
                   <input
                     type="number"
                     value={credit}
@@ -246,7 +246,7 @@ export default function AdminNuevoPage() {
                     key={l}
                     type="button"
                     onClick={() => setLang(l)}
-                    className={`py-3 font-serif text-[12px] tracking-[0.25em] uppercase transition-all duration-200 ${
+                    className={`py-3 font-serif text-legende tracking-[0.25em] uppercase transition-all duration-200 ${
                       lang === l
                         ? "bg-champagne text-charcoal-deep"
                         : "bg-white/5 text-white/40 hover:text-white/70"
@@ -261,7 +261,7 @@ export default function AdminNuevoPage() {
         )}
 
         {error && (
-          <p className="font-serif text-[12px] text-red-400/80 border-l border-red-400/30 pl-4">
+          <p className="font-serif text-legende text-red-400/80 border-l border-red-400/30 pl-4">
             {error}
           </p>
         )}
@@ -270,11 +270,11 @@ export default function AdminNuevoPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full font-serif text-[12px] tracking-[0.3em] uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40"
+            className="w-full font-serif text-legende tracking-[0.3em] uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40"
           >
             {loading ? "Création en cours…" : "Créer le compte et envoyer l'email"}
           </button>
-          <p className="font-serif text-[11px] text-white/20 text-center mt-4">
+          <p className="font-serif text-capitale text-white/20 text-center mt-4">
             Un email avec les identifiants sera envoyé automatiquement.
           </p>
         </div>

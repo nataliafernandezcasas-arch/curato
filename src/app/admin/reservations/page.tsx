@@ -60,34 +60,34 @@ export default async function AdminReservationsPage() {
 
   return (
     <div className="max-w-[1100px] mx-auto px-5 py-12">
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">
+      <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/60 mb-3">
         Demandes en attente
       </p>
-      <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white mb-10">
+      <h1 className="font-serif text-grande font-light tracking-[0.15em] uppercase text-white mb-10">
         Réservations
       </h1>
       <ReservationsAdmin items={items} />
 
       {valoradas.length > 0 && (
         <section className="mt-16">
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">
+          <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/60 mb-6">
             Avis des storytellers
           </p>
           <ul className="space-y-4">
             {valoradas.map((r) => (
               <li key={r.id as string} className="border border-white/10 rounded-[14px] p-5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="font-serif text-[16px] text-white">
+                  <p className="font-serif text-corps text-white">
                     {venueMap.get(r.venue_id)?.name ?? "Maison"}
                     <span className="text-white/50"> · {creatorMap.get(r.creator_id)?.full_name ?? "Créateur"}</span>
                   </p>
-                  <p className="text-[18px] tracking-[0.15em] text-champagne" aria-label={`${r.rating} / 5`}>
+                  <p className="text-sous-titre tracking-[0.15em] text-champagne" aria-label={`${r.rating} / 5`}>
                     {"★".repeat(r.rating as number)}
                     <span className="text-white/20">{"★".repeat(5 - (r.rating as number))}</span>
                   </p>
                 </div>
-                <p className="mt-1 text-[12px] text-white/50">{whenLabel(r.slot_start as string)}</p>
-                {r.rating_note && <p className="mt-3 text-[14px] text-white/80 whitespace-pre-line">{r.rating_note as string}</p>}
+                <p className="mt-1 text-legende text-white/50">{whenLabel(r.slot_start as string)}</p>
+                {r.rating_note && <p className="mt-3 text-corps text-white/80 whitespace-pre-line">{r.rating_note as string}</p>}
               </li>
             ))}
           </ul>

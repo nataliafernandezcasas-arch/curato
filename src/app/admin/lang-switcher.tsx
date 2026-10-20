@@ -17,7 +17,7 @@ export default function AdminLangSwitcher() {
         <button
           key={key}
           onClick={() => setLang(key)}
-          className={`font-serif text-[11px] tracking-[0.2em] transition-colors ${
+          className={`font-serif text-capitale tracking-[0.2em] transition-colors ${
             lang === key ? "text-champagne" : "text-white/30 hover:text-white/60"
           }`}
         >

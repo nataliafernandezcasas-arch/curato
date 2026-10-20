@@ -17,8 +17,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" />
         </div>
         <div className="relative z-10 max-w-[380px] text-center">
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-copper mb-6">Error de configuración</p>
-          <p className="font-serif text-[15px] font-light text-charcoal-deep">
+          <p className="font-serif text-capitale tracking-[0.35em] uppercase text-copper mb-6">Error de configuración</p>
+          <p className="font-serif text-corps font-light text-charcoal-deep">
             Falta la variable <code className="text-copper">ADMIN_PASS</code> en Vercel.
           </p>
         </div>
@@ -38,8 +38,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/">
               <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto", display: "inline-block", filter: "invert(1)" }} />
             </Link>
-            <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-charcoal-deep/50 mt-6 mb-3">Acceso interno</p>
-            <h1 className="font-serif text-2xl font-light tracking-[0.28em] uppercase text-charcoal-deep">Admin</h1>
+            <p className="font-serif text-capitale tracking-[0.35em] uppercase text-charcoal-deep/50 mt-6 mb-3">Acceso interno</p>
+            <h1 className="font-serif text-grande font-light tracking-[0.28em] uppercase text-charcoal-deep">Admin</h1>
           </div>
           <AdminLoginForm />
         </div>

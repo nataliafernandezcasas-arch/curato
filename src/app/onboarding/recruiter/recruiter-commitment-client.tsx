@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/member/button";
 import { useRouter } from "next/navigation";
-import { DownloadSimple } from "@phosphor-icons/react";
+import { DownloadSimple } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
 import { signRecruiterCommitment } from "./actions";
@@ -172,8 +172,8 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
   }
 
   const inputClass =
-    "campo-cristal font-serif text-[14px] tracking-wide";
-  const labelClass = "block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3";
+    "campo-cristal font-serif text-corps tracking-wide";
+  const labelClass = "block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3";
 
   return (
     <div className="min-h-[100dvh] bg-charcoal-deep text-white">
@@ -202,7 +202,7 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
         </div>
         <div className="max-w-[640px] mx-auto px-5 py-24 md:py-28">
           <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{t.eyebrow}</p>
-          <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+          <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-grande">
             {t.title}
           </h1>
           <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">
@@ -237,7 +237,7 @@ export default function RecruiterCommitmentClient({ recruiterName }: { recruiter
 
             <label className="flex items-start gap-4 cursor-pointer group">
               <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0" />
-              <span className="font-serif text-[14px] md:text-[15px] font-light text-white/75 leading-relaxed tracking-wide group-hover:text-white transition-colors">
+              <span className="font-serif text-corps md:text-corps font-light text-white/75 leading-relaxed tracking-wide group-hover:text-white transition-colors">
                 {t.acceptStart}{" "}
                 <Link href="/condiciones" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-champagne/90 hover:text-champagne underline underline-offset-2">
                   {t.termsLink}

@@ -497,7 +497,7 @@ export function PanelVisita({
                     onChange={(e) =>
                       setCifras((x) => ({ ...x, [m.path]: { ...cifrasDe(m.path), [campo]: e.target.value.replace(/\D/g, "") } }))
                     }
-                    className="w-full min-w-0 border-0 border-b border-border bg-transparent py-etiqueta text-[17px] tabular-nums text-text-primary transition-colors duration-200 ease-curato outline-none focus:border-accent"
+                    className="w-full min-w-0 border-0 border-b border-border bg-transparent py-etiqueta text-sous-titre tabular-nums text-text-primary transition-colors duration-200 ease-curato outline-none focus:border-accent"
                   />
                 </label>
               ))}

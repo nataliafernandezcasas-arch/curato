@@ -30,7 +30,7 @@ export default function ComingSoonToggle({ id, initial }: { id: string; initial:
     <button
       onClick={toggle}
       disabled={saving}
-      className={`font-serif text-[11px] tracking-[0.15em] uppercase px-3 py-1.5 border transition-colors ${
+      className={`font-serif text-capitale tracking-[0.15em] uppercase px-3 py-1.5 border transition-colors ${
         on
           ? "border-amber-400/50 text-amber-300 bg-amber-400/10"
           : "border-white/15 text-white/50 hover:text-white/80 hover:border-white/30"

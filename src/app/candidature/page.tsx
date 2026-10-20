@@ -125,10 +125,10 @@ export default function CandidaturePage() {
           <Link href="/" className="inline-block mb-12">
             <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
           </Link>
-          <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-6">{t.successBadge}</p>
-          <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-text-primary mb-6">{t.successTitle}</h1>
-          <p className="font-serif text-[16px] font-light text-text-secondary leading-relaxed mb-10">{t.successText}</p>
-          <Link href="/" className="font-serif text-[12px] tracking-widest uppercase text-champagne/60 hover:text-champagne transition-colors">
+          <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/60 mb-6">{t.successBadge}</p>
+          <h1 className="font-serif text-cifra font-light tracking-[0.28em] uppercase text-text-primary mb-6">{t.successTitle}</h1>
+          <p className="font-serif text-corps font-light text-text-secondary leading-relaxed mb-10">{t.successText}</p>
+          <Link href="/" className="font-serif text-legende tracking-widest uppercase text-champagne/60 hover:text-champagne transition-colors">
             {t.successBack}
           </Link>
         </motion.div>
@@ -148,43 +148,43 @@ export default function CandidaturePage() {
           <Link href="/" className="inline-block mb-8">
             <img src="/logo-curato-simple.png" alt="curato" style={{ height: "14px", width: "auto" }} />
           </Link>
-          <h1 className="font-serif text-3xl font-light tracking-[0.35em] uppercase text-text-primary">{t.title}</h1>
-          <p className="font-serif text-[13px] font-light text-text-muted mt-3 tracking-wide">{t.badge}</p>
+          <h1 className="font-serif text-grande font-light tracking-[0.35em] uppercase text-text-primary">{t.title}</h1>
+          <p className="font-serif text-legende font-light text-text-muted mt-3 tracking-wide">{t.badge}</p>
         </div>
 
         {!type ? (
           <motion.div {...fade(0.1)} className="space-y-4">
-            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 text-center mb-8">{t.chooseLabel}</p>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/50 text-center mb-8">{t.chooseLabel}</p>
             <button
               onClick={() => setType("creator")}
               className="w-full group border border-border bg-charcoal-mid/40 p-8 text-left hover:border-champagne/40 hover:bg-charcoal-mid transition-all duration-300"
             >
-              <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50 mb-3">{t.creatorLabel}</p>
-              <p className="font-serif text-xl font-light tracking-wider uppercase text-text-primary">{t.creatorTitle}</p>
-              <p className="font-serif text-[14px] font-light text-text-muted mt-3 leading-relaxed">{t.creatorDesc}</p>
+              <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/50 mb-3">{t.creatorLabel}</p>
+              <p className="font-serif text-sous-titre font-light tracking-wider uppercase text-text-primary">{t.creatorTitle}</p>
+              <p className="font-serif text-corps font-light text-text-muted mt-3 leading-relaxed">{t.creatorDesc}</p>
             </button>
             <button
               onClick={() => setType("maison")}
               className="w-full group border border-border bg-charcoal-mid/40 p-8 text-left hover:border-copper/40 hover:bg-charcoal-mid transition-all duration-300"
             >
-              <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-copper/50 mb-3">{t.maisonLabel}</p>
-              <p className="font-serif text-xl font-light tracking-wider uppercase text-text-primary">{t.maisonTitle}</p>
-              <p className="font-serif text-[14px] font-light text-text-muted mt-3 leading-relaxed">{t.maisonDesc}</p>
+              <p className="font-serif text-capitale tracking-[0.3em] uppercase text-copper/50 mb-3">{t.maisonLabel}</p>
+              <p className="font-serif text-sous-titre font-light tracking-wider uppercase text-text-primary">{t.maisonTitle}</p>
+              <p className="font-serif text-corps font-light text-text-muted mt-3 leading-relaxed">{t.maisonDesc}</p>
             </button>
           </motion.div>
         ) : (
           <motion.form {...fade(0.1)} onSubmit={handleSubmit} className="space-y-5">
             <div className="flex items-center gap-4 mb-8">
-              <button type="button" onClick={() => setType(null)} className="font-serif text-[11px] tracking-[0.2em] uppercase text-text-muted/50 hover:text-text-muted transition-colors">
+              <button type="button" onClick={() => setType(null)} className="font-serif text-capitale tracking-[0.2em] uppercase text-text-muted/50 hover:text-text-muted transition-colors">
                 {t.back}
               </button>
-              <span className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/50">
+              <span className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/50">
                 {type === "creator" ? t.creatorLabel : t.maisonLabel}
               </span>
             </div>
 
             <div>
-              <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+              <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">
                 {type === "creator" ? t.nameLabel : t.nameLabelMaison}
               </label>
               <input
@@ -192,31 +192,31 @@ export default function CandidaturePage() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
-                className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
+                className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
                 placeholder={type === "creator" ? t.namePlaceholder : t.namePlaceholderMaison}
               />
             </div>
 
             <div>
-              <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.emailLabel}</label>
+              <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.emailLabel}</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
-                className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
+                className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
                 placeholder={t.emailPlaceholder}
               />
             </div>
 
             {type === "creator" && (
               <div>
-                <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.instagramLabel}</label>
+                <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.instagramLabel}</label>
                 <input
                   type="text"
                   value={form.instagram}
                   onChange={(e) => setForm({ ...form, instagram: e.target.value })}
-                  className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
+                  className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
                   placeholder={t.instagramPlaceholder}
                 />
               </div>
@@ -227,7 +227,7 @@ export default function CandidaturePage() {
             {type === "creator" && (
               <>
                 <div>
-                  <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+                  <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">
                     {t.styleLabel}
                     <span className="text-copper/70"> *</span>
                   </label>
@@ -237,17 +237,17 @@ export default function CandidaturePage() {
                     rows={3}
                     maxLength={400}
                     required
-                    className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40 resize-none"
+                    className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40 resize-none"
                     placeholder={t.stylePlaceholder}
                   />
                 </div>
 
                 <div>
-                  <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+                  <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">
                     {t.portfolioLabel}
                     <span className="text-copper/70"> *</span>
                   </label>
-                  <p className="font-serif text-[13px] font-light text-text-muted/60 leading-relaxed mb-4">
+                  <p className="font-serif text-legende font-light text-text-muted/60 leading-relaxed mb-4">
                     {t.portfolioHelp
                       .replace("{min}", String(PORTFOLIO_MIN))
                       .replace("{max}", String(PORTFOLIO_MAX))}
@@ -262,7 +262,7 @@ export default function CandidaturePage() {
                             type="button"
                             onClick={() => removePhoto(i)}
                             aria-label={t.portfolioRemove}
-                            className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center bg-charcoal-deep/80 border border-border text-text-secondary hover:text-text-primary hover:border-champagne/40 transition-colors font-serif text-[15px] leading-none"
+                            className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center bg-charcoal-deep/80 border border-border text-text-secondary hover:text-text-primary hover:border-champagne/40 transition-colors font-serif text-corps leading-none"
                           >
                             ×
                           </button>
@@ -284,13 +284,13 @@ export default function CandidaturePage() {
                         }}
                         className="sr-only"
                       />
-                      <span className="font-serif text-[12px] tracking-[0.2em] uppercase text-champagne/60">
+                      <span className="font-serif text-legende tracking-[0.2em] uppercase text-champagne/60">
                         {t.portfolioAdd}
                       </span>
                     </label>
                   )}
 
-                  <p className="font-serif text-[12px] font-light text-text-muted/40 mt-3 tracking-wide">
+                  <p className="font-serif text-legende font-light text-text-muted/40 mt-3 tracking-wide">
                     {t.portfolioCount
                       .replace("{n}", String(photos.length))
                       .replace("{min}", String(PORTFOLIO_MIN))}
@@ -301,7 +301,7 @@ export default function CandidaturePage() {
 
             {type === "maison" && (
               <div>
-                <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.websiteLabel}</label>
+                <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">{t.websiteLabel}</label>
                 <input
                   // Texto y no "url": el navegador exige https:// y rechazaba
                   // «www.kalatra.com». El https:// lo pone el envío.
@@ -311,14 +311,14 @@ export default function CandidaturePage() {
                   autoCorrect="off"
                   value={form.website}
                   onChange={(e) => setForm({ ...form, website: e.target.value })}
-                  className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
+                  className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
                   placeholder={t.websitePlaceholder}
                 />
               </div>
             )}
 
             <div>
-              <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-champagne/60 mb-3">
+              <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">
                 {type === "creator" ? t.whyLabel : t.describeLabel}
                 <span className="normal-case tracking-normal ml-2 text-text-muted/40">{t.optional}</span>
               </label>
@@ -326,7 +326,7 @@ export default function CandidaturePage() {
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 rows={4}
-                className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-[15px] font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40 resize-none"
+                className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40 resize-none"
                 placeholder={type === "creator" ? t.whyPlaceholder : t.describePlaceholder}
               />
             </div>
@@ -339,7 +339,7 @@ export default function CandidaturePage() {
                 onChange={(e) => setAgeConfirmed(e.target.checked)}
                 className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
               />
-              <span className="font-serif text-[13px] font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
+              <span className="font-serif text-legende font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
                 {t.ageLabel}
                 <span className="text-copper/70"> *</span>
               </span>
@@ -353,7 +353,7 @@ export default function CandidaturePage() {
                 onChange={(e) => setTermsAccepted(e.target.checked)}
                 className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
               />
-              <span className="font-serif text-[13px] font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
+              <span className="font-serif text-legende font-light text-text-secondary leading-relaxed tracking-wide group-hover:text-text-primary transition-colors">
                 {t.termsLabel}{" "}
                 <Link
                   href="/condiciones"
@@ -369,7 +369,7 @@ export default function CandidaturePage() {
             </label>
 
             {error && (
-              <p className="font-serif text-[13px] font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">{error}</p>
+              <p className="font-serif text-legende font-light text-copper/80 leading-relaxed border-l border-copper/40 pl-4">{error}</p>
             )}
 
             <button
@@ -380,12 +380,12 @@ export default function CandidaturePage() {
                 !termsAccepted ||
                 (type === "creator" && (photos.length < PORTFOLIO_MIN || !form.photoStyle.trim()))
               }
-              className="w-full font-serif text-[13px] tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full font-serif text-legende tracking-widest uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? t.submitting : t.submitBtn}
             </button>
 
-            <p className="text-center font-serif text-[12px] font-light text-text-muted/50 tracking-wide">{t.note}</p>
+            <p className="text-center font-serif text-legende font-light text-text-muted/50 tracking-wide">{t.note}</p>
           </motion.form>
         )}
       </div>

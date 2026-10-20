@@ -9,7 +9,7 @@ import { Rise } from "@/components/member/motion";
 import { Section } from "@/components/member/section";
 import { Retrato } from "@/components/member/retrato";
 import { PullToRefresh } from "@/components/member/pull-to-refresh";
-import { CaretRight } from "@phosphor-icons/react";
+import { CaretRight } from "@/components/member/iconos";
 import Link from "next/link";
 import { EnlacesDeCalendario } from "./enlaces";
 import { ButtonLink } from "@/components/member/button";
@@ -180,7 +180,7 @@ export default function CalendrierMaison() {
                           <div className="flex items-center gap-fila">
                             <Retrato src={v.portrait} nombre={v.storyteller} />
                             <div className="min-w-0 flex-1">
-                              <p className="truncate font-titulo text-[18px] text-text-primary transition-colors group-hover:text-accent">
+                              <p className="truncate font-titulo text-sous-titre text-text-primary transition-colors group-hover:text-accent">
                                 {v.storyteller}
                               </p>
                               <p className="text-legende text-text-secondary">

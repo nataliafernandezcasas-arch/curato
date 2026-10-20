@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Star } from "@phosphor-icons/react";
+import { Star } from "@/components/member/iconos";
 import type { Lang } from "@/lib/i18n/translations";
 import { Button } from "@/components/member/button";
 
@@ -109,7 +109,7 @@ export function Valoracion({
             maxLength={2000}
             placeholder={t.nota}
             aria-label={t.nota}
-            className="campo-cristal mt-fila resize-none text-[14px]"
+            className="campo-cristal mt-fila resize-none text-corps"
           />
           {(!enviada || cambiada) && (
             <div className="mt-fila">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle } from "@phosphor-icons/react";
+import { CheckCircle } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import { Button } from "@/components/member/button";
@@ -66,18 +66,18 @@ export default function SuggestVenue({ inicial = "" }: { inicial?: string }) {
 
   return (
     <div className="max-w-[460px] mx-auto text-center mt-16">
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-accent mb-4">
+      <p className="font-serif text-capitale tracking-[0.35em] uppercase text-accent mb-4">
         {t.suggestKicker}
       </p>
-      <h3 className="font-serif text-[22px] font-light text-text-primary mb-3">{t.suggestTitle}</h3>
-      <p className="font-serif text-[13px] font-light text-text-secondary leading-relaxed mb-7">
+      <h3 className="font-serif text-sous-titre font-light text-text-primary mb-3">{t.suggestTitle}</h3>
+      <p className="font-serif text-legende font-light text-text-secondary leading-relaxed mb-7">
         {t.suggestText}
       </p>
 
       {done ? (
         <div className="caja-cristal flex items-center justify-center gap-2 px-6 py-4">
           <CheckCircle size={18} weight="thin" className="text-accent shrink-0" />
-          <p className="font-serif text-[13px] font-light text-text-secondary">{t.suggestThanks}</p>
+          <p className="font-serif text-legende font-light text-text-secondary">{t.suggestThanks}</p>
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-3 text-left">
@@ -87,16 +87,16 @@ export default function SuggestVenue({ inicial = "" }: { inicial?: string }) {
             onChange={(e) => setVenue(e.target.value)}
             required
             placeholder={t.suggestPlaceholder}
-            className="campo-cristal font-serif text-[14px] font-light"
+            className="campo-cristal font-serif text-corps font-light"
           />
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             placeholder={t.suggestNotePlaceholder}
-            className="campo-cristal resize-none font-serif text-[14px] font-light"
+            className="campo-cristal resize-none font-serif text-corps font-light"
           />
-          {error && <p className="font-serif text-[12px] text-copper-vif">{ERRORES[lang][error]}</p>}
+          {error && <p className="font-serif text-legende text-copper-vif">{ERRORES[lang][error]}</p>}
           <Button type="submit" full disabled={busy}>
             {busy ? t.suggestSending : t.suggestSubmit}
           </Button>

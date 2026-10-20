@@ -59,10 +59,10 @@ export default async function AdminLanzamientoPage() {
 
       {/* Header */}
       <div className="mb-10">
-        <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-champagne/40 mb-3">
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/40 mb-3">
           Admin · Lancement · Paris
         </p>
-        <h1 className="font-serif text-3xl font-light tracking-[0.2em] uppercase text-white">
+        <h1 className="font-serif text-grande font-light tracking-[0.2em] uppercase text-white">
           {signups.length}{" "}
           <span className="text-white/40">
             {signups.length === 1 ? "inscription" : "inscriptions"}
@@ -72,7 +72,7 @@ export default async function AdminLanzamientoPage() {
 
       {/* Error */}
       {error && (
-        <div className="border border-red-400/20 bg-red-400/5 text-red-400 font-serif text-[13px] px-4 py-3 mb-6">
+        <div className="border border-red-400/20 bg-red-400/5 text-red-400 font-serif text-legende px-4 py-3 mb-6">
           No se pudo cargar la lista: {error.message}
         </div>
       )}
@@ -94,35 +94,35 @@ export default async function AdminLanzamientoPage() {
       {/* Empty state */}
       {signups.length === 0 ? (
         <div className="border border-white/10 bg-white/5 py-16 text-center">
-          <p className="font-serif text-[13px] font-light text-white/30 italic">
+          <p className="font-serif text-legende font-light text-white/30 italic">
             Aucune inscription pour le moment.
           </p>
-          <p className="font-serif text-[11px] text-white/20 mt-3 tracking-wide">
+          <p className="font-serif text-capitale text-white/20 mt-3 tracking-wide">
             curatocollective.com/lanzamiento?from=ig
           </p>
         </div>
       ) : (
         /* Table */
         <div className="border border-white/10 overflow-hidden">
-          <table className="w-full text-[13px]">
+          <table className="w-full text-legende">
             <thead>
               <tr className="border-b border-white/10 bg-white/5">
-                <th className="px-4 py-3 text-left font-serif font-normal text-[10px] tracking-[0.25em] uppercase text-white/30">
+                <th className="px-4 py-3 text-left font-serif font-normal text-capitale tracking-[0.25em] uppercase text-white/30">
                   Nom
                 </th>
-                <th className="px-4 py-3 text-left font-serif font-normal text-[10px] tracking-[0.25em] uppercase text-white/30">
+                <th className="px-4 py-3 text-left font-serif font-normal text-capitale tracking-[0.25em] uppercase text-white/30">
                   Contact
                 </th>
-                <th className="px-4 py-3 text-left font-serif font-normal text-[10px] tracking-[0.25em] uppercase text-white/30">
+                <th className="px-4 py-3 text-left font-serif font-normal text-capitale tracking-[0.25em] uppercase text-white/30">
                   Profil
                 </th>
-                <th className="px-4 py-3 text-left font-serif font-normal text-[10px] tracking-[0.25em] uppercase text-white/30">
+                <th className="px-4 py-3 text-left font-serif font-normal text-capitale tracking-[0.25em] uppercase text-white/30">
                   Instagram
                 </th>
-                <th className="px-4 py-3 text-left font-serif font-normal text-[10px] tracking-[0.25em] uppercase text-white/30">
+                <th className="px-4 py-3 text-left font-serif font-normal text-capitale tracking-[0.25em] uppercase text-white/30">
                   Canal
                 </th>
-                <th className="px-4 py-3 text-left font-serif font-normal text-[10px] tracking-[0.25em] uppercase text-white/30">
+                <th className="px-4 py-3 text-left font-serif font-normal text-capitale tracking-[0.25em] uppercase text-white/30">
                   Fecha
                 </th>
               </tr>
@@ -139,7 +139,7 @@ export default async function AdminLanzamientoPage() {
                   <td className="px-4 py-3 font-serif font-light text-white/50">
                     <div>{s.email}</div>
                     {s.whatsapp && (
-                      <div className="text-[11px] text-white/25">{s.whatsapp}</div>
+                      <div className="text-capitale text-white/25">{s.whatsapp}</div>
                     )}
                   </td>
                   <td className="px-4 py-3 font-serif font-light text-champagne/70">
@@ -162,7 +162,7 @@ export default async function AdminLanzamientoPage() {
                   <td className="px-4 py-3 font-serif font-light text-white/40">
                     {SOURCE_LABEL[s.source || "direct"] || s.source}
                   </td>
-                  <td className="px-4 py-3 font-serif text-[11px] text-white/25">
+                  <td className="px-4 py-3 font-serif text-capitale text-white/25">
                     {new Date(s.created_at).toLocaleDateString("fr-FR", {
                       day: "numeric",
                       month: "short",
@@ -183,14 +183,14 @@ export default async function AdminLanzamientoPage() {
 function BreakdownCard({ title, rows }: { title: string; rows: [string, number][] }) {
   return (
     <div className="bg-white/5 px-6 py-5">
-      <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-4">
+      <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-4">
         {title}
       </p>
       <div className="space-y-2">
         {rows.map(([label, n]) => (
           <div key={label} className="flex items-center justify-between">
-            <span className="font-serif font-light text-[13px] text-white/60">{label}</span>
-            <span className="font-serif text-[18px] font-light text-champagne tabular-nums">{n}</span>
+            <span className="font-serif font-light text-legende text-white/60">{label}</span>
+            <span className="font-serif text-sous-titre font-light text-champagne tabular-nums">{n}</span>
           </div>
         ))}
       </div>

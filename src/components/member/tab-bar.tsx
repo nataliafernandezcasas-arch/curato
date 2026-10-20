@@ -154,7 +154,7 @@ export function TabBar({ links }: { links: NavLink[] }) {
                   </span>
                 );
               })()}
-              <span className="whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.12em]">{l.label}</span>
+              <span className="whitespace-nowrap text-capitale uppercase leading-none tracking-[0.12em]">{l.label}</span>
               {!l.icono && !!l.cifra && <Cifra n={l.cifra} />}
             </span>
           </Link>
@@ -167,7 +167,7 @@ export function TabBar({ links }: { links: NavLink[] }) {
 /** Cuántas cosas esperan en un destino: las demandas por responder. */
 export function Cifra({ n }: { n: number }) {
   return (
-    <span className="ml-1.5 inline-flex h-[18px] min-w-[18px] translate-y-[-1px] items-center justify-center rounded-full bg-accent px-1 align-middle font-sans text-[11px] font-medium not-italic leading-none tracking-normal tabular-nums text-surface">
+    <span className="ml-1.5 inline-flex h-[18px] min-w-[18px] translate-y-[-1px] items-center justify-center rounded-full bg-accent px-1 align-middle font-sans text-capitale font-medium not-italic leading-none tracking-normal tabular-nums text-surface">
       {n > 99 ? "99+" : n}
     </span>
   );

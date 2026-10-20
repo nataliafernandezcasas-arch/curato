@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trash } from "@phosphor-icons/react";
+import { Trash } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 import { suggestedBudgetEUR } from "@/lib/credits";
@@ -34,7 +34,7 @@ function StatusBadge({ status, t }: { status: string; t: { [K in keyof typeof tr
     deleted: t.statusDeleted,
   };
   return (
-    <span className={`inline-block font-serif text-[10px] tracking-[0.25em] uppercase border px-2.5 py-1 ${styles[status] ?? styles.pending}`}>
+    <span className={`inline-block font-serif text-capitale tracking-[0.25em] uppercase border px-2.5 py-1 ${styles[status] ?? styles.pending}`}>
       {labels[status] ?? status}
     </span>
   );
@@ -89,23 +89,23 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
   if (app.status === "deleted") {
     return (
       <div className="flex items-center gap-3">
-        <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-white/40 hover:text-white transition-colors disabled:opacity-40">
+        <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-capitale tracking-wider text-white/40 hover:text-white transition-colors disabled:opacity-40">
           {loading === "pending" ? "…" : t.actionRestore}
         </button>
-        {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
+        {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
       </div>
     );
   }
   if (app.status === "approved") {
     return (
       <div className="flex items-center gap-3">
-        <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-red-400 hover:text-red-300 transition-colors disabled:opacity-40">
+        <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-capitale tracking-wider text-red-400 hover:text-red-300 transition-colors disabled:opacity-40">
           {loading === "rejected" ? "…" : t.actionReject}
         </button>
         <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
-          {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
+          {loading === "deleted" ? <span className="text-capitale">…</span> : <Trash size={14} />}
         </button>
-        {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
+        {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
       </div>
     );
   }
@@ -119,26 +119,26 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
               value={followers}
               onChange={(e) => onFollowersChange(e.target.value)}
               placeholder={t.followersPlaceholderShort}
-              className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+              className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
             />
             <input
               type="number"
               value={budget}
               onChange={(e) => { setBudget(e.target.value); setBudgetTouched(true); }}
               placeholder="Budget € / mois"
-              className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+              className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
             />
           </>
         )}
         <div className="flex items-center gap-3">
-          <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-[11px] tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-40">
+          <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-capitale tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-40">
             {loading === "approved" ? "…" : t.actionAccept}
           </button>
           <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
-            {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
+            {loading === "deleted" ? <span className="text-capitale">…</span> : <Trash size={14} />}
           </button>
         </div>
-        {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
+        {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
       </div>
     );
   }
@@ -152,14 +152,14 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
             value={followers}
             onChange={(e) => onFollowersChange(e.target.value)}
             placeholder={t.followersPlaceholder}
-            className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+            className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
           />
           <input
             type="number"
             value={budget}
             onChange={(e) => { setBudget(e.target.value); setBudgetTouched(true); }}
             placeholder="Budget € / mois"
-            className="w-full font-serif text-[11px] border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
+            className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
           />
         </>
       )}
@@ -167,14 +167,14 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
         <button
           onClick={() => update("approved")}
           disabled={!!loading}
-          className="font-serif text-[11px] tracking-widest uppercase text-charcoal-deep bg-champagne px-4 py-2 hover:bg-emerald-400 transition-all duration-200 disabled:opacity-40"
+          className="font-serif text-capitale tracking-widest uppercase text-charcoal-deep bg-champagne px-4 py-2 hover:bg-emerald-400 transition-all duration-200 disabled:opacity-40"
         >
           {loading === "approved" ? "…" : t.actionAccept}
         </button>
         <button
           onClick={() => update("rejected")}
           disabled={!!loading}
-          className="font-serif text-[11px] tracking-widest uppercase text-white/50 border border-white/20 px-4 py-2 hover:border-red-400 hover:text-red-400 transition-all duration-200 disabled:opacity-40"
+          className="font-serif text-capitale tracking-widest uppercase text-white/50 border border-white/20 px-4 py-2 hover:border-red-400 hover:text-red-400 transition-all duration-200 disabled:opacity-40"
         >
           {loading === "rejected" ? "…" : t.actionReject}
         </button>
@@ -184,10 +184,10 @@ function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: 
           title="Borrar"
           className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40"
         >
-          {loading === "deleted" ? <span className="text-[10px]">…</span> : <Trash size={14} />}
+          {loading === "deleted" ? <span className="text-capitale">…</span> : <Trash size={14} />}
         </button>
       </div>
-      {err && <p className="font-serif text-[10px] text-red-400">{err}</p>}
+      {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
     </div>
   );
 }
@@ -239,10 +239,10 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
     <div>
       {/* Header */}
       <div className="mb-12">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-4">
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-4">
           {t.pageLabel}
         </p>
-        <h1 className="font-serif text-[26px] sm:text-4xl font-light tracking-[0.2em] sm:tracking-[0.28em] uppercase text-white break-words">
+        <h1 className="font-serif text-grande sm:text-cifra font-light tracking-[0.2em] sm:tracking-[0.28em] uppercase text-white break-words">
           {t.pageTitle}
         </h1>
       </div>
@@ -256,8 +256,8 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
         ].map((s) => (
           <div key={s.key} className="min-w-0 bg-white/8 backdrop-blur-sm border border-white/10 px-3 py-4 sm:px-8 sm:py-6">
             {/* En el teléfono, menos espaciado entre letras: «PENDIENTES» se salía de la caja. */}
-            <p className="font-serif text-[9px] sm:text-[10px] tracking-[0.12em] sm:tracking-[0.35em] uppercase text-champagne/50 mb-2 break-words">{s.label}</p>
-            <p className="font-serif text-3xl font-light text-white">{s.value}</p>
+            <p className="font-serif text-capitale sm:text-capitale tracking-[0.12em] sm:tracking-[0.35em] uppercase text-champagne/50 mb-2 break-words">{s.label}</p>
+            <p className="font-serif text-grande font-light text-white">{s.value}</p>
           </div>
         ))}
       </div>
@@ -268,14 +268,14 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`font-serif text-[12px] tracking-wider pb-3 transition-colors border-b-2 -mb-px ${
+            className={`font-serif text-legende tracking-wider pb-3 transition-colors border-b-2 -mb-px ${
               tab === t.key
                 ? "text-white border-champagne"
                 : "text-white/35 border-transparent hover:text-white/60"
             }`}
           >
             {t.label}
-            <span className="ml-2 text-[10px] opacity-60">{t.count}</span>
+            <span className="ml-2 text-capitale opacity-60">{t.count}</span>
           </button>
         ))}
       </div>
@@ -283,7 +283,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
       {/* List */}
       {filtered.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="font-serif text-[15px] font-light text-white/40">{t.empty}</p>
+          <p className="font-serif text-corps font-light text-white/40">{t.empty}</p>
         </div>
       ) : (
         <div className="divide-y divide-white/10">
@@ -291,15 +291,15 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
             <div key={app.id} className="py-6 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
               <div className="space-y-2">
                 <div className="flex items-center gap-4 flex-wrap">
-                  <Link href={`/admin/applications/${app.id}`} className="font-serif text-[17px] font-light text-white hover:text-champagne transition-colors">{app.name}</Link>
-                  <span className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/40 border border-white/15 px-2 py-0.5">
+                  <Link href={`/admin/applications/${app.id}`} className="font-serif text-sous-titre font-light text-white hover:text-champagne transition-colors">{app.name}</Link>
+                  <span className="font-serif text-capitale tracking-[0.25em] uppercase text-white/40 border border-white/15 px-2 py-0.5">
                     {app.type === "creator" ? t.typeCreator : t.typeHouse}
                   </span>
                   <StatusBadge status={app.status} t={t} />
                 </div>
 
                 <div className="flex items-center gap-5 flex-wrap">
-                  <a href={`mailto:${app.email}`} className="font-serif text-[13px] font-light text-white/60 hover:text-white transition-colors">
+                  <a href={`mailto:${app.email}`} className="font-serif text-legende font-light text-white/60 hover:text-white transition-colors">
                     {app.email}
                   </a>
                   {app.instagram && (
@@ -307,7 +307,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
                       href={`https://instagram.com/${app.instagram.replace("@", "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-serif text-[13px] font-light text-white/40 hover:text-white transition-colors"
+                      className="font-serif text-legende font-light text-white/40 hover:text-white transition-colors"
                     >
                       {app.instagram.startsWith("@") ? app.instagram : `@${app.instagram}`}
                     </a>
@@ -317,7 +317,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
                       href={app.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-serif text-[13px] font-light text-white/40 hover:text-white transition-colors"
+                      className="font-serif text-legende font-light text-white/40 hover:text-white transition-colors"
                     >
                       {app.website.replace(/^https?:\/\//, "")}
                     </a>
@@ -325,12 +325,12 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
                 </div>
 
                 {app.message && (
-                  <p className="font-serif text-[13px] font-light text-white/50 leading-relaxed max-w-2xl italic">
+                  <p className="font-serif text-legende font-light text-white/50 leading-relaxed max-w-2xl italic">
                     "{app.message}"
                   </p>
                 )}
 
-                <p className="font-serif text-[11px] text-white/30">
+                <p className="font-serif text-capitale text-white/30">
                   {new Date(app.created_at).toLocaleDateString("es-ES", {
                     day: "numeric",
                     month: "long",

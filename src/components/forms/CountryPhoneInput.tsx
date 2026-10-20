@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CaretDown } from "@phosphor-icons/react";
+import { CaretDown } from "@/components/member/iconos";
 import { COUNTRIES } from "@/lib/constants";
 
 /**
@@ -84,9 +84,9 @@ export default function CountryPhoneInput({
           aria-expanded={open}
         >
           <span className="flex items-center gap-2.5 min-w-0">
-            <span className="text-lg leading-none">{country.flag}</span>
+            <span className="text-sous-titre leading-none">{country.flag}</span>
             <span className="truncate">{country.name}</span>
-            <span className="text-text-muted text-xs shrink-0">+{country.dialCode}</span>
+            <span className="text-text-muted text-legende shrink-0">+{country.dialCode}</span>
           </span>
           <CaretDown size={14} weight="bold" className={`text-text-muted transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
@@ -99,12 +99,12 @@ export default function CountryPhoneInput({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar país o código…"
-                className="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+                className="w-full px-3 py-2 rounded-md border border-border bg-surface text-corps focus:outline-none focus:ring-2 focus:ring-accent/30"
               />
             </div>
-            <ul role="listbox" className="max-h-64 overflow-y-auto py-1 text-sm">
+            <ul role="listbox" className="max-h-64 overflow-y-auto py-1 text-corps">
               {filtered.length === 0 && (
-                <li className="px-4 py-3 text-text-muted text-xs">Sin resultados</li>
+                <li className="px-4 py-3 text-text-muted text-legende">Sin resultados</li>
               )}
               {filtered.map((c) => (
                 <li
@@ -120,9 +120,9 @@ export default function CountryPhoneInput({
                     c.code === country.code ? "bg-accent/8 text-text-primary" : "hover:bg-border/40"
                   }`}
                 >
-                  <span className="text-lg leading-none">{c.flag}</span>
+                  <span className="text-sous-titre leading-none">{c.flag}</span>
                   <span className="flex-1 truncate">{c.name}</span>
-                  <span className="text-text-muted text-xs">+{c.dialCode}</span>
+                  <span className="text-text-muted text-legende">+{c.dialCode}</span>
                 </li>
               ))}
             </ul>
@@ -140,10 +140,10 @@ export default function CountryPhoneInput({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="flex items-center gap-1.5 pl-4 pr-3 py-3 text-sm text-text-muted shrink-0 hover:text-text-primary transition-colors border-r border-border/60"
+            className="flex items-center gap-1.5 pl-4 pr-3 py-3 text-corps text-text-muted shrink-0 hover:text-text-primary transition-colors border-r border-border/60"
             aria-label="Cambiar código de país"
           >
-            <span className="text-base leading-none">{country.flag}</span>
+            <span className="text-corps leading-none">{country.flag}</span>
             <span>+{country.dialCode}</span>
           </button>
           <input
@@ -154,7 +154,7 @@ export default function CountryPhoneInput({
             value={phoneLocal}
             onChange={(e) => setPhoneLocal(e.target.value.replace(/[^\d\s-]/g, ""))}
             placeholder="300 123 4567"
-            className="flex-1 pl-3 pr-4 py-3 bg-transparent text-sm text-text-primary focus:outline-none"
+            className="flex-1 pl-3 pr-4 py-3 bg-transparent text-corps text-text-primary focus:outline-none"
           />
         </div>
         {/* Submitted value: full international number */}

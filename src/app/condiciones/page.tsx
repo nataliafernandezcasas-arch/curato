@@ -32,13 +32,13 @@ export default function TermsPage() {
         {/* ── HEADER ── */}
         <section className="pt-36 md:pt-44 pb-12 px-5 border-b border-border">
           <div className="max-w-[860px] mx-auto">
-            <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-6">
+            <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-6">
               {t.eyebrow}
             </p>
             <h1 className="font-serif text-[clamp(2rem,6vw,3.4rem)] font-light tracking-[0.18em] uppercase leading-[1.1] text-text-primary mb-6">
               {t.pageTitle}
             </h1>
-            <p className="font-serif text-[12px] font-light italic tracking-wide text-text-muted">
+            <p className="font-serif text-legende font-light italic tracking-wide text-text-muted">
               {t.lastUpdatedLabel} · {t.lastUpdated}
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function TermsPage() {
         {/* ── TABLE OF CONTENTS ── */}
         <section className="px-5 pt-12">
           <div className="max-w-[860px] mx-auto">
-            <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-5">
+            <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-5">
               {t.tocTitle}
             </p>
             <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 list-none">
@@ -55,7 +55,7 @@ export default function TermsPage() {
                 <li key={s.id}>
                   <a
                     href={`#${s.id}`}
-                    className="group flex items-baseline gap-3 font-serif text-[13px] font-light text-text-secondary hover:text-champagne transition-colors"
+                    className="group flex items-baseline gap-3 font-serif text-legende font-light text-text-secondary hover:text-champagne transition-colors"
                   >
                     <span className="w-3 h-px bg-border group-hover:bg-champagne transition-colors" />
                     {s.title}
@@ -75,7 +75,7 @@ export default function TermsPage() {
                 id={section.id}
                 className="scroll-mt-28"
               >
-                <h2 className="font-serif text-[20px] md:text-[22px] font-light tracking-[0.12em] uppercase text-champagne mb-6 leading-snug">
+                <h2 className="font-serif text-sous-titre md:text-sous-titre font-light tracking-[0.12em] uppercase text-champagne mb-6 leading-snug">
                   {section.title}
                 </h2>
                 <div className="space-y-5">
@@ -84,7 +84,7 @@ export default function TermsPage() {
                       return (
                         <p
                           key={j}
-                          className="font-serif text-[15px] font-light text-text-secondary leading-[1.85] tracking-wide"
+                          className="font-serif text-corps font-light text-text-secondary leading-[1.85] tracking-wide"
                         >
                           {renderInline(block)}
                         </p>
@@ -95,7 +95,7 @@ export default function TermsPage() {
                         {block.list.map((item, k) => (
                           <li
                             key={k}
-                            className="flex gap-3 items-start font-serif text-[15px] font-light text-text-secondary leading-[1.75] tracking-wide"
+                            className="flex gap-3 items-start font-serif text-corps font-light text-text-secondary leading-[1.75] tracking-wide"
                           >
                             <span className="w-4 h-px bg-champagne/40 mt-[14px] shrink-0" />
                             <span>{renderInline(item)}</span>

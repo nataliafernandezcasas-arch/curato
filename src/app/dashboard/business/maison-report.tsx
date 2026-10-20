@@ -86,7 +86,7 @@ export default function MaisonReport() {
         <p className="mt-bloque text-legende text-text-secondary">{nombreMes}</p>
 
         {/* La cifra que justifica la suscripción. */}
-        <p className={`mt-fila text-[46px] font-light leading-none tabular-nums ${informe.belowMinimum ? "text-copper-vif" : "text-accent"}`}>
+        <p className={`mt-fila text-cifra font-light leading-none tabular-nums ${informe.belowMinimum ? "text-copper-vif" : "text-accent"}`}>
           {informe.visits}
         </p>
         <p className="mt-bloque text-legende text-text-secondary">

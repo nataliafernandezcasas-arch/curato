@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { ArrowRight } from "@phosphor-icons/react";
+import { ArrowRight } from "@/components/member/iconos";
 
 /**
  * El botón.

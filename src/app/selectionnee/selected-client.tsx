@@ -193,7 +193,7 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
             key={key}
             type="button"
             onClick={() => handleLangChange(key)}
-            className={`pointer-events-auto font-serif text-[11px] tracking-[0.25em] px-2.5 py-1.5 rounded-sm backdrop-blur-md transition-colors ${
+            className={`pointer-events-auto font-serif text-capitale tracking-[0.25em] px-2.5 py-1.5 rounded-sm backdrop-blur-md transition-colors ${
               lang === key
                 ? "bg-champagne/90 text-charcoal-deep"
                 : "bg-black/40 text-white/70 hover:text-white"
@@ -218,7 +218,7 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
 
         <div className="w-full max-w-[640px] text-center">
           {/* Eyebrow */}
-          <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/60 mb-10">
+          <p className="font-serif text-capitale tracking-[0.4em] uppercase text-champagne/60 mb-10">
             {t.eyebrow}
           </p>
 
@@ -241,7 +241,7 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
           <div className="w-16 h-px bg-champagne/40 mx-auto mb-10" />
 
           {/* Intro */}
-          <p className="font-serif text-[16px] md:text-[17px] font-light leading-[1.85] tracking-wide text-text-secondary max-w-[520px] mx-auto">
+          <p className="font-serif text-corps md:text-sous-titre font-light leading-[1.85] tracking-wide text-text-secondary max-w-[520px] mx-auto">
             {t.intro}
           </p>
         </div>
@@ -251,7 +251,7 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
             still stacked on desktop — the reading rhythm matters more
             than horizontal density here. */}
         <div className="w-full max-w-[560px] mt-20">
-          <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/50 text-center mb-10">
+          <p className="font-serif text-capitale tracking-[0.4em] uppercase text-champagne/50 text-center mb-10">
             {t.pillarsLabel}
           </p>
 
@@ -261,13 +261,13 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
                 key={i}
                 className="border-t border-white/10 pt-8 text-center"
               >
-                <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/40 mb-3">
+                <p className="font-serif text-capitale tracking-[0.4em] uppercase text-champagne/40 mb-3">
                   {String(i + 1).padStart(2, "0")}
                 </p>
-                <h2 className="font-serif text-[20px] md:text-[22px] font-light tracking-wide text-text-primary mb-4">
+                <h2 className="font-serif text-sous-titre md:text-sous-titre font-light tracking-wide text-text-primary mb-4">
                   {p.title}
                 </h2>
-                <p className="font-serif text-[15px] font-light leading-[1.8] text-text-muted">
+                <p className="font-serif text-corps font-light leading-[1.8] text-text-muted">
                   {p.desc}
                 </p>
               </div>
@@ -277,16 +277,16 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
 
         {/* ─── CTA ──────────────────────────────────────────────────── */}
         <div className="w-full max-w-[480px] mt-24 text-center">
-          <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-champagne/50 mb-6">
+          <p className="font-serif text-capitale tracking-[0.4em] uppercase text-champagne/50 mb-6">
             {t.ctaLabel}
           </p>
           <Link
             href={ctaHref}
-            className="inline-block font-serif text-[13px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-12 py-4 hover:bg-copper hover:text-white transition-all duration-300"
+            className="inline-block font-serif text-legende tracking-[0.25em] uppercase text-charcoal-deep bg-champagne px-12 py-4 hover:bg-copper hover:text-white transition-all duration-300"
           >
             {t.ctaBtn}
           </Link>
-          <p className="font-serif text-[12px] font-light text-text-muted/60 tracking-wide mt-6">
+          <p className="font-serif text-legende font-light text-text-muted/60 tracking-wide mt-6">
             {t.ctaNote}
           </p>
         </div>
@@ -296,17 +296,17 @@ export default function SelectedClient({ initialLang }: { initialLang: Lang }) {
             DM instead of clicking through, if that's more her style. */}
         <div className="w-full max-w-[520px] mt-20 text-center">
           <div className="w-px h-12 bg-champagne/30 mx-auto mb-10" />
-          <p className="font-serif italic text-[15px] font-light leading-[1.9] text-text-muted">
+          <p className="font-serif italic text-corps font-light leading-[1.9] text-text-muted">
             {t.closing}
           </p>
-          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/40 mt-8">
+          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mt-8">
             — {t.signedBy}
           </p>
         </div>
 
         {/* Footer */}
         <div className="mt-24">
-          <p className="font-serif text-[10px] tracking-[0.4em] uppercase text-champagne/25">
+          <p className="font-serif text-capitale tracking-[0.4em] uppercase text-champagne/25">
             © Curato — {new Date().getFullYear()}
           </p>
         </div>

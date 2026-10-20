@@ -39,22 +39,22 @@ export default async function AdminSuggestionsPage() {
 
   return (
     <div className="max-w-[1000px] mx-auto px-5 py-12">
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-3">
+      <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/70 mb-3">
         {rows.length} suggestions
       </p>
-      <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white mb-10">
+      <h1 className="font-serif text-grande font-light tracking-[0.15em] uppercase text-white mb-10">
         Suggestions
       </h1>
 
       {/* Most requested */}
       {top.length > 0 && (
         <div className="mb-12">
-          <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70 mb-4">
+          <p className="font-serif text-capitale tracking-[0.25em] uppercase text-champagne/70 mb-4">
             Les plus demandées
           </p>
           <div className="flex flex-wrap gap-2">
             {top.map((v) => (
-              <span key={v.label} className="font-serif text-[13px] text-white border border-champagne/25 bg-champagne/5 px-4 py-2">
+              <span key={v.label} className="font-serif text-legende text-white border border-champagne/25 bg-champagne/5 px-4 py-2">
                 {v.label} <span className="text-champagne">· {v.count}</span>
               </span>
             ))}
@@ -64,7 +64,7 @@ export default async function AdminSuggestionsPage() {
 
       {rows.length === 0 ? (
         <div className="text-center py-20 border border-white/10">
-          <p className="font-serif text-[14px] font-light text-white/65">Aucune suggestion pour le moment.</p>
+          <p className="font-serif text-corps font-light text-white/65">Aucune suggestion pour le moment.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -74,16 +74,16 @@ export default async function AdminSuggestionsPage() {
               <div key={s.id} className="border border-white/10 bg-black/40 p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <p className="font-serif text-[16px] text-white">{s.venue_name}</p>
+                    <p className="font-serif text-corps text-white">{s.venue_name}</p>
                     {s.note && (
-                      <p className="font-serif text-[13px] font-light text-white/55 italic mt-1">« {s.note} »</p>
+                      <p className="font-serif text-legende font-light text-white/55 italic mt-1">« {s.note} »</p>
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="font-serif text-[12px] text-white/65">
+                    <p className="font-serif text-legende text-white/65">
                       {c ? c.full_name || (c.handle ? `@${c.handle}` : "—") : "—"}
                     </p>
-                    <p className="font-serif text-[11px] text-white/45 mt-1">{formatDate(s.created_at)}</p>
+                    <p className="font-serif text-capitale text-white/45 mt-1">{formatDate(s.created_at)}</p>
                   </div>
                 </div>
               </div>

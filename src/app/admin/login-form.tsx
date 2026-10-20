@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeSlash } from "@phosphor-icons/react";
+import { Eye, EyeSlash } from "@/components/member/iconos";
 
 export default function AdminLoginForm() {
   const [pass, setPass] = useState("");
@@ -37,7 +37,7 @@ export default function AdminLoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block font-serif text-[11px] tracking-[0.25em] uppercase text-charcoal-deep/50 mb-3">
+        <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-charcoal-deep/50 mb-3">
           Clave
         </label>
         <div className="relative">
@@ -47,7 +47,7 @@ export default function AdminLoginForm() {
             required
             value={pass}
             onChange={(e) => setPass(e.target.value)}
-            className="w-full px-5 py-4 pr-12 border border-black/15 bg-white/70 text-charcoal-deep font-serif text-[15px] font-light focus:outline-none focus:border-black/30 transition-colors placeholder:text-charcoal-deep/30"
+            className="w-full px-5 py-4 pr-12 border border-black/15 bg-white/70 text-charcoal-deep font-serif text-corps font-light focus:outline-none focus:border-black/30 transition-colors placeholder:text-charcoal-deep/30"
             placeholder="••••••••••"
           />
           <button
@@ -61,7 +61,7 @@ export default function AdminLoginForm() {
       </div>
 
       {error && (
-        <p className="font-serif text-[13px] font-light text-copper border-l border-copper/40 pl-4">
+        <p className="font-serif text-legende font-light text-copper border-l border-copper/40 pl-4">
           {error}
         </p>
       )}
@@ -69,7 +69,7 @@ export default function AdminLoginForm() {
       <button
         type="submit"
         disabled={loading || !pass}
-        className="w-full font-serif text-[13px] tracking-widest uppercase text-white bg-charcoal-deep py-4 hover:bg-copper transition-all duration-300 disabled:opacity-40"
+        className="w-full font-serif text-legende tracking-widest uppercase text-white bg-charcoal-deep py-4 hover:bg-copper transition-all duration-300 disabled:opacity-40"
       >
         {loading ? "Verificando…" : "Entrar"}
       </button>

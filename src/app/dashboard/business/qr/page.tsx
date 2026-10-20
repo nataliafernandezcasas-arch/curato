@@ -244,7 +244,7 @@ export default function MaisonScanner({ searchParams }: { searchParams: Promise<
         )}
       </div>
       <div className="min-w-0">
-        <p className="font-titulo text-[22px]">{v.name}</p>
+        <p className="font-titulo text-sous-titre">{v.name}</p>
         {v.handle && <p className="text-legende" style={{ color: CHAMPAGNE }}>@{v.handle.replace(/^@/, "")}</p>}
         <p className="mt-bloque text-legende tabular-nums">
           {t.today} · {hora(v.slotStart)} · {t.party(v.partySize)}
@@ -306,7 +306,7 @@ export default function MaisonScanner({ searchParams }: { searchParams: Promise<
                 autoCapitalize="characters"
                 autoComplete="off"
                 spellCheck={false}
-                className="mt-fila w-full border-0 border-b bg-transparent py-bloque text-[28px] font-light uppercase tabular-nums tracking-[0.18em] outline-none"
+                className="mt-fila w-full border-0 border-b bg-transparent py-bloque text-grande font-light uppercase tabular-nums tracking-[0.18em] outline-none"
                 style={{ borderColor: CHAMPAGNE, color: TINTA }}
               />
               <div className="mt-fila">

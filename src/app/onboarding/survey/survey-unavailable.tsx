@@ -30,13 +30,13 @@ export default function SurveyUnavailable() {
   return (
     <div className="min-h-[100dvh] bg-charcoal-deep flex items-center justify-center px-5">
       <div className="text-center max-w-[480px]">
-        <p className="font-serif text-[10px] tracking-[0.35em] uppercase text-copper-vif mb-5">
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-copper-vif mb-5">
           {t.eyebrow}
         </p>
-        <h1 className="font-serif text-[24px] md:text-[28px] font-light text-white leading-tight mb-4 tracking-wide">
+        <h1 className="font-serif text-grande md:text-grande font-light text-white leading-tight mb-4 tracking-wide">
           {t.title}
         </h1>
-        <p className="font-serif text-[13px] font-light text-white/40 leading-relaxed tracking-wide">
+        <p className="font-serif text-legende font-light text-white/40 leading-relaxed tracking-wide">
           {t.body}
         </p>
       </div>

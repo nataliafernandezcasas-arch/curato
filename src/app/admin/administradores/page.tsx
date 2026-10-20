@@ -23,8 +23,8 @@ export default async function AdministradoresPage() {
   );
   return (
     <main className="mx-auto max-w-[720px] px-5 py-14">
-      <p className="mb-3 font-serif text-[11px] uppercase tracking-[0.35em] text-champagne/60">Accès</p>
-      <h1 className="mb-10 font-serif text-[32px] font-light uppercase tracking-[0.15em] text-white">Administrateurs</h1>
+      <p className="mb-3 font-serif text-capitale uppercase tracking-[0.35em] text-champagne/60">Accès</p>
+      <h1 className="mb-10 font-serif text-grande font-light uppercase tracking-[0.15em] text-white">Administrateurs</h1>
       <Administradores lista={lista} />
     </main>
   );

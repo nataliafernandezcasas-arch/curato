@@ -200,7 +200,7 @@ export default function CodigoDeVisita() {
 
             <section className="mt-seccion">
               <p className="text-legende">{t.manual}</p>
-              <p className="mt-etiqueta text-[34px] font-light tabular-nums tracking-[0.18em]">{codigo || "···"}</p>
+              <p className="mt-etiqueta text-cifra font-light tabular-nums tracking-[0.18em]">{codigo || "···"}</p>
             </section>
           </>
         )}

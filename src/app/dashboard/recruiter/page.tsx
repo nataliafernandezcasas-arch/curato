@@ -207,8 +207,8 @@ export default function RecruiterDashboard() {
   }
 
   const inputClass =
-    "campo-cristal font-serif text-[14px] font-light";
-  const labelClass = "block font-serif text-[10px] tracking-[0.3em] uppercase text-white/35 mb-2";
+    "campo-cristal font-serif text-corps font-light";
+  const labelClass = "block font-serif text-capitale tracking-[0.3em] uppercase text-white/35 mb-2";
 
   const firstName = (data?.recruiter.full_name || "").split(" ")[0];
 
@@ -222,11 +222,11 @@ export default function RecruiterDashboard() {
       maxWidth="1120px"
     />
     <main className="max-w-[1120px] mx-auto px-pagina md:px-8 py-seccion">
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/60 mb-3">{t.eyebrow}</p>
-      <h1 className="font-serif text-3xl font-light tracking-wide text-white mb-2">
+      <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/60 mb-3">{t.eyebrow}</p>
+      <h1 className="font-serif text-grande font-light tracking-wide text-white mb-2">
         {t.hello}{firstName ? `, ${firstName}` : ""}.
       </h1>
-      <p className="font-serif text-[14px] font-light text-white/55 leading-relaxed mb-12">
+      <p className="font-serif text-corps font-light text-white/55 leading-relaxed mb-12">
         {t.intro}
       </p>
 
@@ -238,16 +238,16 @@ export default function RecruiterDashboard() {
           { k: t.statCommission, v: loading ? "—" : eur(data?.earnings.total ?? 0, lang) },
         ].map((c) => (
           <div key={c.k} className="bg-black/30 px-7 py-8">
-            <p className="font-serif text-[9px] tracking-[0.3em] uppercase text-white/35 mb-3">{c.k}</p>
-            <p className="font-serif text-[20px] font-light text-champagne">{c.v}</p>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/35 mb-3">{c.k}</p>
+            <p className="font-serif text-sous-titre font-light text-champagne">{c.v}</p>
           </div>
         ))}
       </div>
 
       {/* Add a maison */}
       <section className="caja-cristal p-8 mb-12">
-        <h2 className="font-serif text-[15px] text-white mb-1">{t.proposeTitle}</h2>
-        <p className="font-serif text-[12px] font-light text-white/45 mb-5">
+        <h2 className="font-serif text-corps text-white mb-1">{t.proposeTitle}</h2>
+        <p className="font-serif text-legende font-light text-white/45 mb-5">
           {t.proposeSub}
         </p>
         <form onSubmit={addProspect} className="space-y-4">
@@ -263,7 +263,7 @@ export default function RecruiterDashboard() {
             <label className={labelClass}>{t.lblNotes}</label>
             <input className={inputClass} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t.phNotes} />
           </div>
-          {addMsg && <p className="font-serif text-[12px] text-champagne/80">{t[addMsg]}</p>}
+          {addMsg && <p className="font-serif text-legende text-champagne/80">{t[addMsg]}</p>}
           <Button type="submit" disabled={adding}>
             {adding ? t.btnProposing : t.btnPropose}
           </Button>
@@ -272,9 +272,9 @@ export default function RecruiterDashboard() {
 
       {/* Prospects list */}
       <section className="mb-12">
-        <h2 className="font-serif text-[15px] text-white mb-5">{t.myMaisons}</h2>
+        <h2 className="font-serif text-corps text-white mb-5">{t.myMaisons}</h2>
         {loading ? (
-          <p className="font-serif text-[13px] text-white/40">{t.loading}</p>
+          <p className="font-serif text-legende text-white/40">{t.loading}</p>
         ) : data && data.prospects.length > 0 ? (
           <div className="divide-y divide-white/8 border-y border-white/8">
             {data.prospects.map((p) => {
@@ -282,10 +282,10 @@ export default function RecruiterDashboard() {
               return (
                 <div key={p.id} className="flex items-center justify-between py-4 gap-4">
                   <div className="min-w-0">
-                    <p className="font-serif text-[15px] text-white truncate">{p.maison_name}</p>
-                    {p.maison_email && <p className="font-serif text-[12px] font-light text-white/40 truncate">{p.maison_email}</p>}
+                    <p className="font-serif text-corps text-white truncate">{p.maison_name}</p>
+                    {p.maison_email && <p className="font-serif text-legende font-light text-white/40 truncate">{p.maison_email}</p>}
                   </div>
-                  <div className={`shrink-0 inline-flex items-center gap-2 font-serif text-[12px] ${s.text}`}>
+                  <div className={`shrink-0 inline-flex items-center gap-2 font-serif text-legende ${s.text}`}>
                     <span style={{ width: 8, height: 8, borderRadius: 9999, background: s.dot, display: "inline-block" }} />
                     {t[s.key]}
                   </div>
@@ -294,14 +294,14 @@ export default function RecruiterDashboard() {
             })}
           </div>
         ) : (
-          <p className="font-serif text-[13px] font-light text-white/40">{t.empty}</p>
+          <p className="font-serif text-legende font-light text-white/40">{t.empty}</p>
         )}
       </section>
 
       {/* Payouts / IBAN */}
       <section className="caja-cristal p-8">
-        <h2 className="font-serif text-[15px] text-white mb-1">{t.payoutsTitle}</h2>
-        <p className="font-serif text-[12px] font-light text-white/45 mb-5">
+        <h2 className="font-serif text-corps text-white mb-1">{t.payoutsTitle}</h2>
+        <p className="font-serif text-legende font-light text-white/45 mb-5">
           {t.payoutsSub}
         </p>
         <form onSubmit={saveIban} className="space-y-4">
@@ -309,7 +309,7 @@ export default function RecruiterDashboard() {
             <label className={labelClass}>{t.lblIban}</label>
             <input className={inputClass} value={iban} onChange={(e) => setIban(e.target.value)} placeholder={t.phIban} />
           </div>
-          {ibanMsg && <p className="font-serif text-[12px] text-champagne/80">{t[ibanMsg]}</p>}
+          {ibanMsg && <p className="font-serif text-legende text-champagne/80">{t[ibanMsg]}</p>}
           <Button type="submit">{t.btnSaveIban}</Button>
         </form>
       </section>

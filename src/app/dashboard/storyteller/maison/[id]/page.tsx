@@ -5,7 +5,7 @@ import Link from "next/link";
 import DashboardNav from "../../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../../nav-links";
 import { MAISON_LINKS } from "../../../business/nav-links";
-import { MapPin, ArrowLeft, GlobeSimple, X, CheckCircle } from "@phosphor-icons/react";
+import { MapPin, ArrowLeft, GlobeSimple, X, CheckCircle } from "@/components/member/iconos";
 import { useRouter } from "next/navigation";
 import { pickLang } from "@/lib/i18n/pick-lang";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -179,7 +179,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
             <p className="caja-cristal mt-fila px-5 py-4 text-legende text-text-secondary">{APERCU[lang].nota}</p>
           </div>
         ) : (
-          <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.2em] uppercase text-text-secondary hover:text-accent transition-colors mb-8">
+          <Link href="/dashboard/storyteller" className="inline-flex items-center gap-2 font-serif text-capitale tracking-[0.2em] uppercase text-text-secondary hover:text-accent transition-colors mb-8">
             <ArrowLeft size={14} />
             {t.backToAll}
           </Link>
@@ -187,13 +187,13 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
         {gated ? (
           <div className="py-respiro text-center">
-            <p className="font-serif text-[11px] tracking-[0.4em] uppercase text-accent mb-6">
+            <p className="font-serif text-capitale tracking-[0.4em] uppercase text-accent mb-6">
               {td.comingSoonKicker}
             </p>
-            <h2 className="font-serif text-[26px] md:text-[34px] font-light tracking-[0.1em] text-text-primary mb-6">
+            <h2 className="font-serif text-grande md:text-cifra font-light tracking-[0.1em] text-text-primary mb-6">
               {td.comingSoonTitle}
             </h2>
-            <p className="font-serif text-[14px] md:text-[15px] font-light text-text-secondary leading-relaxed max-w-[440px] mx-auto px-6">
+            <p className="font-serif text-corps md:text-corps font-light text-text-secondary leading-relaxed max-w-[440px] mx-auto px-6">
               {launchDateLabel
                 ? td.comingSoonBody.replace("{date}", launchDateLabel)
                 : td.comingSoonBodyNoDate}
@@ -206,7 +206,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
           </div>
         ) : !maison ? (
           <div className="py-respiro text-center">
-            <p className="font-serif text-[15px] font-light text-text-secondary">{t.notFound}</p>
+            <p className="font-serif text-corps font-light text-text-secondary">{t.notFound}</p>
           </div>
         ) : (
           <>
@@ -239,26 +239,26 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
               {/* Left: info */}
               <div className="md:col-span-2">
                 {cat && (
-                  <span className="font-serif text-[10px] tracking-[0.3em] uppercase text-accent">
+                  <span className="font-serif text-capitale tracking-[0.3em] uppercase text-accent">
                     {catLabelText}
                   </span>
                 )}
-                <h1 className="font-titulo text-[34px] font-light text-text-primary leading-tight mt-2 mb-1">
+                <h1 className="font-titulo text-cifra font-light text-text-primary leading-tight mt-2 mb-1">
                   {maison.name}
                 </h1>
                 {maison.arrondissement && (
-                  <p className="font-serif text-[13px] text-text-secondary tracking-wide mb-6">Paris {maison.arrondissement}</p>
+                  <p className="font-serif text-legende text-text-secondary tracking-wide mb-6">Paris {maison.arrondissement}</p>
                 )}
 
                 {desc && (
-                  <p className="font-serif text-[15px] font-light text-text-secondary leading-relaxed mb-8">
+                  <p className="font-serif text-corps font-light text-text-secondary leading-relaxed mb-8">
                     {desc}
                   </p>
                 )}
 
                 {oferta && (oferta.eur || oferta.menuUrls.length > 0) && (
                   <div className="mb-8">
-                    <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-accent mb-3">{OFERTA[lang].title}</p>
+                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-accent mb-3">{OFERTA[lang].title}</p>
                     {/* El importe que la casa ofrece. La lista de servicios con
                         precio de antes ya no se enseña: no es lo que se gasta. */}
                     {oferta.eur ? (
@@ -296,7 +296,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                 {/* Map */}
                 {maison.address && (
                   <div className="mb-8">
-                    <p className="font-serif text-[11px] tracking-[0.25em] uppercase text-accent mb-3">{t.location}</p>
+                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-accent mb-3">{t.location}</p>
                     <div className="h-[180px] overflow-hidden">
                       <iframe
                         title={t.location}
@@ -389,7 +389,7 @@ function Horarios({ horario, lang }: { horario: Pick<MaisonAvail, "agenda" | "av
     const a = horario.agenda;
     return (
       <div className="mb-8">
-        <p className="mb-3 font-serif text-[11px] uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
+        <p className="mb-3 font-serif text-capitale uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
         <div className={fila}>
           <span className="text-legende text-text-secondary">{t.llegadas}</span>
           <span className="text-right text-legende text-text-primary">{ORDEN.filter((d) => a.llegadas.includes(d)).map((d) => t.dias[d]).join(", ")}</span>
@@ -403,7 +403,7 @@ function Horarios({ horario, lang }: { horario: Pick<MaisonAvail, "agenda" | "av
   if (horario.availability.length === 0) return null;
   return (
     <div className="mb-8">
-      <p className="mb-3 font-serif text-[11px] uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
+      <p className="mb-3 font-serif text-capitale uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
       {ORDEN.map((d) => {
         const franjas = horario.availability
           .filter((w) => w.day === d)

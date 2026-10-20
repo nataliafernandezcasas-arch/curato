@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeft } from "@/components/member/iconos";
 import type { Lang } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";
 import { Laminas } from "@/components/member/laminas";
@@ -183,7 +183,7 @@ export function Carta({
                 type="button"
                 onClick={() => onRemove(url)}
                 aria-label={removeLabel}
-                className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-[15px] text-white backdrop-blur transition-colors hover:bg-black/80"
+                className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-corps text-white backdrop-blur transition-colors hover:bg-black/80"
               >
                 ✕
               </button>

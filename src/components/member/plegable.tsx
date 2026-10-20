@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { CaretDown } from "@phosphor-icons/react";
+import { CaretDown } from "@/components/member/iconos";
 
 /**
  * Una sección que se abre al tocar su título, con la flecha a la derecha.

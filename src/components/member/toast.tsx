@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, Clock, WarningCircle } from "@phosphor-icons/react";
+import { Check, Clock, WarningCircle } from "@/components/member/iconos";
 import type { Tono } from "./state-mark";
 
 /**

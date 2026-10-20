@@ -84,13 +84,13 @@ export default async function AdminMaisonsPage() {
 
   return (
     <div className="max-w-[1100px] mx-auto px-5 py-12">
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/70 mb-3">
+      <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/70 mb-3">
         {maisons.length} maisons · {signedCount} signées · {connectedCount} connectées
       </p>
       <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-serif text-[32px] font-light tracking-[0.15em] uppercase text-white">Maisons</h1>
+        <h1 className="font-serif text-grande font-light tracking-[0.15em] uppercase text-white">Maisons</h1>
         {/* Créer un profil : le formulaire de « Nouveau membre ». */}
-        <Link href="/admin/nuevo" className="border border-champagne/40 px-4 py-2.5 font-serif text-[11px] uppercase tracking-[0.2em] text-champagne transition-colors hover:bg-champagne/10">
+        <Link href="/admin/nuevo" className="border border-champagne/40 px-4 py-2.5 font-serif text-capitale uppercase tracking-[0.2em] text-champagne transition-colors hover:bg-champagne/10">
           + Nouveau
         </Link>
       </div>

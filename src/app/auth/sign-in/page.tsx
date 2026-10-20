@@ -2,7 +2,7 @@
 
 import { useNativePlatform } from "@/lib/native/use-native";
 import { useState } from "react";
-import { Eye, EyeSlash } from "@phosphor-icons/react";
+import { Eye, EyeSlash } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
 import { COMUN } from "@/lib/i18n/comun";

@@ -38,7 +38,7 @@ export function CodeField({
         required
         maxLength={6}
         placeholder="000000"
-        className="w-full min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-center text-[28px] font-light tracking-capitale text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted/40 focus:border-accent"
+        className="w-full min-w-0 border-0 border-b border-transparent bg-transparent py-bloque text-center text-grande font-light tracking-capitale text-text-primary transition-colors duration-200 ease-curato outline-none placeholder:text-text-muted/40 focus:border-accent"
       />
       {hint && <p className="mt-etiqueta text-legende text-text-secondary">{hint}</p>}
     </div>
