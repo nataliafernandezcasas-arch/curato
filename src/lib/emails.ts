@@ -19,7 +19,7 @@ import {
   demandeDeclineeTexto,
   visiteConfirmeeTexto,
 } from "@/emails/visitas";
-import { CandidatureAcceptee, CandidatureRecue, CodeDacces, Lancement, MotDePasse } from "@/emails/cuenta";
+import { CandidatureAcceptee, CandidatureRecue, CodeDacces, InvitationEquipe, Lancement, MotDePasse } from "@/emails/cuenta";
 import { EngagementSigne, NouvelleMaison, DemandeRecue, AvisoDerechos, avisoDerechosTexto, type AvisoDerechosProps } from "@/emails/maison";
 import { Aviso, MaisonValidee, maisonValideeTexto } from "@/emails/apporteur";
 import { SeisHoras, StoriesManquantes, seisHorasTexto } from "@/emails/recordatorios";
@@ -326,6 +326,11 @@ export async function sendMaisonJoinedAdminAlert(opts: {
 // acción de recuperación de Supabase que abre /auth/change-password.
 export async function sendPasswordReset(to: string, resetUrl: string) {
   return sendEmail(to, "Curato · Choisissez un nouveau mot de passe", createElement(MotDePasse, { resetUrl }));
+}
+
+/** A quien entra en el equipo de una casa (migración 055). */
+export async function sendInvitacionEquipo(to: string, p: { maison: string; url: string; nueva: boolean }) {
+  return sendEmail(to, `Curato · Vous rejoignez l'équipe de ${p.maison}`, createElement(InvitationEquipe, p));
 }
 
 // ── Apporteurs ───────────────────────────────────────────────────────────────

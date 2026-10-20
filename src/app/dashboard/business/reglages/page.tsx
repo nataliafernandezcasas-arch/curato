@@ -15,6 +15,7 @@ import { AvisosDelTelefono } from "@/components/member/avisos-telefono";
 import { BorrarCuenta } from "@/components/member/borrar-cuenta";
 import { Plegable } from "@/components/member/plegable";
 import { Ayuda } from "@/components/member/ayuda";
+import { Equipo } from "./equipo";
 
 const LANGS: { key: Lang; label: string; name: string }[] = [
   { key: "fr", label: "FR", name: "Français" },
@@ -102,6 +103,8 @@ export default function MaisonReglagesPage() {
             </div>
           </Plegable>
         )}
+
+        <Equipo lang={lang} />
 
         <AvisosDelTelefono espacio="maison" />
 

@@ -12,6 +12,29 @@ import { Rise } from "@/components/member/motion";
 import { Button, ButtonLink } from "@/components/member/button";
 import { DossierInline } from "../../storyteller-dossier";
 import { EnlacesDeCalendario } from "../enlaces";
+import { Valoracion } from "../../../storyteller/visits/valoracion";
+
+// La casa valora al storyteller después de la visita. Lo lee Curato.
+const VALORAR = {
+  fr: {
+    titulo: "Comment s'est passée cette visite ?",
+    nota: "Un mot sur ce storyteller pour Curato (facultatif, il ne le voit pas)",
+    enviar: "Envoyer mon avis",
+    gracias: "Merci, votre avis est envoyé à Curato.",
+  },
+  en: {
+    titulo: "How did this visit go?",
+    nota: "A few words about this storyteller for Curato (optional, they won't see it)",
+    enviar: "Send my review",
+    gracias: "Thank you, your review has been sent to Curato.",
+  },
+  es: {
+    titulo: "¿Qué tal fue esta visita?",
+    nota: "Unas líneas sobre este storyteller para Curato (opcional, no lo verá)",
+    enviar: "Enviar mi opinión",
+    gracias: "Gracias, tu opinión ha llegado a Curato.",
+  },
+};
 
 type Visita = {
   id: string;
@@ -24,6 +47,8 @@ type Visita = {
   today: boolean;
   noShow?: boolean;
   canNoShow?: boolean;
+  canRate?: boolean;
+  rating?: { estrellas: number | null; nota: string } | null;
   calendar: { google: string; ics: string };
 };
 
@@ -246,6 +271,9 @@ export default function VisitaDeLaCasa({ params }: { params: Promise<{ id: strin
                 </div>
 
                 <EnlacesDeCalendario calendar={v.calendar} lang={lang} className="mt-fila" />
+                {v.canRate && (
+                  <Valoracion id={v.id} inicial={v.rating ?? null} lang={lang} endpoint="/api/maison/valoracion" textos={VALORAR} />
+                )}
               </div>
             </Rise>
 

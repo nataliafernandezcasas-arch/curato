@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { filtroDeCasa } from "@/lib/casa";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import { visitaDeHoy } from "@/lib/check-in";
 import { puedeMarcarNoShow } from "@/lib/asistencia";
@@ -23,7 +24,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name, address")
-      .or(filtroDeUsuario(user))
+      .or(await filtroDeCasa(admin, user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)
@@ -42,6 +43,14 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     if (!r) return NextResponse.json({ error: "visita" }, { status: 404 });
 
     const dossier = (await buildDossiers(admin, [r.creator_id])).get(r.creator_id) ?? null;
+    // La valoración de la casa (migración 054), aparte y tolerante: sin la
+    // columna no se ofrece valorar.
+    const { data: val, error: sinValoracion } = await admin
+      .from("reservations")
+      .select("maison_rating, maison_rating_note")
+      .eq("id", r.id)
+      .maybeSingle();
+    const hecha = Boolean(r.visited_at) || new Date(r.slot_start as string).getTime() < Date.now();
     const nombre = dossier?.name || (dossier?.handle ? `@${dossier.handle}` : "Storyteller");
     const partySize = (r.party_size as number | null) ?? 1;
 
@@ -59,6 +68,14 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
         canNoShow: puedeMarcarNoShow(r),
         // Hoy es el día de la visita (o una de sus noches): se puede escanear.
         today: Boolean(visitaDeHoy([r])),
+        canRate: !sinValoracion && hecha && (r.status === "confirmed" || r.status === "completed"),
+        rating:
+          !sinValoracion && val
+            ? {
+                estrellas: ((val as { maison_rating?: number | null }).maison_rating ?? null),
+                nota: ((val as { maison_rating_note?: string | null }).maison_rating_note ?? ""),
+              }
+            : null,
         calendar: {
           google: googleCalendarUrl(
             eventoDeVisita({

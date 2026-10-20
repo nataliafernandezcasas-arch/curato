@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { filtroDeCasa } from "@/lib/casa";
 
 // La ficha de un storyteller que la casa abre desde el roster. Es el mismo
 // dossier que acompaña a una demanda de visita, sin la demanda.
@@ -19,7 +20,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     const { data: maison } = await admin
       .from("comercios")
       .select("id")
-      .or(filtroDeUsuario(user))
+      .or(await filtroDeCasa(admin, user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

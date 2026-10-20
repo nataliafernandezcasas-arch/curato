@@ -5,6 +5,7 @@ import { getPhylloAccounts, getPhylloProfile, getPhylloFeedContents, summarizeMe
 import { signPortraits } from "@/lib/creator-portrait";
 import { subjectLabel } from "@/lib/photo-subjects";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { filtroDeCasa } from "@/lib/casa";
 import { phylloDePrueba, seguidoresCreibles } from "@/lib/storyteller-dossier";
 
 
@@ -22,7 +23,7 @@ export async function GET() {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name")
-      .or(filtroDeUsuario(user))
+      .or(await filtroDeCasa(admin, user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

@@ -89,3 +89,21 @@ export function CodeDacces(p: { code: string; groupedCode: string; expiresLabel:
     </Shell>
   );
 }
+
+// ── Invitation à l'équipe d'une maison ─────────────────────────────────────
+// Una persona más del equipo de una casa (migración 055). Si aún no tenía
+// cuenta, el enlace le lleva a elegir su contraseña; si ya la tenía, a entrar.
+export function InvitationEquipe(p: { maison: string; url: string; nueva: boolean }) {
+  return (
+    <Shell preview={`Vous rejoignez l'équipe de ${p.maison} sur Curato.`}>
+      <Capital>Équipe</Capital>
+      <Titre>Bienvenue chez {p.maison}.</Titre>
+      <Corps>
+        Vous avez été ajouté à l&apos;équipe de {p.maison} sur Curato. Vous verrez les demandes de visite, le calendrier des
+        storytellers qui viennent et le rapport du mois, comme le compte de la maison.
+      </Corps>
+      <Enlace href={p.url}>{p.nueva ? "Choisir mon mot de passe" : "Accéder à Curato"}</Enlace>
+      <Nota>Connectez-vous ensuite avec cette adresse e-mail, sur l&apos;application ou sur curatocollective.com.</Nota>
+    </Shell>
+  );
+}

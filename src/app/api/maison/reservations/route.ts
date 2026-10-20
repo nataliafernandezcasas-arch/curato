@@ -5,6 +5,7 @@ import { googleCalendarUrl, buildIcs } from "@/lib/calendar";
 import { sendReservationConfirmed, sendReservationDeclined } from "@/lib/emails";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { filtroDeCasa } from "@/lib/casa";
 import { avisar, AVISOS } from "@/lib/push/avisos";
 import { pendientesDe } from "@/lib/pendientes";
 import { agendaDe } from "@/lib/agenda";
@@ -81,7 +82,7 @@ export async function GET() {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name, category_id, availability")
-      .or(filtroDeUsuario(user))
+      .or(await filtroDeCasa(admin, user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name, address, photos, email, owner_id")
-      .or(filtroDeUsuario(user))
+      .or(await filtroDeCasa(admin, user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)
