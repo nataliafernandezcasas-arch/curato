@@ -60,12 +60,12 @@ export default function Administradores({ lista }: { lista: Persona[] }) {
         {lista.map((p) => (
           <li key={p.userId} className="flex flex-wrap items-center justify-between gap-4 py-4">
             <div>
-              <p className="font-serif text-[15px] text-white">{p.email}</p>
-              <p className="mt-0.5 font-serif text-[12px] text-white/35">
+              <p className="font-serif text-corps text-white">{p.email}</p>
+              <p className="mt-0.5 font-serif text-legende text-white/35">
                 admin depuis le {fecha(p.desde)} · dernière connexion : {fecha(p.ultima)}
               </p>
             </div>
-            <button type="button" onClick={() => quitar(p)} className="font-serif text-[11px] uppercase tracking-[0.2em] text-red-300/70 hover:text-red-300">
+            <button type="button" onClick={() => quitar(p)} className="font-serif text-capitale uppercase tracking-[0.2em] text-red-300/70 hover:text-red-300">
               Retirer
             </button>
           </li>
@@ -73,8 +73,8 @@ export default function Administradores({ lista }: { lista: Persona[] }) {
       </ul>
 
       <form onSubmit={anadir} className="border border-white/10 bg-white/5 p-6">
-        <p className="mb-2 font-serif text-[11px] uppercase tracking-[0.35em] text-champagne/50">Ajouter un administrateur</p>
-        <p className="mb-4 font-serif text-[13px] text-white/50">
+        <p className="mb-2 font-serif text-capitale uppercase tracking-[0.35em] text-champagne/50">Ajouter un administrateur</p>
+        <p className="mb-4 font-serif text-legende text-white/50">
           Avec son email. S&apos;il n&apos;a pas encore de compte Curato, il est créé et il reçoit un email pour choisir son mot de passe.
         </p>
         <input
@@ -83,16 +83,16 @@ export default function Administradores({ lista }: { lista: Persona[] }) {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="prenom.nom@curatocollective.com"
           required
-          className="w-full border border-white/15 bg-black/40 px-4 py-3 font-serif text-[14px] text-white outline-none focus:border-champagne/40"
+          className="w-full border border-white/15 bg-black/40 px-4 py-3 font-serif text-corps text-white outline-none focus:border-champagne/40"
         />
         <button
           type="submit"
           disabled={ocupado}
-          className="mt-4 bg-champagne px-6 py-3 font-serif text-[11px] uppercase tracking-[0.2em] text-charcoal-deep transition-colors hover:bg-copper hover:text-white disabled:opacity-50"
+          className="mt-4 bg-champagne px-6 py-3 font-serif text-capitale uppercase tracking-[0.2em] text-charcoal-deep transition-colors hover:bg-copper hover:text-white disabled:opacity-50"
         >
           {ocupado ? "…" : "Ajouter"}
         </button>
-        {mensaje && <p className={`mt-4 font-serif text-[13px] ${mensaje.ok ? "text-emerald-400" : "text-red-300"}`}>{mensaje.texto}</p>}
+        {mensaje && <p className={`mt-4 font-serif text-legende ${mensaje.ok ? "text-emerald-400" : "text-red-300"}`}>{mensaje.texto}</p>}
       </form>
     </>
   );

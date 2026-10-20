@@ -292,7 +292,7 @@ export default function InfluencerDashboard() {
             </Rise>
 
             <Rise index={1}>
-              <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+              <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-grande">
                 {profile?.full_name || profile?.handle || t.defaultName}
               </h1>
             </Rise>
@@ -395,7 +395,7 @@ export default function InfluencerDashboard() {
                         <div className="aspect-[4/3] w-full bg-surface-raised" />
                       )}
                       <div className="p-4">
-                        <p className="truncate font-titulo text-[18px] text-text-primary transition-colors group-hover:text-accent">{m.name}</p>
+                        <p className="truncate font-titulo text-sous-titre text-text-primary transition-colors group-hover:text-accent">{m.name}</p>
                         <p className="mt-etiqueta text-legende tabular-nums text-text-secondary">
                           {m.offer_eur ? <span className="text-accent">{m.offer_eur.toLocaleString(lang)} €</span> : null}
                           {m.offer_eur && etiquetaDeCategoria(m.category_id, lang) ? " · " : ""}

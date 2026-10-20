@@ -526,7 +526,7 @@ function Reserver({ id }: { id: string }) {
 
         <Rise>
           <p className="text-capitale uppercase tracking-capitale text-text-secondary">{casa?.name ?? ""}</p>
-          <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-[32px]">{t.title}</h1>
+          <h1 className="mt-bloque text-titre uppercase tracking-titre text-text-primary md:text-grande">{t.title}</h1>
         </Rise>
 
         {/* El éxito no es un diálogo: es esta misma pantalla diciendo que ya

@@ -213,7 +213,7 @@ function MaisonDashboard() {
             <p className="mb-bloque text-capitale uppercase tracking-capitale text-accent">
               {tab === "profile" ? t.tabProfile : t.kicker}
             </p>
-            <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+            <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-grande">
               {tab === "profile"
                 ? maisonName || t.tabProfile
                 : tab === "directory"
@@ -242,7 +242,7 @@ function MaisonDashboard() {
             </div>
           ) : roster.length === 0 ? (
             <div className="caja-cristal text-center py-24">
-              <p className="font-serif text-[15px] font-light text-text-secondary">{t.empty}</p>
+              <p className="font-serif text-corps font-light text-text-secondary">{t.empty}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-rango md:grid-cols-2">
@@ -266,7 +266,7 @@ function MaisonDashboard() {
                       </div>
                       <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="min-w-0 break-words font-titulo text-[21px] text-text-primary">{c.name}</h3>
+                        <h3 className="min-w-0 break-words font-titulo text-sous-titre text-text-primary">{c.name}</h3>
                         {c.igConnected && (
                           <span
                             title={t.igVerified}
@@ -337,7 +337,7 @@ function MaisonDashboard() {
           <div className="space-y-16">
             <MaisonProfile t={t} lang={lang} />
             <div className="pt-4 border-t border-border">
-              <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-accent mb-8">{t.tabOffer}</p>
+              <p className="font-serif text-capitale tracking-[0.35em] uppercase text-accent mb-8">{t.tabOffer}</p>
               <MaisonOffer t={t} lang={lang} />
             </div>
           </div>
@@ -356,7 +356,7 @@ function MaisonDashboard() {
             </div>
           ) : directory.length === 0 ? (
             <div className="caja-cristal text-center py-24">
-              <p className="font-serif text-[15px] font-light text-text-secondary">{t.directoryEmpty}</p>
+              <p className="font-serif text-corps font-light text-text-secondary">{t.directoryEmpty}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -375,13 +375,13 @@ function MaisonDashboard() {
                         <img src="/flor-bg.jpg" alt="" className="w-full h-full object-cover blur-xl scale-110 opacity-40" />
                       )}
                       <div className="absolute inset-0 bg-charcoal-deep/50 flex items-center justify-center">
-                        <span className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/80 rounded-full border border-champagne/30 bg-[rgba(245,239,228,0.06)] backdrop-blur-md px-4 py-2">
+                        <span className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/80 rounded-full border border-champagne/30 bg-[rgba(245,239,228,0.06)] backdrop-blur-md px-4 py-2">
                           {t.directoryComingSoon}
                         </span>
                       </div>
                     </div>
                     <div className="p-5">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-accent mb-1">{placeOf(m)}</p>
+                      <p className="font-serif text-capitale tracking-[0.25em] uppercase text-accent mb-1">{placeOf(m)}</p>
                       <div className="h-[1.1em] w-2/3 bg-border rounded-sm" />
                     </div>
                   </div>
@@ -398,8 +398,8 @@ function MaisonDashboard() {
                       )}
                     </div>
                     <div className="p-5">
-                      <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-accent mb-1">{placeOf(m)}</p>
-                      <h3 className="font-titulo text-[18px] font-light text-text-primary">{m.name}</h3>
+                      <p className="font-serif text-capitale tracking-[0.25em] uppercase text-accent mb-1">{placeOf(m)}</p>
+                      <h3 className="font-titulo text-sous-titre font-light text-text-primary">{m.name}</h3>
                     </div>
                   </button>
                 )
@@ -414,7 +414,7 @@ function MaisonDashboard() {
           </div>
         ) : visitors.length === 0 ? (
           <div className="caja-cristal text-center py-24">
-            <p className="font-serif text-[15px] font-light text-text-secondary">{t.visitorsEmpty}</p>
+            <p className="font-serif text-corps font-light text-text-secondary">{t.visitorsEmpty}</p>
           </div>
         ) : (
           <div className="space-y-12 max-w-[920px] mx-auto">
@@ -429,18 +429,18 @@ function MaisonDashboard() {
                   ))}
                 </div>
                 <div className="mt-4">
-                  <h3 className="flex items-center gap-3 font-serif text-[18px] font-light text-text-primary">
+                  <h3 className="flex items-center gap-3 font-serif text-sous-titre font-light text-text-primary">
                     <Retrato src={v.portrait} nombre={v.creator} />
                     <span>
                       {v.creator}
-                      {v.handle && <span className="text-text-secondary text-[14px]"> · @{v.handle}</span>}
+                      {v.handle && <span className="text-text-secondary text-corps"> · @{v.handle}</span>}
                     </span>
                   </h3>
-                  <p className="font-serif text-[13px] text-text-secondary mt-1">
+                  <p className="font-serif text-legende text-text-secondary mt-1">
                     {t.visitedOn.replace("{date}", fmtDate(v.visitDate))}
                   </p>
                   {v.rightsExpiresAt && (
-                    <p className="font-serif text-[12px] font-light text-text-secondary mt-1 italic">
+                    <p className="font-serif text-legende font-light text-text-secondary mt-1 italic">
                       {t.visitorsRights.replace("{date}", fmtDate(v.rightsExpiresAt))}
                     </p>
                   )}
@@ -472,13 +472,13 @@ function MaisonDashboard() {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-charcoal-deep/10 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/70 mb-1">{placeOf(selected)}</p>
-                <h3 className="font-titulo text-[26px] font-light tracking-[0.12em] uppercase text-white leading-none">{selected.name}</h3>
+                <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/70 mb-1">{placeOf(selected)}</p>
+                <h3 className="font-titulo text-grande font-light tracking-[0.12em] uppercase text-white leading-none">{selected.name}</h3>
               </div>
             </div>
             <div className="p-6 space-y-6">
               {descOf(selected) && (
-                <p className="font-serif text-[15px] font-light text-text-secondary leading-relaxed">{descOf(selected)}</p>
+                <p className="font-serif text-corps font-light text-text-secondary leading-relaxed">{descOf(selected)}</p>
               )}
               {selected.photos.length > 1 && (
                 <div className="grid grid-cols-3 gap-1.5">
@@ -494,17 +494,17 @@ function MaisonDashboard() {
                 {selected.website && (
                   <a href={selected.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                     <GlobeSimple size={15} />
-                    <span className="font-serif text-[13px]">{selected.website.replace(/^https?:\/\//, "")}</span>
+                    <span className="font-serif text-legende">{selected.website.replace(/^https?:\/\//, "")}</span>
                   </a>
                 )}
                 {selected.instagram.replace(/^@/, "").trim() && (
                   <a href={`https://instagram.com/${selected.instagram.replace(/^@/, "").trim()}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                     <InstagramLogo size={15} />
-                    <span className="font-serif text-[13px]">@{selected.instagram.replace(/^@/, "").trim()}</span>
+                    <span className="font-serif text-legende">@{selected.instagram.replace(/^@/, "").trim()}</span>
                   </a>
                 )}
                 {selected.address && (
-                  <span className="inline-flex items-center gap-2 text-text-secondary font-serif text-[13px]">
+                  <span className="inline-flex items-center gap-2 text-text-secondary font-serif text-legende">
                     <MapPin size={14} /> {selected.address}
                   </span>
                 )}

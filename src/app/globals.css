@@ -59,7 +59,9 @@
   --font-serif: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, "Segoe UI", Roboto, sans-serif;
   --font-titulo: 'Cormorant Garamond', Georgia, serif;
 
-  /* ── Cinco peldaños tipográficos, de los doce tamaños que había ────────────
+  /* ── La escala de Curato: capitale 11 · légende 13 · champ 14 (solo campos)
+     · corps 15 · sous-titre 19 · titre / grande 28 · cifra 36. No se escribe
+     ningún otro tamaño. ────────────────────────────────────────────────────
      Titre uno por pantalla. Sous-titre para un nombre o una cifra. Corps para
      toda la prosa. Légende sube a peso 400: el 300 a 13px se deshace en
      pantalla. Capitale es el recurso de titulación de Curato. */
@@ -73,6 +75,14 @@
   --text-legende--line-height: 1.55;
   --text-capitale: 11px;
   --text-capitale--line-height: 1.2;
+  /* Dos peldaños más para lo grande, y nada fuera de la escala (revisión de
+     diseño, 2026-10-20: había 24 tamaños sueltos escritos a mano). Grande es
+     un titular que no va en Cormorant a la fuerza; cifra, un importe o una
+     cifra que se lee de lejos. */
+  --text-grande: 28px;
+  --text-grande--line-height: 1.15;
+  --text-cifra: 36px;
+  --text-cifra--line-height: 1.05;
 
   /* El valor de un campo. Por debajo de 16px el WebView de iOS hace zoom al
      enfocar, y ese zoom es el origen del desplazamiento horizontal. */

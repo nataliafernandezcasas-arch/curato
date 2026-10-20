@@ -68,11 +68,11 @@ export default function Footer() {
               alt="curato"
               style={{ height: "14px", width: "auto", display: "block" }}
             />
-            <p className="font-serif text-[13px] text-text-secondary mt-2 tracking-wide font-light">
+            <p className="font-serif text-legende text-text-secondary mt-2 tracking-wide font-light">
               {t.footer.tagline}
             </p>
           </div>
-          <div className="flex flex-wrap gap-x-8 gap-y-3 text-[12px] text-text-primary/80 font-light tracking-widest">
+          <div className="flex flex-wrap gap-x-8 gap-y-3 text-legende text-text-primary/80 font-light tracking-widest">
             <Link href="/storytellers" className={linkCls}>{t.nav.creators}</Link>
             <Link href="/casas" className={linkCls}>{t.nav.maisons}</Link>
             <Link href="/auth/sign-in" className={linkCls}>{t.nav.access}</Link>
@@ -82,7 +82,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-border mt-10 pt-8">
-          <p className="font-serif text-[11px] text-text-muted font-light italic leading-relaxed">
+          <p className="font-serif text-capitale text-text-muted font-light italic leading-relaxed">
             {t.footer.copyright}
           </p>
         </div>

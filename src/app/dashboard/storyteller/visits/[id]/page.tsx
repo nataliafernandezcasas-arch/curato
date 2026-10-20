@@ -145,7 +145,7 @@ export default function PaginaVisita({ params }: { params: Promise<{ id: string 
                 </div>
               )}
 
-              <h1 className="font-titulo text-[34px] font-light leading-tight text-text-primary">{visit.maison}</h1>
+              <h1 className="font-titulo text-cifra font-light leading-tight text-text-primary">{visit.maison}</h1>
               {casa?.arrondissement && <p className="mt-etiqueta text-legende text-text-secondary">Paris {casa.arrondissement}</p>}
               {casa?.address && (
                 <p className="mt-bloque flex items-start gap-2 text-legende text-text-secondary">

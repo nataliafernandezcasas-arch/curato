@@ -101,7 +101,7 @@ export function Buscador({
         aria-label={t.placeholder}
         aria-expanded={mostrar}
         aria-controls="sugerencias-de-casas"
-        className="campo-cristal !pl-11 !pr-11 font-serif text-[14px] font-light [&::-webkit-search-cancel-button]:hidden"
+        className="campo-cristal !pl-11 !pr-11 font-serif text-corps font-light [&::-webkit-search-cancel-button]:hidden"
       />
       {valor && (
         <button
@@ -136,7 +136,7 @@ export function Buscador({
                   <div className="h-11 w-11 shrink-0 rounded-[10px] bg-surface-raised" />
                 )}
                 <div className="min-w-0">
-                  <p className="truncate font-titulo text-[18px] leading-tight text-text-primary">
+                  <p className="truncate font-titulo text-sous-titre leading-tight text-text-primary">
                     <Resaltado texto={m.name} q={q} />
                   </p>
                   <p className="truncate text-legende text-text-secondary">

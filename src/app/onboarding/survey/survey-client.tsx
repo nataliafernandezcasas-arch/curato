@@ -156,10 +156,10 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
           >
             <Sparkle size={22} weight="fill" className="text-champagne" />
           </motion.div>
-          <h1 className="font-serif text-[28px] md:text-[32px] font-light tracking-[0.15em] uppercase text-white leading-tight mb-4">
+          <h1 className="font-serif text-grande md:text-grande font-light tracking-[0.15em] uppercase text-white leading-tight mb-4">
             {t.doneTitle}
           </h1>
-          <p className="font-serif text-[14px] font-light text-white/50 leading-relaxed tracking-wide">
+          <p className="font-serif text-corps font-light text-white/50 leading-relaxed tracking-wide">
             {t.doneSubtitle}
           </p>
         </motion.div>
@@ -224,10 +224,10 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
             exit={{ opacity: 0, x: direction * -40 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1 className="font-serif text-[26px] md:text-[34px] font-light tracking-wide text-white leading-tight mb-3">
+            <h1 className="font-serif text-grande md:text-cifra font-light tracking-wide text-white leading-tight mb-3">
               {pickQuestionText(current, lang)}
             </h1>
-            <p className="font-serif text-[13px] font-light italic text-white/40 leading-relaxed mb-10 tracking-wide">
+            <p className="font-serif text-legende font-light italic text-white/40 leading-relaxed mb-10 tracking-wide">
               {current.slug === SUBJECT_QUESTION
                 ? DOS_AL_MAS[lang]
                 : current.question_type === "cards"
@@ -253,7 +253,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
 
             {/* Required hint only after the user tried to advance */}
             {!answersOk && current.is_required && (
-              <p className="font-serif text-[12px] italic text-copper-vif mt-6 tracking-wide">
+              <p className="font-serif text-legende italic text-copper-vif mt-6 tracking-wide">
                 {t.requiredHint}
               </p>
             )}
@@ -266,7 +266,7 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="font-serif text-[12px] font-light text-white/40 leading-relaxed tracking-wide mt-12 pt-6 border-t border-white/8"
+            className="font-serif text-legende font-light text-white/40 leading-relaxed tracking-wide mt-12 pt-6 border-t border-white/8"
           >
             {t.privacyNotice}{" "}
             <Link
@@ -295,13 +295,13 @@ export default function SurveyClient({ questions }: { questions: SurveyQuestion[
                 onChange={(e) => setConsented(e.target.checked)}
                 className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
               />
-              <span className="font-serif text-[13px] font-light text-white/70 leading-relaxed tracking-wide group-hover:text-white/90 transition-colors">
+              <span className="font-serif text-legende font-light text-white/70 leading-relaxed tracking-wide group-hover:text-white/90 transition-colors">
                 {t.consentLabel}
                 <span className="text-copper-vif"> *</span>
               </span>
             </label>
             {!consented && (
-              <p className="font-serif text-[11px] italic text-white/30 mt-3 ml-7 tracking-wide">
+              <p className="font-serif text-capitale italic text-white/30 mt-3 ml-7 tracking-wide">
                 {t.consentRequiredHint}
               </p>
             )}

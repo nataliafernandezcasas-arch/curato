@@ -59,17 +59,17 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
     <main className="max-w-[800px] mx-auto px-5 py-14">
 
       {/* Back */}
-      <Link href="/admin" className="inline-flex items-center gap-2 font-serif text-[11px] tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
+      <Link href="/admin" className="inline-flex items-center gap-2 font-serif text-capitale tracking-[0.25em] uppercase text-white/30 hover:text-white transition-colors mb-10">
         ← Candidaturas
       </Link>
 
       {/* Header */}
       <div className="mb-10">
-        <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-4">
+        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-4">
           Curato · Admin · Candidature
         </p>
         <div className="flex items-start justify-between gap-4 flex-wrap">
-          <h1 className="font-serif text-4xl font-light tracking-[0.28em] uppercase text-white">
+          <h1 className="font-serif text-cifra font-light tracking-[0.28em] uppercase text-white">
             {app.name}
           </h1>
           <StatusPill status={app.status} />
@@ -107,8 +107,8 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
       {/* Message */}
       {app.message && (
         <div className="border border-white/10 bg-white/5 p-8 mb-10">
-          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/40 mb-4">Mensaje</p>
-          <p className="font-serif text-[16px] font-light text-white/70 leading-relaxed italic">
+          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">Mensaje</p>
+          <p className="font-serif text-corps font-light text-white/70 leading-relaxed italic">
             "{app.message}"
           </p>
         </div>
@@ -117,8 +117,8 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
       {/* Le regard */}
       {app.photo_style && (
         <div className="border border-white/10 bg-white/5 p-8 mb-10">
-          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/40 mb-4">Su mirada</p>
-          <p className="font-serif text-[16px] font-light text-white/70 leading-relaxed">
+          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">Su mirada</p>
+          <p className="font-serif text-corps font-light text-white/70 leading-relaxed">
             {app.photo_style}
           </p>
         </div>
@@ -126,7 +126,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
 
       {portfolio.length > 0 && (
         <div className="mb-10">
-          <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-champagne/40 mb-4">
+          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">
             Portfolio · {portfolio.length} {portfolio.length === 1 ? "foto" : "fotos"}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -149,7 +149,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
       )}
 
       {app.type === "creator" && portfolio.length === 0 && (
-        <p className="font-serif text-[13px] font-light text-white/25 mb-10 border-l border-white/10 pl-4">
+        <p className="font-serif text-legende font-light text-white/25 mb-10 border-l border-white/10 pl-4">
           Sin portfolio. Candidatura enviada antes de que el formulario lo pidiera.
         </p>
       )}
@@ -165,22 +165,22 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
       {app.status === "approved" && creator && (
         <div className="mt-8 border border-white/10 bg-white/5 p-6 flex items-center justify-between flex-wrap gap-4">
           <div>
-            <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">Perfil activo</p>
-            <p className="font-serif text-[16px] font-light text-white">@{creator.handle || app.instagram?.replace("@", "")}</p>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-2">Perfil activo</p>
+            <p className="font-serif text-corps font-light text-white">@{creator.handle || app.instagram?.replace("@", "")}</p>
             <div className="flex items-center gap-4 mt-1 flex-wrap">
               {creator.followers != null && creator.followers > 0 && (
-                <p className="font-serif text-[12px] text-white/30">
+                <p className="font-serif text-legende text-white/30">
                   {creator.followers >= 1000 ? `${(creator.followers / 1000).toFixed(1)}K` : creator.followers} seguidores
                 </p>
               )}
-              <p className="font-serif text-[12px] text-white/25">
+              <p className="font-serif text-legende text-white/25">
                 €{(creator.monthly_credit_cop ?? 0) - (creator.credit_used_cop ?? 0)} disponibles · €{creator.credit_used_cop ?? 0} usado
               </p>
             </div>
           </div>
           <Link
             href={`/admin/creators/${encodeURIComponent(app.email)}`}
-            className="font-serif text-[12px] tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300"
+            className="font-serif text-legende tracking-widest uppercase text-charcoal-deep bg-champagne px-6 py-3 hover:bg-copper hover:text-white transition-all duration-300"
           >
             Ver dashboard →
           </Link>
@@ -205,7 +205,7 @@ function StatusPill({ status }: { status: string }) {
     deleted: "Borrada",
   };
   return (
-    <span className={`font-serif text-[11px] tracking-[0.25em] uppercase border px-3 py-1.5 ${styles[status] ?? styles.pending}`}>
+    <span className={`font-serif text-capitale tracking-[0.25em] uppercase border px-3 py-1.5 ${styles[status] ?? styles.pending}`}>
       {labels[status] ?? status}
     </span>
   );
@@ -214,18 +214,18 @@ function StatusPill({ status }: { status: string }) {
 function InfoBlock({ label, value, href, external }: { label: string; value: string; href?: string; external?: boolean }) {
   return (
     <div className="bg-white/5 px-6 py-5">
-      <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-white/30 mb-2">{label}</p>
+      <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/30 mb-2">{label}</p>
       {href ? (
         <a
           href={href}
           target={external ? "_blank" : undefined}
           rel={external ? "noopener noreferrer" : undefined}
-          className="font-serif text-[15px] font-light text-champagne/80 hover:text-champagne transition-colors"
+          className="font-serif text-corps font-light text-champagne/80 hover:text-champagne transition-colors"
         >
           {value}
         </a>
       ) : (
-        <p className="font-serif text-[15px] font-light text-white/80">{value}</p>
+        <p className="font-serif text-corps font-light text-white/80">{value}</p>
       )}
     </div>
   );

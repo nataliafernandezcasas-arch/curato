@@ -15,7 +15,7 @@ export default async function AdminPage() {
 
       {error && (
         <div className="border border-red-200 bg-red-50 px-6 py-4 mb-8">
-          <p className="font-serif text-[13px] font-light text-red-700">{error.message}</p>
+          <p className="font-serif text-legende font-light text-red-700">{error.message}</p>
         </div>
       )}
 

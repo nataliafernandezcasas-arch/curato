@@ -19,8 +19,8 @@ const PLANS: { id: string; label: string }[] = [
 ];
 
 const inputCls =
-  "w-full px-3 py-2 border border-white/15 bg-black/40 text-white font-serif text-[13px] focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30";
-const labelCls = "block font-serif text-[10px] tracking-[0.2em] uppercase text-white/45 mb-1.5";
+  "w-full px-3 py-2 border border-white/15 bg-black/40 text-white font-serif text-legende focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30";
+const labelCls = "block font-serif text-capitale tracking-[0.2em] uppercase text-white/45 mb-1.5";
 
 // Admin actions for one maison: sign / un-sign, and edit its details.
 export default function MaisonActions({ m }: { m: MaisonItem }) {
@@ -81,7 +81,7 @@ export default function MaisonActions({ m }: { m: MaisonItem }) {
     }
   }
 
-  const btn = "font-serif text-[11px] tracking-[0.15em] uppercase px-3 py-1.5 border transition-colors disabled:opacity-50";
+  const btn = "font-serif text-capitale tracking-[0.15em] uppercase px-3 py-1.5 border transition-colors disabled:opacity-50";
 
   return (
     <div className="mt-5 pt-4 border-t border-white/10">
@@ -101,7 +101,7 @@ export default function MaisonActions({ m }: { m: MaisonItem }) {
         >
           {editing ? "Fermer" : "Éditer"}
         </button>
-        {err && <span className="font-serif text-[12px] text-copper/80">{err}</span>}
+        {err && <span className="font-serif text-legende text-copper/80">{err}</span>}
       </div>
 
       {editing && (

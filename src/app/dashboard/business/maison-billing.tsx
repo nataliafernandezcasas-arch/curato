@@ -99,8 +99,8 @@ export default function MaisonBilling() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="font-serif text-[13px] text-text-secondary">{t.loading}</p>;
-  if (!b) return <p className="font-serif text-[13px] text-text-secondary">{t.unavailable}</p>;
+  if (loading) return <p className="font-serif text-legende text-text-secondary">{t.loading}</p>;
+  if (!b) return <p className="font-serif text-legende text-text-secondary">{t.unavailable}</p>;
 
   const signed = b.signedAt ? new Date(b.signedAt) : null;
   const now = new Date();
@@ -137,7 +137,7 @@ export default function MaisonBilling() {
 
       {/* El estado estaba escondido en una fila dentro de un recuadro. Es lo
           primero que una casa quiere saber, así que es el titular. */}
-      <p className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-accent md:text-[32px]">
+      <p className="mt-bloque mb-seccion text-titre uppercase tracking-titre text-accent md:text-grande">
         {status}
       </p>
 

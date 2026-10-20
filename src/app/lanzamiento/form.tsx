@@ -82,10 +82,10 @@ export default function LaunchForm() {
         <div className="inline-flex items-center justify-center w-12 h-12 border border-champagne/40 mb-5">
           <CheckCircle size={22} weight="fill" className="text-champagne" />
         </div>
-        <h2 className="font-serif text-[26px] font-light tracking-wide text-white mb-3">
+        <h2 className="font-serif text-grande font-light tracking-wide text-white mb-3">
           Vous êtes confirmé.
         </h2>
-        <p className="font-serif text-[14px] font-light text-white/50 leading-relaxed mb-6">
+        <p className="font-serif text-corps font-light text-white/50 leading-relaxed mb-6">
           Un email de confirmation vous sera envoyé.<br />
           Vous serez prévenu dès que la date est{" "}
           <span className="text-champagne">confirmée</span>.
@@ -95,10 +95,10 @@ export default function LaunchForm() {
   }
 
   const inputClass =
-    "w-full px-4 py-3 border border-white/15 bg-white/5 text-white font-serif text-[14px] placeholder:text-white/25 focus:outline-none focus:border-champagne/50 transition-all backdrop-blur-sm";
+    "w-full px-4 py-3 border border-white/15 bg-white/5 text-white font-serif text-corps placeholder:text-white/25 focus:outline-none focus:border-champagne/50 transition-all backdrop-blur-sm";
 
   const labelClass =
-    "block font-serif text-[10px] tracking-[0.3em] uppercase text-white/35 mb-2";
+    "block font-serif text-capitale tracking-[0.3em] uppercase text-white/35 mb-2";
 
   return (
     <form
@@ -135,7 +135,7 @@ export default function LaunchForm() {
       <div>
         <label className={labelClass}>
           WhatsApp{" "}
-          <span className="text-white/20 normal-case tracking-normal font-serif text-[10px]">
+          <span className="text-white/20 normal-case tracking-normal font-serif text-capitale">
             (optionnel · optional)
           </span>
         </label>
@@ -159,7 +159,7 @@ export default function LaunchForm() {
                 key={p.value}
                 type="button"
                 onClick={() => setProfile(p.value)}
-                className={`py-3 font-serif text-[11px] tracking-wide transition-all duration-200 border ${
+                className={`py-3 font-serif text-capitale tracking-wide transition-all duration-200 border ${
                   selected
                     ? "border-champagne bg-champagne/15 text-champagne"
                     : "border-white/15 bg-transparent text-white/40 hover:border-white/30 hover:text-white/70"
@@ -176,12 +176,12 @@ export default function LaunchForm() {
       <div>
         <label className={labelClass}>
           Instagram{" "}
-          <span className="text-white/20 normal-case tracking-normal font-serif text-[10px]">
+          <span className="text-white/20 normal-case tracking-normal font-serif text-capitale">
             (optionnel)
           </span>
         </label>
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-serif text-[14px] text-white/25">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 font-serif text-corps text-white/25">
             @
           </span>
           <input
@@ -202,7 +202,7 @@ export default function LaunchForm() {
           onChange={(e) => setAgeConfirmed(e.target.checked)}
           className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
         />
-        <span className="font-serif text-[12px] font-light text-white/60 leading-relaxed group-hover:text-white/80 transition-colors">
+        <span className="font-serif text-legende font-light text-white/60 leading-relaxed group-hover:text-white/80 transition-colors">
           J&apos;atteste avoir 18 ans révolus.
           <span className="text-copper/70"> *</span>
         </span>
@@ -216,7 +216,7 @@ export default function LaunchForm() {
           onChange={(e) => setTermsAccepted(e.target.checked)}
           className="mt-1 w-4 h-4 accent-champagne cursor-pointer flex-shrink-0"
         />
-        <span className="font-serif text-[12px] font-light text-white/60 leading-relaxed group-hover:text-white/80 transition-colors">
+        <span className="font-serif text-legende font-light text-white/60 leading-relaxed group-hover:text-white/80 transition-colors">
           J&apos;accepte les{" "}
           <Link
             href="/condiciones"
@@ -233,14 +233,14 @@ export default function LaunchForm() {
 
       {/* Error */}
       {error && (
-        <p className="font-serif text-[12px] text-red-400/80">{error}</p>
+        <p className="font-serif text-legende text-red-400/80">{error}</p>
       )}
 
       {/* Submit */}
       <button
         type="submit"
         disabled={loading || !ageConfirmed || !termsAccepted}
-        className="w-full font-serif text-[12px] tracking-[0.3em] uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full font-serif text-legende tracking-[0.3em] uppercase text-charcoal-deep bg-champagne py-4 hover:bg-copper hover:text-white transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {loading ? "…" : "Confirmer ma présence"}
       </button>

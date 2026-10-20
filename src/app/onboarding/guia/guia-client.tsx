@@ -173,7 +173,7 @@ export default function GuiaClient({ instagram }: { instagram: boolean }) {
               <>
                 {paso === 0 && <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">{t.kicker}</p>}
                 <Icono size={40} weight="thin" className="text-accent" />
-                <h1 className="mt-fila font-titulo text-[26px] uppercase tracking-titre text-text-primary">{pantalla.titulo}</h1>
+                <h1 className="mt-fila font-titulo text-grande uppercase tracking-titre text-text-primary">{pantalla.titulo}</h1>
                 <p className="mt-fila text-corps text-text-secondary">{pantalla.texto}</p>
                 <div className="mt-rango">
                   <Button full onClick={siguiente}>
@@ -183,7 +183,7 @@ export default function GuiaClient({ instagram }: { instagram: boolean }) {
               </>
             ) : paso === t.pantallas.length ? (
               <>
-                <h1 className="font-titulo text-[26px] uppercase tracking-titre text-text-primary">{t.igTitulo}</h1>
+                <h1 className="font-titulo text-grande uppercase tracking-titre text-text-primary">{t.igTitulo}</h1>
                 <p className="mb-rango mt-fila text-corps text-text-secondary">{t.igTexto}</p>
                 <ConnectInstagram connected={instagram} onConnected={() => setTimeout(siguiente, 900)} className="" />
                 <button
@@ -196,7 +196,7 @@ export default function GuiaClient({ instagram }: { instagram: boolean }) {
               </>
             ) : (
               <>
-                <h1 className="font-titulo text-[26px] uppercase tracking-titre text-text-primary">{t.perfilTitulo}</h1>
+                <h1 className="font-titulo text-grande uppercase tracking-titre text-text-primary">{t.perfilTitulo}</h1>
                 <p className="mt-fila text-corps text-text-secondary">{t.perfilTexto}</p>
                 <div className="mt-rango">
                   <Button full onClick={abrirPerfil} disabled={cargandoPerfil || terminando}>

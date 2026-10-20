@@ -164,7 +164,7 @@ export default function DashboardNav({
           {eyebrow && (
             <>
               <div className="h-3 w-px shrink-0 bg-border" />
-              <span className="truncate font-serif text-[10px] uppercase tracking-[0.3em] text-text-muted">
+              <span className="truncate font-serif text-capitale uppercase tracking-[0.3em] text-text-muted">
                 {eyebrow}
               </span>
             </>
@@ -178,7 +178,7 @@ export default function DashboardNav({
                   <Link
                     key={l.href}
                     href={l.href}
-                    className={`whitespace-nowrap font-serif text-[12px] tracking-wider transition-colors ${
+                    className={`whitespace-nowrap font-serif text-legende tracking-wider transition-colors ${
                       l.active ? "text-accent" : "text-text-secondary hover:text-accent"
                     }`}
                   >
@@ -209,7 +209,7 @@ export default function DashboardNav({
           {esAdmin && (
             <Link
               href="/admin"
-              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-text-secondary transition-colors hover:text-accent"
+              className="flex items-center gap-1.5 font-serif text-capitale tracking-wider text-text-secondary transition-colors hover:text-accent"
             >
               <ShieldCheck width={15} height={15} strokeWidth={1.5} />
               Admin
@@ -218,7 +218,7 @@ export default function DashboardNav({
           {settingsHref && (
             <Link
               href={settingsHref}
-              className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-text-secondary transition-colors hover:text-accent"
+              className="flex items-center gap-1.5 font-serif text-capitale tracking-wider text-text-secondary transition-colors hover:text-accent"
             >
               <Settings width={15} height={15} strokeWidth={1.5} />
               {settingsLabel}

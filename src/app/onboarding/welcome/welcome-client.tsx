@@ -98,7 +98,7 @@ export default function WelcomeClient() {
           <p className="mb-fila text-capitale uppercase tracking-capitale text-accent">
             {welcomeLabels.acceptEyebrow}
           </p>
-          <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-[32px]">
+          <h1 className="mb-fila text-titre uppercase tracking-titre text-text-primary md:text-grande">
             {welcomeLabels.acceptTitle}
           </h1>
           <p className="mb-seccion max-w-[46ch] text-corps text-text-secondary">

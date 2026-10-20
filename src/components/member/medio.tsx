@@ -14,7 +14,7 @@ export function Medio({ url, className = "" }: { url: string; className?: string
         <video src={url} className={`h-full w-full object-cover ${className}`} muted playsInline loop autoPlay preload="metadata" />
         <span
           aria-hidden
-          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-[11px] text-white"
+          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-capitale text-white"
         >
           ▶
         </span>

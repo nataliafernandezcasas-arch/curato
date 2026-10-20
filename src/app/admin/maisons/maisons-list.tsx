@@ -54,7 +54,7 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Rechercher une maison…"
-        className="w-full max-w-[420px] px-5 py-3 mb-6 border border-white/15 bg-black/40 text-white font-serif text-[14px] focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30"
+        className="w-full max-w-[420px] px-5 py-3 mb-6 border border-white/15 bg-black/40 text-white font-serif text-corps focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-white/30"
       />
 
       {!query && (
@@ -63,7 +63,7 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key)}
-              className={`font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
+              className={`font-serif text-capitale tracking-[0.2em] uppercase px-4 py-2 transition-all duration-200 ${
                 filter === tab.key
                   ? "bg-champagne text-charcoal-deep"
                   : "text-white/55 border border-white/10 hover:border-champagne/30 hover:text-champagne"
@@ -77,7 +77,7 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
 
       {list.length === 0 ? (
         <div className="text-center py-16 border border-white/10">
-          <p className="font-serif text-[14px] font-light text-white/55">
+          <p className="font-serif text-corps font-light text-white/55">
             {query
               ? "Aucune maison trouvée."
               : filter === "unsigned"
@@ -93,8 +93,8 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
             <div key={m.id} className="border border-white/10 bg-black/40 p-6">
               <div className="flex items-start justify-between flex-wrap gap-4">
                 <div>
-                  <a href={`/admin/maisons/${m.id}`} className="font-serif text-[18px] font-light text-white underline-offset-4 hover:text-champagne hover:underline">{m.name || "—"}</a>
-                  <p className="font-serif text-[13px] text-white/65 mt-1">
+                  <a href={`/admin/maisons/${m.id}`} className="font-serif text-sous-titre font-light text-white underline-offset-4 hover:text-champagne hover:underline">{m.name || "—"}</a>
+                  <p className="font-serif text-legende text-white/65 mt-1">
                     {m.email || ""}
                     {m.place ? ` · ${m.place}` : ""}
                   </p>
@@ -102,19 +102,19 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
 
                 <div className="flex items-center gap-6 text-right">
                   <div>
-                    <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Formule</p>
-                    <p className="font-serif text-[14px] text-champagne">{m.planLabel}</p>
+                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-white/55">Formule</p>
+                    <p className="font-serif text-corps text-champagne">{m.planLabel}</p>
                   </div>
                   <div className="min-w-[110px]">
-                    <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Compte</p>
-                    <p className={`font-serif text-[14px] ${m.account === "connected" ? "text-emerald-400" : m.account === "never" ? "text-amber-300" : "text-white/40"}`}>
+                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-white/55">Compte</p>
+                    <p className={`font-serif text-corps ${m.account === "connected" ? "text-emerald-400" : m.account === "never" ? "text-amber-300" : "text-white/40"}`}>
                       {m.account === "connected" ? "Connectée" : m.account === "never" ? "Jamais entrée" : "Pas de compte"}
                     </p>
-                    {m.account === "connected" && m.lastSignIn && <p className="font-serif text-[11px] text-white/30 mt-0.5">{m.lastSignIn}</p>}
+                    {m.account === "connected" && m.lastSignIn && <p className="font-serif text-capitale text-white/30 mt-0.5">{m.lastSignIn}</p>}
                   </div>
                   <div className="min-w-[110px]">
-                    <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-white/55">Engagement</p>
-                    <p className={`font-serif text-[14px] ${m.isSigned ? "text-emerald-400" : "text-white/45"}`}>
+                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-white/55">Engagement</p>
+                    <p className={`font-serif text-corps ${m.isSigned ? "text-emerald-400" : "text-white/45"}`}>
                       {m.isSigned ? "Signé" : "Non signé"}
                     </p>
                   </div>
@@ -127,12 +127,12 @@ export default function MaisonsList({ maisons }: { maisons: MaisonItem[] }) {
               {m.isSigned && (
                 <div className="mt-5 pt-4 border-t border-white/15 flex flex-wrap gap-x-10 gap-y-2">
                   <div>
-                    <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70 mb-1">Signé par</p>
-                    <p className="font-serif text-[15px] text-white/85">{m.signatory || "—"}</p>
+                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-champagne/70 mb-1">Signé par</p>
+                    <p className="font-serif text-corps text-white/85">{m.signatory || "—"}</p>
                   </div>
                   <div>
-                    <p className="font-serif text-[10px] tracking-[0.25em] uppercase text-champagne/70 mb-1">Date</p>
-                    <p className="font-serif text-[15px] text-white/85">{m.signedDate}</p>
+                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-champagne/70 mb-1">Date</p>
+                    <p className="font-serif text-corps text-white/85">{m.signedDate}</p>
                   </div>
                 </div>
               )}

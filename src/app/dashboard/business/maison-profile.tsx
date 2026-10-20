@@ -292,7 +292,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={photos[0]} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-text-muted font-serif text-[12px]">—</div>
+            <div className="w-full h-full flex items-center justify-center text-text-muted font-serif text-legende">—</div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-charcoal-deep/10 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -301,7 +301,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
           </div>
         </div>
         {previewDesc && (
-          <p className="font-serif text-[14px] font-light text-text-secondary leading-relaxed p-6">
+          <p className="font-serif text-corps font-light text-text-secondary leading-relaxed p-6">
             {previewDesc.length > 240 ? `${previewDesc.slice(0, 240)}…` : previewDesc}
           </p>
         )}
@@ -344,7 +344,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             )}
 
             {previewDesc && (
-              <p className="font-serif text-[17px] font-light text-text-primary leading-relaxed max-w-[720px] mb-10">
+              <p className="font-serif text-sous-titre font-light text-text-primary leading-relaxed max-w-[720px] mb-10">
                 {previewDesc}
               </p>
             )}
@@ -353,13 +353,13 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               {website && (
                 <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                   <GlobeSimple size={15} />
-                  <span className="font-serif text-[13px]">{website.replace(/^https?:\/\//, "")}</span>
+                  <span className="font-serif text-legende">{website.replace(/^https?:\/\//, "")}</span>
                 </a>
               )}
               {igHandle && (
                 <a href={`https://instagram.com/${igHandle}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-text-secondary hover:text-accent transition-colors">
                   <InstagramLogo size={15} />
-                  <span className="font-serif text-[13px]">@{igHandle}</span>
+                  <span className="font-serif text-legende">@{igHandle}</span>
                 </a>
               )}
             </div>
@@ -406,12 +406,12 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
       <div className="space-y-12">
         <div>
           <div className="flex items-baseline justify-between mb-1.5">
-            <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent">{t.profilePhotos}</p>
-            <span className={`font-serif text-[12px] ${photosOk ? "text-accent" : "text-copper-vif"}`}>
+            <p className="font-serif text-capitale tracking-[0.3em] uppercase text-accent">{t.profilePhotos}</p>
+            <span className={`font-serif text-legende ${photosOk ? "text-accent" : "text-copper-vif"}`}>
               {photos.length}/{MIN_PHOTOS}
             </span>
           </div>
-          <p className="font-serif text-[12px] font-light text-text-secondary mb-4">{t.profilePhotosHint}</p>
+          <p className="font-serif text-legende font-light text-text-secondary mb-4">{t.profilePhotosHint}</p>
 
           <div
             onDragOver={(e) => { if (e.dataTransfer.types.includes("Files")) { e.preventDefault(); setFileDrag(true); } }}
@@ -433,7 +433,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt="" className="w-full h-full object-cover pointer-events-none" />
                 {i === 0 && (
-                  <span className="absolute top-2 left-2 font-serif text-[9px] tracking-[0.25em] uppercase text-charcoal-deep bg-champagne/90 rounded-full px-2 py-1">
+                  <span className="absolute top-2 left-2 font-serif text-capitale tracking-[0.25em] uppercase text-charcoal-deep bg-champagne/90 rounded-full px-2 py-1">
                     {t.profileCover}
                   </span>
                 )}
@@ -483,20 +483,20 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               <Plus size={22} weight="thin" />
             </FilePicker>
           </div>
-          {hdRejected && <p className="font-serif text-[12px] text-copper-vif mt-3 border-l border-copper-vif pl-3">{t.profileHdRejected}</p>}
+          {hdRejected && <p className="font-serif text-legende text-copper-vif mt-3 border-l border-copper-vif pl-3">{t.profileHdRejected}</p>}
         </div>
 
         {/* Description */}
         <div>
           <div className="flex items-baseline justify-between mb-3">
-            <label className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent">{t.profileDescription}</label>
-            <span className={`font-serif text-[12px] ${descLang === fuente ? (descOk ? "text-accent" : "text-copper-vif") : "text-text-secondary"}`}>
+            <label className="font-serif text-capitale tracking-[0.3em] uppercase text-accent">{t.profileDescription}</label>
+            <span className={`font-serif text-legende ${descLang === fuente ? (descOk ? "text-accent" : "text-copper-vif") : "text-text-secondary"}`}>
               {descValue.trim().length}/{MIN_DESC}
             </span>
           </div>
           {/* El idioma en que escribe la casa. Los otros dos los pone Claude. */}
           <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className="font-serif text-[12px] text-text-secondary">{TRAD[lang].writeIn}</span>
+            <span className="font-serif text-legende text-text-secondary">{TRAD[lang].writeIn}</span>
             <select
               id="idioma-descripcion"
               value={fuente}
@@ -505,7 +505,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
                 setFuente(l);
                 setDescLang(l);
               }}
-              className="min-h-11 rounded-full border border-border bg-transparent px-3 font-serif text-[13px] text-text-primary outline-none focus:border-accent"
+              className="min-h-11 rounded-full border border-border bg-transparent px-3 font-serif text-legende text-text-primary outline-none focus:border-accent"
             >
               {(["fr", "en", "es"] as const).map((l) => (
                 <option key={l} value={l}>
@@ -514,7 +514,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
               ))}
             </select>
           </div>
-          <p className="mb-3 font-serif text-[12px] font-light text-text-secondary">{TRAD[lang].hint}</p>
+          <p className="mb-3 font-serif text-legende font-light text-text-secondary">{TRAD[lang].hint}</p>
           <div className="flex gap-1.5 mb-3">
             {(["fr", "en", "es"] as const).map((lg) => {
               const filled = (lg === "fr" ? description : lg === "en" ? descriptionEn : descriptionEs).trim().length > 0;
@@ -542,14 +542,14 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             placeholder={t.profileDescPlaceholder}
             className={`${inputCls} resize-none leading-relaxed`}
           />
-          <p className="font-serif text-[12px] font-light text-text-secondary mt-2">
+          <p className="font-serif text-legende font-light text-text-secondary mt-2">
             {descLang === fuente ? t.profileDescMin : TRAD[lang].auto}
           </p>
         </div>
 
         {/* La dirección: la ve el storyteller, con el mapa, y de ella sale el distrito. */}
         <div>
-          <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-3">{DIRECCION[lang].label}</label>
+          <label className="block font-serif text-capitale tracking-[0.3em] uppercase text-accent mb-3">{DIRECCION[lang].label}</label>
           <input
             type="text"
             value={address}
@@ -563,11 +563,11 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
         {/* Links */}
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-3">{t.profileWebsite}</label>
+            <label className="block font-serif text-capitale tracking-[0.3em] uppercase text-accent mb-3">{t.profileWebsite}</label>
             <input type="text" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" className={inputCls} />
           </div>
           <div>
-            <label className="block font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-3">{t.profileInstagram}</label>
+            <label className="block font-serif text-capitale tracking-[0.3em] uppercase text-accent mb-3">{t.profileInstagram}</label>
             <input type="text" value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@…" className={inputCls} />
           </div>
         </div>
@@ -580,7 +580,7 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
             {saving ? t.profileSaving : t.profileSave}
           </Button>
           {!canSave && !saving && (
-            <span className="font-serif text-[12px] font-light text-copper-vif">
+            <span className="font-serif text-legende font-light text-copper-vif">
               {!photosOk
                 ? t.profilePhotosNeed.replace("{n}", String(MIN_PHOTOS - photos.length))
                 : t.profileDescMin}
@@ -591,10 +591,10 @@ export default function MaisonProfile({ t, lang }: { t: T; lang: Lang }) {
 
       {/* Live storyteller preview */}
       <div className="lg:sticky lg:top-6">
-        <p className="font-serif text-[11px] tracking-[0.3em] uppercase text-accent mb-4 flex items-center gap-2"><Eye size={14} /> {t.profilePreview}</p>
+        <p className="font-serif text-capitale tracking-[0.3em] uppercase text-accent mb-4 flex items-center gap-2"><Eye size={14} /> {t.profilePreview}</p>
         <StorytellerPreview />
         {place && (
-          <p className="font-serif text-[11px] text-text-muted mt-3 flex items-center gap-1.5"><MapPin size={12} /> {place}</p>
+          <p className="font-serif text-capitale text-text-muted mt-3 flex items-center gap-1.5"><MapPin size={12} /> {place}</p>
         )}
       </div>
       </div>
@@ -610,7 +610,7 @@ function EnlaceVistaPrevia({ id, label }: { id: string; label: string }) {
   return (
     <Link
       href={`/dashboard/storyteller/maison/${id}?apercu=1`}
-      className="inline-flex items-center gap-2 rounded-full border border-border-hover px-4 py-2.5 font-serif text-[11px] uppercase tracking-[0.2em] text-text-secondary transition-all duration-200 hover:border-accent hover:text-accent"
+      className="inline-flex items-center gap-2 rounded-full border border-border-hover px-4 py-2.5 font-serif text-capitale uppercase tracking-[0.2em] text-text-secondary transition-all duration-200 hover:border-accent hover:text-accent"
     >
       <Eye size={15} /> {label}
     </Link>

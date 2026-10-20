@@ -108,7 +108,7 @@ export default function ConectarInstagram() {
         ) : (
           <>
             <InstagramLogo size={32} weight="thin" className="mx-auto mb-fila text-accent" />
-            <h1 className="font-titulo text-[20px] uppercase tracking-titre text-text-primary">{t.titulo}</h1>
+            <h1 className="font-titulo text-sous-titre uppercase tracking-titre text-text-primary">{t.titulo}</h1>
             <p className="mt-fila text-legende text-text-secondary">{t.nota}</p>
             <div className="mt-rango">
               <Button full onClick={abrir} disabled={estado === "abriendo"}>

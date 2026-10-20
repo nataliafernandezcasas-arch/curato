@@ -68,15 +68,15 @@ export default function CreatorEditForm({ email, initial }: { email: string; ini
     return (
       <button
         onClick={() => setOpen(true)}
-        className="font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-2 border border-white/20 text-white/70 hover:text-white hover:border-champagne/40 transition-colors"
+        className="font-serif text-capitale tracking-[0.2em] uppercase px-4 py-2 border border-white/20 text-white/70 hover:text-white hover:border-champagne/40 transition-colors"
       >
         Éditer
       </button>
     );
   }
 
-  const field = "w-full px-4 py-3 border border-white/15 bg-black/40 text-white font-serif text-[14px] focus:outline-none focus:border-champagne/40 transition-colors";
-  const label = "block font-serif text-[10px] tracking-[0.25em] uppercase text-white/40 mb-2";
+  const field = "w-full px-4 py-3 border border-white/15 bg-black/40 text-white font-serif text-corps focus:outline-none focus:border-champagne/40 transition-colors";
+  const label = "block font-serif text-capitale tracking-[0.25em] uppercase text-white/40 mb-2";
 
   return (
     <div className="w-full border border-champagne/20 bg-black/40 p-6 mt-4">
@@ -103,20 +103,20 @@ export default function CreatorEditForm({ email, initial }: { email: string; ini
         </div>
       </div>
 
-      {error && <p className="font-serif text-[13px] text-red-400/80 mt-4">{error}</p>}
+      {error && <p className="font-serif text-legende text-red-400/80 mt-4">{error}</p>}
 
       <div className="flex items-center gap-3 mt-6 flex-wrap">
         <button
           onClick={save}
           disabled={saving}
-          className={`font-serif text-[11px] tracking-[0.2em] uppercase px-6 py-3 transition-colors ${saving ? "bg-white/10 text-white/30" : "bg-champagne text-charcoal-deep hover:bg-copper hover:text-white"}`}
+          className={`font-serif text-capitale tracking-[0.2em] uppercase px-6 py-3 transition-colors ${saving ? "bg-white/10 text-white/30" : "bg-champagne text-charcoal-deep hover:bg-copper hover:text-white"}`}
         >
           {saving ? "…" : "Enregistrer"}
         </button>
-        <button onClick={() => setOpen(false)} className="font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-3 text-white/50 hover:text-white transition-colors">
+        <button onClick={() => setOpen(false)} className="font-serif text-capitale tracking-[0.2em] uppercase px-4 py-3 text-white/50 hover:text-white transition-colors">
           Annuler
         </button>
-        <button onClick={archive} disabled={saving} className="font-serif text-[11px] tracking-[0.2em] uppercase px-4 py-3 text-red-400/60 hover:text-red-400 transition-colors ml-auto">
+        <button onClick={archive} disabled={saving} className="font-serif text-capitale tracking-[0.2em] uppercase px-4 py-3 text-red-400/60 hover:text-red-400 transition-colors ml-auto">
           Archiver
         </button>
       </div>

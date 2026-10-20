@@ -95,7 +95,7 @@ export default function AdminNavClient() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-curato-simple.png" alt="curato" style={{ height: "12px", width: "auto", display: "block" }} />
           <div className="w-px h-3 bg-champagne/20" />
-          <span className="font-serif text-[10px] tracking-[0.35em] uppercase text-cream/30">Admin</span>
+          <span className="font-serif text-capitale tracking-[0.35em] uppercase text-cream/30">Admin</span>
         </div>
 
         {/* El menú, con su icono ☰ a la derecha como en el resto de la app
@@ -106,7 +106,7 @@ export default function AdminNavClient() {
             <button
               key={key}
               onClick={() => setLang(key)}
-              className={`font-serif text-[11px] tracking-[0.25em] transition-colors ${
+              className={`font-serif text-capitale tracking-[0.25em] transition-colors ${
                 lang === key ? "text-champagne" : "text-cream/30 hover:text-cream/60"
               }`}
             >
@@ -115,7 +115,7 @@ export default function AdminNavClient() {
           ))}
           <div className="w-px h-3 bg-champagne/20" />
           <form action="/api/admin/logout" method="post">
-            <button type="submit" className="font-serif text-[12px] tracking-[0.15em] text-cream/30 hover:text-champagne transition-colors">
+            <button type="submit" className="font-serif text-legende tracking-[0.15em] text-cream/30 hover:text-champagne transition-colors">
               {t.navSignOut}
             </button>
           </form>
@@ -159,7 +159,7 @@ export default function AdminNavClient() {
                   <span className="absolute top-1/2 left-0 h-px w-5 bg-current rotate-45" />
                   <span className="absolute top-1/2 left-0 h-px w-5 bg-current -rotate-45" />
                 </span>
-                <span className="font-serif text-[11px] tracking-[0.32em] uppercase">{x.cerrar}</span>
+                <span className="font-serif text-capitale tracking-[0.32em] uppercase">{x.cerrar}</span>
               </button>
               {/* El logotipo de verdad, la imagen, no uno dibujado con letras. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -172,7 +172,7 @@ export default function AdminNavClient() {
                 {groups.map((g) => (
                   <div key={g.id}>
                     <h3
-                      className={`font-serif font-light text-cream/90 text-[13px] leading-tight tracking-[0.03em] mb-6 transition-all duration-700 ${
+                      className={`font-serif font-light text-cream/90 text-legende leading-tight tracking-[0.03em] mb-6 transition-all duration-700 ${
                         shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
                       }`}
                       style={{ transitionDelay: `${(idx++) * 55}ms` }}
@@ -187,7 +187,7 @@ export default function AdminNavClient() {
                             <Link
                               href={it.href}
                               onClick={() => setOpen(false)}
-                              className={`group inline-block font-serif text-[13px] tracking-[0.28em] uppercase text-cream/55 hover:text-champagne transition-all duration-700 ${
+                              className={`group inline-block font-serif text-legende tracking-[0.28em] uppercase text-cream/55 hover:text-champagne transition-all duration-700 ${
                                 shown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                               }`}
                               style={{ transitionDelay: `${delay}ms` }}
@@ -211,13 +211,13 @@ export default function AdminNavClient() {
               className="px-8 md:px-16 pb-11 flex items-center justify-between gap-4 border-t border-champagne/12 pt-6"
               style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 24px)" }}
             >
-              <span className="font-serif text-[10px] tracking-[0.4em] uppercase text-cream/25">{x.lema}</span>
+              <span className="font-serif text-capitale tracking-[0.4em] uppercase text-cream/25">{x.lema}</span>
               <div className="flex items-center gap-6">
                 {LANGS.map(({ key, label }) => (
                   <button
                     key={key}
                     onClick={() => setLang(key)}
-                    className={`font-serif text-[10px] tracking-[0.25em] transition-colors ${
+                    className={`font-serif text-capitale tracking-[0.25em] transition-colors ${
                       lang === key ? "text-champagne" : "text-cream/30 hover:text-cream/60"
                     }`}
                   >
@@ -225,7 +225,7 @@ export default function AdminNavClient() {
                   </button>
                 ))}
                 <form action="/api/admin/logout" method="post">
-                  <button type="submit" className="font-serif text-[11px] tracking-[0.2em] uppercase text-cream/40 hover:text-champagne transition-colors">
+                  <button type="submit" className="font-serif text-capitale tracking-[0.2em] uppercase text-cream/40 hover:text-champagne transition-colors">
                     {t.navSignOut}
                   </button>
                 </form>

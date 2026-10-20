@@ -56,8 +56,8 @@ const fmt = (n: number | null) => (n === null ? "—" : String(n));
 function Tile({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="bg-black/25 px-5 py-5">
-      <p className="font-serif text-[9px] tracking-[0.3em] uppercase text-white/35 mb-3">{label}</p>
-      <p className={`font-serif text-[26px] font-light ${accent ? "text-copper" : "text-champagne"}`}>{value}</p>
+      <p className="font-serif text-capitale tracking-[0.3em] uppercase text-white/35 mb-3">{label}</p>
+      <p className={`font-serif text-grande font-light ${accent ? "text-copper" : "text-champagne"}`}>{value}</p>
     </div>
   );
 }
@@ -66,8 +66,8 @@ function Section({ title, href, children }: { title: string; href: string; child
   return (
     <section className="mb-12">
       <div className="flex items-baseline justify-between mb-4">
-        <h2 className="font-serif text-[13px] tracking-[0.25em] uppercase text-white/55">{title}</h2>
-        <Link href={href} className="font-serif text-[11px] tracking-[0.15em] uppercase text-champagne/70 hover:text-champagne transition-colors">
+        <h2 className="font-serif text-legende tracking-[0.25em] uppercase text-white/55">{title}</h2>
+        <Link href={href} className="font-serif text-capitale tracking-[0.15em] uppercase text-champagne/70 hover:text-champagne transition-colors">
           Ouvrir
         </Link>
       </div>
@@ -81,8 +81,8 @@ export default async function AdminOverviewPage() {
 
   return (
     <main className="max-w-[1000px] mx-auto px-5 py-12">
-      <p className="font-serif text-[11px] tracking-[0.35em] uppercase text-champagne/50 mb-3">Curato · Admin</p>
-      <h1 className="font-serif text-4xl font-light tracking-[0.12em] uppercase text-white mb-12">Vue d&apos;ensemble</h1>
+      <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-3">Curato · Admin</p>
+      <h1 className="font-serif text-cifra font-light tracking-[0.12em] uppercase text-white mb-12">Vue d&apos;ensemble</h1>
 
       <Section title="Storytellers" href="/admin/creators">
         <Tile label="Actifs" value={fmt(d.stActive)} />

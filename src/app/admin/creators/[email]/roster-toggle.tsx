@@ -30,7 +30,7 @@ export default function CreatorRosterToggle({ email, initial }: { email: string;
     <button
       onClick={toggle}
       disabled={saving}
-      className={`font-serif text-[11px] tracking-[0.15em] uppercase px-4 py-2 border transition-colors ${
+      className={`font-serif text-capitale tracking-[0.15em] uppercase px-4 py-2 border transition-colors ${
         hidden
           ? "border-amber-400/50 text-amber-300 bg-amber-400/10"
           : "border-white/20 text-white/60 hover:text-white hover:border-white/40"

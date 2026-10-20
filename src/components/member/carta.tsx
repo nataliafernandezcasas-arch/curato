@@ -183,7 +183,7 @@ export function Carta({
                 type="button"
                 onClick={() => onRemove(url)}
                 aria-label={removeLabel}
-                className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-[15px] text-white backdrop-blur transition-colors hover:bg-black/80"
+                className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-corps text-white backdrop-blur transition-colors hover:bg-black/80"
               >
                 ✕
               </button>

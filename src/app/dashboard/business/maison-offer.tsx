@@ -388,7 +388,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             placeholder={OFERTA[lang].placeholder}
             // Tan ancho como la cifra, para que el «€ par visite» vaya pegado.
             style={{ width: `${Math.max(oferta.length || OFERTA[lang].placeholder.length, 2) + 0.15}ch` }}
-            className={`${inputCls} text-[40px] tabular-nums text-accent`}
+            className={`${inputCls} text-cifra tabular-nums text-accent`}
           />
           <span className="text-corps text-text-primary">{OFERTA[lang].perVisit}</span>
         </div>
@@ -415,7 +415,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           por fechas (días de llegada y noches). */}
       <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerAvailability}</p>
-        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerAvailabilityHint}</p>
+        <p className="font-serif text-legende font-light text-text-secondary mb-5">{t.offerAvailabilityHint}</p>
 
         <div role="radiogroup" className="mb-fila grid grid-cols-2 gap-bloque rounded-full border border-border p-1">
           {(["horaires", "dates"] as const).map((modo) => (
@@ -433,7 +433,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             </button>
           ))}
         </div>
-        <p className="mb-5 font-serif text-[12px] font-light text-text-secondary">
+        <p className="mb-5 font-serif text-legende font-light text-text-secondary">
           {agenda.modo === "dates" ? ta.datesHint : ta.horairesHint}
         </p>
 
@@ -494,7 +494,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         ) : (
           <>
             <p className="text-corps text-text-primary">{ta.arrivals}</p>
-            <p className="mb-fila font-serif text-[12px] font-light text-text-secondary">{ta.arrivalsHint}</p>
+            <p className="mb-fila font-serif text-legende font-light text-text-secondary">{ta.arrivalsHint}</p>
             <div className="mb-rango grid grid-cols-7 gap-1.5">
               {DAY_ORDER.map((day, i) => {
                 const si = agenda.llegadas.includes(day);
@@ -505,7 +505,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
                     onClick={() => toggleLlegada(day)}
                     aria-pressed={si}
                     aria-label={days[i]}
-                    className={`min-h-11 rounded-full border text-[12px] transition-colors duration-200 ease-curato ${
+                    className={`min-h-11 rounded-full border text-legende transition-colors duration-200 ease-curato ${
                       si ? "border-accent bg-accent text-surface" : "border-border text-text-muted hover:border-accent hover:text-accent"
                     }`}
                   >
@@ -531,7 +531,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       {/* Blocked dates */}
       <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerBlocked}</p>
-        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerBlockedHint}</p>
+        <p className="font-serif text-legende font-light text-text-secondary mb-5">{t.offerBlockedHint}</p>
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {/* Con borde y ancho propios: vacío, el campo de fecha de iOS se
               quedaba sin ancho y no había dónde tocar. */}
@@ -542,7 +542,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             aria-label={t.offerBlocked}
             className="min-h-11 min-w-[11rem] flex-1 rounded-full border border-border-hover bg-transparent px-fila text-corps text-text-primary outline-none transition-colors focus:border-accent"
           />
-          <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 rounded-full border border-border-hover text-text-secondary hover:border-accent hover:text-accent px-4 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-40">
+          <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 rounded-full border border-border-hover text-text-secondary hover:border-accent hover:text-accent px-4 py-2.5 font-serif text-legende tracking-wider uppercase transition-colors disabled:opacity-40">
             <Plus size={14} /> {t.offerAdd}
           </button>
         </div>
@@ -566,7 +566,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
       {/* Menu / brochure */}
       <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerMenu}</p>
-        <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerMenuHint}</p>
+        <p className="font-serif text-legende font-light text-text-secondary mb-5">{t.offerMenuHint}</p>
         <Carta urls={menuUrls} lang={lang} onRemove={removeMenu} removeLabel={t.offerRemove} />
         <div className={`flex flex-wrap gap-3 items-center${menuUrls.length > 0 ? " mt-fila" : ""}`}>
           <FilePicker
@@ -579,7 +579,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
             <Plus size={14} /> {t.offerAdd}
           </FilePicker>
         </div>
-        {menuError && <p className="mt-fila font-serif text-[13px] text-copper-vif">{ERROR_MENU[lang][menuError]}</p>}
+        {menuError && <p className="mt-fila font-serif text-legende text-copper-vif">{ERROR_MENU[lang][menuError]}</p>}
       </section>
 
       <section className="caja-cristal p-5 sm:p-6">

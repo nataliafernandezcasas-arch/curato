@@ -45,17 +45,17 @@ export default function CreditEditor({ email, initialCredit }: { email: string; 
   return (
     <div className="flex items-center gap-3">
       <div>
-        <p className="font-serif text-[10px] tracking-[0.3em] uppercase text-champagne/40 mb-1">Crédito mensual</p>
+        <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-1">Crédito mensual</p>
         {editing ? (
           <div className="flex items-center gap-2">
-            <span className="font-serif text-[16px] text-white/50">€</span>
+            <span className="font-serif text-corps text-white/50">€</span>
             <input
               type="number"
               value={value}
               onChange={e => setValue(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") cancel(); }}
               autoFocus
-              className="w-24 font-serif text-[18px] font-light text-white bg-white/10 border border-champagne/40 px-2 py-1 focus:outline-none focus:border-champagne"
+              className="w-24 font-serif text-sous-titre font-light text-white bg-white/10 border border-champagne/40 px-2 py-1 focus:outline-none focus:border-champagne"
             />
             <button
               onClick={save}
@@ -76,7 +76,7 @@ export default function CreditEditor({ email, initialCredit }: { email: string; 
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <p className="font-serif text-[22px] font-light text-champagne">€{current}</p>
+            <p className="font-serif text-sous-titre font-light text-champagne">€{current}</p>
             <button
               onClick={() => setEditing(true)}
               className="text-white/20 hover:text-champagne transition-colors"
@@ -86,7 +86,7 @@ export default function CreditEditor({ email, initialCredit }: { email: string; 
             </button>
           </div>
         )}
-        {err && <p className="font-serif text-[11px] text-red-400 mt-1">{err}</p>}
+        {err && <p className="font-serif text-capitale text-red-400 mt-1">{err}</p>}
       </div>
     </div>
   );
