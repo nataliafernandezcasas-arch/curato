@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FilePicker } from "@/components/member/file-picker";
-import { Plus } from "@phosphor-icons/react";
+import { Check, Plus } from "@phosphor-icons/react";
 import { Carta } from "@/components/member/carta";
 import { Button } from "@/components/member/button";
 import { Toast, useToast } from "@/components/member/toast";
@@ -47,6 +47,9 @@ const OFERTA: Record<Lang, {
   hint: string;
   placeholder: string;
   perVisit: string;
+  /** Lo que la casa recibe a cambio: el importe asusta si va solo. */
+  getsTitle: string;
+  gets: string[];
   range: (min: number, max: number) => string;
   outOfRange: (min: number, max: number) => string;
 }> = {
@@ -55,6 +58,13 @@ const OFERTA: Record<Lang, {
     hint: "Le montant que vous offrez à chaque storyteller, par visite. Il le dépense librement sur votre carte.",
     placeholder: "200",
     perVisit: "€ par visite",
+    getsTitle: "Ce que vous recevez à chaque visite",
+    gets: [
+      "Un storyteller sélectionné par Curato, qui vient chez vous.",
+      "Deux stories Instagram dans les 24 heures, qui mentionnent votre maison.",
+      "Ses photos en haute définition, en exclusivité pendant 90 jours pour vos propres réseaux.",
+      "Les chiffres de ces stories (vues, comptes atteints, interactions) dans « Vos visiteurs ».",
+    ],
     range: (min, max) => `Entre ${min} € et ${max} € pour votre catégorie.`,
     outOfRange: (min, max) => `Choisissez un montant entre ${min} € et ${max} €.`,
   },
@@ -63,6 +73,13 @@ const OFERTA: Record<Lang, {
     hint: "The amount you offer each storyteller, per visit. They spend it freely on your menu.",
     placeholder: "200",
     perVisit: "€ per visit",
+    getsTitle: "What you get from each visit",
+    gets: [
+      "A storyteller selected by Curato, who comes to you.",
+      "Two Instagram stories within 24 hours, mentioning your house.",
+      "Their photos in high definition, exclusive to you for 90 days for your own channels.",
+      "The figures of those stories (views, accounts reached, interactions) in “Your visitors”.",
+    ],
     range: (min, max) => `Between ${min} € and ${max} € for your category.`,
     outOfRange: (min, max) => `Choose an amount between ${min} € and ${max} €.`,
   },
@@ -71,6 +88,13 @@ const OFERTA: Record<Lang, {
     hint: "El importe que ofreces a cada storyteller, por visita. Lo gasta como quiera en tu carta.",
     placeholder: "200",
     perVisit: "€ por visita",
+    getsTitle: "Lo que recibes en cada visita",
+    gets: [
+      "Un storyteller seleccionado por Curato, que viene a tu casa.",
+      "Dos stories de Instagram en las 24 horas siguientes, que mencionan tu casa.",
+      "Sus fotos en alta definición, en exclusiva durante 90 días para tus propias redes.",
+      "Las cifras de esas stories (vistas, cuentas alcanzadas, interacciones) en «Tus visitantes».",
+    ],
     range: (min, max) => `Entre ${min} € y ${max} € para tu categoría.`,
     outOfRange: (min, max) => `Elige un importe entre ${min} € y ${max} €.`,
   },
@@ -96,7 +120,7 @@ const AGENDA: Record<Lang, {
   fr: {
     horaires: "Par horaires",
     dates: "Par dates",
-    horairesHint: "Restaurants, spas, beauté : une ou plusieurs plages par jour, par exemple deux services. Le storyteller choisit son heure d'arrivée dans une plage.",
+    horairesHint: "Restaurants, spas, beauté : une ou plusieurs plages par jour, par exemple deux services. Une plage, c'est le moment où un storyteller peut arriver : il choisit son heure d'arrivée entre le début et la fin. La fin est la dernière heure d'arrivée possible, pas l'heure à laquelle il doit partir : il reste le temps d'un repas ou d'un soin, comme n'importe quel client.",
     datesHint: "Hôtels : sans horaires. Les jours où l'on peut arriver et le nombre de nuits ; fermez les dates complètes plus bas.",
     addService: "Ajouter une plage",
     removeService: "Retirer cette plage",
@@ -110,7 +134,7 @@ const AGENDA: Record<Lang, {
   en: {
     horaires: "By time",
     dates: "By dates",
-    horairesHint: "Restaurants, spas, beauty: one or more windows a day, for example two services. The storyteller picks an arrival time inside a window.",
+    horairesHint: "Restaurants, spas, beauty: one or more windows a day, for example two services. A window is when a storyteller can arrive: they pick their arrival time between its start and its end. The end is the latest possible arrival, not the time they have to leave: they stay for a meal or a treatment, like any guest.",
     datesHint: "Hotels: no times. The days guests can arrive and the number of nights; close full dates below.",
     addService: "Add a window",
     removeService: "Remove this window",
@@ -124,7 +148,7 @@ const AGENDA: Record<Lang, {
   es: {
     horaires: "Por horas",
     dates: "Por fechas",
-    horairesHint: "Restaurantes, spas, belleza: una o varias franjas por día, por ejemplo dos servicios. El storyteller elige su hora de llegada dentro de una franja.",
+    horairesHint: "Restaurantes, spas, belleza: una o varias franjas por día, por ejemplo dos servicios. Una franja es el momento en que un storyteller puede llegar: elige su hora de llegada entre el inicio y el final. El final es la última hora de llegada posible, no la hora a la que tiene que irse: se queda lo que dura una comida o un tratamiento, como cualquier cliente.",
     datesHint: "Hoteles: sin horas. Los días en que se puede llegar y el número de noches; cierra las fechas completas más abajo.",
     addService: "Añadir una franja",
     removeService: "Quitar esta franja",
@@ -134,6 +158,25 @@ const AGENDA: Record<Lang, {
     maxNights: "Noches máximas",
     short: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
     notSaved: "El tipo de agenda no se guardó. Lo demás, sí.",
+  },
+};
+
+// Lo que la casa quiere que el storyteller sepa antes de venir (migración 053).
+const NOTA: Record<Lang, { title: string; hint: string; placeholder: string }> = {
+  fr: {
+    title: "Infos pratiques pour les storytellers",
+    hint: "Tout ce qui l'aide à bien venir : par où entrer, à qui se présenter, une tenue, un code de porte, ce qu'il doit absolument goûter… Il le lit sur votre fiche avant de réserver.",
+    placeholder: "Présentez-vous à l'accueil en donnant votre nom. Entrée par la cour.",
+  },
+  en: {
+    title: "Practical info for storytellers",
+    hint: "Anything that helps them arrive well: which entrance, who to ask for, a dress code, a door code, what they mustn't miss… They read it on your page before booking.",
+    placeholder: "Give your name at the front desk. Entrance through the courtyard.",
+  },
+  es: {
+    title: "Información práctica para los storytellers",
+    hint: "Todo lo que le ayuda a venir bien: por dónde entrar, por quién preguntar, un código de vestimenta, el código de la puerta, lo que no puede dejar de probar… Lo lee en tu ficha antes de reservar.",
+    placeholder: "Preséntate en recepción con tu nombre. Entrada por el patio.",
   },
 };
 
@@ -160,6 +203,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
   const [oferta, setOferta] = useState("");
   const [rango, setRango] = useState<{ min: number; max: number } | null>(null);
   const [menuUrls, setMenuUrls] = useState<string[]>([]);
+  const [nota, setNota] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { aviso, mostrar, cerrar } = useToast();
@@ -178,6 +222,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         setOferta(d.offerEur ? String(d.offerEur) : "");
         setRango(d.offerRange ?? null);
         setMenuUrls(d.menuUrls ?? []);
+        setNota(d.note ?? "");
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -244,6 +289,7 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           blockedSlots: blocked,
           services: services.filter((s) => s.name.trim()),
           offerEur: oferta ? Number(oferta) : null,
+          note: nota,
         }),
       });
       // La confirmación llega como aviso, encima de la barra, y se va sola en 4 s.
@@ -327,6 +373,42 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
 
   return (
     <div className="max-w-[820px] mx-auto space-y-6 pb-8">
+      {/* La oferta, primero y distinta de los demás bloques: es lo que la
+          casa da, y al lado va lo que recibe a cambio. Solo el importe, sin
+          más, asustaba (revisión de diseño, 2026-10-20). */}
+      <section className="rounded-[20px] border border-accent/45 bg-accent/[0.07] p-5 sm:p-6">
+        <label htmlFor="oferta-eur" className={`${labelCls} mb-1 block`}>{OFERTA[lang].title}</label>
+        <p className="mb-fila text-legende text-text-secondary">{OFERTA[lang].hint}</p>
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          <input
+            id="oferta-eur"
+            inputMode="numeric"
+            value={oferta}
+            onChange={(e) => setOferta(e.target.value.replace(/\D/g, "").slice(0, 5))}
+            placeholder={OFERTA[lang].placeholder}
+            // Tan ancho como la cifra, para que el «€ par visite» vaya pegado.
+            style={{ width: `${Math.max(oferta.length || OFERTA[lang].placeholder.length, 2) + 0.15}ch` }}
+            className={`${inputCls} text-[40px] tabular-nums text-accent`}
+          />
+          <span className="text-corps text-text-primary">{OFERTA[lang].perVisit}</span>
+        </div>
+        {rango && <p className="mt-bloque text-legende text-accent">{OFERTA[lang].range(rango.min, rango.max)}</p>}
+        {fueraDeRango && rango && (
+          <p className="mt-bloque text-legende text-copper-vif">{OFERTA[lang].outOfRange(rango.min, rango.max)}</p>
+        )}
+        <div className="mt-rango border-t border-accent/25 pt-fila">
+          <p className={labelCls}>{OFERTA[lang].getsTitle}</p>
+          <ul className="mt-bloque space-y-bloque">
+            {OFERTA[lang].gets.map((g) => (
+              <li key={g} className="flex gap-bloque text-legende text-text-primary">
+                <Check size={15} className="mt-0.5 shrink-0 text-accent" aria-hidden />
+                {g}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* Cada bloque de la oferta, en su burbuja de cristal: se lee como una
           tarjeta de la app sobre la flor del fondo, y no como texto suelto. */}
       {/* Availability: por horas (una o varias franjas por día) o, un hotel,
@@ -451,7 +533,15 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         <p className={`${labelCls} mb-1`}>{t.offerBlocked}</p>
         <p className="font-serif text-[12px] font-light text-text-secondary mb-5">{t.offerBlockedHint}</p>
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <input type="date" value={newBlock} onChange={(e) => setNewBlock(e.target.value)} className={inputCls} />
+          {/* Con borde y ancho propios: vacío, el campo de fecha de iOS se
+              quedaba sin ancho y no había dónde tocar. */}
+          <input
+            type="date"
+            value={newBlock}
+            onChange={(e) => setNewBlock(e.target.value)}
+            aria-label={t.offerBlocked}
+            className="min-h-11 min-w-[11rem] flex-1 rounded-full border border-border-hover bg-transparent px-fila text-corps text-text-primary outline-none transition-colors focus:border-accent"
+          />
           <button onClick={addBlock} disabled={!newBlock} className="inline-flex items-center gap-1.5 rounded-full border border-border-hover text-text-secondary hover:border-accent hover:text-accent px-4 py-2.5 font-serif text-[12px] tracking-wider uppercase transition-colors disabled:opacity-40">
             <Plus size={14} /> {t.offerAdd}
           </button>
@@ -473,30 +563,6 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
         )}
       </section>
 
-      {/* La oferta: un importe en euros por visita. La lista de servicios con
-          precio que había antes se queda guardada, pero ya no se edita. */}
-      <section className="caja-cristal p-5 sm:p-6">
-        <label htmlFor="oferta-eur" className={`${labelCls} mb-1 block`}>{OFERTA[lang].title}</label>
-        <p className="font-serif text-[12px] font-light text-text-secondary mb-1">{OFERTA[lang].hint}</p>
-        {rango && (
-          <p className="font-serif text-[12px] text-accent mb-5">{OFERTA[lang].range(rango.min, rango.max)}</p>
-        )}
-        <div className="flex items-baseline gap-3">
-          <input
-            id="oferta-eur"
-            inputMode="numeric"
-            value={oferta}
-            onChange={(e) => setOferta(e.target.value.replace(/\D/g, "").slice(0, 5))}
-            placeholder={OFERTA[lang].placeholder}
-            className={`${inputCls} w-28 text-[34px] tabular-nums`}
-          />
-          <span className="font-serif text-[15px] text-text-secondary">{OFERTA[lang].perVisit}</span>
-        </div>
-        {fueraDeRango && rango && (
-          <p className="mt-3 font-serif text-[13px] text-copper-vif">{OFERTA[lang].outOfRange(rango.min, rango.max)}</p>
-        )}
-      </section>
-
       {/* Menu / brochure */}
       <section className="caja-cristal p-5 sm:p-6">
         <p className={`${labelCls} mb-1`}>{t.offerMenu}</p>
@@ -514,6 +580,19 @@ export default function MaisonOffer({ t, lang }: { t: T; lang: Lang }) {
           </FilePicker>
         </div>
         {menuError && <p className="mt-fila font-serif text-[13px] text-copper-vif">{ERROR_MENU[lang][menuError]}</p>}
+      </section>
+
+      <section className="caja-cristal p-5 sm:p-6">
+        <label htmlFor="nota-storytellers" className={`${labelCls} mb-1 block`}>{NOTA[lang].title}</label>
+        <p className="mb-fila text-legende text-text-secondary">{NOTA[lang].hint}</p>
+        <textarea
+          id="nota-storytellers"
+          value={nota}
+          onChange={(e) => setNota(e.target.value.slice(0, 1000))}
+          rows={4}
+          placeholder={NOTA[lang].placeholder}
+          className="campo-cristal resize-none"
+        />
       </section>
 
       {/* Guardar. Era el último botón relleno de champagne de la oferta, y

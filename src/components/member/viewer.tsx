@@ -86,16 +86,18 @@ export function Viewer({
             className="flex items-center justify-between px-pagina py-fila"
             style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
           >
-            <span className="text-capitale uppercase tracking-capitale tabular-nums text-text-secondary">
-              {actual + 1} / {photos.length}
-            </span>
+            {/* Volver a la izquierda, donde se busca en cualquier app, y la
+                cuenta a la derecha (revisión de diseño, 2026-10-20). */}
             <button
               onClick={onClose}
               aria-label={COMUN[lang].close}
-              className="-mr-2 flex h-11 w-11 items-center justify-center text-accent transition-colors duration-200 ease-curato hover:text-text-primary"
+              className="-ml-2 flex h-11 w-11 items-center justify-center text-accent transition-colors duration-200 ease-curato hover:text-text-primary"
             >
               <ArrowLeft size={22} />
             </button>
+            <span className="text-capitale uppercase tracking-capitale tabular-nums text-text-secondary">
+              {actual + 1} / {photos.length}
+            </span>
           </div>
 
           <div

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 /**
  * The flower behind every dashboard.
@@ -10,7 +10,7 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "fr
  * behind the content, so the flower judders instead of sitting still. Inside
  * the native WebView it was the first thing you noticed.
  *
- * Now the layer is composited and moved by transform, driven by scroll through
+ * Then the layer was composited and moved by transform, driven by scroll through
  * a soft spring. Two things come out of that. The judder goes, because a
  * transform on its own layer never waits for a repaint. And the image trails
  * the finger by a fraction of a second instead of locking to it, which is what
@@ -37,19 +37,14 @@ export default function FloralBackdrop({
   breathe?: boolean;
 }) {
   const reduce = useReducedMotion();
-  const { scrollY } = useScroll();
-
-  // Low stiffness and high damping give the lag. Stiffer than this and it
-  // snaps to the finger, which reads as the old jitter all over again.
-  const eased = useSpring(scrollY, { stiffness: 38, damping: 24, mass: 0.7 });
-  const y = useTransform(eased, [0, 2400], ["0%", "-8%"]);
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden">
       <motion.div
-        // Oversized so the drift never exposes an edge.
-        className="absolute inset-0 h-[112%] w-full will-change-transform"
-        style={reduce || breathe ? undefined : { y }}
+        // Quieta al hacer scroll: moverse detrás del texto costaba leerlo
+        // (revisión de diseño, 2026-10-20). Sigue en su propia capa, así que
+        // no tiembla en iOS.
+        className="absolute inset-0 h-full w-full will-change-transform"
         animate={reduce || !breathe ? undefined : { scale: [1, 1.008, 1] }}
         transition={reduce || !breathe ? undefined : { duration: 18, repeat: Infinity, ease: "easeInOut" }}
       >
