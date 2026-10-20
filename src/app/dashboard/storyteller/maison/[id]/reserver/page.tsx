@@ -747,7 +747,7 @@ function Reserver({ id }: { id: string }) {
       {!hecho && (
         <div
           className="pie-panel sticky z-30 mt-rango"
-          style={{ bottom: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
+          style={{ bottom: "calc(64px + env(safe-area-inset-bottom, 0px))" }}
         >
           <div className="mx-auto flex max-w-[560px] flex-col gap-fila px-pagina py-fila">
             {resumen ? (

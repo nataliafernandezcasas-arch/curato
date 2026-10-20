@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Gear, CaretDown, ShieldCheck } from "@phosphor-icons/react";
+import { Menu, Settings, ShieldCheck, Xmark } from "iconoir-react";
+import type { IconoNav } from "@/components/member/iconos";
 import { TabBar, TabBarSpacer, MAX_DESTINOS, Cifra } from "@/components/member/tab-bar";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -16,6 +17,8 @@ export type NavLink = {
   /** Qué se cuenta en este destino. La cifra la pone la barra, no la página. */
   contador?: "demandes";
   cifra?: number;
+  /** El icono de la barra de abajo (src/components/member/iconos.tsx). */
+  icono?: IconoNav;
 };
 
 /**
@@ -147,7 +150,7 @@ export default function DashboardNav({
               what Curato is. In the app that page should never appear at all.
               En el teléfono el logotipo abre el menú: el botón «Menu» de la
               derecha competía con la barra y nadie lo encontraba. */}
-          <Link href="/dashboard" className="hidden shrink-0 sm:block">
+          <Link href="/dashboard" className="flex min-h-11 shrink-0 items-center">
             {/* El logotipo en tinta (logo-curato-ink.png) vuelve con la piel
                 nueva, cuando el modo claro se rehaga. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -157,24 +160,6 @@ export default function DashboardNav({
               style={{ height: "12px", width: "auto", display: "block" }}
             />
           </Link>
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-label={open ? c.close : c.menu}
-            className="-ml-2 flex min-h-11 shrink-0 items-center gap-2 px-2 sm:hidden"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo-curato-simple.png"
-              alt="curato"
-              style={{ height: "12px", width: "auto", display: "block" }}
-            />
-            <CaretDown
-              size={11}
-              className={`text-text-muted transition-transform duration-300 ease-curato ${open ? "rotate-180" : ""}`}
-            />
-          </button>
 
           {eyebrow && (
             <>
@@ -206,6 +191,19 @@ export default function DashboardNav({
           )}
         </div>
 
+        {/* El menú, con su icono de siempre arriba a la derecha: la flecha
+            junto al logotipo no la encontraba nadie (revisión de diseño,
+            2026-10-20). */}
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-label={open ? c.close : c.menu}
+          className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center text-accent sm:hidden"
+        >
+          {open ? <Xmark width={24} height={24} strokeWidth={1.5} /> : <Menu width={24} height={24} strokeWidth={1.5} />}
+        </button>
+
         <div className="hidden items-center gap-5 sm:flex">
           {roleSwitch}
           {esAdmin && (
@@ -213,7 +211,7 @@ export default function DashboardNav({
               href="/admin"
               className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-text-secondary transition-colors hover:text-accent"
             >
-              <ShieldCheck size={14} />
+              <ShieldCheck width={15} height={15} strokeWidth={1.5} />
               Admin
             </Link>
           )}
@@ -222,7 +220,7 @@ export default function DashboardNav({
               href={settingsHref}
               className="flex items-center gap-1.5 font-serif text-[11px] tracking-wider text-text-secondary transition-colors hover:text-accent"
             >
-              <Gear size={14} />
+              <Settings width={15} height={15} strokeWidth={1.5} />
               {settingsLabel}
             </Link>
           )}
@@ -271,7 +269,7 @@ export default function DashboardNav({
                     onClick={() => setOpen(false)}
                     className="flex min-h-11 items-center gap-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
                   >
-                    <ShieldCheck size={13} />
+                    <ShieldCheck width={16} height={16} strokeWidth={1.5} />
                     Admin
                   </Link>
                 )}
@@ -282,7 +280,7 @@ export default function DashboardNav({
                     onClick={() => setOpen(false)}
                     className="flex min-h-11 items-center gap-2 text-capitale uppercase tracking-capitale text-text-secondary transition-colors duration-200 ease-curato hover:text-accent"
                   >
-                    <Gear size={13} />
+                    <Settings width={16} height={16} strokeWidth={1.5} />
                     {settingsLabel}
                   </Link>
                 )}
