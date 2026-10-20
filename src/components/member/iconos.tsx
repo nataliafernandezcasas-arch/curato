@@ -15,6 +15,9 @@ import {
   Drag as IDrag,
   EditPencil as IEditPencil,
   Eye as IEye,
+  Gift as IGift,
+  InfoCircle as IInfoCircle,
+  Page as IPage,
   EyeClosed as IEyeClosed,
   FilterList as IFilterList,
   Globe as IGlobe,
@@ -100,6 +103,9 @@ export const EnvelopeSimple = icono(IMail);
 export const Eye = icono(IEye);
 export const EyeSlash = icono(IEyeClosed);
 export const GlobeSimple = icono(IGlobe);
+export const Gift = icono(IGift);
+export const FileText = icono(IPage);
+export const Info = icono(IInfoCircle);
 export const InstagramLogo = icono(IInstagram);
 export const List = icono(IMenu);
 export const MagnifyingGlass = icono(ISearch);
