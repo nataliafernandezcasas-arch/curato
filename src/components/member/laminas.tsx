@@ -176,12 +176,12 @@ function Visor({ laminas, inicio, onClose }: { laminas: Lamina[]; inicio: number
         className="relative z-10 flex items-center justify-between px-pagina"
         style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 6px)" }}
       >
+        <button type="button" onClick={onClose} aria-label={t.cerrar} className="-ml-2 flex h-11 w-11 items-center justify-center text-white">
+          <ArrowLeft size={22} />
+        </button>
         <span className="text-capitale tabular-nums tracking-capitale text-white/60">
           {i + 1} / {laminas.length}
         </span>
-        <button type="button" onClick={onClose} aria-label={t.cerrar} className="flex h-11 w-11 items-center justify-center text-white">
-          <ArrowLeft size={22} />
-        </button>
       </header>
 
       <div

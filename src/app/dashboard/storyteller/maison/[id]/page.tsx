@@ -27,14 +27,15 @@ type MaisonAvail = {
   services: MaisonService[];
   menuUrls?: string[];
   offerEur?: number | null;
+  note?: string | null;
 };
 
 // La oferta de la casa en su ficha. Solo se veía en la pantalla de reserva, así
 // que nadie sabía qué ofrecía una casa antes de empezar a pedir mesa.
 const OFERTA = {
-  fr: { title: "L'offre", spend: "à dépenser librement sur la carte, par visite", menu: "Menu / brochure" },
-  en: { title: "The offer", spend: "to spend freely on the menu, per visit", menu: "Menu / brochure" },
-  es: { title: "La oferta", spend: "para gastar libremente en la carta, por visita", menu: "Carta / folleto" },
+  fr: { title: "L'offre", perVisit: "par visite", spend: "À dépenser librement sur la carte.", menu: "Menu / brochure", note: "Infos pratiques" },
+  en: { title: "The offer", perVisit: "per visit", spend: "To spend freely on the menu.", menu: "Menu / brochure", note: "Practical info" },
+  es: { title: "La oferta", perVisit: "por visita", spend: "Para gastar libremente en la carta.", menu: "Carta / folleto", note: "Información práctica" },
 };
 
 type Maison = {
@@ -79,7 +80,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
   const { id } = use(params);
   const [maison, setMaison] = useState<Maison | null>(null);
   const [loading, setLoading] = useState(true);
-  const [oferta, setOferta] = useState<{ services: MaisonService[]; menuUrls: string[]; eur: number | null } | null>(null);
+  const [oferta, setOferta] = useState<{ services: MaisonService[]; menuUrls: string[]; eur: number | null; note: string | null } | null>(null);
   const [horario, setHorario] = useState<Pick<MaisonAvail, "agenda" | "availability"> | null>(null);
 
   const router = useRouter();
@@ -126,7 +127,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
       .then((r) => (r.ok ? r.json() : null))
       .then((d: MaisonAvail | null) => {
         if (!d) return;
-        setOferta({ services: (d.services ?? []).filter((s) => s.name?.trim()), menuUrls: d.menuUrls ?? [], eur: d.offerEur ?? null });
+        setOferta({ services: (d.services ?? []).filter((s) => s.name?.trim()), menuUrls: d.menuUrls ?? [], eur: d.offerEur ?? null, note: d.note ?? null });
         setHorario({ agenda: d.agenda, availability: d.availability ?? [] });
       })
       .catch(() => {});
@@ -261,12 +262,15 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                     {/* El importe que la casa ofrece. La lista de servicios con
                         precio de antes ya no se enseña: no es lo que se gasta. */}
                     {oferta.eur ? (
-                      <p className="text-corps text-text-secondary">
-                        <span className="mr-2 text-titre tabular-nums text-text-primary">
-                          {oferta.eur.toLocaleString(lang)} €
-                        </span>
-                        {OFERTA[lang].spend}
-                      </p>
+                      // El importe y «par visite» juntos, y debajo en qué se
+                      // gasta (revisión de diseño, 2026-10-20).
+                      <div>
+                        <p className="flex flex-wrap items-baseline gap-x-2">
+                          <span className="text-titre tabular-nums text-text-primary">{oferta.eur.toLocaleString(lang)} €</span>
+                          <span className="text-corps text-text-primary">{OFERTA[lang].perVisit}</span>
+                        </p>
+                        <p className="mt-etiqueta text-corps text-text-secondary">{OFERTA[lang].spend}</p>
+                      </div>
                     ) : null}
                     {oferta.menuUrls.length > 0 && (
                       <div className="mt-fila">
@@ -276,6 +280,13 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {oferta?.note && (
+                  <div className="mb-8">
+                    <p className="mb-3 text-capitale uppercase tracking-capitale text-accent">{OFERTA[lang].note}</p>
+                    <p className="whitespace-pre-line text-corps text-text-secondary">{oferta.note}</p>
                   </div>
                 )}
 

@@ -6,6 +6,7 @@ import { useAnimate, useReducedMotion } from "framer-motion";
 import type { NavLink } from "@/app/dashboard/dashboard-nav";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
+import { ICONOS_NAV, TRAZO } from "@/components/member/iconos";
 
 const SIN_CONEXION: Record<Lang, string> = { fr: "Hors ligne", en: "Offline", es: "Sin conexión" };
 
@@ -17,9 +18,10 @@ const SIN_CONEXION: Record<Lang, string> = { fr: "Hors ligne", en: "Offline", es
  * menú. El pulgar no llega arriba del todo en un teléfono, y abrir un menú para
  * cambiar de sitio son dos gestos donde debería haber uno.
  *
- * Abajo, siempre visible, sin iconos: la palabra del destino en capital y la
- * activa en champagne. Sin caja, sin subrayado y sin píldora. Solo en el
- * teléfono: en un portátil los destinos siguen arriba, que ahí sí se alcanzan.
+ * Abajo, siempre visible: el icono del destino y debajo su palabra, la
+ * activa en champagne (revisión de diseño, 2026-10-20: sin iconos no se leía
+ * como una barra de app). Solo en el teléfono: en un portátil los destinos
+ * siguen arriba, que ahí sí se alcanzan.
  *
  * **Tres como máximo.** La maison tiene cinco secciones y en 375 px no caben:
  * la quinta se sale por la derecha y deja de poder tocarse. Las que no entran
@@ -129,17 +131,31 @@ export function TabBar({ links }: { links: NavLink[] }) {
             onClick={() => i !== activo && llevar(i, true)}
             // En una sola línea: con San Francisco y el espaciado ancho de las
             // capitales, «MES VISITES» saltaba a dos y la segunda se cortaba.
-            className="flex min-h-14 min-w-0 flex-1 items-center justify-center px-1 py-bloque text-center text-capitale uppercase tracking-[0.14em] whitespace-nowrap"
+            className="flex min-h-16 min-w-0 flex-1 items-center justify-center px-1 py-bloque text-center"
           >
             <span
               ref={(e) => {
                 etiquetas.current[i] = e;
               }}
-              className={`pestana relative z-10 !px-3 !border-transparent !bg-transparent ${l.active ? "!text-[#F5EFE4]" : ""}`}
+              className={`pestana relative z-10 flex flex-col items-center gap-1 !px-4 !py-1.5 !border-transparent !bg-transparent ${l.active ? "!text-[#F5EFE4]" : ""}`}
               style={{ backdropFilter: "none", WebkitBackdropFilter: "none" }}
             >
-              {l.label}
-              {!!l.cifra && <Cifra n={l.cifra} />}
+              {l.icono && (() => {
+                const Icono = ICONOS_NAV[l.icono];
+                return (
+                  <span className="relative">
+                    <Icono width={22} height={22} strokeWidth={TRAZO} aria-hidden />
+                    {/* La cifra, en el icono, como las apps de mensajes. */}
+                    {!!l.cifra && (
+                      <span className="absolute -right-2.5 -top-1.5">
+                        <Cifra n={l.cifra} />
+                      </span>
+                    )}
+                  </span>
+                );
+              })()}
+              <span className="whitespace-nowrap text-[10px] uppercase leading-none tracking-[0.12em]">{l.label}</span>
+              {!l.icono && !!l.cifra && <Cifra n={l.cifra} />}
             </span>
           </Link>
         ))}
@@ -166,7 +182,7 @@ export function TabBarSpacer() {
     <div
       aria-hidden
       className="sm:hidden"
-      style={{ height: "calc(56px + env(safe-area-inset-bottom, 0px))" }}
+      style={{ height: "calc(64px + env(safe-area-inset-bottom, 0px))" }}
     />
   );
 }

@@ -9,6 +9,7 @@ import { Rise } from "@/components/member/motion";
 import { Button, ButtonLink } from "@/components/member/button";
 import { StateMark } from "@/components/member/state-mark";
 import { DossierPane, fotosDe } from "./storyteller-dossier";
+import { CalendarioDemandes } from "./calendario-demandes";
 import { capitalizar, claveDia, compacto, dia, diaSemana, enLetra, haceCuanto, hora, nombrePila } from "./demandes-format";
 
 type Demanda = {
@@ -234,6 +235,8 @@ export default function MaisonDemandes() {
   // La clave del aviso, no el texto, para que siga al idioma.
   const [errorAccion, setErrorAccion] = useState<"" | "expiredNow" | "actionError">("");
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  // El día tocado en el calendario: la lista enseña solo ese día.
+  const [diaElegido, setDiaElegido] = useState<string | null>(null);
 
   const cargar = useCallback(async () => {
     setFallo(false);
@@ -291,7 +294,8 @@ export default function MaisonDemandes() {
   }
 
   const requests = datos?.requests ?? [];
-  const abiertas = requests.filter((r) => !r.expired);
+  const pendientes = requests.filter((r) => !r.expired);
+  const abiertas = diaElegido ? pendientes.filter((r) => claveDia(r.slotStart) === diaElegido) : pendientes;
   const cerradas = requests.filter((r) => r.expired);
   const visits = datos?.visits ?? 0;
   const guaranteed = datos?.guaranteed ?? 5;
@@ -322,7 +326,7 @@ export default function MaisonDemandes() {
         </h1>
         {datos && (
           <p className="max-w-[36ch] text-corps text-text-secondary">
-            {abiertas.length > 0 && `${t.waiting(abiertas.length)} `}
+            {pendientes.length > 0 && `${t.waiting(pendientes.length)} `}
             {t.month(visits, guaranteed)}
           </p>
         )}
@@ -338,6 +342,10 @@ export default function MaisonDemandes() {
             ? t.accepted(nombrePila(nombre(resultado.demanda)), cuandoLargo(resultado.demanda, t, lang))
             : t.declined(nombrePila(nombre(resultado.demanda)), visits, guaranteed)}
         </StateMark>
+      )}
+
+      {!cargando && !fallo && (
+        <CalendarioDemandes demandas={pendientes} lang={lang} elegido={diaElegido} onElegir={setDiaElegido} />
       )}
 
       {cargando ? (
@@ -357,7 +365,7 @@ export default function MaisonDemandes() {
         >
           {t.loadFail}
         </StateMark>
-      ) : abiertas.length === 0 ? (
+      ) : pendientes.length === 0 ? (
         <Section>
           <p className="text-sous-titre text-text-primary">{t.emptyTitle}</p>
           <p className="mt-etiqueta max-w-[46ch] text-corps text-text-secondary">
@@ -373,7 +381,7 @@ export default function MaisonDemandes() {
             </ButtonLink>
           </div>
         </Section>
-      ) : (
+      ) : abiertas.length === 0 ? null : (
         <div className="mb-seccion space-y-fila">
           {abiertas.map((r, i) => {
             const clave = claveDia(r.slotStart);

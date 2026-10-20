@@ -39,9 +39,9 @@ export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr" | 
 
   return [
     // Lleva la cifra de demandas por responder (src/lib/pendientes.ts).
-    { href: at("demandes"), label: t.tabDemandes, active: current === "demandes", contador: "demandes" },
-    { href: at("visitors"), label: t.tabVisitors, active: current === "visitors" },
-    { href: at("profile"), label: t.tabProfile, active: current === "profile" },
+    { href: at("demandes"), label: t.tabDemandes, active: current === "demandes", contador: "demandes", icono: "demandes" },
+    { href: at("visitors"), label: t.tabVisitors, active: current === "visitors", icono: "visiteurs" },
+    { href: at("profile"), label: t.tabProfile, active: current === "profile", icono: "maison" },
     // Quién viene, cuándo y cuántos: lo que la sala mira antes del servicio. El
     // escáner del código vive ahí, con cada visita, y no en el menú.
     { href: "/dashboard/business/calendrier", label: t.navCalendar, active: current === "calendrier" },

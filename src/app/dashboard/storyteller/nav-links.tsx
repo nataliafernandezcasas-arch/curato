@@ -8,8 +8,8 @@ export function STORYTELLER_LINKS(
   current: "addresses" | "visits" | "profile" | "reglages"
 ): NavLink[] {
   return [
-    { href: "/dashboard/storyteller", label: t.navAddresses, active: current === "addresses" },
-    { href: "/dashboard/storyteller/visits", label: t.navVisits, active: current === "visits" },
-    { href: "/dashboard/storyteller/profil", label: t.navProfile, active: current === "profile" },
+    { href: "/dashboard/storyteller", label: t.navAddresses, active: current === "addresses", icono: "adresses" },
+    { href: "/dashboard/storyteller/visits", label: t.navVisits, active: current === "visits", icono: "visites" },
+    { href: "/dashboard/storyteller/profil", label: t.navProfile, active: current === "profile", icono: "profil" },
   ];
 }

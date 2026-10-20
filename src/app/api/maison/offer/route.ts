@@ -28,6 +28,12 @@ async function ofertaDe(admin: ReturnType<typeof createAdminClient>, id: string)
 
 // El tipo de agenda (migración 044), aparte y tolerante como la oferta: sin la
 // columna, la casa usa el modo de su categoría.
+// La nota para los storytellers (migración 053), aparte y tolerante.
+async function notaDe(admin: ReturnType<typeof createAdminClient>, id: string): Promise<string> {
+  const { data, error } = await admin.from("comercios").select("storyteller_note").eq("id", id).maybeSingle();
+  return !error && data ? ((data as { storyteller_note?: string | null }).storyteller_note ?? "") : "";
+}
+
 async function agendaGuardada(admin: ReturnType<typeof createAdminClient>, id: string): Promise<unknown> {
   const { data, error } = await admin.from("comercios").select("agenda").eq("id", id).maybeSingle();
   return !error && data ? (data as { agenda?: unknown }).agenda ?? null : null;
@@ -50,6 +56,7 @@ export async function GET() {
       // Entre cuánto y cuánto puede ofrecer, según su categoría.
       offerRange: rangoDe(m.category_id as string | null),
       menuUrls: m.menu_urls ?? [],
+      note: await notaDe(admin, m.id),
     });
   } catch {
     return NextResponse.json({ error: "Erreur." }, { status: 500 });
@@ -103,6 +110,11 @@ export async function PATCH(request: NextRequest) {
       const agenda = agendaDe(body.agenda, m.category_id as string | null);
       const { error } = await admin.from("comercios").update({ agenda }).eq("id", m.id);
       if (error) errores.push("agenda");
+    }
+    if (typeof body.note === "string") {
+      const storyteller_note = body.note.trim().slice(0, 1000) || null;
+      const { error } = await admin.from("comercios").update({ storyteller_note }).eq("id", m.id);
+      if (error) errores.push("note");
     }
     // El importe va aparte: si la migración 043 aún no está, lo demás se guarda.
     let rango: { min: number; max: number } | null = null;
