@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { filtroDe } from "@/lib/identidad";
+import { filtroDeCasa } from "@/lib/casa";
 import { enRango, rangoDe } from "@/lib/oferta";
 import { agendaDe } from "@/lib/agenda";
 
@@ -11,7 +11,7 @@ async function getMaison(admin: ReturnType<typeof createAdminClient>, userId: st
   const { data } = await admin
     .from("comercios")
     .select("id, category_id, availability, blocked_slots, services, menu_urls")
-    .or(filtroDe(userId, email))
+    .or(await filtroDeCasa(admin, { id: userId, email }))
     .eq("stage", "activo")
     .order("created_at", { ascending: false })
     .limit(1)

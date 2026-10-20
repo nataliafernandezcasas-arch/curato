@@ -223,15 +223,20 @@ export async function POST(request: NextRequest) {
 
     // El plazo de la casa son cuarenta y ocho horas, así que el aviso en el
     // teléfono es lo que evita que se le vaya el tiempo sin abrir la app.
-    await avisar(
-      { ownerId: venue.owner_id ?? null, email: venue.email ?? null },
-      AVISOS.nuevaDemanda(
-        creator.full_name || creator.handle || "Un storyteller",
-        whenLabel,
-        reservation.id,
-        await pendientesDe(admin, venue.id)
-      )
+    // A la cuenta de la casa y a cada persona de su equipo (migración 055).
+    const { data: equipo } = await admin.from("maison_equipo").select("user_id, email").eq("comercio_id", venue.id);
+    const aviso = AVISOS.nuevaDemanda(
+      creator.full_name || creator.handle || "Un storyteller",
+      whenLabel,
+      reservation.id,
+      await pendientesDe(admin, venue.id)
     );
+    for (const destino of [
+      { ownerId: venue.owner_id ?? null, email: venue.email ?? null },
+      ...(equipo ?? []).map((m) => ({ ownerId: (m.user_id as string | null) ?? null, email: (m.email as string | null) ?? null })),
+    ]) {
+      await avisar(destino, aviso);
+    }
 
     return NextResponse.json({ ok: true, reservationId: reservation.id, creditsCost });
   } catch {

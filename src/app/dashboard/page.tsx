@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { casasDelEquipo } from "@/lib/casa";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -89,6 +90,9 @@ export default async function DashboardPage() {
     }
     redirect("/dashboard/business");
   }
+
+  // 2 bis. En el equipo de una casa (migración 055): su tablero, el de la casa.
+  if ((await casasDelEquipo(admin, user)).length > 0) redirect("/dashboard/business");
 
   // 3. Recruiter? (commission-based maison sourcing)
   const { data: recruiter } = await admin

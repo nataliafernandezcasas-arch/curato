@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { filtroDeCasa } from "@/lib/casa";
 
 // The Curato maison directory: every signed venue (is_reservable = true), so a
 // maison can browse the other houses in the collective and see their profiles.
@@ -17,7 +18,7 @@ export async function GET() {
     const { data: self } = await admin
       .from("comercios")
       .select("id")
-      .or(filtroDeUsuario(user))
+      .or(await filtroDeCasa(admin, user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)

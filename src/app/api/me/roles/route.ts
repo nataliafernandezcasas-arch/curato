@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { casasDelEquipo } from "@/lib/casa";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,8 @@ export async function GET() {
 
   return NextResponse.json({
     storyteller: !!creatorRes.data && creatorRes.data.partnership_stage !== "declined",
-    maison: !!comercioRes.data,
+    // La casa propia, o una en cuyo equipo está (migración 055).
+    maison: !!comercioRes.data || (await casasDelEquipo(admin, user)).length > 0,
     recruiter: !!recruiterRes.data,
     // Quien está en admin_users ve el enlace al admin en el menú de la app.
     admin: !!adminRes.data,

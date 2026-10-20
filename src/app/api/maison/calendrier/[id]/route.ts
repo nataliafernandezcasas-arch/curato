@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
+import { filtroDeCasa } from "@/lib/casa";
 import { buildDossiers } from "@/lib/storyteller-dossier";
 import { visitaDeHoy } from "@/lib/check-in";
 import { puedeMarcarNoShow } from "@/lib/asistencia";
@@ -23,7 +24,7 @@ export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string
     const { data: maison } = await admin
       .from("comercios")
       .select("id, name, address")
-      .or(filtroDeUsuario(user))
+      .or(await filtroDeCasa(admin, user))
       .eq("stage", "activo")
       .order("created_at", { ascending: false })
       .limit(1)
