@@ -5,14 +5,14 @@ import Link from "next/link";
 import DashboardNav from "../../../dashboard-nav";
 import { STORYTELLER_LINKS } from "../../nav-links";
 import { MAISON_LINKS } from "../../../business/nav-links";
-import { MapPin, ArrowLeft, GlobeSimple, X, CheckCircle } from "@/components/member/iconos";
+import { MapPin, ArrowLeft, GlobeSimple, Clock, FileText, Gift, Info, InstagramLogo } from "@/components/member/iconos";
+import { TituloSeccion } from "@/components/member/titulo-seccion";
 import { useRouter } from "next/navigation";
 import { pickLang } from "@/lib/i18n/pick-lang";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations, type Lang } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import { parisParts, AvailWindow } from "@/lib/availability";
-import { Row } from "@/components/member/row";
 import { ButtonLink } from "@/components/member/button";
 import { Gallery } from "@/components/member/gallery";
 import { Viewer } from "@/components/member/viewer";
@@ -48,6 +48,7 @@ type Maison = {
   description_es: string | null;
   photos: string[] | null;
   website_url: string | null;
+  contact_instagram?: string | null;
   category_id: string | null;
 };
 
@@ -112,7 +113,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
       const enVistaPrevia = new URLSearchParams(window.location.search).get("apercu") === "1";
       let consulta = supabase
         .from("comercios")
-        .select("id, name, arrondissement, address, description, description_en, description_es, photos, website_url, category_id")
+        .select("id, name, arrondissement, address, description, description_en, description_es, photos, website_url, contact_instagram, category_id")
         .eq("id", id);
       if (!enVistaPrevia) consulta = consulta.eq("is_reservable", true);
       const { data } = await consulta.maybeSingle();
@@ -258,7 +259,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
                 {oferta && (oferta.eur || oferta.menuUrls.length > 0) && (
                   <div className="mb-8">
-                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-accent mb-3">{OFERTA[lang].title}</p>
+                    <TituloSeccion icono={Gift}>{OFERTA[lang].title}</TituloSeccion>
                     {/* El importe que la casa ofrece. La lista de servicios con
                         precio de antes ya no se enseña: no es lo que se gasta. */}
                     {oferta.eur ? (
@@ -274,7 +275,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                     ) : null}
                     {oferta.menuUrls.length > 0 && (
                       <div className="mt-fila">
-                        <p className="text-capitale uppercase tracking-capitale text-text-secondary">{OFERTA[lang].menu}</p>
+                        <TituloSeccion icono={FileText} className="!mb-0">{OFERTA[lang].menu}</TituloSeccion>
                         <div className="mt-bloque">
                           <Carta urls={oferta.menuUrls} lang={lang} />
                         </div>
@@ -285,7 +286,7 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
 
                 {oferta?.note && (
                   <div className="mb-8">
-                    <p className="mb-3 text-capitale uppercase tracking-capitale text-accent">{OFERTA[lang].note}</p>
+                    <TituloSeccion icono={Info}>{OFERTA[lang].note}</TituloSeccion>
                     <p className="whitespace-pre-line text-corps text-text-secondary">{oferta.note}</p>
                   </div>
                 )}
@@ -293,10 +294,42 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
                 {/* Cuándo se puede ir: antes solo se veía al pedir la visita. */}
                 {horario && <Horarios horario={horario} lang={lang} />}
 
+                {/* La web y el Instagram de la casa, cada uno con su icono. */}
+                {(maison.website_url || maison.contact_instagram) && (
+                  <div className="mb-8">
+                    <TituloSeccion icono={GlobeSimple}>{ENLACES[lang]}</TituloSeccion>
+                    <div className="flex flex-col">
+                      {maison.website_url && (
+                        <a
+                          href={maison.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex min-h-11 items-center gap-fila text-corps text-text-primary transition-colors hover:text-accent"
+                        >
+                          <GlobeSimple size={18} className="shrink-0 text-text-secondary" aria-hidden />
+                          <span className="truncate">{maison.website_url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
+                        </a>
+                      )}
+                      {maison.contact_instagram && (
+                        <a
+                          href={`https://instagram.com/${maison.contact_instagram.replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex min-h-11 items-center gap-fila text-corps text-text-primary transition-colors hover:text-accent"
+                        >
+                          <InstagramLogo size={18} className="shrink-0 text-text-secondary" aria-hidden />
+                          <span className="truncate">@{maison.contact_instagram.replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "")}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Map */}
                 {maison.address && (
                   <div className="mb-8">
-                    <p className="font-serif text-capitale tracking-[0.25em] uppercase text-accent mb-3">{t.location}</p>
+                    <TituloSeccion icono={MapPin}>{t.location}</TituloSeccion>
+                    <p className="mb-bloque text-legende text-text-primary">{maison.address}</p>
                     <div className="h-[180px] overflow-hidden">
                       <iframe
                         title={t.location}
@@ -314,27 +347,6 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
               {/* Right: actions */}
               <div className="md:col-span-1">
                 <div className="sticky top-20 space-y-fila">
-                  {maison.address && (
-                    <Row
-                      label={<span className="text-capitale uppercase tracking-capitale text-text-secondary">{t.location}</span>}
-                      aside={<span className="text-legende text-text-primary">{maison.address}</span>}
-                    />
-                  )}
-                  {maison.website_url && (
-                    <Row
-                      label={
-                        <a
-                          href={maison.website_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-legende text-accent transition-colors hover:text-text-primary"
-                        >
-                          {maison.website_url.replace(/^https?:\/\//, "")}
-                        </a>
-                      }
-                    />
-                  )}
-
                   {apercu ? (
                     // En la vista previa el botón se ve, pero no reserva.
                     <span className="boton-cristal pointer-events-none w-full opacity-60">{t.requestReservation}</span>
@@ -354,6 +366,8 @@ export default function MaisonProfile({ params }: { params: Promise<{ id: string
     </div>
   );
 }
+
+const ENLACES: Record<Lang, string> = { fr: "Sur le web", en: "Online", es: "En la web" };
 
 const HORARIOS: Record<Lang, { titulo: string; cerrado: string; llegadas: string; noches: (a: number, b: number) => string; dias: string[] }> = {
   fr: {
@@ -389,7 +403,7 @@ function Horarios({ horario, lang }: { horario: Pick<MaisonAvail, "agenda" | "av
     const a = horario.agenda;
     return (
       <div className="mb-8">
-        <p className="mb-3 font-serif text-capitale uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
+        <TituloSeccion icono={Clock}>{t.titulo}</TituloSeccion>
         <div className={fila}>
           <span className="text-legende text-text-secondary">{t.llegadas}</span>
           <span className="text-right text-legende text-text-primary">{ORDEN.filter((d) => a.llegadas.includes(d)).map((d) => t.dias[d]).join(", ")}</span>
@@ -403,7 +417,7 @@ function Horarios({ horario, lang }: { horario: Pick<MaisonAvail, "agenda" | "av
   if (horario.availability.length === 0) return null;
   return (
     <div className="mb-8">
-      <p className="mb-3 font-serif text-capitale uppercase tracking-[0.25em] text-accent">{t.titulo}</p>
+      <TituloSeccion icono={Clock}>{t.titulo}</TituloSeccion>
       {ORDEN.map((d) => {
         const franjas = horario.availability
           .filter((w) => w.day === d)
