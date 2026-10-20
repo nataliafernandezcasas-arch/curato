@@ -32,15 +32,6 @@ type Informe = {
   guaranteed: number;
   belowMinimum: boolean;
   reach: { accounts: number; views: number; interactions: number; engagement: number | null; declared: number };
-  value: {
-    equivalent: number;
-    cpm: number;
-    subscription: number;
-    offered: number;
-    cost: number;
-    perVisit: number | null;
-    perThousandViews: number | null;
-  };
   evolution: { month: string; visits: number; accounts: number; views: number }[];
   storytellers: Storyteller[];
   gallery: (Foto & { name: string; until: string | null })[];
@@ -56,15 +47,10 @@ const TEXTOS: Record<
     empty: string;
     previous: string;
     next: string;
-    valueCap: string;
-    valueLead: (cost: string, sub: string, offered: string) => string;
-    valueNote: (cpm: number) => string;
     accounts: string;
     views: string;
     interactions: string;
     engagement: string;
-    perVisit: string;
-    perThousand: string;
     evolution: string;
     evolutionHint: string;
     storytellers: string;
@@ -84,15 +70,10 @@ const TEXTOS: Record<
     empty: "Aucune visite ce mois-ci.",
     previous: "Mois précédent",
     next: "Mois suivant",
-    valueCap: "Équivalent publicitaire estimé",
-    valueLead: (cost, sub, offered) => `Pour ${cost} ce mois-ci : votre abonnement (${sub}) et ce que vous avez offert sur votre carte (${offered}).`,
-    valueNote: (cpm) => `Estimation sur la base de ${cpm} € les 1 000 vues, le prix d'une publicité Instagram ciblée à Paris. Les vues viennent des statistiques que chaque storyteller déclare.`,
     accounts: "Comptes atteints",
     views: "Vues",
     interactions: "Interactions",
     engagement: "Taux d'interaction",
-    perVisit: "Coût par visite",
-    perThousand: "Coût pour 1 000 vues",
     evolution: "Les six derniers mois",
     evolutionHint: "Comptes atteints chaque mois, et le nombre de visites.",
     storytellers: "Les storytellers reçus",
@@ -111,15 +92,10 @@ const TEXTOS: Record<
     empty: "No visits this month.",
     previous: "Previous month",
     next: "Next month",
-    valueCap: "Estimated advertising equivalent",
-    valueLead: (cost, sub, offered) => `For ${cost} this month: your subscription (${sub}) and what you offered on your menu (${offered}).`,
-    valueNote: (cpm) => `Estimated at ${cpm} € per 1,000 views, the price of an Instagram ad targeted at Paris. Views come from the insights each storyteller declares.`,
     accounts: "Accounts reached",
     views: "Views",
     interactions: "Interactions",
     engagement: "Engagement rate",
-    perVisit: "Cost per visit",
-    perThousand: "Cost per 1,000 views",
     evolution: "The last six months",
     evolutionHint: "Accounts reached each month, and the number of visits.",
     storytellers: "Storytellers you hosted",
@@ -138,15 +114,10 @@ const TEXTOS: Record<
     empty: "Ninguna visita este mes.",
     previous: "Mes anterior",
     next: "Mes siguiente",
-    valueCap: "Equivalente publicitario estimado",
-    valueLead: (cost, sub, offered) => `Por ${cost} este mes: tu suscripción (${sub}) y lo que ofreciste en tu carta (${offered}).`,
-    valueNote: (cpm) => `Estimación a ${cpm} € las 1.000 vistas, el precio de un anuncio de Instagram dirigido a París. Las vistas salen de las estadísticas que declara cada storyteller.`,
     accounts: "Cuentas alcanzadas",
     views: "Vistas",
     interactions: "Interacciones",
     engagement: "Tasa de interacción",
-    perVisit: "Coste por visita",
-    perThousand: "Coste por 1.000 vistas",
     evolution: "Los últimos seis meses",
     evolutionHint: "Cuentas alcanzadas cada mes, y el número de visitas.",
     storytellers: "Los storytellers recibidos",
@@ -162,12 +133,12 @@ const TEXTOS: Record<
 const etiqueta = "text-capitale uppercase tracking-capitale text-text-secondary";
 
 /**
- * El informe mensual de la maison: lo que la casa obtuvo y lo que le costó.
+ * El informe mensual de la maison.
  *
- * Responde a «¿me compensa?» (Natalia, 2026-10-20). Arriba, las visitas contra
- * el mínimo garantizado; después, el equivalente publicitario de lo publicado
- * frente al coste del mes; la evolución de seis meses; cada storyteller con
- * sus cifras, y las fotos para descargar en alta definición.
+ * Arriba, las visitas contra el mínimo garantizado; después, lo que dieron de
+ * sí las stories del mes; la evolución de seis meses; cada storyteller con
+ * sus cifras, y las fotos para descargar en alta definición. Sin cálculos en
+ * euros: se entendían mal (Natalia, 2026-10-20).
  */
 export default function MaisonReport() {
   const { lang } = useLang();
@@ -189,7 +160,6 @@ export default function MaisonReport() {
   if (cargando) return <div className="h-64 animate-pulse bg-border [animation-duration:1.6s]" />;
   if (!informe) return null;
 
-  const eur = (n: number) => `${n.toLocaleString(lang)} €`;
   const cifra = (n: number | null) => (n == null ? "—" : n.toLocaleString(lang));
   const fecha = (iso: string) => new Date(iso).toLocaleDateString(lang, { day: "numeric", month: "long", timeZone: "Europe/Paris" });
   const [anio, num] = informe.month.split("-").map(Number);
@@ -202,7 +172,6 @@ export default function MaisonReport() {
   const esEsteMes = informe.month === new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Paris" }).slice(0, 7);
   const pendientes = informe.visits - informe.reach.declared;
   const maxCuentas = Math.max(1, ...informe.evolution.map((e) => e.accounts));
-  const v = informe.value;
 
   return (
     <div>
@@ -234,29 +203,17 @@ export default function MaisonReport() {
         <p className="py-respiro text-center text-corps text-text-secondary">{t.empty}</p>
       ) : (
         <>
-          {/* Lo que vale y lo que costó, en su propio marco: es la respuesta a
-              «¿me compensa?». */}
+          {/* Lo que dieron de sí las stories del mes, en su propio marco. */}
           <Rise index={1} className="mt-seccion">
             <section className="rounded-[20px] border border-accent/45 bg-accent/[0.07] p-5 sm:p-6">
-              <p className="text-capitale uppercase tracking-capitale text-accent">{t.valueCap}</p>
-              <p className="mt-bloque text-cifra font-light leading-none tabular-nums text-text-primary">{eur(v.equivalent)}</p>
-              <p className="mt-fila text-legende text-text-secondary">{t.valueLead(eur(v.cost), eur(v.subscription), eur(v.offered))}</p>
-              <div className="mt-fila border-t border-accent/25 pt-bloque">
-                <Row label={<span className={etiqueta}>{t.accounts}</span>} value={<span className="text-sous-titre tabular-nums text-text-primary">{cifra(informe.reach.accounts)}</span>} />
-                <Row label={<span className={etiqueta}>{t.views}</span>} value={<span className="text-sous-titre tabular-nums text-text-primary">{cifra(informe.reach.views)}</span>} />
-                <Row label={<span className={etiqueta}>{t.interactions}</span>} value={<span className="text-sous-titre tabular-nums text-text-primary">{cifra(informe.reach.interactions)}</span>} />
-                <Row
-                  label={<span className={etiqueta}>{t.engagement}</span>}
-                  value={<span className="text-sous-titre tabular-nums text-text-primary">{informe.reach.engagement == null ? "—" : `${informe.reach.engagement.toLocaleString(lang)} %`}</span>}
-                />
-                <Row label={<span className={etiqueta}>{t.perVisit}</span>} value={<span className="text-sous-titre tabular-nums text-text-primary">{v.perVisit == null ? "—" : eur(v.perVisit)}</span>} />
-                <Row
-                  label={<span className={etiqueta}>{t.perThousand}</span>}
-                  value={<span className="text-sous-titre tabular-nums text-text-primary">{v.perThousandViews == null ? "—" : eur(v.perThousandViews)}</span>}
-                />
-              </div>
+              <Row label={<span className={etiqueta}>{t.accounts}</span>} value={<span className="text-sous-titre tabular-nums text-text-primary">{cifra(informe.reach.accounts)}</span>} />
+              <Row label={<span className={etiqueta}>{t.views}</span>} value={<span className="text-sous-titre tabular-nums text-text-primary">{cifra(informe.reach.views)}</span>} />
+              <Row label={<span className={etiqueta}>{t.interactions}</span>} value={<span className="text-sous-titre tabular-nums text-text-primary">{cifra(informe.reach.interactions)}</span>} />
+              <Row
+                label={<span className={etiqueta}>{t.engagement}</span>}
+                value={<span className="text-sous-titre tabular-nums text-text-primary">{informe.reach.engagement == null ? "—" : `${informe.reach.engagement.toLocaleString(lang)} %`}</span>}
+              />
               {pendientes > 0 && <p className="mt-bloque text-legende text-copper-vif">{t.pending(pendientes)}</p>}
-              <p className="mt-fila text-legende text-text-muted">{t.valueNote(v.cpm)}</p>
             </section>
           </Rise>
         </>

@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { filtroDeUsuario } from "@/lib/identidad";
 import { filtroDeCasa } from "@/lib/casa";
 import { retratoDeCada } from "@/lib/creator-portrait";
-import { ABONO_MENSUAL, CPM_REFERENCIA, costeDelMes, costePorMilVistas, costePorVisita, mesDe, mesesHasta, tasaDeInteraccion, valorPublicitario } from "@/lib/valor";
+import { mesDe, mesesHasta, tasaDeInteraccion } from "@/lib/informe-casa";
 
 const BUCKET = "content-proofs";
 // El compromiso de Curato con cada casa: cinco visitas garantizadas al mes.
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     const desdeEvolucion = new Date(Date.UTC(a0, m0 - 1, 1));
     const { data: todas } = await admin
       .from("reservations")
-      .select("id, creator_id, slot_start, credits_cost, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions")
+      .select("id, creator_id, slot_start, content_photo_paths, content_rights_expires_at, reach_views, reach_accounts, reach_interactions")
       .eq("venue_id", maison.id)
       .eq("status", "completed")
       .gte("slot_start", desdeEvolucion.toISOString())
@@ -98,9 +98,6 @@ export async function GET(request: NextRequest) {
 
     const suma = (campo: "reach_views" | "reach_accounts" | "reach_interactions") =>
       filas.reduce((total, r) => total + num(r[campo]), 0);
-    const vistas = suma("reach_views");
-    const ofrecido = filas.reduce((t, r) => t + num(r.credits_cost), 0);
-    const coste = costeDelMes(ofrecido);
 
     const storytellers = await Promise.all(
       filas.map(async (r) => {
@@ -134,22 +131,12 @@ export async function GET(request: NextRequest) {
       belowMinimum: filas.length < MINIMO_MENSUAL,
       reach: {
         accounts: suma("reach_accounts"),
-        views: vistas,
+        views: suma("reach_views"),
         interactions: suma("reach_interactions"),
         engagement: tasaDeInteraccion(suma("reach_interactions"), suma("reach_accounts")),
         // Cuántas visitas han declarado ya sus cifras: sin esto, un mes con
         // portée baja parece un mal mes cuando solo faltan datos.
         declared: filas.filter((r) => r.reach_accounts != null).length,
-      },
-      // Lo que vale y lo que costó: la pregunta de «¿me compensa?».
-      value: {
-        equivalent: valorPublicitario(vistas),
-        cpm: CPM_REFERENCIA,
-        subscription: ABONO_MENSUAL,
-        offered: ofrecido,
-        cost: coste,
-        perVisit: costePorVisita(coste, filas.length),
-        perThousandViews: costePorMilVistas(coste, vistas),
       },
       // Los seis últimos meses, del más antiguo al de este informe.
       evolution: meses.map((m) => {
