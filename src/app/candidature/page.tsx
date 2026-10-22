@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Ciudades } from "@/components/member/ciudades";
 import { motion } from "framer-motion";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
@@ -21,12 +22,52 @@ const fade = (d = 0) => ({
 
 type Type = "creator" | "maison" | null;
 
+// Los campos nuevos de la candidatura de un storyteller (2026-10-22).
+const TB: Record<"fr" | "en" | "es", {
+  followers: string; followersPlaceholder: string; cities: string; citiesHelp: string;
+  citiesPlaceholder: string; citiesRequired: string; add: string; remove: string;
+}> = {
+  fr: {
+    followers: "Abonnés Instagram",
+    followersPlaceholder: "12 500",
+    cities: "Où êtes-vous basé(e) ?",
+    citiesHelp: "Une ville, ou plusieurs si vous vivez entre deux villes ou voyagez souvent.",
+    citiesPlaceholder: "Paris",
+    citiesRequired: "Indiquez au moins une ville où vous êtes basé(e).",
+    add: "Ajouter",
+    remove: "Retirer",
+  },
+  en: {
+    followers: "Instagram followers",
+    followersPlaceholder: "12,500",
+    cities: "Where are you based?",
+    citiesHelp: "One city, or several if you live between two cities or travel often.",
+    citiesPlaceholder: "Paris",
+    citiesRequired: "Add at least one city where you're based.",
+    add: "Add",
+    remove: "Remove",
+  },
+  es: {
+    followers: "Seguidores de Instagram",
+    followersPlaceholder: "12.500",
+    cities: "¿Dónde estás basado/a?",
+    citiesHelp: "Una ciudad, o varias si vives entre dos ciudades o viajas a menudo.",
+    citiesPlaceholder: "París",
+    citiesRequired: "Indica al menos una ciudad donde estás basado/a.",
+    add: "Añadir",
+    remove: "Quitar",
+  },
+};
+
 export default function CandidaturePage() {
   const [type, setType] = useState<Type>(null);
   const [form, setForm] = useState({ name: "", email: "", instagram: "", website: "", message: "", photoStyle: "" });
   // Kept as previews so the applicant sees the edit they are making, and so a
   // second pick adds to the selection instead of silently replacing it.
   const [photos, setPhotos] = useState<{ file: File; url: string }[]>([]);
+  // Sus seguidores y dónde está basado (una ciudad o varias).
+  const [seguidores, setSeguidores] = useState("");
+  const [ciudades, setCiudades] = useState<string[]>([]);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,6 +108,10 @@ export default function CandidaturePage() {
       return;
     }
     if (type === "creator") {
+      if (ciudades.length === 0) {
+        setError(TB[lang].citiesRequired);
+        return;
+      }
       if (!form.photoStyle.trim()) {
         setError(t.styleRequired);
         return;
@@ -89,7 +134,11 @@ export default function CandidaturePage() {
       const web = form.website.trim();
       if (web) body.set("website", /^https?:\/\//i.test(web) ? web : `https://${web}`);
       if (form.message) body.set("message", form.message);
-      if (type === "creator") body.set("photo_style", form.photoStyle.trim());
+      if (type === "creator") {
+        body.set("photo_style", form.photoStyle.trim());
+        if (seguidores) body.set("followers", seguidores);
+        body.set("cities", JSON.stringify(ciudades));
+      }
       body.set("age_confirmed", "true");
       body.set("terms_accepted", "true");
 
@@ -220,6 +269,37 @@ export default function CandidaturePage() {
                   placeholder={t.instagramPlaceholder}
                 />
               </div>
+            )}
+
+            {type === "creator" && (
+              <>
+                <div>
+                  <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">{TB[lang].followers}</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={seguidores}
+                    onChange={(e) => setSeguidores(e.target.value.replace(/\D/g, "").slice(0, 9))}
+                    className="w-full px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
+                    placeholder={TB[lang].followersPlaceholder}
+                  />
+                </div>
+                <div>
+                  <label className="block font-serif text-capitale tracking-[0.25em] uppercase text-champagne/60 mb-3">
+                    {TB[lang].cities}
+                    <span className="text-copper/70"> *</span>
+                  </label>
+                  <p className="font-serif text-legende font-light text-text-muted/60 leading-relaxed mb-3">{TB[lang].citiesHelp}</p>
+                  <Ciudades
+                    valor={ciudades}
+                    onChange={setCiudades}
+                    placeholder={TB[lang].citiesPlaceholder}
+                    anadir={TB[lang].add}
+                    quitar={TB[lang].remove}
+                    inputClassName="px-5 py-4 border border-border bg-charcoal-mid/60 text-text-primary font-serif text-corps font-light focus:outline-none focus:border-champagne/40 transition-colors placeholder:text-text-muted/40"
+                  />
+                </div>
+              </>
             )}
 
             {/* A creator is chosen for their eye, so the eye has to be on the form.

@@ -1,14 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Trash } from "@/components/member/iconos";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import { translations } from "@/lib/i18n/translations";
-import { suggestedBudgetEUR } from "@/lib/credits";
 
-type Application = {
+export type Application = {
   id: string;
   type: string;
   name: string;
@@ -18,20 +15,33 @@ type Application = {
   message: string | null;
   status: string;
   created_at: string;
+  followers?: number | null;
+  cities?: string[] | null;
+  /** Las cuatro primeras fotos de su portfolio, firmadas. */
+  photos: string[];
 };
 
-function StatusBadge({ status, t }: { status: string; t: { [K in keyof typeof translations.fr.admin]: string } }) {
+// La lista de espera (migración 056) y los textos de las tarjetas.
+const EXTRA: Record<"fr" | "en" | "es", { waitlist: string; followers: (n: string) => string; noPhotos: string }> = {
+  fr: { waitlist: "Liste d'attente", followers: (n) => `${n} abonnés`, noPhotos: "Pas de photos" },
+  en: { waitlist: "Waiting list", followers: (n) => `${n} followers`, noPhotos: "No photos" },
+  es: { waitlist: "Lista de espera", followers: (n) => `${n} seguidores`, noPhotos: "Sin fotos" },
+};
+
+function StatusBadge({ status, t, espera }: { status: string; t: { [K in keyof typeof translations.fr.admin]: string }; espera: string }) {
   const styles: Record<string, string> = {
     pending: "text-amber-300 border-amber-400/40 bg-amber-400/10",
     approved: "text-emerald-300 border-emerald-400/40 bg-emerald-400/10",
     rejected: "text-red-400 border-red-400/40 bg-red-400/10",
     deleted: "text-white/25 border-white/10 bg-white/5",
+    waitlist: "text-sky-300 border-sky-400/40 bg-sky-400/10",
   };
   const labels: Record<string, string> = {
     pending: t.statusPending,
     approved: t.statusApproved,
     rejected: t.statusRejected,
     deleted: t.statusDeleted,
+    waitlist: espera,
   };
   return (
     <span className={`inline-block font-serif text-capitale tracking-[0.25em] uppercase border px-2.5 py-1 ${styles[status] ?? styles.pending}`}>
@@ -40,181 +50,28 @@ function StatusBadge({ status, t }: { status: string; t: { [K in keyof typeof tr
   );
 }
 
-function ActionButtons({ app, onUpdate, t }: { app: Application; onUpdate: (id: string, status: string) => void; t: { [K in keyof typeof translations.fr.admin]: string } }) {
-  const [loading, setLoading] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [followers, setFollowers] = useState("");
-  const [budget, setBudget] = useState("");
-  const [budgetTouched, setBudgetTouched] = useState(false);
-
-  // Typing the follower count auto-fills the suggested budget, until the admin
-  // edits the budget by hand (then we stop overwriting it).
-  function onFollowersChange(v: string) {
-    setFollowers(v);
-    if (!budgetTouched) {
-      const n = parseInt(v) || 0;
-      setBudget(n > 0 ? String(suggestedBudgetEUR(n)) : "");
-    }
-  }
-
-  async function update(status: string) {
-    setLoading(status);
-    setErr(null);
-    try {
-      const isCreatorApprove = status === "approved" && app.type === "creator";
-      const res = await fetch("/api/admin/applications", {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: app.id,
-          status,
-          followers: isCreatorApprove ? parseInt(followers) || 0 : undefined,
-          budget: isCreatorApprove ? parseInt(budget) || 0 : undefined,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        onUpdate(app.id, status);
-      } else {
-        setErr(`Error ${res.status}: ${data.error || "desconocido"}`);
-      }
-    } catch (e) {
-      setErr(`Error: ${e instanceof Error ? e.message : "conexión"}`);
-    } finally {
-      setLoading(null);
-    }
-  }
-
-  if (app.status === "deleted") {
-    return (
-      <div className="flex items-center gap-3">
-        <button onClick={() => update("pending")} disabled={!!loading} className="font-serif text-capitale tracking-wider text-white/40 hover:text-white transition-colors disabled:opacity-40">
-          {loading === "pending" ? "…" : t.actionRestore}
-        </button>
-        {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
-      </div>
-    );
-  }
-  if (app.status === "approved") {
-    return (
-      <div className="flex items-center gap-3">
-        <button onClick={() => update("rejected")} disabled={!!loading} className="font-serif text-capitale tracking-wider text-red-400 hover:text-red-300 transition-colors disabled:opacity-40">
-          {loading === "rejected" ? "…" : t.actionReject}
-        </button>
-        <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
-          {loading === "deleted" ? <span className="text-capitale">…</span> : <Trash size={14} />}
-        </button>
-        {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
-      </div>
-    );
-  }
-  if (app.status === "rejected") {
-    return (
-      <div className="space-y-2">
-        {app.type === "creator" && (
-          <>
-            <input
-              type="number"
-              value={followers}
-              onChange={(e) => onFollowersChange(e.target.value)}
-              placeholder={t.followersPlaceholderShort}
-              className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
-            />
-            <input
-              type="number"
-              value={budget}
-              onChange={(e) => { setBudget(e.target.value); setBudgetTouched(true); }}
-              placeholder="Budget € / mois"
-              className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
-            />
-          </>
-        )}
-        <div className="flex items-center gap-3">
-          <button onClick={() => update("approved")} disabled={!!loading} className="font-serif text-capitale tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors disabled:opacity-40">
-            {loading === "approved" ? "…" : t.actionAccept}
-          </button>
-          <button onClick={() => update("deleted")} disabled={!!loading} title="Borrar" className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40">
-            {loading === "deleted" ? <span className="text-capitale">…</span> : <Trash size={14} />}
-          </button>
-        </div>
-        {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      {app.type === "creator" && (
-        <>
-          <input
-            type="number"
-            value={followers}
-            onChange={(e) => onFollowersChange(e.target.value)}
-            placeholder={t.followersPlaceholder}
-            className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
-          />
-          <input
-            type="number"
-            value={budget}
-            onChange={(e) => { setBudget(e.target.value); setBudgetTouched(true); }}
-            placeholder="Budget € / mois"
-            className="w-full font-serif text-capitale border border-white/20 bg-white/10 px-3 py-1.5 text-white placeholder:text-white/30 focus:outline-none focus:border-white/40"
-          />
-        </>
-      )}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => update("approved")}
-          disabled={!!loading}
-          className="font-serif text-capitale tracking-widest uppercase text-charcoal-deep bg-champagne px-4 py-2 hover:bg-emerald-400 transition-all duration-200 disabled:opacity-40"
-        >
-          {loading === "approved" ? "…" : t.actionAccept}
-        </button>
-        <button
-          onClick={() => update("rejected")}
-          disabled={!!loading}
-          className="font-serif text-capitale tracking-widest uppercase text-white/50 border border-white/20 px-4 py-2 hover:border-red-400 hover:text-red-400 transition-all duration-200 disabled:opacity-40"
-        >
-          {loading === "rejected" ? "…" : t.actionReject}
-        </button>
-        <button
-          onClick={() => update("deleted")}
-          disabled={!!loading}
-          title="Borrar"
-          className="text-white/25 hover:text-red-400 transition-colors disabled:opacity-40"
-        >
-          {loading === "deleted" ? <span className="text-capitale">…</span> : <Trash size={14} />}
-        </button>
-      </div>
-      {err && <p className="font-serif text-capitale text-red-400">{err}</p>}
-    </div>
-  );
-}
-
 export default function ApplicationsList({ initial }: { initial: Application[] }) {
-  const [apps, setApps] = useState(initial);
-  const [tab, setTab] = useState<"all" | "creator" | "business" | "deleted">("all");
-  const router = useRouter();
+  const [apps] = useState(initial);
+  const [tab, setTab] = useState<"all" | "creator" | "business" | "waitlist" | "deleted">("all");
   const { lang } = useLang();
   const t = translations[lang].admin;
-
-  function handleUpdate(id: string, status: string) {
-    setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-    router.refresh();
-  }
+  const x = EXTRA[lang] ?? EXTRA.fr;
 
   const active = apps.filter((a) => a.status !== "deleted");
   const deleted = apps.filter((a) => a.status === "deleted");
 
   const filtered = (
     tab === "deleted" ? deleted :
+    tab === "waitlist" ? active.filter((a) => a.status === "waitlist") :
     tab === "all" ? active :
     active.filter((a) => a.type === tab)
   ).sort((a, b) => {
     // Pending first
     if (a.status === "pending" && b.status !== "pending") return -1;
     if (b.status === "pending" && a.status !== "pending") return 1;
+    // Then the waiting list
+    if (a.status === "waitlist" && b.status !== "waitlist") return -1;
+    if (b.status === "waitlist" && a.status !== "waitlist") return 1;
     // Then most recent first
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
@@ -225,6 +82,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
     business: active.filter((a) => a.type === "business").length,
     pending: active.filter((a) => a.status === "pending").length,
     approved: active.filter((a) => a.status === "approved").length,
+    waitlist: active.filter((a) => a.status === "waitlist").length,
     deleted: deleted.length,
   };
 
@@ -232,6 +90,7 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
     { key: "all", label: t.tabAll, count: counts.all },
     { key: "creator", label: t.tabCreators, count: counts.creator },
     { key: "business", label: t.tabHouses, count: counts.business },
+    { key: "waitlist", label: x.waitlist, count: counts.waitlist },
     { key: "deleted", label: t.tabDeleted, count: counts.deleted },
   ] as const;
 
@@ -263,12 +122,12 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-6 mb-8 border-b border-white/10">
+      <div className="flex gap-6 mb-8 border-b border-white/10 overflow-x-auto">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`font-serif text-legende tracking-wider pb-3 transition-colors border-b-2 -mb-px ${
+            className={`shrink-0 whitespace-nowrap font-serif text-legende tracking-wider pb-3 transition-colors border-b-2 -mb-px ${
               tab === t.key
                 ? "text-white border-champagne"
                 : "text-white/35 border-transparent hover:text-white/60"
@@ -286,66 +145,63 @@ export default function ApplicationsList({ initial }: { initial: Application[] }
           <p className="font-serif text-corps font-light text-white/40">{t.empty}</p>
         </div>
       ) : (
-        <div className="divide-y divide-white/10">
-          {filtered.map((app) => (
-            <div key={app.id} className="py-6 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-start">
-              <div className="space-y-2">
-                <div className="flex items-center gap-4 flex-wrap">
-                  <Link href={`/admin/applications/${app.id}`} className="font-serif text-sous-titre font-light text-white hover:text-champagne transition-colors">{app.name}</Link>
-                  <span className="font-serif text-capitale tracking-[0.25em] uppercase text-white/40 border border-white/15 px-2 py-0.5">
-                    {app.type === "creator" ? t.typeCreator : t.typeHouse}
-                  </span>
-                  <StatusBadge status={app.status} t={t} />
-                </div>
-
-                <div className="flex items-center gap-5 flex-wrap">
-                  <a href={`mailto:${app.email}`} className="font-serif text-legende font-light text-white/60 hover:text-white transition-colors">
-                    {app.email}
-                  </a>
-                  {app.instagram && (
-                    <a
-                      href={`https://instagram.com/${app.instagram.replace("@", "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-serif text-legende font-light text-white/40 hover:text-white transition-colors"
-                    >
-                      {app.instagram.startsWith("@") ? app.instagram : `@${app.instagram}`}
-                    </a>
+        // Cada candidatura como una demanda en el lado de la casa: su foto,
+        // su Instagram, sus seguidores, dónde está basada y sus fotos debajo.
+        // Se toca para abrirla entera y decidir abajo (Natalia, 2026-10-22).
+        <div className="space-y-4">
+          {filtered.map((app) => {
+            const handle = app.instagram ? app.instagram.replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "") : null;
+            return (
+              <Link
+                key={app.id}
+                href={`/admin/applications/${app.id}`}
+                className="block overflow-hidden rounded-[20px] bg-white/[0.05] shadow-[inset_0_1px_0_rgba(245,239,228,0.10)] transition-colors hover:bg-white/[0.08]"
+              >
+                <div className="grid grid-cols-[88px_minmax(0,1fr)] items-start gap-4 p-4 sm:grid-cols-[112px_minmax(0,1fr)] sm:p-5">
+                  {app.photos[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={app.photos[0]} alt="" className="aspect-[4/5] w-full rounded-[14px] object-cover" />
+                  ) : (
+                    <span className="flex aspect-[4/5] w-full items-center justify-center rounded-[14px] bg-white/5 font-serif text-sous-titre text-champagne">
+                      {app.name.slice(0, 1).toUpperCase()}
+                    </span>
                   )}
-                  {app.website && (
-                    <a
-                      href={app.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-serif text-legende font-light text-white/40 hover:text-white transition-colors"
-                    >
-                      {app.website.replace(/^https?:\/\//, "")}
-                    </a>
-                  )}
+                  <div className="flex min-w-0 flex-col gap-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusBadge status={app.status} t={t} espera={x.waitlist} />
+                      <span className="font-serif text-capitale uppercase tracking-[0.2em] text-white/40">
+                        {app.type === "creator" ? t.typeCreator : t.typeHouse}
+                      </span>
+                    </div>
+                    <p className="break-words font-titulo text-sous-titre text-white">{app.name}</p>
+                    {handle && <p className="truncate text-legende text-champagne">@{handle}</p>}
+                    {app.type !== "creator" && app.website && (
+                      <p className="truncate text-legende text-champagne">{app.website.replace(/^https?:\/\//, "")}</p>
+                    )}
+                    <p className="text-legende text-white/60">
+                      {[
+                        app.followers != null ? x.followers(app.followers.toLocaleString(lang)) : null,
+                        app.cities?.length ? app.cities.join(" · ") : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" — ")}
+                    </p>
+                    <p className="text-capitale text-white/30">
+                      {new Date(app.created_at).toLocaleDateString(lang, { day: "numeric", month: "long", year: "numeric" })}
+                    </p>
+                  </div>
                 </div>
-
-                {app.message && (
-                  <p className="font-serif text-legende font-light text-white/50 leading-relaxed max-w-2xl italic">
-                    "{app.message}"
-                  </p>
+                {app.photos.length > 1 && (
+                  <div className="grid grid-cols-4 gap-1.5 px-4 pb-4 sm:px-5 sm:pb-5">
+                    {app.photos.map((url) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={url} src={url} alt="" className="aspect-square w-full rounded-lg object-cover" />
+                    ))}
+                  </div>
                 )}
-
-                <p className="font-serif text-capitale text-white/30">
-                  {new Date(app.created_at).toLocaleDateString("es-ES", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-
-              <div className="flex md:justify-end">
-                <ActionButtons app={app} onUpdate={handleUpdate} t={t} />
-              </div>
-            </div>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

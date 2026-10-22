@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash, PencilSimple, Check, X } from "@/components/member/iconos";
 
-type App = { id: string; type: string; status: string; name: string };
+type App = { id: string; type: string; status: string; name: string; followers?: number | null };
 
 function CreditEditorInline({ email, initialCredit }: { email: string; initialCredit: number }) {
   const [editing, setEditing] = useState(false);
@@ -74,7 +74,8 @@ export default function ApplicationActions({ app, creatorEmail, initialCredit }:
 }) {
   const [loading, setLoading] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [followers, setFollowers] = useState("");
+  // Los seguidores que declaró en su candidatura, para no volver a escribirlos.
+  const [followers, setFollowers] = useState(app.followers != null ? String(app.followers) : "");
   const [status, setStatus] = useState(app.status);
   const router = useRouter();
 
@@ -159,6 +160,14 @@ export default function ApplicationActions({ app, creatorEmail, initialCredit }:
           <button onClick={() => update("rejected")} disabled={!!loading}
             className="font-serif text-legende tracking-widest uppercase text-white/50 border border-white/20 px-6 py-3 hover:border-red-400 hover:text-red-400 transition-all duration-200 disabled:opacity-40">
             {loading === "rejected" ? "…" : "Rechazar"}
+          </button>
+        )}
+        {/* Ni sí ni no todavía: queda en la lista de espera para revisarla
+            más tarde, sin correo a la persona (Natalia, 2026-10-22). */}
+        {status !== "waitlist" && status !== "approved" && (
+          <button onClick={() => update("waitlist")} disabled={!!loading}
+            className="font-serif text-legende tracking-widest uppercase text-sky-300 border border-sky-400/40 px-6 py-3 hover:border-sky-300 transition-all duration-200 disabled:opacity-40">
+            {loading === "waitlist" ? "…" : "Lista de espera"}
           </button>
         )}
         {status !== "pending" && (

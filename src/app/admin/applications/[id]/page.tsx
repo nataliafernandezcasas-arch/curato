@@ -21,6 +21,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
     .single();
 
   if (!app) return notFound();
+  const handle = app.instagram ? String(app.instagram).replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "") : null;
 
   // If approved, fetch creator profile
   let creator: {
@@ -63,71 +64,50 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
         ← Candidaturas
       </Link>
 
-      {/* Header */}
-      <div className="mb-10">
-        <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-4">
-          Curato · Admin · Candidature
-        </p>
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <h1 className="font-serif text-cifra font-light tracking-[0.28em] uppercase text-white">
-            {app.name}
-          </h1>
+      {/* Su perfil, como lo ve una casa: foto, Instagram, seguidores y dónde
+          está basado; debajo, todas sus fotos (Natalia, 2026-10-22). */}
+      <div className="mb-10 grid grid-cols-[96px_minmax(0,1fr)] items-start gap-5 sm:grid-cols-[140px_minmax(0,1fr)]">
+        {portfolio[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={portfolio[0]} alt="" className="aspect-[4/5] w-full rounded-[16px] object-cover" />
+        ) : (
+          <span className="flex aspect-[4/5] w-full items-center justify-center rounded-[16px] bg-white/5 font-serif text-grande text-champagne">
+            {String(app.name).slice(0, 1).toUpperCase()}
+          </span>
+        )}
+        <div className="min-w-0">
           <StatusPill status={app.status} />
+          <h1 className="mt-3 break-words font-titulo text-grande font-light text-white">{app.name}</h1>
+          {handle && (
+            <a
+              href={`https://instagram.com/${handle}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 block truncate text-corps text-champagne hover:text-white"
+            >
+              @{handle}
+            </a>
+          )}
+          {app.followers != null && (
+            <p className="mt-3 text-corps text-white">
+              <span className="text-sous-titre tabular-nums">{Number(app.followers).toLocaleString("fr-FR")}</span>
+              <span className="text-white/50"> abonnés</span>
+            </p>
+          )}
+          {Array.isArray(app.cities) && app.cities.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {(app.cities as string[]).map((c) => (
+                <span key={c} className="rounded-full border border-champagne/40 px-3 py-1 text-legende text-white/80">{c}</span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Info grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10 mb-10">
-        <InfoBlock label="Type" value={app.type === "creator" ? "Créateur · Creador" : "Maison · Casa"} />
-        <InfoBlock label="Email" value={app.email} href={`mailto:${app.email}`} />
-        {app.instagram && (
-          <InfoBlock
-            label="Instagram"
-            value={app.instagram.startsWith("@") ? app.instagram : `@${app.instagram}`}
-            href={`https://instagram.com/${app.instagram.replace("@", "")}`}
-            external
-          />
-        )}
-        {app.website && (
-          <InfoBlock
-            label="Sitio web"
-            value={app.website.replace(/^https?:\/\//, "")}
-            href={app.website}
-            external
-          />
-        )}
-        <InfoBlock
-          label="Fecha"
-          value={new Date(app.created_at).toLocaleDateString("es-ES", {
-            day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit",
-          })}
-        />
-      </div>
-
-      {/* Message */}
-      {app.message && (
-        <div className="border border-white/10 bg-white/5 p-8 mb-10">
-          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">Mensaje</p>
-          <p className="font-serif text-corps font-light text-white/70 leading-relaxed italic">
-            "{app.message}"
-          </p>
-        </div>
-      )}
-
-      {/* Le regard */}
-      {app.photo_style && (
-        <div className="border border-white/10 bg-white/5 p-8 mb-10">
-          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">Su mirada</p>
-          <p className="font-serif text-corps font-light text-white/70 leading-relaxed">
-            {app.photo_style}
-          </p>
-        </div>
-      )}
 
       {portfolio.length > 0 && (
         <div className="mb-10">
           <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">
-            Portfolio · {portfolio.length} {portfolio.length === 1 ? "foto" : "fotos"}
+            Portfolio · {portfolio.length} {portfolio.length === 1 ? "photo" : "photos"}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {portfolio.map((url, i) => (
@@ -136,7 +116,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block aspect-square border border-white/10 hover:border-champagne/40 transition-colors"
+                className="block aspect-[4/5] overflow-hidden rounded-[10px] border border-white/10 hover:border-champagne/40 transition-colors"
               >
                 {/* Signed, short-lived, one-off URLs: next/image would try to cache
                     and optimise something that stops existing within the hour. */}
@@ -153,6 +133,37 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
           Sin portfolio. Candidatura enviada antes de que el formulario lo pidiera.
         </p>
       )}
+
+      {/* Le regard */}
+      {app.photo_style && (
+        <div className="border border-white/10 bg-white/5 p-8 mb-10">
+          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">Su mirada</p>
+          <p className="font-serif text-corps font-light text-white/70 leading-relaxed">{app.photo_style}</p>
+        </div>
+      )}
+
+      {/* Message */}
+      {app.message && (
+        <div className="border border-white/10 bg-white/5 p-8 mb-10">
+          <p className="font-serif text-capitale tracking-[0.3em] uppercase text-champagne/40 mb-4">Mensaje</p>
+          <p className="font-serif text-corps font-light text-white/70 leading-relaxed italic">&ldquo;{app.message}&rdquo;</p>
+        </div>
+      )}
+
+      {/* Info grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10 mb-10">
+        <InfoBlock label="Type" value={app.type === "creator" ? "Créateur · Creador" : "Maison · Casa"} />
+        <InfoBlock label="Email" value={app.email} href={`mailto:${app.email}`} />
+        {app.website && (
+          <InfoBlock label="Sitio web" value={app.website.replace(/^https?:\/\//, "")} href={app.website} external />
+        )}
+        <InfoBlock
+          label="Fecha"
+          value={new Date(app.created_at).toLocaleDateString("es-ES", {
+            day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit",
+          })}
+        />
+      </div>
 
       {/* Actions */}
       <ApplicationActions
@@ -197,15 +208,17 @@ function StatusPill({ status }: { status: string }) {
     approved: "text-emerald-300 border-emerald-400/40 bg-emerald-400/10",
     rejected: "text-red-400 border-red-400/40 bg-red-400/10",
     deleted: "text-white/25 border-white/10 bg-white/5",
+    waitlist: "text-sky-300 border-sky-400/40 bg-sky-400/10",
   };
   const labels: Record<string, string> = {
     pending: "Pendiente",
     approved: "Aceptada",
     rejected: "Rechazada",
     deleted: "Borrada",
+    waitlist: "Lista de espera",
   };
   return (
-    <span className={`font-serif text-capitale tracking-[0.25em] uppercase border px-3 py-1.5 ${styles[status] ?? styles.pending}`}>
+    <span className={`inline-block font-serif text-capitale tracking-[0.25em] uppercase border px-3 py-1.5 ${styles[status] ?? styles.pending}`}>
       {labels[status] ?? status}
     </span>
   );

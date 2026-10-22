@@ -82,7 +82,7 @@ export async function PATCH(request: NextRequest) {
   if (!ok) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const { id, status, followers, budget } = await request.json();
-  if (!id || !["approved", "rejected", "deleted", "pending"].includes(status)) {
+  if (!id || !["approved", "rejected", "deleted", "pending", "waitlist"].includes(status)) {
     return NextResponse.json({ error: "Parámetros inválidos" }, { status: 400 });
   }
 
@@ -108,7 +108,8 @@ export async function PATCH(request: NextRequest) {
     .eq("id", id);
   if (statusErr) return NextResponse.json({ error: statusErr.message }, { status: 500 });
 
-  if (status === "deleted" || status === "pending") {
+  // La lista de espera no avisa a nadie: es solo para revisarla después.
+  if (status === "deleted" || status === "pending" || status === "waitlist") {
     return NextResponse.json({ ok: true });
   }
 
@@ -157,6 +158,13 @@ export async function PATCH(request: NextRequest) {
         ...(followers != null ? { followers } : {}),
       }, { onConflict: "email" });
       if (creatorErr) console.error("Creator upsert error:", creatorErr);
+      // Dónde está basado, de su candidatura (migración 056), aparte y tolerante.
+      const { data: conCiudades } = await supabase.from("applications").select("cities").eq("id", id).maybeSingle();
+      const ciudades = (conCiudades as { cities?: string[] | null } | null)?.cities;
+      if (ciudades?.length) {
+        const { error: ciudadesErr } = await supabase.from("creators").update({ cities: ciudades }).eq("email", app.email);
+        if (ciudadesErr) console.error("Creator cities error:", ciudadesErr.message);
+      }
     } else if (app.type === "business" || app.type === "maison") {
       const { error: comercioErr } = await supabase.from("comercios").upsert({
         name: app.name,
