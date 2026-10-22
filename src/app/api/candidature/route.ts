@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { avisar, AVISOS } from "@/lib/push/avisos";
 import {
   PORTFOLIO_BUCKET,
   PORTFOLIO_MIN,
@@ -210,6 +211,18 @@ export async function POST(req: NextRequest) {
   const photoStyle = str("photo_style");
   const age_confirmed = formData.get("age_confirmed") === "true";
   const terms_accepted = formData.get("terms_accepted") === "true";
+  // Sus seguidores y las ciudades donde está basado (migración 056).
+  const seguidores = Number((str("followers") ?? "").replace(/\D/g, "")) || null;
+  const ciudades = (() => {
+    try {
+      const v = JSON.parse(str("cities") || "[]");
+      return Array.isArray(v)
+        ? [...new Set(v.filter((c): c is string => typeof c === "string").map((c) => c.trim().slice(0, 60)).filter(Boolean))].slice(0, 6)
+        : [];
+    } catch {
+      return [];
+    }
+  })();
   const photos = formData.getAll("photos").filter((f): f is File => f instanceof File && f.size > 0);
 
   if (!type || !name || !email) {
@@ -294,6 +307,15 @@ export async function POST(req: NextRequest) {
   // upload we would rather hold an application with a thin portfolio than lose
   // the candidature altogether, so a failure here is logged, not fatal.
   const applicationId = inserted.id as string;
+
+  // Aparte y tolerante: sin la migración 056 la candidatura se guarda igual.
+  if (seguidores != null || ciudades.length > 0) {
+    const { error: extraErr } = await createAdminClient()
+      .from("applications")
+      .update({ followers: seguidores, cities: ciudades.length ? ciudades : null })
+      .eq("id", applicationId);
+    if (extraErr) console.error("candidature: seguidores y ciudades no guardados", extraErr.message);
+  }
   const uploadedPaths: string[] = [];
 
   if (photos.length > 0) {
@@ -343,6 +365,17 @@ export async function POST(req: NextRequest) {
     ]);
   } catch (emailErr) {
     console.error("Email send error:", emailErr);
+  }
+
+  // Y en el teléfono de cada admin, que abre la candidatura (Natalia,
+  // 2026-10-22).
+  try {
+    const { data: admins } = await createAdminClient().from("admin_users").select("user_id");
+    for (const a of admins ?? []) {
+      await avisar({ ownerId: a.user_id as string }, AVISOS.nuevaCandidatura(name, type === "creator", applicationId));
+    }
+  } catch (avisoErr) {
+    console.error("candidature: aviso a los admins no enviado", avisoErr);
   }
 
   return NextResponse.json({ ok: true });

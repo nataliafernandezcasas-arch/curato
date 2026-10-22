@@ -56,6 +56,14 @@ export const AVISOS = {
     agrupar: `cifras-${id}`,
   }),
 
+  // A cada admin: una candidatura nueva. Abre la candidatura en el admin.
+  nuevaCandidatura: (nombre: string, storyteller: boolean, id: string): Aviso => ({
+    titulo: "Nouvelle candidature",
+    cuerpo: `${nombre} · ${storyteller ? "storyteller" : "maison"}`,
+    ruta: `/admin/applications/${id}`,
+    agrupar: `candidature-${id}`,
+  }),
+
   // Confirmar que va (migración 046): 24 h antes a quien reservó con más de
   // 24 h, y un recordatorio 6 h antes si no contestó. Abren la página de
   // confirmar, con las reglas del crédito a la vista.

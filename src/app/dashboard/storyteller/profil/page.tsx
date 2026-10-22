@@ -1,5 +1,6 @@
 "use client";
 
+import { CiudadesPerfil } from "./ciudades-perfil";
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useLang } from "@/lib/i18n/LanguageContext";
@@ -182,6 +183,8 @@ export default function ProfilPage() {
 
         {/* Lo suyo, que la casa no ve así: el crédito, y lo que ha hecho en el
             club contado entero, con la portée que declaró visita a visita. */}
+        <CiudadesPerfil lang={lang} />
+
         <Section title={tp.figures} className="mt-seccion">
           <Row
             label={etiqueta(t.profileCredit)}
