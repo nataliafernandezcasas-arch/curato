@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -57,7 +56,7 @@
      --font-serif se llama así por historia: 600 sitios usan la clase
      font-serif para el texto, y cambiarla aquí los cambia todos a la vez. */
   --font-serif: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-titulo: 'Cormorant Garamond', Georgia, serif;
+  --font-titulo: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
 
   /* ── La escala de Curato: capitale 11 · légende 13 · champ 14 (solo campos)
      · corps 15 · sous-titre 19 · titre / grande 28 · cifra 36. No se escribe

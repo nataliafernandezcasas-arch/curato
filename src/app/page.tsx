@@ -12,15 +12,15 @@ import { translations } from "@/lib/i18n/translations";
 const fade = (d: number = 0) => ({
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-60px" as const },
-  transition: { delay: d, duration: 0.9, ease: [0.16, 1, 0.3, 1] as const },
+  viewport: { once: true, margin: "0px 0px -8% 0px" as const },
+  transition: { delay: d, duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
 });
 
 const fadeIn = (d: number = 0) => ({
   initial: { opacity: 0 },
   whileInView: { opacity: 1 },
-  viewport: { once: true },
-  transition: { delay: d, duration: 1.1 },
+  viewport: { once: true, margin: "0px 0px -8% 0px" as const },
+  transition: { delay: d, duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
 });
 
 const catImgs = ["/Gastronomie.jpeg", "/Conscience.jpeg", "/Bien etre.jpeg", "/Hotelerie.jpeg"];
