@@ -62,6 +62,8 @@ const TEXTOS: Record<
     photosHint: string;
     download: string;
     rate: string;
+    share: string;
+    shareHint: string;
     invite: string;
     inviting: string;
     invited: string;
@@ -90,6 +92,8 @@ const TEXTOS: Record<
     photosHint: "En haute définition, pour vos réseaux, votre site ou votre presse. Elles restent exclusives 90 jours après la visite.",
     download: "Télécharger",
     rate: "Voir la visite et donner votre avis",
+    share: "Partager le rapport (PDF)",
+    shareHint: "Pour l'envoyer à votre équipe ou à la direction.",
     invite: "Inviter à nouveau",
     inviting: "Envoi…",
     invited: "Invitation envoyée",
@@ -117,6 +121,8 @@ const TEXTOS: Record<
     photosHint: "In high definition, for your social media, website or press. They stay exclusive for 90 days after the visit.",
     download: "Download",
     rate: "See the visit and leave a review",
+    share: "Share the report (PDF)",
+    shareHint: "To send it to your team or management.",
     invite: "Invite again",
     inviting: "Sending…",
     invited: "Invitation sent",
@@ -144,6 +150,8 @@ const TEXTOS: Record<
     photosHint: "En alta definición, para tus redes, tu web o tu prensa. Son exclusivas durante 90 días tras la visita.",
     download: "Descargar",
     rate: "Ver la visita y dar tu opinión",
+    share: "Compartir el informe (PDF)",
+    shareHint: "Para enviarlo a tu equipo o a la dirección.",
     invite: "Volver a invitar",
     inviting: "Enviando…",
     invited: "Invitación enviada",
@@ -266,6 +274,19 @@ export default function MaisonReport() {
           <span className="text-legende text-text-secondary">{t.visitsOf(informe.guaranteed)}</span>
         </p>
         {informe.belowMinimum && <p className="mt-fila max-w-[46ch] text-corps text-copper-vif">{t.below(informe.guaranteed)}</p>}
+
+        {/* El informe en PDF, para reenviarlo. Un enlace de verdad: en la app
+            abre la vista del PDF de iOS, con su botón de compartir. */}
+        <a
+          href={`/api/maison/report/pdf?month=${informe.month}&lang=${lang}`}
+          target="_blank"
+          rel="noopener"
+          title={t.shareHint}
+          className="mt-fila inline-flex min-h-11 items-center gap-bloque rounded-full border border-accent/45 px-4 text-legende text-accent transition-[transform,background-color] duration-150 ease-out hover:bg-accent/10 active:scale-[0.97]"
+        >
+          <DownloadSimple size={16} />
+          {t.share}
+        </a>
       </Rise>
 
       {informe.visits === 0 ? (
