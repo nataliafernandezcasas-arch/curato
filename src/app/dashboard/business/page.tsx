@@ -14,6 +14,7 @@ import MaisonProfile from "./maison-profile";
 import MaisonOffer from "./maison-offer";
 import MaisonBilling from "./maison-billing";
 import MaisonReport from "./maison-report";
+import MaisonContenus from "./maison-contenus";
 import MaisonDemandes from "./maison-demandes";
 import { DossierPane } from "./storyteller-dossier";
 import type { Dossier } from "@/lib/storyteller-dossier";
@@ -345,6 +346,8 @@ function MaisonDashboard() {
           // El informe encabeza la sección: primero cuánto sirvió el mes, y
           // debajo quién vino exactamente.
           <MaisonReport />
+        ) : tab === "library" ? (
+          <MaisonContenus />
         ) : tab === "billing" ? (
           <MaisonBilling />
         ) : tab === "directory" ? (

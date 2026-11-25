@@ -362,6 +362,23 @@ export async function sendRecruiterWelcome(to: string, o: { name: string; email:
   );
 }
 
+/** Una casa invita otra vez al storyteller (migración 057). */
+export async function sendInvitacionCasa(to: string, o: { nombre: string; maison: string; maisonId: string }) {
+  return sendEmail(
+    to,
+    `Curato · ${o.maison} aimerait vous recevoir à nouveau`,
+    aviso({
+      capital: "Une invitation",
+      titulo: first(o.nombre) ? `Bonjour, ${first(o.nombre)}` : "Bonjour",
+      parrafos: [
+        `${o.maison} a aimé votre visite et vous invite à revenir.`,
+        "Choisissez une date dans l'application, quand cela vous convient. Votre crédit du mois s'applique comme d'habitude.",
+      ],
+      enlace: { label: "Choisir une date", url: `${SITE}/dashboard/storyteller/maison/${o.maisonId}` },
+    })
+  );
+}
+
 // Un segundo rol en una cuenta que ya existe: sin contraseña nueva.
 export async function sendRecruiterSecondRole(to: string, o: { name: string }) {
   return sendEmail(

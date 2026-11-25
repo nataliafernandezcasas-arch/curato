@@ -1,19 +1,20 @@
 import type { NavLink } from "../dashboard-nav";
 
-export type MaisonSection = "profile" | "demandes" | "roster" | "visitors" | "directory" | "billing";
+export type MaisonSection = "profile" | "demandes" | "roster" | "visitors" | "library" | "directory" | "billing";
 
 type T = {
   tabProfile: string;
   tabDemandes: string;
   tabRoster: string;
   tabVisitors: string;
+  tabLibrary: string;
   tabDirectory: string;
   navQrScan: string;
   navBilling: string;
   navCalendar: string;
 };
 
-const SECTIONS: string[] = ["profile", "demandes", "roster", "visitors", "directory", "billing"];
+const SECTIONS: string[] = ["profile", "demandes", "roster", "visitors", "library", "directory", "billing"];
 
 export function isMaisonSection(value: string | null): value is MaisonSection {
   return !!value && SECTIONS.includes(value);
@@ -45,6 +46,8 @@ export function MAISON_LINKS(t: T, current: MaisonSection | "reglages" | "qr" | 
     // Quién viene, cuándo y cuántos: lo que la sala mira antes del servicio. El
     // escáner del código vive ahí, con cada visita, y no en el menú.
     { href: "/dashboard/business/calendrier", label: t.navCalendar, active: current === "calendrier" },
+    // Todas las fotos de las visitas, con su exclusividad.
+    { href: at("library"), label: t.tabLibrary, active: current === "library" },
     { href: at("roster"), label: t.tabRoster, active: current === "roster" },
     { href: at("directory"), label: t.tabDirectory, active: current === "directory" },
     { href: at("billing"), label: t.navBilling, active: current === "billing" },

@@ -9,6 +9,7 @@ import { translations } from "@/lib/i18n/translations";
 import { isBeforeLaunch, LAUNCH_AT, canBypassLaunchGate } from "@/lib/launch";
 import ConnectInstagram from "./connect-instagram";
 import SuggestVenue from "./suggest-venue";
+import Invitaciones from "./invitaciones";
 import { Rise } from "@/components/member/motion";
 import { Row } from "@/components/member/row";
 import { Section } from "@/components/member/section";
@@ -341,6 +342,9 @@ export default function InfluencerDashboard() {
         )}
 
         {!profileLoading && profile && <ConnectInstagram connected={!!profile.instagram_connected} />}
+
+        {/* Las casas que le invitan a volver (migración 057). */}
+        <Invitaciones lang={lang} />
 
         {gated ? (
           <div className="py-respiro text-center">

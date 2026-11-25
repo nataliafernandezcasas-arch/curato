@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
@@ -14,6 +14,7 @@ import { CaretLeft, CaretRight, DownloadSimple } from "@/components/member/icono
 type Foto = { url: string; download: string };
 type Storyteller = {
   id: string;
+  creatorId: string;
   name: string;
   handle: string | null;
   portrait: string | null;
@@ -53,6 +54,7 @@ const TEXTOS: Record<
     engagement: string;
     evolution: string;
     evolutionHint: string;
+    monthLabel: (m: string, n: number) => string;
     storytellers: string;
     followers: (x: string) => string;
     exclusiveUntil: (d: string) => string;
@@ -60,6 +62,12 @@ const TEXTOS: Record<
     photosHint: string;
     download: string;
     rate: string;
+    share: string;
+    shareHint: string;
+    invite: string;
+    inviting: string;
+    invited: string;
+    inviteHint: string;
   }
 > = {
   fr: {
@@ -75,7 +83,8 @@ const TEXTOS: Record<
     interactions: "Interactions",
     engagement: "Taux d'interaction",
     evolution: "Les six derniers mois",
-    evolutionHint: "Comptes atteints chaque mois, et le nombre de visites.",
+    evolutionHint: "Comptes atteints chaque mois, et le nombre de visites. Touchez un mois pour voir qui est venu.",
+    monthLabel: (m, n) => `${m} : ${n} ${n === 1 ? "visite" : "visites"}`,
     storytellers: "Les storytellers reçus",
     followers: (x) => `${x} abonnés`,
     exclusiveUntil: (d) => `Photos en exclusivité jusqu'au ${d}`,
@@ -83,6 +92,12 @@ const TEXTOS: Record<
     photosHint: "En haute définition, pour vos réseaux, votre site ou votre presse. Elles restent exclusives 90 jours après la visite.",
     download: "Télécharger",
     rate: "Voir la visite et donner votre avis",
+    share: "Partager le rapport (PDF)",
+    shareHint: "Pour l'envoyer à votre équipe ou à la direction.",
+    invite: "Inviter à nouveau",
+    inviting: "Envoi…",
+    invited: "Invitation envoyée",
+    inviteHint: "Le storyteller reçoit une notification et un e-mail pour choisir une date.",
   },
   en: {
     kicker: "Monthly report",
@@ -97,7 +112,8 @@ const TEXTOS: Record<
     interactions: "Interactions",
     engagement: "Engagement rate",
     evolution: "The last six months",
-    evolutionHint: "Accounts reached each month, and the number of visits.",
+    evolutionHint: "Accounts reached each month, and the number of visits. Tap a month to see who came.",
+    monthLabel: (m, n) => `${m}: ${n} ${n === 1 ? "visit" : "visits"}`,
     storytellers: "Storytellers you hosted",
     followers: (x) => `${x} followers`,
     exclusiveUntil: (d) => `Photos exclusive until ${d}`,
@@ -105,6 +121,12 @@ const TEXTOS: Record<
     photosHint: "In high definition, for your social media, website or press. They stay exclusive for 90 days after the visit.",
     download: "Download",
     rate: "See the visit and leave a review",
+    share: "Share the report (PDF)",
+    shareHint: "To send it to your team or management.",
+    invite: "Invite again",
+    inviting: "Sending…",
+    invited: "Invitation sent",
+    inviteHint: "The storyteller gets a notification and an email to pick a date.",
   },
   es: {
     kicker: "Informe mensual",
@@ -119,7 +141,8 @@ const TEXTOS: Record<
     interactions: "Interacciones",
     engagement: "Tasa de interacción",
     evolution: "Los últimos seis meses",
-    evolutionHint: "Cuentas alcanzadas cada mes, y el número de visitas.",
+    evolutionHint: "Cuentas alcanzadas cada mes, y el número de visitas. Toca un mes para ver quién vino.",
+    monthLabel: (m, n) => `${m}: ${n} ${n === 1 ? "visita" : "visitas"}`,
     storytellers: "Los storytellers recibidos",
     followers: (x) => `${x} seguidores`,
     exclusiveUntil: (d) => `Fotos en exclusiva hasta el ${d}`,
@@ -127,6 +150,12 @@ const TEXTOS: Record<
     photosHint: "En alta definición, para tus redes, tu web o tu prensa. Son exclusivas durante 90 días tras la visita.",
     download: "Descargar",
     rate: "Ver la visita y dar tu opinión",
+    share: "Compartir el informe (PDF)",
+    shareHint: "Para enviarlo a tu equipo o a la dirección.",
+    invite: "Volver a invitar",
+    inviting: "Enviando…",
+    invited: "Invitación enviada",
+    inviteHint: "El storyteller recibe un aviso y un correo para elegir una fecha.",
   },
 };
 
@@ -148,11 +177,50 @@ export default function MaisonReport() {
   const [informe, setInforme] = useState<Informe | null>(null);
   const [cargando, setCargando] = useState(true);
   const [visor, setVisor] = useState<number | null>(null);
+  // Los seis meses del gráfico se quedan fijos al tocar una barra: si no,
+  // el mes elegido pasaría a ser el último y las barras se moverían.
+  const [ventana, setVentana] = useState<Informe["evolution"] | null>(null);
+  // Al tocar un mes, bajar hasta los storytellers de ese mes cuando lleguen.
+  const irALista = useRef(false);
+  const lista = useRef<HTMLDivElement>(null);
+  // « Inviter à nouveau » (migración 057): a quién se invitó estos 30 días.
+  const [invitados, setInvitados] = useState<Set<string>>(new Set());
+  const [invitando, setInvitando] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/maison/invitar")
+      .then((r) => r.json())
+      .then((d) => setInvitados(new Set<string>(d.invitados ?? [])))
+      .catch(() => {});
+  }, []);
+
+  async function invitar(s: Storyteller) {
+    setInvitando(s.creatorId);
+    try {
+      const r = await fetch("/api/maison/invitar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reservationId: s.id }),
+      });
+      if (r.ok) setInvitados((v) => new Set(v).add(s.creatorId));
+    } finally {
+      setInvitando(null);
+    }
+  }
 
   useEffect(() => {
     fetch(`/api/maison/report${mes ? `?month=${mes}` : ""}`)
       .then((r) => r.json())
-      .then((d) => setInforme(d.error ? null : d))
+      .then((d) => {
+        if (d.error) return setInforme(null);
+        setInforme(d);
+        setVentana((v) => (v && v.some((e) => e.month === d.month) ? v : d.evolution));
+        if (irALista.current) {
+          irALista.current = false;
+          // Después de pintar el mes nuevo.
+          setTimeout(() => lista.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+        }
+      })
       .catch(() => setInforme(null))
       .finally(() => setCargando(false));
   }, [mes]);
@@ -171,7 +239,16 @@ export default function MaisonReport() {
   };
   const esEsteMes = informe.month === new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Paris" }).slice(0, 7);
   const pendientes = informe.visits - informe.reach.declared;
-  const maxCuentas = Math.max(1, ...informe.evolution.map((e) => e.accounts));
+  const barras = ventana ?? informe.evolution;
+  const maxCuentas = Math.max(1, ...barras.map((e) => e.accounts));
+  const elegirMes = (m: string) => {
+    if (m === informe.month) {
+      lista.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    irALista.current = true;
+    setMes(m);
+  };
 
   return (
     <div>
@@ -197,6 +274,19 @@ export default function MaisonReport() {
           <span className="text-legende text-text-secondary">{t.visitsOf(informe.guaranteed)}</span>
         </p>
         {informe.belowMinimum && <p className="mt-fila max-w-[46ch] text-corps text-copper-vif">{t.below(informe.guaranteed)}</p>}
+
+        {/* El informe en PDF, para reenviarlo. Un enlace de verdad: en la app
+            abre la vista del PDF de iOS, con su botón de compartir. */}
+        <a
+          href={`/api/maison/report/pdf?month=${informe.month}&lang=${lang}`}
+          target="_blank"
+          rel="noopener"
+          title={t.shareHint}
+          className="mt-fila inline-flex min-h-11 items-center gap-bloque rounded-full border border-accent/45 px-4 text-legende text-accent transition-[transform,background-color] duration-150 ease-out hover:bg-accent/10 active:scale-[0.97]"
+        >
+          <DownloadSimple size={16} />
+          {t.share}
+        </a>
       </Rise>
 
       {informe.visits === 0 ? (
@@ -222,25 +312,33 @@ export default function MaisonReport() {
       {/* La evolución: barras de cuentas alcanzadas, con las visitas encima. */}
       <Section title={t.evolution} hint={t.evolutionHint} className="mt-seccion">
         <div className="flex h-40 items-end gap-bloque">
-          {informe.evolution.map((e) => {
+          {barras.map((e) => {
             const actual = e.month === informe.month;
+            const corto = new Date(`${e.month}-01T12:00:00Z`).toLocaleDateString(lang, { month: "short" }).replace(".", "");
+            const largo = new Date(`${e.month}-01T12:00:00Z`).toLocaleDateString(lang, { month: "long", year: "numeric" });
             return (
-              <div key={e.month} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-etiqueta">
-                <span className="text-legende tabular-nums text-text-secondary">{e.visits}</span>
+              <button
+                key={e.month}
+                type="button"
+                onClick={() => elegirMes(e.month)}
+                aria-pressed={actual}
+                aria-label={t.monthLabel(largo, e.visits)}
+                className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-etiqueta transition-transform duration-150 ease-out active:scale-[0.97]"
+              >
+                <span className={`text-legende tabular-nums ${actual ? "text-text-primary" : "text-text-secondary"}`}>{e.visits}</span>
                 <div
-                  className={`w-full rounded-t-[6px] ${actual ? "bg-accent" : "bg-accent/35"}`}
+                  className={`w-full rounded-t-[6px] transition-colors duration-200 ${actual ? "bg-accent" : "bg-accent/35 group-hover:bg-accent/55"}`}
                   style={{ height: `${Math.max(4, (e.accounts / maxCuentas) * 100)}%` }}
-                  title={`${e.accounts.toLocaleString(lang)}`}
                 />
-                <span className={`text-capitale uppercase ${actual ? "text-accent" : "text-text-muted"}`}>
-                  {new Date(`${e.month}-01T12:00:00Z`).toLocaleDateString(lang, { month: "short" }).replace(".", "")}
-                </span>
-              </div>
+                <span className={`text-capitale uppercase ${actual ? "text-accent" : "text-text-muted"}`}>{corto}</span>
+              </button>
             );
           })}
         </div>
       </Section>
 
+      {/* Ancla: al tocar un mes del gráfico, se baja hasta aquí. */}
+      <div ref={lista} className="scroll-mt-24" />
       {informe.storytellers.length > 0 && (
         <Section title={t.storytellers} className="mt-seccion">
           <div className="space-y-fila">
@@ -273,12 +371,27 @@ export default function MaisonReport() {
                 {s.rightsExpiresAt && s.photos.length > 0 && (
                   <p className="mt-fila text-legende text-sauge-vif">{t.exclusiveUntil(fecha(s.rightsExpiresAt))}</p>
                 )}
-                <Link
-                  href={`/dashboard/business/calendrier/${s.id}`}
-                  className="mt-bloque inline-flex min-h-11 items-center text-legende text-accent underline underline-offset-4"
-                >
-                  {t.rate}
-                </Link>
+                <div className="mt-bloque flex flex-wrap items-center gap-x-fila">
+                  <Link
+                    href={`/dashboard/business/calendrier/${s.id}`}
+                    className="inline-flex min-h-11 items-center text-legende text-accent underline underline-offset-4"
+                  >
+                    {t.rate}
+                  </Link>
+                  {invitados.has(s.creatorId) ? (
+                    <span className="inline-flex min-h-11 items-center text-legende text-sauge-vif">{t.invited}</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => invitar(s)}
+                      disabled={invitando === s.creatorId}
+                      title={t.inviteHint}
+                      className="inline-flex min-h-11 items-center rounded-full border border-accent/45 px-4 text-legende text-accent transition-[transform,background-color] duration-150 ease-out hover:bg-accent/10 active:scale-[0.97] disabled:opacity-60"
+                    >
+                      {invitando === s.creatorId ? t.inviting : t.invite}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
