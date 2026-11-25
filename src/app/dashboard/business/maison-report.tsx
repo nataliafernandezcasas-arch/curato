@@ -311,7 +311,7 @@ export default function MaisonReport() {
 
       {/* La evolución: barras de cuentas alcanzadas, con las visitas encima. */}
       <Section title={t.evolution} hint={t.evolutionHint} className="mt-seccion">
-        <div className="flex h-40 items-end gap-bloque">
+        <div className="flex h-48 items-end gap-bloque">
           {barras.map((e) => {
             const actual = e.month === informe.month;
             const corto = new Date(`${e.month}-01T12:00:00Z`).toLocaleDateString(lang, { month: "short" }).replace(".", "");
@@ -330,7 +330,16 @@ export default function MaisonReport() {
                   className={`w-full rounded-t-[6px] transition-colors duration-200 ${actual ? "bg-accent" : "bg-accent/35 group-hover:bg-accent/55"}`}
                   style={{ height: `${Math.max(4, (e.accounts / maxCuentas) * 100)}%` }}
                 />
-                <span className={`text-capitale uppercase ${actual ? "text-accent" : "text-text-muted"}`}>{corto}</span>
+                {/* El mes, con forma de botón: relleno el que se está viendo. */}
+                <span
+                  className={`mt-etiqueta inline-flex min-h-8 w-full items-center justify-center rounded-full border text-capitale uppercase transition-colors duration-200 ${
+                    actual
+                      ? "border-accent bg-accent text-charcoal-deep"
+                      : "border-accent/35 text-text-secondary group-hover:border-accent group-hover:text-accent"
+                  }`}
+                >
+                  {corto}
+                </span>
               </button>
             );
           })}
