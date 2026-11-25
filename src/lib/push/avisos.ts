@@ -56,6 +56,15 @@ export const AVISOS = {
     agrupar: `cifras-${id}`,
   }),
 
+  // Una casa invita otra vez al storyteller (migración 057). Abre la casa,
+  // donde está el botón para reservar.
+  invitacionCasa: (maison: string, id: string): Aviso => ({
+    titulo: `${maison} aimerait vous recevoir à nouveau`,
+    cuerpo: "Votre dernière visite leur a plu. Choisissez une date quand vous voulez.",
+    ruta: `${CARNET}/maison/${id}`,
+    agrupar: `invitation-${id}`,
+  }),
+
   // A cada admin: una candidatura nueva. Abre la candidatura en el admin.
   nuevaCandidatura: (nombre: string, storyteller: boolean, id: string): Aviso => ({
     titulo: "Nouvelle candidature",

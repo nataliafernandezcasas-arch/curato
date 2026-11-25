@@ -5,6 +5,7 @@ import { Medio } from "@/components/member/medio";
 import { VIDEO_MAX_S } from "@/lib/medio";
 import type { CasaTarjeta } from "@/components/member/tarjeta-casa";
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Button, ButtonLink, LabelButton } from "@/components/member/button";
 import type { Lang } from "@/lib/i18n/translations";
 import { createClient } from "@/lib/supabase/client";
@@ -48,6 +49,13 @@ function duracion(file: File): Promise<number> {
     v.src = url;
   });
 }
+
+// Pedir volver a una casa ya visitada.
+const REVENIR: Record<Lang, (maison: string) => string> = {
+  fr: (m) => `Revenir chez ${m}`,
+  en: (m) => `Go back to ${m}`,
+  es: (m) => `Volver a ${m}`,
+};
 
 export type Reach = { views: number | null; accounts: number | null; interactions: number | null };
 
@@ -533,6 +541,16 @@ export function PanelVisita({
         </div>
 
         {visit.canRate && <Valoracion id={visit.id} inicial={visit.rating ?? null} lang={lang} />}
+
+        {/* Pedir volver: la reserva de siempre, en esta casa. */}
+        {visit.status === "completed" && visit.casa?.id && (
+          <Link
+            href={`/dashboard/storyteller/maison/${visit.casa.id}/reserver`}
+            className="mt-fila inline-flex min-h-11 items-center rounded-full border border-accent/45 px-4 text-legende text-accent transition-[transform,background-color] duration-150 ease-out hover:bg-accent/10 active:scale-[0.97]"
+          >
+            {REVENIR[lang](visit.maison)}
+          </Link>
+        )}
       </div>
     );
   }

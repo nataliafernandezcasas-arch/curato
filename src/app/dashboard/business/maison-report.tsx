@@ -14,6 +14,7 @@ import { CaretLeft, CaretRight, DownloadSimple } from "@/components/member/icono
 type Foto = { url: string; download: string };
 type Storyteller = {
   id: string;
+  creatorId: string;
   name: string;
   handle: string | null;
   portrait: string | null;
@@ -61,6 +62,10 @@ const TEXTOS: Record<
     photosHint: string;
     download: string;
     rate: string;
+    invite: string;
+    inviting: string;
+    invited: string;
+    inviteHint: string;
   }
 > = {
   fr: {
@@ -85,6 +90,10 @@ const TEXTOS: Record<
     photosHint: "En haute définition, pour vos réseaux, votre site ou votre presse. Elles restent exclusives 90 jours après la visite.",
     download: "Télécharger",
     rate: "Voir la visite et donner votre avis",
+    invite: "Inviter à nouveau",
+    inviting: "Envoi…",
+    invited: "Invitation envoyée",
+    inviteHint: "Le storyteller reçoit une notification et un e-mail pour choisir une date.",
   },
   en: {
     kicker: "Monthly report",
@@ -108,6 +117,10 @@ const TEXTOS: Record<
     photosHint: "In high definition, for your social media, website or press. They stay exclusive for 90 days after the visit.",
     download: "Download",
     rate: "See the visit and leave a review",
+    invite: "Invite again",
+    inviting: "Sending…",
+    invited: "Invitation sent",
+    inviteHint: "The storyteller gets a notification and an email to pick a date.",
   },
   es: {
     kicker: "Informe mensual",
@@ -131,6 +144,10 @@ const TEXTOS: Record<
     photosHint: "En alta definición, para tus redes, tu web o tu prensa. Son exclusivas durante 90 días tras la visita.",
     download: "Descargar",
     rate: "Ver la visita y dar tu opinión",
+    invite: "Volver a invitar",
+    inviting: "Enviando…",
+    invited: "Invitación enviada",
+    inviteHint: "El storyteller recibe un aviso y un correo para elegir una fecha.",
   },
 };
 
@@ -158,6 +175,30 @@ export default function MaisonReport() {
   // Al tocar un mes, bajar hasta los storytellers de ese mes cuando lleguen.
   const irALista = useRef(false);
   const lista = useRef<HTMLDivElement>(null);
+  // « Inviter à nouveau » (migración 057): a quién se invitó estos 30 días.
+  const [invitados, setInvitados] = useState<Set<string>>(new Set());
+  const [invitando, setInvitando] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/maison/invitar")
+      .then((r) => r.json())
+      .then((d) => setInvitados(new Set<string>(d.invitados ?? [])))
+      .catch(() => {});
+  }, []);
+
+  async function invitar(s: Storyteller) {
+    setInvitando(s.creatorId);
+    try {
+      const r = await fetch("/api/maison/invitar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reservationId: s.id }),
+      });
+      if (r.ok) setInvitados((v) => new Set(v).add(s.creatorId));
+    } finally {
+      setInvitando(null);
+    }
+  }
 
   useEffect(() => {
     fetch(`/api/maison/report${mes ? `?month=${mes}` : ""}`)
@@ -309,12 +350,27 @@ export default function MaisonReport() {
                 {s.rightsExpiresAt && s.photos.length > 0 && (
                   <p className="mt-fila text-legende text-sauge-vif">{t.exclusiveUntil(fecha(s.rightsExpiresAt))}</p>
                 )}
-                <Link
-                  href={`/dashboard/business/calendrier/${s.id}`}
-                  className="mt-bloque inline-flex min-h-11 items-center text-legende text-accent underline underline-offset-4"
-                >
-                  {t.rate}
-                </Link>
+                <div className="mt-bloque flex flex-wrap items-center gap-x-fila">
+                  <Link
+                    href={`/dashboard/business/calendrier/${s.id}`}
+                    className="inline-flex min-h-11 items-center text-legende text-accent underline underline-offset-4"
+                  >
+                    {t.rate}
+                  </Link>
+                  {invitados.has(s.creatorId) ? (
+                    <span className="inline-flex min-h-11 items-center text-legende text-sauge-vif">{t.invited}</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => invitar(s)}
+                      disabled={invitando === s.creatorId}
+                      title={t.inviteHint}
+                      className="inline-flex min-h-11 items-center rounded-full border border-accent/45 px-4 text-legende text-accent transition-[transform,background-color] duration-150 ease-out hover:bg-accent/10 active:scale-[0.97] disabled:opacity-60"
+                    >
+                      {invitando === s.creatorId ? t.inviting : t.invite}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

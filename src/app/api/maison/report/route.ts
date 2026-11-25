@@ -106,6 +106,7 @@ export async function GET(request: NextRequest) {
         const interacciones = (r.reach_interactions as number | null) ?? null;
         return {
           id: r.id as string,
+          creatorId: r.creator_id as string,
           name: c?.full_name ?? c?.handle ?? "",
           handle: c?.handle ?? null,
           portrait: retratos.get(r.creator_id) ?? null,
