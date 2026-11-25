@@ -1,18 +1,29 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Cormorant_Garamond } from "next/font/google";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import NativeShell from "./native-shell";
 import TemaSync from "./tema-sync";
 import { SCRIPT_TEMA } from "@/lib/tema";
 
+// Cormorant alojada con next/font: llega con la página y no hay salto de
+// letra al cargar (antes venía por @import de Google en globals.css).
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-cormorant",
+});
+
 export const metadata: Metadata = {
   title: "Curato — París",
-  description: "Un ecosistema curado donde creators y comercios construyen algo juntos. Invitation only. París.",
-  metadataBase: new URL("https://curato.co"),
+  description: "Un écosystème vivant qui unit storytellers et maisons d'exception à Paris. Sur invitation uniquement.",
+  metadataBase: new URL("https://www.curatocollective.com"),
   openGraph: {
     title: "Curato",
-    description: "Un ecosistema curado donde creators y comercios construyen algo juntos.",
-    url: "https://curato.co",
+    description: "Jamais une campagne. Toujours une histoire.",
+    url: "https://www.curatocollective.com",
     siteName: "Curato",
     images: [{ url: "/api/og", width: 1200, height: 630, alt: "Curato" }],
     type: "website",
@@ -20,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Curato",
-    description: "Experiencias reales. Contenido auténtico.",
+    description: "Jamais une campagne. Toujours une histoire.",
     images: ["/api/og"],
   },
   icons: {
@@ -56,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     // El script del tema pone data-theme en el <html> antes de la primera
     // pintura, así que el atributo no coincide con lo que renderiza React.
-    <html lang="fr" className="h-full" suppressHydrationWarning>
+    <html lang="fr" className={`h-full ${cormorant.variable}`} suppressHydrationWarning>
       <head>
         {/* Inline y en el <head>, no con next/script: beforeInteractive corre
             cuando carga el runtime de Next, después de pintar, y quien tiene el

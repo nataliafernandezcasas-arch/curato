@@ -49,7 +49,9 @@ export default function Footer() {
           src="/footer-floral.jpeg"
           alt=""
           style={{ x: imgX, y: imgY, scale: 1.2 }}
-          className="w-full h-full object-cover object-center will-change-transform"
+          loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-charcoal-deep/60" />
       </div>
