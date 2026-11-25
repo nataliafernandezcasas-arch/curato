@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLang } from "@/lib/i18n/LanguageContext";
 import type { Lang } from "@/lib/i18n/translations";
@@ -53,6 +53,7 @@ const TEXTOS: Record<
     engagement: string;
     evolution: string;
     evolutionHint: string;
+    monthLabel: (m: string, n: number) => string;
     storytellers: string;
     followers: (x: string) => string;
     exclusiveUntil: (d: string) => string;
@@ -75,7 +76,8 @@ const TEXTOS: Record<
     interactions: "Interactions",
     engagement: "Taux d'interaction",
     evolution: "Les six derniers mois",
-    evolutionHint: "Comptes atteints chaque mois, et le nombre de visites.",
+    evolutionHint: "Comptes atteints chaque mois, et le nombre de visites. Touchez un mois pour voir qui est venu.",
+    monthLabel: (m, n) => `${m} : ${n} ${n === 1 ? "visite" : "visites"}`,
     storytellers: "Les storytellers reçus",
     followers: (x) => `${x} abonnés`,
     exclusiveUntil: (d) => `Photos en exclusivité jusqu'au ${d}`,
@@ -97,7 +99,8 @@ const TEXTOS: Record<
     interactions: "Interactions",
     engagement: "Engagement rate",
     evolution: "The last six months",
-    evolutionHint: "Accounts reached each month, and the number of visits.",
+    evolutionHint: "Accounts reached each month, and the number of visits. Tap a month to see who came.",
+    monthLabel: (m, n) => `${m}: ${n} ${n === 1 ? "visit" : "visits"}`,
     storytellers: "Storytellers you hosted",
     followers: (x) => `${x} followers`,
     exclusiveUntil: (d) => `Photos exclusive until ${d}`,
@@ -119,7 +122,8 @@ const TEXTOS: Record<
     interactions: "Interacciones",
     engagement: "Tasa de interacción",
     evolution: "Los últimos seis meses",
-    evolutionHint: "Cuentas alcanzadas cada mes, y el número de visitas.",
+    evolutionHint: "Cuentas alcanzadas cada mes, y el número de visitas. Toca un mes para ver quién vino.",
+    monthLabel: (m, n) => `${m}: ${n} ${n === 1 ? "visita" : "visitas"}`,
     storytellers: "Los storytellers recibidos",
     followers: (x) => `${x} seguidores`,
     exclusiveUntil: (d) => `Fotos en exclusiva hasta el ${d}`,
@@ -148,11 +152,26 @@ export default function MaisonReport() {
   const [informe, setInforme] = useState<Informe | null>(null);
   const [cargando, setCargando] = useState(true);
   const [visor, setVisor] = useState<number | null>(null);
+  // Los seis meses del gráfico se quedan fijos al tocar una barra: si no,
+  // el mes elegido pasaría a ser el último y las barras se moverían.
+  const [ventana, setVentana] = useState<Informe["evolution"] | null>(null);
+  // Al tocar un mes, bajar hasta los storytellers de ese mes cuando lleguen.
+  const irALista = useRef(false);
+  const lista = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch(`/api/maison/report${mes ? `?month=${mes}` : ""}`)
       .then((r) => r.json())
-      .then((d) => setInforme(d.error ? null : d))
+      .then((d) => {
+        if (d.error) return setInforme(null);
+        setInforme(d);
+        setVentana((v) => (v && v.some((e) => e.month === d.month) ? v : d.evolution));
+        if (irALista.current) {
+          irALista.current = false;
+          // Después de pintar el mes nuevo.
+          setTimeout(() => lista.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+        }
+      })
       .catch(() => setInforme(null))
       .finally(() => setCargando(false));
   }, [mes]);
@@ -171,7 +190,16 @@ export default function MaisonReport() {
   };
   const esEsteMes = informe.month === new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Paris" }).slice(0, 7);
   const pendientes = informe.visits - informe.reach.declared;
-  const maxCuentas = Math.max(1, ...informe.evolution.map((e) => e.accounts));
+  const barras = ventana ?? informe.evolution;
+  const maxCuentas = Math.max(1, ...barras.map((e) => e.accounts));
+  const elegirMes = (m: string) => {
+    if (m === informe.month) {
+      lista.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    irALista.current = true;
+    setMes(m);
+  };
 
   return (
     <div>
@@ -222,25 +250,33 @@ export default function MaisonReport() {
       {/* La evolución: barras de cuentas alcanzadas, con las visitas encima. */}
       <Section title={t.evolution} hint={t.evolutionHint} className="mt-seccion">
         <div className="flex h-40 items-end gap-bloque">
-          {informe.evolution.map((e) => {
+          {barras.map((e) => {
             const actual = e.month === informe.month;
+            const corto = new Date(`${e.month}-01T12:00:00Z`).toLocaleDateString(lang, { month: "short" }).replace(".", "");
+            const largo = new Date(`${e.month}-01T12:00:00Z`).toLocaleDateString(lang, { month: "long", year: "numeric" });
             return (
-              <div key={e.month} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-etiqueta">
-                <span className="text-legende tabular-nums text-text-secondary">{e.visits}</span>
+              <button
+                key={e.month}
+                type="button"
+                onClick={() => elegirMes(e.month)}
+                aria-pressed={actual}
+                aria-label={t.monthLabel(largo, e.visits)}
+                className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-etiqueta transition-transform duration-150 ease-out active:scale-[0.97]"
+              >
+                <span className={`text-legende tabular-nums ${actual ? "text-text-primary" : "text-text-secondary"}`}>{e.visits}</span>
                 <div
-                  className={`w-full rounded-t-[6px] ${actual ? "bg-accent" : "bg-accent/35"}`}
+                  className={`w-full rounded-t-[6px] transition-colors duration-200 ${actual ? "bg-accent" : "bg-accent/35 group-hover:bg-accent/55"}`}
                   style={{ height: `${Math.max(4, (e.accounts / maxCuentas) * 100)}%` }}
-                  title={`${e.accounts.toLocaleString(lang)}`}
                 />
-                <span className={`text-capitale uppercase ${actual ? "text-accent" : "text-text-muted"}`}>
-                  {new Date(`${e.month}-01T12:00:00Z`).toLocaleDateString(lang, { month: "short" }).replace(".", "")}
-                </span>
-              </div>
+                <span className={`text-capitale uppercase ${actual ? "text-accent" : "text-text-muted"}`}>{corto}</span>
+              </button>
             );
           })}
         </div>
       </Section>
 
+      {/* Ancla: al tocar un mes del gráfico, se baja hasta aquí. */}
+      <div ref={lista} className="scroll-mt-24" />
       {informe.storytellers.length > 0 && (
         <Section title={t.storytellers} className="mt-seccion">
           <div className="space-y-fila">
