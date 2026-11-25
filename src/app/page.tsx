@@ -23,7 +23,7 @@ const fadeIn = (d: number = 0) => ({
   transition: { delay: d, duration: 1.1 },
 });
 
-const catImgs = ["/Gastronomie.jpeg", "/Bien etre.jpeg", "/Conscience.jpeg", "/Hotelerie.jpeg"];
+const catImgs = ["/Gastronomie.jpeg", "/Conscience.jpeg", "/Bien etre.jpeg", "/Hotelerie.jpeg"];
 
 export default function Home() {
   const { lang } = useLang();

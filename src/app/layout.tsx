@@ -7,11 +7,11 @@ import { SCRIPT_TEMA } from "@/lib/tema";
 
 export const metadata: Metadata = {
   title: "Curato — París",
-  description: "Un ecosistema curado donde creators y comercios construyen algo juntos. Invitation only. París.",
+  description: "Un écosystème vivant qui unit storytellers et maisons d'exception à Paris. Sur invitation uniquement.",
   metadataBase: new URL("https://curato.co"),
   openGraph: {
     title: "Curato",
-    description: "Un ecosistema curado donde creators y comercios construyen algo juntos.",
+    description: "Jamais une campagne. Toujours une histoire.",
     url: "https://curato.co",
     siteName: "Curato",
     images: [{ url: "/api/og", width: 1200, height: 630, alt: "Curato" }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Curato",
-    description: "Experiencias reales. Contenido auténtico.",
+    description: "Jamais une campagne. Toujours une histoire.",
     images: ["/api/og"],
   },
   icons: {
