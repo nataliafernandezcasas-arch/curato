@@ -9,6 +9,7 @@ import {
   useSpring,
   useAnimationFrame,
   useMotionValue,
+  useReducedMotion,
   wrap,
 } from "framer-motion";
 
@@ -23,6 +24,7 @@ export function MouseParallaxImage({
   overlay,
   strength = 7,
   zoom = 1,
+  priority = false,
 }: {
   src: string;
   alt?: string;
@@ -31,8 +33,12 @@ export function MouseParallaxImage({
   overlay?: string;
   strength?: number;
   zoom?: number;
+  /** Imagen visible al abrir la página: se carga enseguida, sin esperar. */
+  priority?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  // «Reducir movimiento» en el iPhone o el Mac: la imagen se queda quieta.
+  const reduce = useReducedMotion();
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
   const sx = useSpring(mx, { stiffness: 55, damping: 18 });
@@ -41,6 +47,7 @@ export function MouseParallaxImage({
   const y = useTransform(sy, [0, 1], [`${strength * 0.5}%`, `-${strength * 0.5}%`]);
 
   useEffect(() => {
+    if (reduce) return;
     function onMove(e: MouseEvent) {
       const rect = ref.current?.getBoundingClientRect();
       if (!rect) return;
@@ -57,7 +64,7 @@ export function MouseParallaxImage({
     }
     window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
-  }, [mx, my]);
+  }, [mx, my, reduce]);
 
   // Oversize the image so the drift never reveals an edge (zoom can crop further).
   const scale = zoom + (strength * 2) / 100 + 0.04;
@@ -67,8 +74,10 @@ export function MouseParallaxImage({
       <motion.img
         src={src}
         alt={alt}
-        style={{ x, y, scale }}
-        className={`w-full h-full object-cover object-center will-change-transform ${imgClassName}`}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        style={reduce ? { scale: zoom } : { x, y, scale }}
+        className={`w-full h-full object-cover object-center ${imgClassName}`}
       />
       {overlay && <div className={`absolute inset-0 ${overlay}`} />}
     </div>
@@ -87,6 +96,7 @@ export function ParallaxImage({
   overlay,
   caption,
   zoom = 1,
+  priority = false,
 }: {
   src: string;
   alt?: string;
@@ -96,13 +106,17 @@ export function ParallaxImage({
   overlay?: string;
   caption?: React.ReactNode;
   zoom?: number;
+  /** Imagen visible al abrir la página: se carga enseguida, sin esperar. */
+  priority?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  // «Reducir movimiento»: sin desplazamiento al hacer scroll.
+  const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], [-strength, strength]);
+  const y = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [-strength, strength]);
 
   // When zoomed in (to crop baked-in text), the scale provides the headroom for
   // the drift; otherwise the image is oversized via height so an edge never shows.
@@ -113,11 +127,13 @@ export function ParallaxImage({
       <motion.img
         src={src}
         alt={alt}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
         style={zoomed ? { y, scale: zoom } : { y }}
         className={
           zoomed
-            ? `absolute inset-0 w-full h-full object-cover object-center will-change-transform ${imgClassName}`
-            : `absolute left-0 top-[-30%] w-full h-[160%] object-cover object-center will-change-transform ${imgClassName}`
+            ? `absolute inset-0 w-full h-full object-cover object-center ${imgClassName}`
+            : `absolute left-0 top-[-30%] w-full h-[160%] object-cover object-center ${imgClassName}`
         }
       />
       {overlay && <div className={`absolute inset-0 ${overlay}`} />}
@@ -144,8 +160,10 @@ export function Marquee({
   const velocityFactor = useTransform(smoothVelocity, [0, 1000], [0, 5], { clamp: false });
   const x = useTransform(baseX, (v) => `${wrap(-25, -50, v)}%`);
   const directionFactor = useRef(1);
+  const reduce = useReducedMotion();
 
   useAnimationFrame((_, delta) => {
+    if (reduce) return;
     let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
     if (velocityFactor.get() < 0) directionFactor.current = -1;
     else if (velocityFactor.get() > 0) directionFactor.current = 1;
@@ -190,10 +208,11 @@ export function RevealLine({
   // box-content + horizontal padding cancelled by negative margin: gives the
   // mask horizontal slack so wide lines (e.g. "UNE CAMPAGNE.") aren't clipped
   // on the sides, while overflow-hidden still masks the vertical slide reveal.
+  const reduce = useReducedMotion();
   return (
     <span className="box-content block overflow-hidden px-[0.75em] -mx-[0.75em]">
       <motion.span
-        initial={{ y: "110%" }}
+        initial={reduce ? false : { y: "110%" }}
         animate={{ y: "0%" }}
         transition={{ delay, duration: 1, ease: [0.16, 1, 0.3, 1] }}
         className={`block ${className}`}

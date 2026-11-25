@@ -56,6 +56,7 @@ export default function Nav() {
           {/* Language toggle */}
           <button
             onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
+            aria-label={lang === "fr" ? "Changer de langue" : lang === "en" ? "Change language" : "Cambiar idioma"}
             className="font-serif text-legende font-light tracking-widest text-white/75 hover:text-champagne transition-colors mr-3"
           >
             {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
@@ -69,14 +70,20 @@ export default function Nav() {
         </div>
 
         {/* Mobile toggle */}
-        <div className="flex md:hidden items-center gap-3">
+        <div className="flex md:hidden items-center -mr-3">
           <button
             onClick={() => setLang(lang === "fr" ? "en" : lang === "en" ? "es" : "fr")}
-            className="font-serif text-legende font-light tracking-widest text-white/75 hover:text-champagne transition-colors"
+            aria-label={lang === "fr" ? "Changer de langue" : lang === "en" ? "Change language" : "Cambiar idioma"}
+            className="font-serif text-legende font-light tracking-widest text-white/75 hover:text-champagne transition-colors p-3"
           >
             {lang === "fr" ? "EN" : lang === "en" ? "ES" : "FR"}
           </button>
-          <button onClick={() => setOpen(!open)} className="text-champagne p-1">
+          <button
+            onClick={() => setOpen(!open)}
+            aria-label="Menu"
+            aria-expanded={open}
+            className="text-champagne p-3"
+          >
             {open ? <X size={20} /> : <List size={20} />}
           </button>
         </div>

@@ -27,14 +27,14 @@ export default function ComerciosPage() {
         {/* HERO */}
         <section className="relative min-h-[92vh] flex items-end pt-36 pb-20 overflow-hidden">
           <div className="absolute inset-0">
-            <ParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={130} />
+            <ParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={130} priority />
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-black/50 to-black/20" />
           </div>
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 w-full">
-            <motion.p {...fade(0.1)} className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/60 mb-6">
+            <motion.p {...fade(0.1)} className="font-serif text-capitale tracking-capitale uppercase text-champagne/80 mb-6">
               {t.badge}
             </motion.p>
-            <motion.h1 {...fade(0.2)} className="font-serif text-cifra md:text-[6.5rem] font-light tracking-[0.28em] uppercase leading-[1] text-text-primary max-w-4xl">
+            <motion.h1 {...fade(0.2)} className="font-serif text-cifra md:text-[6.5rem] font-light tracking-capitale uppercase leading-[1] text-text-primary max-w-4xl">
               {t.heroTitle1}<br />
               <span className="text-champagne">{t.heroTitle2}</span>
             </motion.h1>
@@ -49,8 +49,8 @@ export default function ComerciosPage() {
           <div className="max-w-[1200px] mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start">
               <motion.div {...fade()}>
-                <p className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-8">{t.principleLabel}</p>
-                <h2 className="font-serif text-cifra md:text-cifra font-light tracking-[0.28em] uppercase leading-[1.1] text-text-primary">
+                <p className="font-serif text-capitale tracking-capitale uppercase text-champagne/80 mb-8">{t.principleLabel}</p>
+                <h2 className="font-serif text-cifra md:text-cifra font-light tracking-capitale uppercase leading-[1.1] text-text-primary">
                   {t.principleTitle}
                 </h2>
               </motion.div>
@@ -68,13 +68,13 @@ export default function ComerciosPage() {
         {/* WHAT YOU RECEIVE */}
         <section className="py-28 px-5 bg-charcoal-deep border-t border-border">
           <div className="max-w-[1200px] mx-auto">
-            <motion.p {...fade()} className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-16">
+            <motion.p {...fade()} className="font-serif text-capitale tracking-capitale uppercase text-champagne/80 mb-16">
               {t.whatLabel}
             </motion.p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
               {t.benefits.map((item, i) => (
                 <motion.div key={item.num} {...fade(i * 0.1)} className="bg-charcoal-deep p-10 md:p-12">
-                  <p className="font-serif text-capitale tracking-[0.3em] text-champagne/40 mb-8">{item.num}</p>
+                  <p className="font-serif text-capitale tracking-capitale text-champagne/70 mb-8">{item.num}</p>
                   <h3 className="font-serif text-grande font-light tracking-wider uppercase text-text-primary mb-5">{item.title}</h3>
                   <p className="font-serif text-corps font-light text-text-muted leading-relaxed">{item.body}</p>
                 </motion.div>
@@ -92,13 +92,13 @@ export default function ComerciosPage() {
         {/* WHY CURATO */}
         <section className="py-28 px-5 bg-charcoal-mid">
           <div className="max-w-[1200px] mx-auto">
-            <motion.p {...fade()} className="font-serif text-capitale tracking-[0.35em] uppercase text-champagne/50 mb-16">
+            <motion.p {...fade()} className="font-serif text-capitale tracking-capitale uppercase text-champagne/80 mb-16">
               {t.whyLabel}
             </motion.p>
             <div className="space-y-0 divide-y divide-border">
               {t.whyItems.map((step, i) => (
                 <motion.div key={step.n} {...fade(i * 0.08)} className="flex items-start gap-10 py-10">
-                  <span className="font-serif text-legende tracking-[0.2em] text-champagne/40 w-10 shrink-0 pt-1">{step.n}</span>
+                  <span className="font-serif text-legende tracking-[0.2em] text-champagne/70 w-10 shrink-0 pt-1">{step.n}</span>
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <h3 className="font-serif text-grande font-light tracking-wider uppercase text-text-primary">{step.title}</h3>
                     <p className="font-serif text-corps font-light text-text-muted leading-relaxed">{step.desc}</p>
@@ -113,7 +113,7 @@ export default function ComerciosPage() {
         <section className="relative py-36 overflow-hidden">
           <ParallaxImage src="/Background Image 5.jpeg" className="absolute inset-0" strength={130} overlay="bg-black/65" />
           <div className="relative z-10 max-w-[900px] mx-auto px-5 text-center">
-            <motion.p {...fade()} className="font-serif text-grande md:text-cifra font-light tracking-[0.28em] leading-[1.3] text-text-primary">
+            <motion.p {...fade()} className="font-serif text-grande md:text-cifra font-light tracking-capitale leading-[1.3] text-text-primary">
               {t.quote}
             </motion.p>
           </div>
@@ -123,7 +123,7 @@ export default function ComerciosPage() {
         <section className="relative py-36 overflow-hidden">
           <MouseParallaxImage src="/Background Image 8.jpeg" className="absolute inset-0" strength={10} overlay="bg-black/65" />
           <div className="relative z-10 max-w-[1200px] mx-auto px-5 text-center">
-            <motion.h2 {...fade()} className="font-serif text-cifra md:text-cifra font-light tracking-[0.35em] uppercase leading-[1.1] text-text-primary mb-6">
+            <motion.h2 {...fade()} className="font-serif text-cifra md:text-cifra font-light tracking-capitale uppercase leading-[1.1] text-text-primary mb-6">
               {t.ctaTitle}
             </motion.h2>
             <motion.p {...fade(0.15)} className="font-serif text-corps font-light text-text-secondary mb-12 max-w-md mx-auto">
